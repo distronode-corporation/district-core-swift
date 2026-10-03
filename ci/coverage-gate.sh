@@ -48,12 +48,13 @@ FLOOR_DistrictAuthCore=100
 FLOOR_DistrictNetwork=100
 FLOOR_DistrictData=100
 FLOOR_DistrictCall=100
+FLOOR_DistrictLive=100
 
 # Modules the gate requires to be present in the report. Adding a target to
 # Package.swift without adding it here means it is built, possibly tested, and
 # NOT gated, so the list is duplicated deliberately and the script fails if a
 # name here has no files in the report.
-MODULES="DistrictModel DistrictAuthCore DistrictNetwork DistrictData DistrictCall"
+MODULES="DistrictModel DistrictAuthCore DistrictNetwork DistrictData DistrictCall DistrictLive"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The package is the repository root, one level above this script.
@@ -105,6 +106,7 @@ FLOOR_DistrictAuthCore="$FLOOR_DistrictAuthCore" \
 FLOOR_DistrictNetwork="$FLOOR_DistrictNetwork" \
 FLOOR_DistrictData="$FLOOR_DistrictData" \
 FLOOR_DistrictCall="$FLOOR_DistrictCall" \
+FLOOR_DistrictLive="$FLOOR_DistrictLive" \
 python3 - "$CODECOV_JSON" <<'PYTHON'
 import json
 import os

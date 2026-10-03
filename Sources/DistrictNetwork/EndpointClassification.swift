@@ -78,7 +78,7 @@ public enum TypedEndpoints {
     /// "raw", which is what keeps the split honest.
     public static let all: Set<EndpointID> =
         core.union(desk).union(inbox).union(callHandling).union(numbers).union(softphone)
-            .union(schedulingAdmin).union(persona).union(blocking).union(setup)
+            .union(schedulingAdmin).union(persona).union(blocking).union(setup).union(live)
 
     private static let core: Set<EndpointID> = [
         .unreadCount,

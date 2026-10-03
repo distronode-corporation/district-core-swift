@@ -26,12 +26,14 @@ import Foundation
 /// asserts the key is absent, not merely empty, so a hand-written
 /// `encode(to:)` could not quietly change it.
 public struct AppleNativeSignInRequest: Encodable, Sendable, Equatable {
-    /// ⛔ `z.enum(["ios", "android"])`, AND NOT A PARAMETER. It is not the
-    /// caller's choice, this client is the iOS one, and a settable field is
-    /// how a device ends up listed as the wrong platform in the settings device
-    /// list. The sibling holds the same value as a static constant; here it is a
-    /// stored property because the body is synthesised from the type.
-    public let platform = "ios"
+    /// ⛔ `z.enum(["ios", "android", "macos"])`, SET FROM A ``ClientPlatform`` AND
+    /// NEVER FROM A FREE STRING. It is the app's choice rather than a screen's,
+    /// so the initialiser defaults it to ``ClientPlatform/ios`` and the iOS body is
+    /// byte-identical to what it was; the macOS app passes ``ClientPlatform/macos``
+    /// once. A settable string is how a device ends up listed as the wrong
+    /// platform in the settings device list. Stored as the wire `String` because
+    /// the body is synthesised from the type.
+    public let platform: String
 
     /// The `identityToken` from `ASAuthorizationAppleIDCredential`, as a UTF-8
     /// string. ⚠️ Apple hands it over as `Data`; the server's schema is
@@ -51,7 +53,14 @@ public struct AppleNativeSignInRequest: Encodable, Sendable, Equatable {
     /// Display only, shown in the settings device list. Never trusted.
     public let deviceName: String?
 
-    public init(identityToken: String, nonce: String, deviceId: String, deviceName: String?) {
+    public init(
+        identityToken: String,
+        nonce: String,
+        deviceId: String,
+        deviceName: String?,
+        platform: ClientPlatform = .ios
+    ) {
+        self.platform = platform.wire
         self.identityToken = identityToken
         self.nonce = nonce
         self.deviceId = deviceId

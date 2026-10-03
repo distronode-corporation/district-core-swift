@@ -9,7 +9,7 @@ unchanged.
   apps decode. `ContractFixtureTests` reads it (see [mobile/README.md](mobile/README.md)).
 - `desktop/` mirrors the service's `contracts/desktop` set, the shapes only the desktop
   clients use (telemetry events, the telemetry token, call hang-up, desktop device
-  registration and the scheduling hand-off). No test in this package reads it yet.
+  registration and the scheduling hand-off). `DesktopContractFixtureTests` reads it.
 
 Both are updated by pull request when the service changes them, file for file, with no
 edits. Edits by hand are not accepted: if a fixture looks wrong, or a model and the

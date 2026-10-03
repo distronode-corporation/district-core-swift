@@ -76,10 +76,10 @@ public extension DistrictEndpoints {
     /// else's row at their own token and start receiving that person's
     /// notifications.
     ///
-    /// ⛔ `platform` IS SENT EXPLICITLY AS `"ios"`. The route's schema defaults it
-    /// to `"android"`, so omitting it works and silently mislabels every row this
-    /// client writes, and the server's push sender selects the APNs payload from
-    /// exactly that column.
+    /// ⛔ `platform` IS SENT EXPLICITLY, `"ios"` UNLESS THE APP SAYS `"macos"`. The
+    /// route's schema defaults it to `"android"`, so omitting it works and
+    /// silently mislabels every row this client writes, and the server's push
+    /// sender selects the APNs payload from exactly that column.
     ///
     /// ⚠️ AN IDEMPOTENT UPSERT KEYED ON THE INSTALLATION: re-sending the same
     /// token is free and a NEW one replaces the old. ⚠️ A device re-registered by
@@ -102,15 +102,22 @@ public extension DistrictEndpoints {
     /// pin on the encoded bytes.
     ///
     /// - Parameter kind: which token this is. ⚠️ Defaulted so the alert
-    ///   register's bytes are unchanged; see ``PushTokenKind``.
-    static func registerPushToken(token: String, kind: PushTokenKind = .alert) -> ApiRequestDescriptor {
+    ///   register's bytes are unchanged; see ``PushTokenKind``, which also lists
+    ///   the two pairings the server refuses.
+    /// - Parameter platform: which app is registering. ⚠️ Defaulted to
+    ///   ``ClientPlatform/ios`` so the iOS bytes are unchanged.
+    static func registerPushToken(
+        token: String,
+        kind: PushTokenKind = .alert,
+        platform: ClientPlatform = .ios
+    ) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .registerPushToken,
             .post,
             DistrictPaths.devicesRegister,
             body: .json(.object([
                 ("token", .string(token)),
-                ("platform", .string(PushPlatform.ios)),
+                ("platform", .string(platform.wire)),
                 // ⚠️ DROPPED RATHER THAN SENT AS NULL FOR THE ALERT TOKEN.
                 // ``JSONValue/object(_:)`` discards a nil pair, and an absent key
                 // is what lets the route's own default fire; an explicit null is

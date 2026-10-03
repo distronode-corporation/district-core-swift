@@ -164,12 +164,12 @@ jobs:
       # ⛔ PROVE THE TESTS ACTUALLY RAN, AND NOT FEWER OF THEM THAN LAST TIME. An XCTest
       # bundle that discovers nothing exits 0, the same shape as a skipped suite reporting
       # green, and a test target dropped from Package.swift loses hundreds of tests with
-      # no other failure. The floor is a ratchet, set a little below the count (1717 on
-      # 2026-10-02): raise it when tests are added, and lower it only in the commit that
+      # no other failure. The floor is a ratchet, set a little below the count (1828 on
+      # 2026-10-03): raise it when tests are added, and lower it only in the commit that
       # deletes tests on purpose, saying so.
       - name: Tests were discovered
         run: |
-          minimum=1700
+          minimum=1810
           executed=$(sed -n 's/.*Executed \([0-9]*\) test.*/\1/p' swift-test.log | sort -n | tail -1)
           echo "unit tests executed - ${executed:-0} (at least $minimum expected)"
           if [ -z "$executed" ] || [ "$executed" -lt "$minimum" ]; then

@@ -72,7 +72,7 @@ extension EndpointSurfaceTests {
         // `SchedulingAdminRepository.perform` is generic and decodes whatever type the
         // CALLER names, so what is fixed is the ENVELOPE rather than the payload. See
         // `TypedEndpoints.schedulingAdmin`.
-        XCTAssertEqual(typed.count, 114)
+        XCTAssertEqual(typed.count, 115)
         // ⛔ A REDIRECT ENDPOINT ANSWERS A 302 TO A PRESIGNED OBJECT, and following it
         // would download the object (for `scheduling/admin/download/{id}`, a
         // multi-hundred-megabyte video) to learn its address.

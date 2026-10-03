@@ -1,0 +1,17 @@
+# No blank issues: everything goes through the structured bug report form, or one of
+# the links below. The tracker is for bugs in this package's source; app problems go to
+# the app's repository, and account and service questions go to District AI support.
+blank_issues_enabled: false
+contact_links:
+  - name: README
+    url: https://github.com/distronode-corporation/district-core-swift#readme
+    about: What the package is, its modules, building and testing.
+  - name: A problem in the iOS app
+    url: https://github.com/distronode-corporation/district-ios/issues
+    about: Screens, calls, notifications and anything else in District AI for iOS itself.
+  - name: Security report
+    url: https://github.com/distronode-corporation/district-core-swift/security/advisories/new
+    about: Please do not open a public issue for a vulnerability. Report it privately here (see SECURITY.md).
+  - name: District AI support
+    url: https://www.distronode.com/support
+    about: Questions about an account, a phone number or billing.

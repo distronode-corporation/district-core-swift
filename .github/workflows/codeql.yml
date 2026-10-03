@@ -1,0 +1,115 @@
+name: CodeQL
+
+# Code scanning in ADVANCED setup, with two jobs: `actions` reads the workflow files and
+# needs no build; `swift` is traced through a `swift build` of every target on macOS.
+#
+# ⛔ BOTH JOBS ARE SKIPPED WHILE THE REPOSITORY IS PRIVATE. Code scanning is not available
+# to a private repository on the free plan, so the upload would fail. `schedule` carries
+# `repository` in its payload too, so the weekly run is guarded the same way.
+on:
+  push:
+    branches: [main]
+    # The Swift sources, what builds them, and the workflows the `actions` job reads. A
+    # push that touches none of them has nothing new for either job to analyse.
+    paths:
+      - "Sources/**"
+      - "Tests/**"
+      - "Package.swift"
+      - "Package.resolved"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, so new queries in a CodeQL release reach code that has not changed.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+# Nothing at the top level; each job below asks for exactly what it uses.
+permissions: {}
+
+jobs:
+  actions:
+    name: Analyze (actions)
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    # Only pull requests cancel in flight. A superseded PR analysis is wasted time; a
+    # superseded main analysis is the record for that commit.
+    concurrency:
+      group: codeql-actions-${{ github.ref }}-${{ github.event_name }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      security-events: write # upload the results
+      contents: read # check out the code
+      actions: read # read this run's workflow details
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: actions
+          build-mode: none
+          queries: security-extended
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: "/language:actions"
+
+  swift:
+    name: Analyze (swift)
+    # Not on pull requests: the free plan runs at most five macOS jobs at once for the
+    # whole organisation, and the apps' CI and release lanes queue behind them. It runs on
+    # pushes to main that change Swift, weekly, and on demand.
+    if: ${{ !github.event.repository.private && github.event_name != 'pull_request' }}
+    runs-on: macos-26
+    timeout-minutes: 120
+    # One scan running and at most one waiting per ref; the running one is never cancelled.
+    concurrency:
+      group: codeql-swift-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      security-events: write # upload the results
+      contents: read # check out the code
+      actions: read # read this run's workflow details
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The same Xcode as ci.yml's `darwin` job, asserted.
+      - name: Select Xcode
+        env:
+          XCODE_APP: /Applications/Xcode_26.3.app
+          XCODE_VERSION: "26.3"
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          have_all="$(xcodebuild -version)"
+          have="${have_all%%$'\n'*}"
+          echo "$have"
+          if [ "$have" != "Xcode $XCODE_VERSION" ]; then
+            echo "::error::expected Xcode $XCODE_VERSION at $XCODE_APP, got '$have'"
+            exit 1
+          fi
+
+      # Every step after this one is traced, so the setup above stays out of it.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: swift
+          build-mode: manual
+          queries: security-extended
+
+      # The library targets only (no test bundles), as GitHub's Swift autobuilder does.
+      # `-j 1` for the reason district-ios's codeql.yml documents: the tracer runs the
+      # extractor beside every frontend, and in parallel the pairs outgrow the runner.
+      - name: swift build
+        run: swift build -j 1
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: "/language:swift"

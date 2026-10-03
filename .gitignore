@@ -1,0 +1,15 @@
+# SwiftPM build output and per-user Xcode package state.
+.build/
+.swiftpm/
+
+# Xcode build output, if the package is built with xcodebuild -derivedDataPath.
+DerivedData/
+**/xcuserdata/
+
+# Written by the verify job (`swift test ... | tee swift-test.log`).
+*.log
+
+# Python bytecode from scripts/.
+__pycache__/
+
+.DS_Store

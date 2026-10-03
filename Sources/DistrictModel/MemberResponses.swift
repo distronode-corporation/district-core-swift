@@ -6,17 +6,17 @@ import Foundation
 /// `getWorkspaceRole` answers from these rows, so a client or viewer able to
 /// write here could grant themselves any role and walk through every
 /// `requireWorkspaceRole` in the API. The READ admits all three roles and
-/// **every mutation is agency-only** — narrower than ``WorkspaceRole/canMutate``
+/// **every mutation is agency-only**, narrower than ``WorkspaceRole/canMutate``
 /// mirrors, so gate the controls on `.agency` specifically.
 ///
 /// ⛔ THE SAME TYPE DECODES THE LIST AND THE TWO WRITES THAT ECHO A ROW. `GET`
 /// returns an array of these, `POST` and `PATCH` each return one under `member`,
-/// and all three use the route's single `MEMBER_SELECT` — so the shapes are
+/// and all three use the route's single `MEMBER_SELECT`, so the shapes are
 /// genuinely identical rather than coincidentally similar.
 ///
 /// ⚠️ NO IDS ON THE WIRE. `(workspaceId, email)` is the natural key every
 /// membership path uses, and the route deliberately does not publish the row's
-/// uuid — so ``email`` IS the identity, and it is what the PATCH body and the
+/// uuid, so ``email`` IS the identity, and it is what the PATCH body and the
 /// DELETE query carry.
 ///
 /// ⚠️ ``createdAt`` IS AN ISO-8601 STRING. This module owns no date parsing, for
@@ -36,7 +36,7 @@ public struct WorkspaceMember: Codable, Sendable {
     }
 }
 
-/// `GET /api/district/workspace/members?workspaceId=` — the roster, oldest
+/// `GET /api/district/workspace/members?workspaceId=`, the roster, oldest
 /// first.
 ///
 /// ⚠️ ORDERED `createdAt asc`, WHICH IS THE OPPOSITE OF EVERY OTHER LIST ON THIS
@@ -56,7 +56,7 @@ public struct MemberListResponse: Codable, Sendable {
 /// ⛔ ONE TYPE FOR THREE ROUTES WITH TWO DIFFERENT KEY SETS, AND THAT IS WHY
 /// ``member`` IS OPTIONAL. `POST` and `PATCH` answer `{success:true, member:{…}}`;
 /// `DELETE` answers a bare `{success:true}` with no `member` key at all. A type
-/// that required the row would throw on the response to a successful REMOVAL —
+/// that required the row would throw on the response to a successful REMOVAL,
 /// the one place a client must not fail, because the row really is gone and a
 /// decode failure would present it as still there.
 ///
@@ -69,7 +69,7 @@ public struct MemberMutationResponse: Codable, Sendable {
     public let member: WorkspaceMember?
 }
 
-/// `PATCH /api/district/workspace/rename` — `{success, name}`.
+/// `PATCH /api/district/workspace/rename`, `{success, name}`.
 ///
 /// ⛔ NAME ONLY, AND THE SLUG IS DELIBERATELY ABSENT: `slug` is unique in two
 /// physically separate databases (the hub's `WorkspaceDirectory` and the
@@ -79,7 +79,7 @@ public struct MemberMutationResponse: Codable, Sendable {
 ///
 /// ⛔ AND ``name`` IS THE **TRIMMED** VALUE THE SERVER STORED, not the string
 /// that was sent. The route trims before it measures (`" "` is an empty name,
-/// not a one-character one) and echoes what it wrote — so this is the value a
+/// not a one-character one) and echoes what it wrote, so this is the value a
 /// later read will see, and adopting it is what makes a second read unnecessary.
 /// Adopting the REQUESTED string instead would display a name nobody stored.
 public struct RenameResponse: Codable, Sendable {

@@ -6,8 +6,8 @@ import XCTest
 /// Per-fixture assertions for the two meetings bodies.
 ///
 /// ⛔ THE ENVELOPE ASSERTION IS THE POINT OF THIS FILE. Both routes answer
-/// WITHOUT a `success` flag and they do not even share a top-level shape — the
-/// list is a bare ARRAY, the detail a bare OBJECT — so the mistake this file
+/// WITHOUT a `success` flag and they do not even share a top-level shape, the
+/// list is a bare ARRAY, the detail a bare OBJECT, so the mistake this file
 /// exists to prevent is a one-line copy of an envelope check from any
 /// neighbouring surface, which would reject every healthy response as contract
 /// drift. It is asserted here rather than described in a comment, because a
@@ -18,14 +18,14 @@ final class MeetingsContractTests: XCTestCase {
     /// ⛔ A TOP-LEVEL ARRAY, NOT AN ENVELOPE, ASSERTED ON THE RAW BYTES. The gate
     /// already proves `[MeetingSummary]` decodes the fixture, but that would also
     /// pass the day someone wrapped the rows in an object and changed the DTO to
-    /// match — so this reads the committed document itself and requires the top
+    /// match, so this reads the committed document itself and requires the top
     /// level to be an array with no `success` anywhere on it. That is what a
     /// later envelope "for consistency" would have to get past.
     func testTheMeetingsListIsATopLevelArrayWithNoEnvelopeToCheck() throws {
         let data = try ContractFixtures.read("district-meetings.json")
         let raw = try JSONSerialization.jsonObject(with: data)
 
-        let rows = try XCTUnwrap(raw as? [Any], "⛔ `NextResponse.json(results)` — a bare array")
+        let rows = try XCTUnwrap(raw as? [Any], "⛔ `NextResponse.json(results)`: a bare array")
         XCTAssertEqual(rows.count, 2)
         XCTAssertNil(raw as? [String: Any], "an object here would mean an envelope arrived")
         for row in rows {
@@ -38,7 +38,7 @@ final class MeetingsContractTests: XCTestCase {
     /// arrives as `summaryPreview` truncated to 220 characters and `participants`
     /// as the integer `participantCount`; neither original name is on the wire
     /// here, so a client modelling this from the detail's shape fails to decode
-    /// every row. ⚠️ The preview really is a preview — asserted at exactly 220 —
+    /// every row. ⚠️ The preview really is a preview, asserted at exactly 220,
     /// which is what stops a screen presenting it as the minutes.
     func testTheListRowIsATruncatedProjectionRatherThanTheMeetingRow() throws {
         let rows = try StrictDecodeVerifier.verify(
@@ -57,7 +57,7 @@ final class MeetingsContractTests: XCTestCase {
     /// ⛔ THE IN-PROGRESS ROW IS THE ORDINARY CASE, NOT AN EDGE ONE, and it is
     /// the row most likely to be at the TOP of a live user's list. The Companion
     /// writes the minutes when the room closes, so a meeting still running has no
-    /// title, no end, no preview and a zero duration — which is stamped at the
+    /// title, no end, no preview and a zero duration, which is stamped at the
     /// end rather than accumulated, so 0 does not mean "just started".
     ///
     /// ⚠️ `participantCount: 0` IS PRESENT RATHER THAN OMITTED: the route writes
@@ -104,8 +104,8 @@ final class MeetingsContractTests: XCTestCase {
     }
 
     /// ⛔ NO RECORDING KEY, AND A ROOMS SCREEN MUST NOT PROMISE PLAYBACK. The
-    /// `Meeting` model has no recording column at all — its artefacts are the
-    /// summary and the transcript, both written by the Companion — and neither
+    /// `Meeting` model has no recording column at all, its artefacts are the
+    /// summary and the transcript, both written by the Companion, and neither
     /// meetings route has a recording sibling. The one recording surface on this
     /// API is `calls/{id}/recording`, a telephone call answering a 302 on
     /// `RedirectEndpoints`. Asserted on the raw bytes so the absence is a

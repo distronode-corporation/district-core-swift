@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/workspace/persona/options?workspaceId=` — the vocabularies
+/// `GET /api/district/workspace/persona/options?workspaceId=`, the vocabularies
 /// a persona form is ALLOWED to offer.
 ///
 /// ⛔ WHY THIS ROUTE EXISTS, BECAUSE IT EXPLAINS EVERY DECISION BELOW AND EVERY
@@ -8,7 +8,7 @@ import Foundation
 /// an unrecognised `modelId` is silently rewritten to `deepgram-pipeline`, and an
 /// unrecognised `voice` is stored verbatim and then replaced by the agent's own
 /// fallback at synthesis time. Both answer **200**. So a native client offering
-/// free text — or a hardcoded Swift list that has drifted — does not fail; it
+/// free text, or a hardcoded Swift list that has drifted, does not fail; it
 /// produces a persona nobody chose, in a voice nobody picked, with nothing
 /// anywhere reporting it. The web form never has that problem because it derives
 /// its pickers from the same modules this route reads.
@@ -20,7 +20,7 @@ import Foundation
 ///
 /// ⛔ IT IS KEYED ON THE WORKSPACE'S REGION, NOT THE SERVING ORIGIN'S. Each
 /// engine's label states where its audio is actually processed, which is a public
-/// claim about residency — so one workspace's answer may never be cached and shown
+/// claim about residency, so one workspace's answer may never be cached and shown
 /// for another, and ``region`` is carried here rather than derived so a screen can
 /// say which region it is describing.
 ///
@@ -51,14 +51,14 @@ public struct PersonaOptionsResponse: Codable, Sendable, Equatable {
 public struct PersonaEngineOption: Codable, Sendable, Equatable {
     /// The `modelId` this engine is saved as.
     public let id: String
-    /// ⚠️ IT CARRIES THE RESIDENCY CLAIM ("… — US (processed in your region)"), so
+    /// ⚠️ IT CARRIES THE RESIDENCY CLAIM ("…, US (processed in your region)"), so
     /// it is shown verbatim rather than reduced to a product name. Shortening it is
     /// how a form stops saying where the audio goes.
     public let label: String
     /// ⛔ `false` MEANS SELECTABLE-LOOKING AND NOT SELECTABLE. The route publishes
     /// every engine so the label can say what each one would mean; offering an
     /// out-of-region engine in a picker would make a data-residency decision on a
-    /// settings screen, silently, with a 200. Render it disabled WITH its label —
+    /// settings screen, silently, with a 200. Render it disabled WITH its label,
     /// hiding it would leave the operator unable to see why their region has fewer
     /// choices than a colleague's.
     public let inRegion: Bool
@@ -87,7 +87,7 @@ public struct PersonaLabelledValue: Codable, Sendable, Equatable, Identifiable {
 ///
 /// ⛔ TWO LISTS AND THE SHORTER ONE IS NOT A SUBSET. Deepgram publishes `nl-NL` and
 /// `it-IT` and does NOT publish `hi-IN`; the general list is the other way round.
-/// A form that showed one list for every engine would offer Hindi on Deepgram — a
+/// A form that showed one list for every engine would offer Hindi on Deepgram, a
 /// language whose voice catalogue is empty, so the picker below it would be blank
 /// and the save would store a language the engine cannot speak.
 public struct PersonaLanguageCatalog: Codable, Sendable, Equatable {
@@ -107,7 +107,7 @@ public struct PersonaLanguageCatalog: Codable, Sendable, Equatable {
 ///
 /// ⚠️ A PAIR WITH NO ENTRY IS A REAL ANSWER AND MEANS "no voices for that
 /// combination", not "the read failed". It happens whenever a stored persona names
-/// a language its engine does not publish — which existing rows genuinely do, since
+/// a language its engine does not publish, which existing rows genuinely do, since
 /// the save route never refused one.
 public struct PersonaVoiceCatalog: Codable, Sendable, Equatable {
     public let engine: String

@@ -1,6 +1,6 @@
 import Foundation
 
-// ⛔ BILLING IS READ ONLY IN THIS CLIENT AND THAT IS NOT REVISITABLE — App Store
+// ⛔ BILLING IS READ ONLY IN THIS CLIENT AND THAT IS NOT REVISITABLE, App Store
 // Review Guideline 3.1.3(b). `POST /api/billing` exists and cancels
 // subscriptions, changes plans, detaches cards and applies promo codes; none of
 // it is modelled here, and no request DTO may appear in this file. ⛔ NOR MAY A
@@ -19,7 +19,7 @@ import Foundation
 // contract drift, and one that skipped the check on the first would let a `{}`
 // body decode into a confident empty plan.
 
-/// `GET /api/district/workspace/billing?workspaceId=` — the plan, from our own
+/// `GET /api/district/workspace/billing?workspaceId=`, the plan, from our own
 /// database.
 ///
 /// ⚠️ ``billing`` IS OPTIONAL ONLY SO A MALFORMED `{}` BODY DOES NOT DECODE INTO
@@ -27,7 +27,7 @@ import Foundation
 /// contract drift rather than "no plan": absence of a plan is representable on
 /// the wire (`subscriptionStatus: "none"` beside a null tier), which is what
 /// makes a missing object mean something else. ``BillingRepository`` turns nil
-/// into a decode failure for exactly that reason — the same call
+/// into a decode failure for exactly that reason, the same call
 /// ``CallsRepository`` makes about a 2xx with no `call`, and the opposite one
 /// ``UsageResponse`` makes, where the null genuinely IS the payload.
 public struct WorkspaceBillingResponse: Codable, Sendable {
@@ -49,7 +49,7 @@ public struct WorkspaceBillingResponse: Codable, Sendable {
 /// than on either field alone.
 ///
 /// ⛔ ``subscriptionTier`` IS NULLABLE AND NULL IS NOT "Free". The column is
-/// nullable and this route passes it through untouched — `GET /api/settings`
+/// nullable and this route passes it through untouched, `GET /api/settings`
 /// substitutes a capitalised "Free" and this one deliberately does not.
 /// Inventing the word here would put a plan name on screen that no row contains.
 ///
@@ -78,7 +78,7 @@ public struct WorkspaceBilling: Codable, Sendable {
     public let overageCapExceeded: Bool
     /// ⛔ nil MEANS "NOTHING METERED THIS MONTH YET" AND IT IS NOT ZERO. A screen
     /// that rendered it as a column of zeros would state, in the register of a
-    /// bill, that a workspace sent nothing and called nobody — beside a cap that
+    /// bill, that a workspace sent nothing and called nobody, beside a cap that
     /// may be saying calls are being refused. The two statements contradict each
     /// other and only one of them was measured.
     ///
@@ -112,7 +112,7 @@ public struct WorkspaceBilling: Codable, Sendable {
 /// nulls, and they mean opposite things. "We could not ask Stripe" must never
 /// render as a free or unstarted account, and "this account has no Stripe
 /// customer" must never render as a fault. A client that branched on "are the
-/// arrays empty" would call a Stripe outage a free account — the same "we could
+/// arrays empty" would call a Stripe outage a free account, the same "we could
 /// not look" / "there is nothing" conflation that routes a paying customer to a
 /// checkout page, except about their PLAN.
 public enum BillingAvailability: Sendable, Equatable {
@@ -126,7 +126,7 @@ public enum BillingAvailability: Sendable, Equatable {
     case unavailable
 }
 
-/// `GET /api/billing` — subscriptions and invoices, from Stripe.
+/// `GET /api/billing`, subscriptions and invoices, from Stripe.
 ///
 /// ⛔ NO `success` KEY, ABSENT RATHER THAN FALSE, AND ``BillingRepository`` MUST
 /// NOT RUN THIS THROUGH ``ResponseEnvelope``. Every other district route answers
@@ -137,7 +137,7 @@ public enum BillingAvailability: Sendable, Equatable {
 /// fixtures instead.
 ///
 /// ⛔ EVERY FIELD BUT THE TWO ARRAYS IS OPTIONAL, AND THE DEGRADED SHAPES ARE
-/// WHY. Nine of the fourteen healthy keys are ABSENT — not null, absent — from
+/// WHY. Nine of the fourteen healthy keys are ABSENT, not null, absent, from
 /// the two six-key bodies, so a required field on any of them would fail to
 /// decode precisely when billing was already broken, turning a legible
 /// "temporarily unavailable" into an illegible "the app does not understand this
@@ -178,7 +178,7 @@ public struct StripeBilling: Codable, Sendable {
     /// `billingUnavailable` beside it is an account that has never had a Stripe
     /// customer, and no Stripe call was made to find that out.
     public let customerId: String?
-    /// The workspace whose subscription this is — the server's ACTIVE workspace,
+    /// The workspace whose subscription this is, the server's ACTIVE workspace,
     /// index 0 of its own listing.
     ///
     /// ⚠️ IT CAN DISAGREE WITH THE WORKSPACE A SCREEN NAMES, and the server logs
@@ -247,17 +247,17 @@ public struct StripeBilling: Codable, Sendable {
 /// about to be billed again.
 ///
 /// ⛔ ``includedMinutes``, ``overageRate`` AND ``discount`` ARE ABSENT KEYS, NOT
-/// NULLS, when they do not apply — `JSON.stringify` drops an undefined value.
+/// NULLS, when they do not apply, `JSON.stringify` drops an undefined value.
 /// The server derives the first two by matching the price against its tier
 /// catalogue, so a legacy or custom price yields neither and a usage meter has
 /// nothing to measure against. Render the meter only when the allowance is
 /// known.
 ///
-/// ⚠️ ``currentPeriodEnd`` IS UNIX **SECONDS**, not milliseconds — multiply by
+/// ⚠️ ``currentPeriodEnd`` IS UNIX **SECONDS**, not milliseconds, multiply by
 /// 1000 before it is a date. Treating it as millis dates every renewal to 1970.
 public struct BillingSubscription: Codable, Sendable {
     /// Stripe's `sub_…`. The row's identity, so it is required rather than
-    /// tolerated — a subscription with nothing to name it cannot be acted on.
+    /// tolerated, a subscription with nothing to name it cannot be acted on.
     public let id: String
     /// Stripe's own status word. The plan status a screen headlines is
     /// ``WorkspaceBilling/subscriptionStatus``.
@@ -269,7 +269,7 @@ public struct BillingSubscription: Codable, Sendable {
     /// The catalogue name, or the literal "Subscription" when nothing matched.
     public let tierName: String
     /// ⛔ CENTS. ⚠️ Optional because the route writes `price?.unit_amount`, and
-    /// both halves of that can be absent — an expanded price that did not
+    /// both halves of that can be absent, an expanded price that did not
     /// resolve, and a Stripe price with no `unit_amount` (tiered or metered).
     public let amount: Int?
     /// ⛔ Absent, not null, when the price matched no tier. See the type doc.
@@ -313,12 +313,12 @@ public struct BillingDiscount: Codable, Sendable {
 ///
 /// ⛔ ``amountPaid``, ``total`` AND ``tax`` ARE ALL IN **CENTS**. ``tax`` is
 /// summed server-side out of Stripe's `total_taxes`, so a zero here is a
-/// MEASURED zero rather than an absence — the key is always present, which is
+/// MEASURED zero rather than an absence, the key is always present, which is
 /// exactly what makes it safe to show.
 ///
 /// ⛔ ``hostedInvoiceUrl`` AND ``invoicePdf`` ARE NULL UNTIL AN INVOICE IS
-/// FINALISED, which makes the most ordinary row there is — this month's, before
-/// it is paid — the one that would throw on a client that typed them non-null. A
+/// FINALISED, which makes the most ordinary row there is, this month's, before
+/// it is paid, the one that would throw on a client that typed them non-null. A
 /// row with no URL must render without an open action rather than with a dead
 /// one. ⛔ AND NEITHER MAY BE OPENED AS A PURCHASE PATH: see the ⛔ at the top of
 /// this file; they are modelled to satisfy the gate, not to be surfaced.

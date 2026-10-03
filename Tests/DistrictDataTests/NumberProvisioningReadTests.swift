@@ -22,7 +22,7 @@ final class NumberProvisioningReadTests: XCTestCase {
     // MARK: - Which carriers are connected
 
     /// ⛔ THE DISCONNECTED BRANCH IS AN ORDINARY ANSWER AND MUST DECODE. It sends
-    /// `{connected:false, provider:null}` — SINGULAR `provider`, always null, and no
+    /// `{connected:false, provider:null}`, SINGULAR `provider`, always null, and no
     /// `providers` map at all. A decoder modelling only the plural would read every fresh
     /// workspace as contract drift.
     func testADisconnectedWorkspaceDecodesTheSingularNullProviderBranch() async throws {
@@ -66,7 +66,7 @@ final class NumberProvisioningReadTests: XCTestCase {
 
     /// ⛔ A MANAGED ENTRY REPORTS CONNECTIVITY AND NOTHING ELSE, AND THAT IS A PRIVACY
     /// PROPERTY RATHER THAN A GAP. `getAccountInfo` describes the AUTHENTICATING account,
-    /// which for a managed provider is the platform's own — so a name, a balance or a
+    /// which for a managed provider is the platform's own, so a name, a balance or a
     /// number count here would be Distronode's figures plus every other managed tenant's.
     /// This route had no managed short-circuit at all once, which is what made the
     /// platform's balance readable by any member of any workspace flagged managed.
@@ -83,7 +83,7 @@ final class NumberProvisioningReadTests: XCTestCase {
         XCTAssertNil(entry.status)
     }
 
-    /// ⛔ NO ENVELOPE TO AFFIRM ON THIS ROUTE — it sends no `success` flag at all — so the
+    /// ⛔ NO ENVELOPE TO AFFIRM ON THIS ROUTE, it sends no `success` flag at all, so the
     /// guard against a thin body is the required `connected`. A `{}` must be a decode
     /// failure rather than a confident "no carrier connected".
     func testAnEmptyProviderStatusBodyIsADecodeFailureRatherThanADisconnectedAnswer() async throws {

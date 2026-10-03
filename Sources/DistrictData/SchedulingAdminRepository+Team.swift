@@ -22,7 +22,7 @@ import Foundation
 /// refused and the archive is what closes the member out. See the note at the top
 /// of `SchedulingAdminTeam.swift`.
 public extension SchedulingAdminRepository {
-    /// `users.list` — every scheduler user in the tenancy.
+    /// `users.list`, every scheduler user in the tenancy.
     ///
     /// ⚠️ A BARE ARRAY ON THE WIRE, not `{items}`. The `data` of the envelope IS
     /// the array, which is why the response type here is `[SchedulingUser]` and
@@ -43,13 +43,13 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `users.archive` — soft-delete a scheduler user.
+    /// `users.archive`, soft-delete a scheduler user.
     ///
     /// ⛔ SOFT, AND THAT IS WHAT MAKES IT SAFE TO OFFER. The row and its links
     /// survive, the member cannot sign in, they are skipped in routing and their
     /// event types are deactivated. ⚠️ Its other refusals are all 4xx with a reason
     /// an operator can act on (403 admin-only, 400 own account / already archived /
-    /// is the workspace owner, 404 gone) — but the fork's own text never travels,
+    /// is the workspace owner, 404 gone), but the fork's own text never travels,
     /// so the sentence for each is ours to write from the code and the status.
     func archiveSchedulerUser(workspaceId: String, userId: String) async throws -> SchedulingUserArchived {
         try await perform(
@@ -60,7 +60,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `users.upcomingBookings` — what is standing between this user and an
+    /// `users.upcomingBookings`, what is standing between this user and an
     /// archive.
     func upcomingBookings(workspaceId: String, userId: String) async throws -> [SchedulingUpcomingBooking] {
         try await perform(
@@ -71,7 +71,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `teams.list` — every team, each with its members inlined.
+    /// `teams.list`, every team, each with its members inlined.
     ///
     /// ⚠️ A TEAM WITH NO MEMBERS CARRIES `members: null`, not `[]`. See
     /// ``SchedulingTeam/members``.
@@ -84,7 +84,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `teams.get` — one team.
+    /// `teams.get`, one team.
     func team(workspaceId: String, teamId: String) async throws -> SchedulingTeam {
         try await perform(
             .teamsGet,
@@ -94,7 +94,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.create` — a new team.
+    /// `teams.create`, a new team.
     ///
     /// ⚠️ `slug` IS OPTIONAL AND THE FORK DERIVES ONE FROM THE NAME WHEN IT IS
     /// ABSENT, so sending a guessed slug is a way to disagree with the server
@@ -115,7 +115,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.patch` — rename a team, or re-slug it.
+    /// `teams.patch`, rename a team, or re-slug it.
     ///
     /// ⛔ CHANGING THE SLUG CHANGES PUBLIC BOOKING URLS. The fork routes team
     /// booking pages by slug, so a rename that also re-slugs breaks every link
@@ -139,10 +139,10 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.delete` — remove a team.
+    /// `teams.delete`, remove a team.
     ///
     /// ⚠️ A 200 `{ok:true}`, NOT A 204, unlike almost every other delete in this
-    /// catalog — which is why it decodes as ``SchedulingNoContent`` rather than
+    /// catalog, which is why it decodes as ``SchedulingNoContent`` rather than
     /// through the `NO_CONTENT` rewrite. The two shapes are identical on the wire
     /// and arrive by different routes.
     func deleteTeam(workspaceId: String, teamId: String) async throws -> SchedulingNoContent {
@@ -154,7 +154,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.members.add` — put a scheduler user into a team.
+    /// `teams.members.add`, put a scheduler user into a team.
     ///
     /// ⚠️ THE ANSWER IS THE WHOLE TEAM, so the caller should replace its row from
     /// the response. ⛔ Its `members` may still be null if the fork answers before
@@ -181,7 +181,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.members.patch` — change a member's place in the rotation.
+    /// `teams.members.patch`, change a member's place in the rotation.
     ///
     /// ⚠️ `routingPriority` IS REQUIRED HERE and optional on the add, which is the
     /// schema's own asymmetry: there is nothing else to patch.
@@ -206,7 +206,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `teams.members.remove` — take a scheduler user out of a team.
+    /// `teams.members.remove`, take a scheduler user out of a team.
     ///
     /// ⚠️ A BARE `{ok}` RATHER THAN THE TEAM, unlike the add and the priority
     /// patch, so a caller holding a roster has to re-read rather than replace.

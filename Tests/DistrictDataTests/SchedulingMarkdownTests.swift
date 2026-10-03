@@ -65,7 +65,7 @@ final class SchedulingMarkdownTests: XCTestCase {
         }
     }
 
-    /// ⚠️ A BARE `#` WITH NO SPACE IS NOT A HEADING to this parser — the pattern needs
+    /// ⚠️ A BARE `#` WITH NO SPACE IS NOT A HEADING to this parser, the pattern needs
     /// `\s+`. It becomes a paragraph, which is the source's behaviour.
     func testABareHashIsAParagraphToTheBookingParser() {
         XCTAssertEqual(Markdown.bookingBlocks("#"), [.paragraph("#")])

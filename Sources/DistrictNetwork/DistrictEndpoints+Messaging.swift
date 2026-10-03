@@ -13,7 +13,7 @@ public struct MessagingAccountDraft: Sendable, Equatable {
     public let activeProvider: String
     public let credentialSource: String
     /// ⚠️ CARRIED WHOLE as the server's own object. A blank or absent secret means
-    /// "keep the stored ciphertext" — except on a provider change, which discards
+    /// "keep the stored ciphertext", except on a provider change, which discards
     /// them.
     public let providerConfig: JSONValue
     /// ⛔ NIL MEANS CREATE, AND CREATE IS NOT IDEMPOTENT: two deliveries are two
@@ -46,7 +46,7 @@ public struct MessagingAccountDraft: Sendable, Equatable {
 /// and a probe on a sibling.
 ///
 /// ⛔ FIVE FUNCTIONS, ONE URL, AND THE `action` IS IN THE BODY RATHER THAN THE
-/// PATH. There is no `messaging/default` or `messaging/delete` — both would 404 —
+/// PATH. There is no `messaging/default` or `messaging/delete`, both would 404,
 /// so the only thing separating a default change from a deletion is a string
 /// inside the JSON. Each function bakes its own action in rather than taking one,
 /// so a call site cannot pass the wrong action without changing the function it
@@ -69,14 +69,14 @@ public extension DistrictEndpoints {
 
     /// Create or edit one carrier account.
     ///
-    /// ⛔ NON-IDEMPOTENT WHEN `accountId` IS NIL — the route mints a fresh
+    /// ⛔ NON-IDEMPOTENT WHEN `accountId` IS NIL, the route mints a fresh
     /// `acct-<uuid>`, so two deliveries are two accounts. Nothing may retry it.
     ///
     /// ⛔ THE UPSERT IS THE ONE ACTION WITH NO `action` KEY, DELIBERATELY: it is
     /// the route's default branch, and adding one would change which branch runs.
     ///
     /// ⛔ A BLANK OR ABSENT SECRET MEANS "KEEP THE STORED CIPHERTEXT", WHICH IS
-    /// WHY THE ORDINARY EDIT TYPES NO CREDENTIAL AT ALL — and why the nil-drop in
+    /// WHY THE ORDINARY EDIT TYPES NO CREDENTIAL AT ALL, and why the nil-drop in
     /// ``JSONValue/object(_:)`` is load-bearing here rather than tidy. ⚠️ Except
     /// on a PROVIDER CHANGE: switching provider on an edit DISCARDS the stored
     /// secrets (`existingEnc` is only reused when the provider is unchanged), so
@@ -87,7 +87,7 @@ public extension DistrictEndpoints {
     /// another workspace holds is 403 with a deliberately non-disclosing
     /// sentence; a number this account's own carrier does not own is 403 with the
     /// same sentence; and a carrier that could not be reached is **502**, which is
-    /// NOT a refusal — the route separates it precisely so an outage does not read
+    /// NOT a refusal, the route separates it precisely so an outage does not read
     /// as theft.
     ///
     /// - Parameter providerConfig: carried WHOLE as the server's own object.
@@ -155,7 +155,7 @@ public extension DistrictEndpoints {
     /// this path is a 405.
     ///
     /// ⛔ IT ALSO FREES EVERY PHONE NUMBER ONLY THIS ACCOUNT HELD, in the hub
-    /// index that routes inbound calls and SMS — the claims that stop another
+    /// index that routes inbound calls and SMS, the claims that stop another
     /// tenant sending as this one. Confirm it with wording that says so.
     ///
     /// ⚠️ ANSWERS 404 "Account not found" for an id the workspace does not hold,

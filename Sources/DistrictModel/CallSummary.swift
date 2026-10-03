@@ -1,7 +1,7 @@
 import Foundation
 
 /// One row of `GET /api/district/calls`, of `overview.recentCalls`, and of
-/// `GET /api/district/calls/{callId}` — three surfaces, one shape.
+/// `GET /api/district/calls/{callId}`, three surfaces, one shape.
 ///
 /// ⛔ THE FEED IS A BARE JSON ARRAY, NOT AN ENVELOPE. Almost every other
 /// district route answers `{success, …}`; this one is `NextResponse.json(calls)`.
@@ -41,7 +41,7 @@ public struct CallSummary: Codable, Sendable {
     /// "Unknown".
     public let number: String
     /// The DISPLAY status from `displayCallStatus`, which downgrades a stale
-    /// in-progress call — one whose terminal webhook was lost — to `no-answer`
+    /// in-progress call, one whose terminal webhook was lost, to `no-answer`
     /// rather than showing it live forever.
     ///
     /// ⚠️ THIS IS HOW A "LIVE" BADGE IS DERIVED, with no separate flag: only a
@@ -58,7 +58,7 @@ public struct CallSummary: Codable, Sendable {
     /// `userTimezone` is `user.timezone || "America/Toronto"`. ⚠️ THAT COLUMN
     /// IS WRITABLE ONLY FROM THE WEB SETTINGS PAGE (`PUT /api/settings`), and
     /// THIS CLIENT DOES NOT
-    /// IMPLEMENT THAT ENDPOINT — there is no descriptor for it and no screen
+    /// IMPLEMENT THAT ENDPOINT, there is no descriptor for it and no screen
     /// behind one. So on iOS the value is whatever the browser last set, or the
     /// Toronto default, printed with no zone label either way: an operator in
     /// Berlin who has never opened the web app would read every call six hours off,
@@ -98,7 +98,7 @@ public struct CallSummary: Codable, Sendable {
     /// DTO: rows that never had a number exist, and a non-optional here would
     /// fail the whole feed over one of them.
     public let from: String?
-    /// `inbound` or `outbound` — the raw direction, not ``type``.
+    /// `inbound` or `outbound`, the raw direction, not ``type``.
     public let direction: String?
     /// Duration in SECONDS. nil when the call never recorded one.
     public let durationRaw: Int?
@@ -237,12 +237,12 @@ public enum CallNarrative {
 /// The post-call analysis blob.
 ///
 /// ⚠️ EVERY FIELD IS OPTIONAL, DELIBERATELY. `Call.analysis` is a Prisma `Json?`
-/// column, so nothing in the database enforces this shape — the documented one
+/// column, so nothing in the database enforces this shape, the documented one
 /// is `{keyPoints, objections, topics, actionItems, followUpSuggested?}`, and
 /// rows written by an earlier pipeline may carry fewer keys. ⚠️ THIS DIVERGES
 /// FROM KOTLIN ONLY IN SPELLING: it defaults the four lists to empty, which
 /// Swift cannot express on a synthesised `Decodable` without also inventing the
-/// key on re-encode — and an invented key is what the strict gate refuses.
+/// key on re-encode, and an invented key is what the strict gate refuses.
 /// Optional means "absent stays absent", which is the same leniency without the
 /// round-trip lie.
 public struct CallAnalysis: Codable, Sendable {
@@ -274,7 +274,7 @@ public struct CallFollowUp: Codable, Sendable {
 /// ⚠️ THE ENVELOPE DIFFERS FROM THE FEED'S EVEN THOUGH THE PAYLOAD DOES NOT: the
 /// feed is a bare ARRAY, this is `{success, call}`. A single resource needs a way
 /// to say "found nothing" that a bare object cannot, so absence is a 404 with an
-/// envelope — the same shape every other single-resource route here uses.
+/// envelope, the same shape every other single-resource route here uses.
 ///
 /// ⚠️ No transcript text rides on this payload (``CallSummary/transcript`` is
 /// always empty); the text is `GET …/transcript`.

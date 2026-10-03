@@ -51,7 +51,7 @@ final class CallHandlingRepositoryTests: XCTestCase {
     /// ⛔ A MODE THIS BUILD DOES NOT KNOW IS A SUCCESSFUL READ, NOT A DECODE FAILURE,
     /// AND THE DIRECTION IS THE WHOLE REASON `callHandling` IS A `String`. The server
     /// normalises an unrecognised STORED value to `ai_first` before answering, so this
-    /// body should be unreachable — but an enum here would turn the day it becomes
+    /// body should be unreachable, but an enum here would turn the day it becomes
     /// reachable (a fourth mode shipped server-side) into a screen that cannot read its
     /// own ring duration either, because one strict field takes the whole response with
     /// it.
@@ -102,7 +102,7 @@ final class CallHandlingRepositoryTests: XCTestCase {
     }
 
     /// ⛔ AN INTEGER ON THE WIRE, NEVER `20.0`. The route validates with a zod `.int()`,
-    /// so a `Double` that encodes with a decimal point is refused as fractional — a 400
+    /// so a `Double` that encodes with a decimal point is refused as fractional, a 400
     /// whose cause is invisible from the response and which an operator cannot act on.
     func testSavingTheRingAloneSendsAnIntegerAndNoMode() async {
         let transport = RepositoryTransport(json: Self.handling(mode: "ai_first", ring: 30))
@@ -118,8 +118,8 @@ final class CallHandlingRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THREE REFUSALS THE ROUTE WOULD ANSWER 400 FOR, REFUSED HERE INSTEAD, AND NOT
-    /// ONE REQUEST IS SENT. Each of them is a CLIENT bug — an empty body, a mode this
-    /// build invented, a ring outside 5...30 — and a 400 arriving back from the server
+    /// ONE REQUEST IS SENT. Each of them is a CLIENT bug, an empty body, a mode this
+    /// build invented, a ring outside 5...30, and a 400 arriving back from the server
     /// is indistinguishable from a refusal the operator could act on. Refusing locally
     /// keeps that distinction, and keeps a broken stepper from spending the workspace's
     /// rate limit.

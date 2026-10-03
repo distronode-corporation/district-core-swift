@@ -18,7 +18,7 @@ import Foundation
 /// the ⛔ on ``DistrictEndpoints/devices()``.
 ///
 /// ⛔ THIS LAYER DOES NOT SIGN THE USER OUT AND MUST NOT LEARN HOW. Revoking THIS
-/// device, or revoking all, ends this installation's session server-side — but
+/// device, or revoking all, ends this installation's session server-side, but
 /// the local half (revoking through `SignOutCoordinator`, wiping the Keychain,
 /// dropping the workspace selection)
 /// is `AppContainer`'s job and the ORDER of it matters. These functions report
@@ -29,7 +29,7 @@ import Foundation
 /// stating because the neighbouring `POST /api/auth/native/revoke` does NOT: it
 /// takes the refresh TOKEN as its credential and is reached through
 /// ``SignOutCoordinator``, never through here. The difference is who can call
-/// it — a token route can only ever end the session of whoever holds the token,
+/// it, a token route can only ever end the session of whoever holds the token,
 /// so "sign out my lost phone" is unreachable through it by construction.
 public struct DevicesRepository: Sendable {
     private let client: ApiClient
@@ -44,7 +44,7 @@ public struct DevicesRepository: Sendable {
     /// field rejects `{}`; it does not reject a well-formed body that says
     /// `success: false`, and this route's own catch branch answers exactly that
     /// shape on a 200 if the headers are already written. Without the check, "we
-    /// could not look" would render as "you have no devices" — the same
+    /// could not look" would render as "you have no devices", the same
     /// conflation that routed a paying customer to a checkout page on the web.
     ///
     /// ⚠️ Rate limited at 30/min PER ACCOUNT, sized for a settings screen. Nothing
@@ -63,7 +63,7 @@ public struct DevicesRepository: Sendable {
     /// deliberately: ids are client-generated and opaque, so a 404 for a
     /// stranger's id and a 200 for a real one would turn the route into a
     /// membership oracle over the id space. Zero is equally the honest answer for
-    /// the ordinary races — a row another device already revoked, or a chain that
+    /// the ordinary races, a row another device already revoked, or a chain that
     /// rotated between the list read and the tap. This layer cannot tell those
     /// apart and neither can the server, so the count is carried through
     /// untouched and the screen decides what to say.
@@ -97,7 +97,7 @@ public struct DevicesRepository: Sendable {
     /// an oversight: an "all" that quietly excepted the device that asked would be
     /// a control nobody could reason about. A caller must treat success as this
     /// device's own sign-out and run the local half itself, because the server has
-    /// no way to tell this process that its credential just died — it will simply
+    /// no way to tell this process that its credential just died, it will simply
     /// 401 on the next request.
     ///
     /// ⚠️ `0` IS A LEGITIMATE SUCCESS HERE TOO: a second press, after the first

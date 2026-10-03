@@ -14,7 +14,7 @@ extension EndpointTable {
     /// ⛔ THE PREVIEW BODY NESTS UNDER `formData` AND THAT IS WHAT THIS ROW EXISTS
     /// TO PIN. Every other write on this surface is flat; this route reads
     /// `{ workspaceId, formData }` and answers **400 "Missing workspaceId or
-    /// formData"** for a flattened body — a refusal that reads as a broken client
+    /// formData"** for a flattened body, a refusal that reads as a broken client
     /// rather than as a shape mismatch, and one no type checker catches.
     ///
     /// ⛔ AND THE PREVIEW ROW DROPS ITS nil FIELDS, WHICH IS THE OPPOSITE PIN FROM
@@ -54,7 +54,7 @@ extension EndpointTable {
                 // THAT PICKED IT: this row compares BYTES, and 0.7 has no exact
                 // binary representation, so its shortest round-tripping decimal is a
                 // property of the encoder rather than of this file. 0.5 is exact. The
-                // value's meaning is unaffected — the route guards with
+                // value's meaning is unaffected, the route guards with
                 // `typeof temperature === "number"` and clamps to 0...1.
                 .json(
                     #"{"formData":{"language":"en-US","modelId":"deepgram-pipeline","name":"Ada","#

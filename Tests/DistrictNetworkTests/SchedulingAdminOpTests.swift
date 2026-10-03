@@ -9,7 +9,7 @@ import XCTest
 /// strings were read off the server's `ADMIN_OPS` catalog.
 ///
 /// ⚠️ THE COUNTS BELOW WERE COUNTED, NOT COMPUTED. 75 ops, 35 `viewer` / 40
-/// `client`, 29 reads / 46 writes — the last pair from the server's own test
+/// `client`, 29 reads / 46 writes, the last pair from the server's own test
 /// (`method !== "GET"`), which is NOT the role split: four viewer-level ops write.
 final class SchedulingAdminOpTests: XCTestCase {
     /// `ADMIN_OPS`' keys, in catalog order.
@@ -143,7 +143,7 @@ final class SchedulingAdminOpTests: XCTestCase {
     }
 
     /// ⚠️ A DUPLICATE RAW VALUE IS NOT A COMPILE ERROR IN SWIFT WHEN THE VALUES
-    /// ARE WRITTEN OUT — two cases may carry the same string, and the second one
+    /// ARE WRITTEN OUT, two cases may carry the same string, and the second one
     /// then becomes unreachable through `init(rawValue:)` while `allCases` still
     /// reports 75. The count assertion above cannot see it; this can.
     func testEveryRawValueIsUnique() {

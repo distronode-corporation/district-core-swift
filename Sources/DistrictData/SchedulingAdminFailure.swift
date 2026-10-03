@@ -10,13 +10,13 @@ import Foundation
 /// HTTP statuses; several of those want the same sentence and the same recovery,
 /// and one status (403) wants a different sentence from every `failure` kind.
 /// `admin-fetch.ts` performs exactly this collapse for the browser, and the two
-/// clients have to agree — a person shown two different explanations of one
+/// clients have to agree, a person shown two different explanations of one
 /// refusal depending on which device they picked it up on will report a bug
 /// against whichever one they saw second.
 ///
 /// ⛔ NO SENTENCES HERE. DistrictCore is Linux-testable and locale-free; the App
 /// owns the copy, the same way ``ApiError`` refuses to invent a message. What this
-/// type carries is the DECISION — which of five recoveries applies — and nothing
+/// type carries is the DECISION, which of five recoveries applies, and nothing
 /// a translator would need to touch.
 ///
 /// ⚠️ ONLY THREE OF THE FIVE ARE REACHABLE FROM A `failure` STRING
@@ -34,7 +34,7 @@ public enum SchedulingAdminFailureCode: String, Sendable, CaseIterable {
     case slotTaken
     /// The role gate refused: this member may read the surface and not change it.
     case forbidden
-    /// The workspace has no scheduling tenancy. Not a fault and not retryable —
+    /// The workspace has no scheduling tenancy. Not a fault and not retryable,
     /// somebody has to press Enable.
     case notReady
     /// Anything the two vocabularies do not name. ⚠️ The honest generic, and it
@@ -76,7 +76,7 @@ public enum SchedulingAdminFailureCode: String, Sendable, CaseIterable {
 ///
 /// ⚠️ THERE IS NO `.http(status:)` ESCAPE HATCH, DELIBERATELY. A caller that
 /// switched on a raw status would re-implement this mapping badly and in several
-/// places; the status is preserved where it matters — as the code — and thrown
+/// places; the status is preserved where it matters, as the code, and thrown
 /// away where it does not.
 public enum SchedulingAdminError: Error, Equatable, Sendable {
     /// HTTP 200, `{ok:false, failure, status}`. The scheduler refused.

@@ -24,16 +24,16 @@ public protocol RefreshClient: Sendable {
 /// | status | route behaviour                                   | case               |
 /// |--------|---------------------------------------------------|--------------------|
 /// | 200    | rotated successfully                              | `success`          |
-/// | 401    | `invalid_grant` — the credential is dead          | `rejected`         |
+/// | 401    | `invalid_grant`, the credential is dead          | `rejected`         |
 /// | 429    | limited BEFORE rotation, token NOT consumed       | `rateLimited`      |
 /// | 400    | malformed body; never reached rotation            | `rateLimited`      |
-/// | 5xx    | may have rotated before failing — AMBIGUOUS       | `transportFailure` |
-/// | I/O    | no answer — AMBIGUOUS                             | `transportFailure` |
+/// | 5xx    | may have rotated before failing, AMBIGUOUS       | `transportFailure` |
+/// | I/O    | no answer, AMBIGUOUS                             | `transportFailure` |
 /// | connect| the request provably never left the device        | `notSent`          |
 public enum RefreshResult: Sendable, Equatable {
     case success(NativeTokens)
 
-    /// A definite 401 `invalid_grant`. Unknown, expired, revoked or replayed —
+    /// A definite 401 `invalid_grant`. Unknown, expired, revoked or replayed,
     /// the server collapses all four into one opaque answer on purpose, so
     /// there is nothing to distinguish here. Any of them means this credential
     /// is dead.
@@ -50,26 +50,26 @@ public enum RefreshResult: Sendable, Equatable {
     /// field.
     case rateLimited
 
-    /// No usable answer — a timeout, a 5xx, an unreadable 200.
+    /// No usable answer, a timeout, a 5xx, an unreadable 200.
     ///
     /// ⚠️ AMBIGUOUS: the server may have processed the rotation anyway, which is
     /// why the coordinator deliberately LEAVES the pending marker set here.
     case transportFailure
 
-    /// The request PROVABLY never left the device — DNS failure, connection
+    /// The request PROVABLY never left the device, DNS failure, connection
     /// refused, no route, a TLS handshake that never completed.
     ///
     /// ⛔ DISTINCT FROM ``transportFailure`` BECAUSE CONFLATING THEM SIGNED
     /// PEOPLE OUT FOR BEING OFFLINE. Both were once mapped together, which
     /// leaves the marker set because the token *might* have been spent. For a
     /// connect-phase failure it provably was not: no byte reached the server. So
-    /// opening the app in airplane mode — any cold start more than ten minutes
-    /// after last use, since the access token is memory-only — marked the token
+    /// opening the app in airplane mode, any cold start more than ten minutes
+    /// after last use, since the access token is memory-only, marked the token
     /// pending, failed to send it, and the next attempt saw marker == stored
     /// token and cleared the session. One offline app-open cost a re-login.
     ///
     /// ⚠️ A READ TIMEOUT IS NOT THIS. A connect timeout and a read timeout are
     /// often the same error type, and a read timeout means the request was
-    /// already sent — so it stays ambiguous.
+    /// already sent, so it stays ambiguous.
     case notSent
 }

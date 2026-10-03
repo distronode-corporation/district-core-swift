@@ -82,7 +82,7 @@ final class RoutingRuleDraftTests: XCTestCase {
 
     // MARK: - Rendering
 
-    /// ⛔ THE HEADLINE. An edit to one field rewrites that field and NOTHING ELSE —
+    /// ⛔ THE HEADLINE. An edit to one field rewrites that field and NOTHING ELSE,
     /// `createdBy` and `id` survive byte-identically. A row rebuilt from the six
     /// fields this editor owns would strip them and be answered 200, which is a
     /// silent deletion inside somebody's rule rather than of one.
@@ -107,8 +107,8 @@ final class RoutingRuleDraftTests: XCTestCase {
         ]))
     }
 
-    /// ⛔ `""` ON `model` IS A REAL, MEANINGFUL VALUE — the route reads a falsy model
-    /// as "no override, use the workspace engine" — so it is written rather than
+    /// ⛔ `""` ON `model` IS A REAL, MEANINGFUL VALUE, the route reads a falsy model
+    /// as "no override, use the workspace engine", so it is written rather than
     /// dropped. Dropping it works today and is a different instruction the day the
     /// route starts distinguishing absent from empty.
     func testAnEmptyModelIsWrittenRatherThanDropped() {
@@ -135,7 +135,7 @@ final class RoutingRuleDraftTests: XCTestCase {
 
     /// ⛔ AN UNRECOGNISED ROW GOES BACK EXACTLY AS IT CAME, EXPLICIT NULL INCLUDED.
     /// ``JSONValue/carrying(_:)`` builds `.object` directly rather than through
-    /// ``JSONValue/object(_:)``, whose whole job is to drop nils — dropping one here
+    /// ``JSONValue/object(_:)``, whose whole job is to drop nils, dropping one here
     /// would delete `target` on a route that answers 200 either way.
     func testAnUnrecognisedRowIsCarriedBackWithItsNullIntact() {
         let draft = RoutingRuleDraft(id: 0, row: legacyRow)
@@ -156,7 +156,7 @@ final class RoutingRuleDraftTests: XCTestCase {
 
     /// ⛔ A SERVER ROW IS NEVER BLANK, HOWEVER EMPTY ITS FIELDS LOOK. Dropping one
     /// would be a deletion the operator did not ask for, through a route that
-    /// replaces the array wholesale — and the legacy rows are exactly the case: every
+    /// replaces the array wholesale, and the legacy rows are exactly the case: every
     /// field the editor reads is empty and the rule is live.
     func testAStoredRowIsNeverTreatedAsBlank() {
         XCTAssertFalse(RoutingRuleDraft(id: 0, row: legacyRow).isBlank)
@@ -178,7 +178,7 @@ final class RoutingRuleDraftTests: XCTestCase {
     }
 
     /// ⚠️ A RULE WITH NOTHING TO MATCH ON IS FLAGGED, NOT REFUSED. It is legal, it is
-    /// stored, and it simply never fires — which is what an operator opened the screen
+    /// stored, and it simply never fires, which is what an operator opened the screen
     /// to find out.
     func testARuleWithNoMatchValueIsFlaggedAsIncomplete() {
         XCTAssertTrue(RoutingRuleDraft(id: 0, row: legacyRow).isIncomplete)

@@ -13,8 +13,8 @@ final class EndpointSurfaceTests: XCTestCase {
     /// ⛔ `calls/outbound` IS THE AI CAMPAIGN DIALER. It creates a `call_` room the
     /// voice agent joins and speaks in, so a human dialling through it would find
     /// an agent on their own line. It has no `EndpointID`, no ``DistrictPaths``
-    /// constant, and — because ``ApiRequestDescriptor``'s initialiser is internal
-    /// — no way to be assembled from outside this module.
+    /// constant, and, because ``ApiRequestDescriptor``'s initialiser is internal
+    /// no way to be assembled from outside this module.
     func testTheOutboundCampaignDialerIsNotReachable() {
         for row in EndpointTable.all() {
             XCTAssertFalse(
@@ -53,7 +53,7 @@ final class EndpointSurfaceTests: XCTestCase {
     /// THIS SURFACE THAT ARRIVES FROM AN UNAUTHENTICATED SOURCE. A notification
     /// payload is a `[String: String]` the OS hands over; every field of it is a
     /// string the sender chose. An id of `a/../../admin` interpolated into
-    /// `messages/{id}` resolves to `/api/district/admin` — the same class of bug the
+    /// `messages/{id}` resolves to `/api/district/admin`, the same class of bug the
     /// Kotlin client shipped on `calls/{id}/transcript` before its paths were segment
     /// lists, reached here from a much cheaper direction.
     ///
@@ -79,7 +79,7 @@ final class EndpointSurfaceTests: XCTestCase {
     /// ⛔ `all: true` IS A THIRD SELECTOR ON `messages/mark-read`, NOT A ROUTE, AND
     /// THE ROUTE'S OWN SOURCE IS WHY IT GETS ITS OWN BUILDER. Its comment records
     /// that a selector which resolved to nothing usable must mark ZERO rows, because
-    /// "falling through to an empty filter would mark the ENTIRE workspace read" — so
+    /// "falling through to an empty filter would mark the ENTIRE workspace read", so
     /// the two bodies are kept apart by two functions rather than by a defaulted
     /// argument, and this asserts that neither can carry the other's keys.
     func testMarkAllReadIsASeparateBodyOnTheSamePathAndCarriesNoSelector() throws {
@@ -197,7 +197,7 @@ final class EndpointSurfaceTests: XCTestCase {
 
     /// ⚠️ THE QUEUE'S STATUS FILTER IS DROPPED WHEN ABSENT rather than sent empty.
     /// `status=` present-and-empty is not in the route's vocabulary, so it falls
-    /// through to "no filter" — the same answer by accident rather than by contract,
+    /// through to "no filter", the same answer by accident rather than by contract,
     /// and the kind of agreement that stops holding the day the route validates.
     func testTheQueueFilterIsDroppedWhenAbsentAndSentWhenPresent() throws {
         let base = try XCTUnwrap(URL(string: EndpointTable.host))
@@ -216,7 +216,7 @@ final class EndpointSurfaceTests: XCTestCase {
     /// ⛔ CLEARING THE PUBLIC BRAND NAME NEEDS AN EXPLICIT NULL, WHICH IS THE ONE
     /// PLACE THIS CLIENT USES `JSONValue`'S ESCAPE HATCH. `object(_:)` drops a nil
     /// pair by design, so "leave it alone" and "clear it" would be the same bytes if
-    /// the parameter were a plain `String?` — and the value being cleared is the
+    /// the parameter were a plain `String?`, and the value being cleared is the
     /// heading a tenant's own customers see.
     func testTheBrandNameDistinguishesLeavingAloneFromClearing() throws {
         let untouched = DistrictEndpoints.saveDeskSettings(
@@ -257,7 +257,7 @@ final class EndpointSurfaceTests: XCTestCase {
     /// ⛔ `scheduling/sso` MUST NOT BE EXPRESSIBLE. It answers a **302** whose
     /// `Location` is a ONE-TIME sign-in URL into the tenant's scheduler, so a
     /// descriptor for it would let `ApiClient.send` follow the redirect and spend
-    /// the credential on a transport the user never sees — and
+    /// the credential on a transport the user never sees, and
     /// `redirectTarget(_:)` would not help, because putting it on
     /// ``RedirectEndpoints`` is what would make it constructible in the first
     /// place. The App target fetches it directly, with redirects disabled.
@@ -309,7 +309,7 @@ final class EndpointSurfaceTests: XCTestCase {
                 "\(descriptor.id.rawValue) must use the PLURAL, cheap path"
             )
         }
-        // The three verbs the persistence route exports, and no POST — a POST
+        // The three verbs the persistence route exports, and no POST, a POST
         // there is a 405.
         XCTAssertEqual(Set(persistence.map(\.method)), [.get, .put, .delete])
 
@@ -319,7 +319,7 @@ final class EndpointSurfaceTests: XCTestCase {
     }
 
     /// ⛔ A CAMPAIGN PAUSE MUST NEVER REACH `workspace/campaign-settings`, WHICH
-    /// REBUILDS ALL THREE SDR FIELDS FROM THE BODY — the same JSON sent one path
+    /// REBUILDS ALL THREE SDR FIELDS FROM THE BODY, the same JSON sent one path
     /// over answers 200 and wipes the goal text.
     func testTheCampaignPauseUsesTheStatusPathNotTheSettingsPath() {
         let pause = DistrictEndpoints.setCampaignEnabled(workspaceId: "ws_1", infiniteSdrEnabled: false)

@@ -15,7 +15,7 @@ import XCTest
 ///
 /// ⚠️ THE ROUTE PATHS ARE ASSERTED BY STRING because these three live under
 /// `/api/auth/native/…` while every district route lives under `/api/district/…`
-/// — and there is a second, unrelated `devices` surface at
+/// and there is a second, unrelated `devices` surface at
 /// `/api/district/devices/{register,unregister}` for push. The two 404 each
 /// other, and a path typo would present as a broken client rather than as a
 /// wrong URL.
@@ -36,7 +36,7 @@ final class DevicesRepositoryTests: XCTestCase {
     }
 
     /// ⛔ AN EMPTY LIST IS A SUCCESS AND MUST STAY ONE. The route filters on
-    /// `rotatedAt: null`, so a chain caught mid-refresh is briefly invisible —
+    /// `rotatedAt: null`, so a chain caught mid-refresh is briefly invisible,
     /// which on a single-device account is an empty list arriving on a perfectly
     /// good session. Mapping it to a failure would tell someone they had been
     /// signed out while they were not.
@@ -84,7 +84,7 @@ final class DevicesRepositoryTests: XCTestCase {
     /// `/api/auth/native/…` routes answer `{error: "<code>", message:
     /// "<sentence>"}`, splitting the two across two keys; every district route
     /// answers `{success:false, error: "<sentence>"}` and puts the code in `code`.
-    /// ``ApiErrorEnvelope`` models `success`, `error` and `code` — no `message` —
+    /// ``ApiErrorEnvelope`` models `success`, `error` and `code`, no `message`,
     /// so what reaches ``ApiError/http(status:message:)`` from here is the machine
     /// code, `"rate_limited"`, not the sentence a user could read. The Kotlin
     /// client's envelope has exactly the same three fields and behaves the same
@@ -130,8 +130,8 @@ final class DevicesRepositoryTests: XCTestCase {
     }
 
     /// ⛔ ZERO IS A SUCCESS CARRYING ZERO, NOT A FAILURE AND NOT A BARE SUCCESS.
-    /// The route answers it for a device id that is not yours — deliberately, so
-    /// it cannot be used as an oracle over an opaque id space — and equally for a
+    /// The route answers it for a device id that is not yours, deliberately, so
+    /// it cannot be used as an oracle over an opaque id space, and equally for a
     /// row another device already revoked or a chain that rotated between the
     /// list read and the tap. Promoting it to an error would report a fault that
     /// did not happen; discarding the count would claim a revocation that did not
@@ -154,7 +154,7 @@ final class DevicesRepositoryTests: XCTestCase {
     ///
     /// ⚠️ THE MESSAGE IS THE CODE RATHER THAN THE SENTENCE, for the reason the
     /// rate-limit test above sets out. Harmless on a 5xx specifically, because
-    /// ``FailureText`` deliberately DISCARDS a 5xx body — these routes return raw
+    /// ``FailureText`` deliberately DISCARDS a 5xx body, these routes return raw
     /// exception text on some siblings and it must never reach a screen.
     func testAFailedRevokeWriteIsAFailureRatherThanAZeroCount() async {
         let transport = RepositoryTransport(
@@ -198,7 +198,7 @@ final class DevicesRepositoryTests: XCTestCase {
         XCTAssertEqual(transport.bodies.first, "{}")
     }
 
-    /// ⚠️ ZERO IS LEGITIMATE HERE TOO — a second press, after the first revoked
+    /// ⚠️ ZERO IS LEGITIMATE HERE TOO, a second press, after the first revoked
     /// everything. It still means this device is signed out, because the server's
     /// "all" does not spare the caller; that consequence belongs to the screen,
     /// and this layer only reports the count.
@@ -224,7 +224,7 @@ private extension Bodies {
     /// The device list's envelope, with one row per id.
     ///
     /// ⚠️ `named: false` PRODUCES THE FRESHLY-SIGNED-IN SHAPE, with `deviceName`
-    /// and `lastUsedAt` both explicitly null rather than omitted — which is what
+    /// and `lastUsedAt` both explicitly null rather than omitted, which is what
     /// the route sends, because it serialises the Prisma selection whole.
     static func devices(ids: [String], named: Bool = true) -> String {
         let rows = ids.map { device(id: $0, named: named) }.joined(separator: ",")

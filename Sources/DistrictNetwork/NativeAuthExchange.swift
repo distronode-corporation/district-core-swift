@@ -6,7 +6,7 @@ public struct CodeExchangeRequest: Sendable, Equatable {
     /// 400 that reads exactly like a rejected code.
     ///
     /// ⚠️ A CONSTANT RATHER THAN A FIELD ON PURPOSE. It is not the CALLER's
-    /// choice — this client is the iOS one — and a settable field is how a
+    /// choice, this client is the iOS one, and a settable field is how a
     /// device ends up listed as the wrong platform in the settings device list.
     public static let platform = "ios"
 
@@ -23,7 +23,7 @@ public struct CodeExchangeRequest: Sendable, Equatable {
 
     /// Display only, shown in the settings device list. Never trusted.
     ///
-    /// ⚠️ Optional server-side, and OMITTED rather than sent empty when nil —
+    /// ⚠️ Optional server-side, and OMITTED rather than sent empty when nil,
     /// see ``NativeAuthClient/exchangeCode(_:)``.
     public let deviceName: String?
 
@@ -44,7 +44,7 @@ public struct CodeExchangeRequest: Sendable, Equatable {
 
 /// What a code exchange learned. Mirrors `DistrictAuthCore.RefreshResult`'s
 /// shape minus the `notSent` case, which only matters to a credential that must
-/// not be re-presented — a code is single-use and the flow restarts either way.
+/// not be re-presented, a code is single-use and the flow restarts either way.
 ///
 /// ⚠️ GENERIC OVER THE TOKEN TYPE for the reason ``NativeAuthTokenWire`` exists:
 /// `NativeTokens` lives in `DistrictAuthCore`, which this module does not
@@ -53,7 +53,7 @@ public enum CodeExchangeResult<Tokens: Sendable>: Sendable {
     case success(Tokens)
 
     /// ⚠️ THE 400. The token route answers one opaque `invalid_grant` for every
-    /// refusal — expired, replayed, PKCE mismatch, redirect mismatch — and all
+    /// refusal, expired, replayed, PKCE mismatch, redirect mismatch, and all
     /// four mean "start the login over".
     case rejected
 

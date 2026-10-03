@@ -7,7 +7,7 @@ import Foundation
 /// and the portable ways to tell them apart (`CFBooleanGetTypeID`,
 /// `objCType`) either do not exist on Linux or disagree between the two. The
 /// gate compares STRUCTURE, not values, so collapsing them costs nothing it
-/// was ever going to catch — whereas a check that behaved differently on the
+/// was ever going to catch, whereas a check that behaved differently on the
 /// Linux tier than on a Mac would be worse than no check at all.
 ///
 /// `string` is kept separate from `scalar` because that distinction *is*

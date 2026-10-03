@@ -213,7 +213,7 @@ final class SignOutCoordinatorTests: XCTestCase {
     }
 
     /// ⛔ NEVER THROWS. A store that cannot be read is a reason to try again on
-    /// the next launch, not a reason to propagate — there is nothing a user
+    /// the next launch, not a reason to propagate, there is nothing a user
     /// could do with the news, and this runs behind the first render.
     func testDrainingSwallowsAThrownRead() async {
         let store = SpyTokenStore(revokePending: "stranded-token")
@@ -242,8 +242,8 @@ final class SignOutCoordinatorTests: XCTestCase {
 
     /// ⛔ A STALE ENTRY CANNOT TOUCH THE CURRENT SESSION, which is what makes
     /// running the drain unconditionally at launch safe. `revokeNativeSession`
-    /// matches on the presented token's hash alone — not on its family and not
-    /// on the user — so an entry written before a re-login revokes exactly the
+    /// matches on the presented token's hash alone, not on its family and not
+    /// on the user, so an entry written before a re-login revokes exactly the
     /// one dead row it names. Asserted from this side as: the drain presents the
     /// OUTBOX token, never the session's, and never touches the session.
     func testTheDrainNeverPresentsOrDisturbsTheCurrentSession() async {

@@ -20,7 +20,7 @@ public extension SchedulingAdminOp {
     /// notification preferences, avatar and calendar connections. A viewer who
     /// cannot set their own timezone is offered every booking window in the wrong
     /// hours, and a viewer who cannot connect their own calendar cannot be booked
-    /// at all — so the narrow rule would break the product for exactly the role it
+    /// at all, so the narrow rule would break the product for exactly the role it
     /// was meant to protect. Four viewer-level WRITES come out of that:
     /// ``meAvatarDelete``, ``mePatch``, ``calendarCaldavConnect`` and the three
     /// `calendar.connections.*` mutations.
@@ -28,7 +28,7 @@ public extension SchedulingAdminOp {
     /// ⛔ THIS IS THE WEAKER HALF OF THE GATE AND MUST NOT BE READ AS THE ANSWER.
     /// The scheduler enforces its own `requireAdmin` on the settings, recordings,
     /// notes, transcript and reassign routes, and its own host-ownership checks on
-    /// the booking routes — against the MEMBER's key, carrying the member's
+    /// the booking routes, against the MEMBER's key, carrying the member's
     /// scheduler role. A District `viewer` calling a read this property allows can
     /// still come back **403**. What it is for is deciding whether to draw a
     /// control and whether to spend a request, not whether the answer will be yes.
@@ -77,7 +77,7 @@ public extension SchedulingAdminOp {
     ///
     /// ⛔ "NOT A GET", WHICH IS THE SERVER'S OWN TEST AND NOT A SEPARATE OPINION.
     /// The server route budgets `opSendsBody(op) || op.method === "DELETE"`, and
-    /// `opSendsBody` is `method !== "GET" && method !== "DELETE"` — so the union is
+    /// `opSendsBody` is `method !== "GET" && method !== "DELETE"`, so the union is
     /// exactly "the method is not GET". Twenty-nine reads, forty-six writes.
     ///
     /// ⚠️ IT IS NOT `minRole == .client`, AND THE TWO DISAGREE ON SIX OPS. The four

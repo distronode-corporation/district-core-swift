@@ -109,7 +109,7 @@ final class CallbacksRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ AND THE FILTER IS NOT OVER-EAGER. The match is exact, so a caller genuinely
-    /// named something that merely BEGINS with a placeholder keeps their row — a
+    /// named something that merely BEGINS with a placeholder keeps their row, a
     /// prefix or `contains` implementation would quietly drop real people, which is
     /// the failure a test written only for the case above would not catch.
     func testACallerWhoseNameMerelyBeginsWithAPlaceholderIsStillACallback() async {

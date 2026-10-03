@@ -4,7 +4,7 @@ import XCTest
 
 /// ⛔ EVERY BODY HERE IS INLINE AND DELIBERATELY NOT A CONTRACT FIXTURE. The
 /// fixtures are gated in `ImplementedFixtures+SchedulingA.swift`, which proves the
-/// DTO models the bytes EXACTLY; what this file proves is the other half — that
+/// DTO models the bytes EXACTLY; what this file proves is the other half, that
 /// each field lands where the wire says and that the three kinds of absence on
 /// these rows stay distinguishable. A fixture cannot show that, because it carries
 /// one row per shape and the interesting cases are the pairs.
@@ -19,7 +19,7 @@ final class SchedulingAdminEventTypesTests: XCTestCase {
 
     /// ⛔ THIRTY-THREE FIELDS, WHICH IS WHY THE POPULATED CASE IS ASSERTED AT ALL.
     /// Every key is spelled out in `CodingKeys` by hand, so a transposition
-    /// (`buffer_before` onto `bufferAfterMinutes`) compiles, decodes and is wrong —
+    /// (`buffer_before` onto `bufferAfterMinutes`) compiles, decodes and is wrong,
     /// the numbers are interchangeable to the type system and not to a booking.
     func testAFullyPopulatedEventTypeLandsEveryField() throws {
         let row = try decode(SchedulingEventType.self, Self.populatedEventType)
@@ -134,7 +134,7 @@ final class SchedulingAdminEventTypesTests: XCTestCase {
     /// strips both from the response and refuses them on the way in, because a
     /// dashboard that rendered them would advertise paid bookings this platform
     /// cannot settle. ⚠️ The assertion here is that their arrival is IGNORED rather
-    /// than fatal — an unknown key is not a decode failure in Swift, so this pins
+    /// than fatal, an unknown key is not a decode failure in Swift, so this pins
     /// the behaviour a reader would otherwise have to infer.
     func testThePriceFieldsAreIgnoredRatherThanModelled() throws {
         let row = try decode(

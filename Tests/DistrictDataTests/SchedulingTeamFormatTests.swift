@@ -184,7 +184,7 @@ final class SchedulingTeamFormatTests: XCTestCase {
         XCTAssertEqual(try Team.strandedHosts(rows()).map(\.name), ["Bob", "Cy"])
     }
 
-    /// ⚠️ AN ARCHIVED ACCOUNT IS NOT STRANDED — it is already dealt with.
+    /// ⚠️ AN ARCHIVED ACCOUNT IS NOT STRANDED, it is already dealt with.
     func testAnArchivedAccountIsNotStranded() throws {
         let rows = try Team.joinMembers(
             district: [],

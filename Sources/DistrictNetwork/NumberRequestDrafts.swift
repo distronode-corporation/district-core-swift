@@ -27,9 +27,9 @@ import Foundation
 
 /// One supporting document, as the multipart upload takes it.
 ///
-/// ⛔ THE WORKSPACE IS DELIBERATELY NOT A FIELD HERE. It travels in the QUERY on that route —
+/// ⛔ THE WORKSPACE IS DELIBERATELY NOT A FIELD HERE. It travels in the QUERY on that route,
 /// `formData()` buffers the whole body before anything can look at it, so an id carried in the
-/// parts would force that buffering on unauthenticated callers — and holding it on this type
+/// parts would force that buffering on unauthenticated callers, and holding it on this type
 /// would invite exactly the copy-paste that leaves `requireWorkspaceRole` with null while the
 /// URL reads perfectly correct. See ``DistrictPaths/numbersRegistrationDocuments``.
 ///
@@ -47,7 +47,7 @@ public struct RegulatoryDocumentUpload: Sendable, Equatable {
     /// ⛔ The carrier's machine name. See the type doc.
     public let requirementName: String
     /// ⚠️ Carried for the server's benefit, and omitting it makes the part a plain field rather
-    /// than a file — at which point `file instanceof File` fails and the route answers 400.
+    /// than a file, at which point `file instanceof File` fails and the route answers 400.
     public let fileName: String
     /// ⚠️ `application/pdf`, `image/png` or `image/jpeg`. See the type doc.
     public let mimeType: String
@@ -70,13 +70,13 @@ public struct RegulatoryDocumentUpload: Sendable, Equatable {
 /// ⛔ `campaignType` DECIDES THE BRAND TYPE AND THE PRICE, so it is not an ordinary label.
 /// `LOW_VOLUME` registers a `SOLE_PROPRIETOR` brand billed at $1.50/month; anything else
 /// registers a `STANDARD` brand at $10.00. ⚠️ And the route's use-case map knows only
-/// `LOW_VOLUME`, `CUSTOMER_CARE`, `MARKETING` and `2FA` — anything unrecognised falls through to
+/// `LOW_VOLUME`, `CUSTOMER_CARE`, `MARKETING` and `2FA`, anything unrecognised falls through to
 /// `MIXED` rather than being refused, so a typo files a campaign under the wrong use case
 /// silently.
 ///
 /// ⚠️ THE THREE OPTIONAL BUSINESS FIELDS ARE NOT DECORATION. Twilio's `brandRegistrations` API
 /// does not accept them; they populate the TrustHub Customer Profile, which is a manual
-/// per-account Console step, and the route PERSISTS them even on the refused path — which is
+/// per-account Console step, and the route PERSISTS them even on the refused path, which is
 /// exactly when whoever builds that profile needs them.
 public struct A2PRegistrationDraft: Sendable, Equatable {
     public let businessName: String
@@ -118,7 +118,7 @@ public struct A2PRegistrationDraft: Sendable, Equatable {
 ///
 /// ⛔ `optInImageUrls` MUST BE NON-EMPTY AND MUST BE THE TENANT'S OWN EVIDENCE. Twilio's
 /// reviewers open every URL by hand and reject the filing days later with error 30509 if one
-/// does not load, so the route refuses an empty list up front — a 400 now beats losing days. ⛔
+/// does not load, so the route refuses an empty list up front, a 400 now beats losing days. ⛔
 /// And a Distronode-owned asset could never satisfy it in principle: this is a BYOK flow, every
 /// workspace is a different business, and the evidence has to demonstrate THAT business's
 /// declared opt-in. The placeholder this route once hardcoded is rejected by pathname.
@@ -133,7 +133,7 @@ public struct A2PRegistrationDraft: Sendable, Equatable {
 /// into a manual review, so leaving them blank is a choice rather than a no-op.
 public struct TollFreeVerificationDraft: Sendable, Equatable {
     /// ⚠️ Must be a number this workspace owns AND that lives on the connected carrier account.
-    /// Those are two different refusals — **404** and **400** — that read alike.
+    /// Those are two different refusals, **404** and **400**, that read alike.
     public let phoneNumber: String
     public let businessName: String
     public let website: String?

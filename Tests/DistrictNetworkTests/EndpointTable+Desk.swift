@@ -1,13 +1,13 @@
 @testable import DistrictNetwork
 import Foundation
 
-/// District Desk — the tenant's OWN customers' tickets.
+/// District Desk, the tenant's OWN customers' tickets.
 ///
 /// ⛔ THE URLs ARE WRITTEN OUT RATHER THAN BUILT FROM ``DistrictPaths``, like every
 /// other row in this table, and this family earns it twice over. Three unrelated
-/// route families share the word `desk` — this one, `/api/district/support/*` (the
+/// route families share the word `desk`, this one, `/api/district/support/*` (the
 /// mirror image, the tenant's tickets with DISTRONODE) and `/api/desk/threads/*` (the
-/// PUBLIC customer page, capability-token authenticated) — so a table derived from
+/// PUBLIC customer page, capability-token authenticated), so a table derived from
 /// the same constants the endpoints are built from would assert only that the code
 /// equals itself, on the one surface where naming the wrong family is easiest.
 extension EndpointTable {
@@ -15,7 +15,7 @@ extension EndpointTable {
     ///
     /// ⛔ EVERY ROW BELOW CARRIES `workspaceId` IN THE **QUERY**, INCLUDING THE
     /// MULTIPART UPLOAD. That is the one place the desk logo differs from
-    /// `messages/media`, which reads the workspace off `req.formData()` — and the
+    /// `messages/media`, which reads the workspace off `req.formData()`, and the
     /// difference is invisible in a request that otherwise looks correct, so it is
     /// asserted here as a URL rather than trusted to a comment.
     static func deskSettings() -> [EndpointExpectation] {

@@ -1,7 +1,7 @@
 import DistrictModel
 import Foundation
 
-/// Turns one HTTP outcome — a status code and whatever bytes came back — into
+/// Turns one HTTP outcome, a status code and whatever bytes came back, into
 /// the single ``ApiError`` every District call resolves to.
 ///
 /// ⛔ CALLERS MUST NEVER PARSE AN ERROR BODY THEMSELVES. There are three
@@ -27,7 +27,7 @@ import Foundation
 /// are NOT branched here, unlike Kotlin's `ApiResult` hierarchy. ``ApiError``
 /// keeps the status, so ``ApiError/isUnauthorized`` and a caller's own check on
 /// `ApiErrorEnvelope.code` recover every one of them. Anything that needs the
-/// code or the degraded region list decodes the body itself — with
+/// code or the degraded region list decodes the body itself, with
 /// `ApiErrorEnvelope.lenient(_:)`, the same decode this function performs, or
 /// with `WorkspaceListDegradedError` for the array. Both are public for exactly
 /// that reason.
@@ -42,9 +42,9 @@ public enum ApiErrorNormalizer {
     ///     transport that returns `Data()` for a 204 and one that returns nil
     ///     would otherwise produce different errors for the same response.
     ///
-    /// - Returns: ``ApiError/decoding(_:)`` for a 2xx — which by construction
+    /// - Returns: ``ApiError/decoding(_:)`` for a 2xx, which by construction
     ///   means the caller already failed to decode the declared contract, since
-    ///   that is the only reason a success would reach this function — and
+    ///   that is the only reason a success would reach this function, and
     ///   ``ApiError/http(status:message:)`` for everything else.
     public static func apiError(statusCode: Int, body: Data?) -> ApiError {
         guard !isSuccess(statusCode) else {
@@ -65,7 +65,7 @@ public enum ApiErrorNormalizer {
     /// THAN AN OVERSIGHT. Kotlin's `ApiResult.DecodeFailure` carries a truncated
     /// `bodyPreview` in a SEPARATE field its UI never renders; ``ApiError`` has
     /// one `String` and ``ApiError/message`` returns it, so anything put here can
-    /// reach a screen — and the bodies that fail to decode are call transcripts,
+    /// reach a screen, and the bodies that fail to decode are call transcripts,
     /// contact records and message threads. The status and the size are enough to
     /// tell "the server sent nothing" from "the server sent a shape we do not
     /// know", which is what this string is for.

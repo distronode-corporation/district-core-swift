@@ -1,6 +1,6 @@
 import Foundation
 
-// District Desk — the tenant's OWN customers' tickets.
+// District Desk, the tenant's OWN customers' tickets.
 //
 // ⛔ THIS IS NOT THE SUPPORT DESK, AND THE TWO POINT IN OPPOSITE DIRECTIONS.
 // `/api/district/desk/*` is where the TENANT'S customers' requests land, filed by
@@ -24,8 +24,8 @@ import Foundation
 /// ASYMMETRY ``KnowledgeMode`` MAKES AND FOR THE SAME REASON. `POST
 /// /api/district/desk/tickets/{id}/status` validates with `z.enum(DESK_TICKET_STATUSES)`,
 /// so a write typed as this enum cannot earn that 400. The column behind it is a
-/// plain `TEXT` — chosen server-side so adding a state never needs a migration on
-/// four databases — so a status this build has not learned must arrive as a value to
+/// plain `TEXT`, chosen server-side so adding a state never needs a migration on
+/// four databases, so a status this build has not learned must arrive as a value to
 /// DISPLAY rather than as a decode failure that blanks a queue.
 ///
 /// ⚠️ `waiting` MEANS THE BALL IS WITH THE CUSTOMER, NOT THAT THE TEAM IS WAITING.
@@ -56,7 +56,7 @@ public enum DeskTicketStatus: String, Sendable, CaseIterable, Equatable {
 /// three-state "on / off / could not ask" the screens need is a property of the
 /// REQUEST's outcome, not of this field: `Result` already carries it. Modelling the
 /// unknown here would put a state in the DTO that no response can produce and invite
-/// a screen to render "off" for a read that failed — which is the failure this whole
+/// a screen to render "off" for a read that failed, which is the failure this whole
 /// family is written to avoid.
 ///
 /// ⚠️ `publicBrandName` NIL MEANS "FALL BACK TO THE WORKSPACE NAME", never "show
@@ -112,7 +112,7 @@ public struct DeskSettingsResponse: Codable, Sendable {
 /// deletes the stored object SECOND, in that order on purpose: clearing the column
 /// is what stops the tenant's customer-facing page showing the image, and it must not
 /// be blocked by a storage error. Deleting the object is what stops the BYTES from
-/// being served at all, which is what an abuse takedown needs — so its outcome is
+/// being served at all, which is what an abuse takedown needs, so its outcome is
 /// reported rather than folded into a blanket success. `success: true` with
 /// `objectRemoved: false` means the image is off the page and may still be
 /// downloadable from the URL it had.

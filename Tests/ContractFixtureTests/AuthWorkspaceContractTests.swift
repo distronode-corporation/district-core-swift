@@ -3,13 +3,13 @@ import DistrictModel
 import Foundation
 import XCTest
 
-/// Per-fixture assertions for the first DTO batch — auth, native sessions and
+/// Per-fixture assertions for the first DTO batch, auth, native sessions and
 /// workspace membership.
 ///
 /// ⚠️ THE STRICT GATE AND THESE TESTS DO DIFFERENT JOBS AND BOTH ARE NEEDED.
 /// `StrictDecodeVerifier` proves the DTO's key set matches the server's exactly;
 /// it deliberately does not compare values. What it therefore cannot notice is a
-/// fixture being REGENERATED against thinner data — every key still present,
+/// fixture being REGENERATED against thinner data, every key still present,
 /// every awkward branch gone. These tests pin the branches each fixture is
 /// supposed to cover, so a regeneration that stopped exercising one fails here.
 final class AuthWorkspaceContractTests: XCTestCase {
@@ -25,8 +25,8 @@ final class AuthWorkspaceContractTests: XCTestCase {
 
     /// ⛔ `revoked` IS A COUNT, AND ZERO IS A SUCCESS. Pinned as a count rather
     /// than a boolean because the per-device route answers `revoked:0` for an id
-    /// that is not yours — deliberately, so it cannot be used as an oracle over
-    /// the id space — and a client that rendered that as a failure would be
+    /// that is not yours, deliberately, so it cannot be used as an oracle over
+    /// the id space, and a client that rendered that as a failure would be
     /// wrong on the most common race.
     func testRevokeResponsesCarryACount() throws {
         let all = try StrictDecodeVerifier.verify(
@@ -46,7 +46,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
     /// ⛔ THE FIXTURE'S TWO ROWS ARE TWO DIFFERENT SHAPES AND THAT IS WHY IT HAS
     /// TWO. Row 0 is a fully populated install; row 1 nulls `deviceName` and
     /// `lastUsedAt` together, which is the install that signed in and has not yet
-    /// rotated a refresh token — every session's first ten minutes, and the row a
+    /// rotated a refresh token, every session's first ten minutes, and the row a
     /// user is most likely to be looking at when they open this screen. A
     /// regeneration that dropped row 1 would leave both Optionals unexercised and
     /// the strict gate would not notice, because it compares shapes and not
@@ -99,7 +99,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
 
     /// ⛔ ALL THREE ROLES MUST BE PRESENT IN THE FIXTURE. `role` is a plain
     /// string column server-side with no enum and no TypeScript union, and
-    /// `WorkspaceRole.fromWire` fails closed on anything else — a fixture
+    /// `WorkspaceRole.fromWire` fails closed on anything else, a fixture
     /// covering only `client` would never exercise that mapping, and a viewer
     /// being silently granted mutation controls is the failure it prevents.
     func testMemberListCoversEveryRoleAndIsOldestFirst() throws {
@@ -149,8 +149,8 @@ final class AuthWorkspaceContractTests: XCTestCase {
     }
 
     /// The two machine-readable codes this surface branches on. Both are 409s
-    /// and neither is a validation failure — nothing the operator typed is
-    /// wrong — so the copy has to differ from a 400's.
+    /// and neither is a validation failure, nothing the operator typed is
+    /// wrong, so the copy has to differ from a 400's.
     func testMembershipRefusalsCarryTheirCodes() throws {
         let duplicate = try StrictDecodeVerifier.verify(
             fixture: "district-member-duplicate.json",
@@ -181,7 +181,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
     // MARK: - Room tokens
 
     /// ⛔ BOTH BRANCHES OF THE VIEWER SPLIT, AND THE VIEWER ONE IS THE SECURITY
-    /// ASSERTION. The guest keys are ABSENT for a read-only seat — not null —
+    /// ASSERTION. The guest keys are ABSENT for a read-only seat, not null,
     /// because an invite is a transferable, publish-capable twelve-hour
     /// capability. A DTO proven against only the non-viewer fixture is proven
     /// against half the responses this route produces.
@@ -209,7 +209,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
         // ⛔ THE ROOM KEY, AND THE CROSS-PLATFORM CONTRACT IT CARRIES. Every LiveKit SDK
         // treats this string as a PASSPHRASE: it UTF-8-encodes the 44 ASCII characters and
         // derives the AES-GCM key with PBKDF2. A client that base64-decoded it to 32 raw
-        // bytes would select HKDF instead and derive a DIFFERENT key from the same input —
+        // bytes would select HKDF instead and derive a DIFFERENT key from the same input,
         // it would join, publish, and be unable to decrypt anyone. No exception, no log,
         // just a meeting where nobody can hear each other.
         XCTAssertNotNil(full.e2ee, "a meet_ room is end-to-end encrypted")
@@ -227,7 +227,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
         let raw = try XCTUnwrap(String(bytes: bytes, encoding: .utf8))
         XCTAssertTrue(raw.contains(key), "the decoded key must appear verbatim in the fixture")
 
-        // ⛔ ENCRYPTION IS A PROPERTY OF THE ROOM, NOT OF THE SEAT — the one place this
+        // ⛔ ENCRYPTION IS A PROPERTY OF THE ROOM, NOT OF THE SEAT, the one place this
         // differs from the guest keys above. A viewer is refused an invite because an
         // invite is a transferable publish capability; it is NOT refused the room key,
         // because without it a read-only attendee could not decode the media it is
@@ -239,7 +239,7 @@ final class AuthWorkspaceContractTests: XCTestCase {
 
     /// ⛔ THE `call_` BRANCH, WHICH HAS NO FIXTURE AND IS MOST OF THIS ROUTE'S TRAFFIC. A
     /// supervisor joining a live phone call gets no key, because the call has a SIP leg
-    /// and the carrier delivers it unencrypted — there is nothing an app-side key could
+    /// and the carrier delivers it unencrypted, there is nothing an app-side key could
     /// protect. A DTO that required the block would refuse exactly the rooms that work.
     ///
     /// ⚠️ It also proves the strict gate stays satisfied when the key is absent: a nil
@@ -298,7 +298,7 @@ final class WorkspaceRoleTests: XCTestCase {
     }
 
     /// ⛔ FAILS CLOSED. nil means "the role could not be established", which is
-    /// the opposite of the server's own `client` fallback — the server reaches
+    /// the opposite of the server's own `client` fallback, the server reaches
     /// that conclusion having confirmed the membership exists.
     func testUnknownAndAbsentRolesFailClosed() {
         XCTAssertNil(WorkspaceRole.fromWire("superuser"))

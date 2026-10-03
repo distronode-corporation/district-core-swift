@@ -7,7 +7,7 @@ import XCTest
 /// ⛔ THIS FILE IS THE ACCEPTANCE CRITERION FOR THE GATE, NOT AN EXTRA. A gate
 /// that has only ever been observed passing is indistinguishable from a gate
 /// that checks nothing, and this repo has been burned by exactly that shape more
-/// than once — a green suite that agreed with the bug, an e2e tier that reported
+/// than once, a green suite that agreed with the bug, an e2e tier that reported
 /// success while running zero specs. Every rejection path below is driven with a
 /// deliberately-broken payload and asserted to throw the SPECIFIC failure, with
 /// the fixture name and the JSON path an operator would need.
@@ -52,7 +52,7 @@ final class StrictDecodeVerifierTests: XCTestCase {
     }
 
     /// The same check has to reach INSIDE arrays, because that is where most of
-    /// the API's shape lives — a roster row, a call row, a timeline entry.
+    /// the API's shape lives, a roster row, a call row, a timeline entry.
     func testUnknownKeyInsideAnArrayElementIsRejected() {
         let json = """
         {"success":true,"members":[
@@ -92,7 +92,7 @@ final class StrictDecodeVerifierTests: XCTestCase {
     /// ⛔ THE FAILURE MODE A DECODE-ONLY TEST CAN NEVER SEE. `init(from:)` reads
     /// `name`; `encode(to:)` writes `title`. Decoding succeeds, the value is
     /// correct, and the app would still serialise something the server cannot
-    /// read — a real hazard on the request side, where the same DTOs get reused.
+    /// read, a real hazard on the request side, where the same DTOs get reused.
     func testAsymmetricEncoderIsRejected() {
         let failure = gateFailure("asymmetric.json", #"{"name":"Renamed Workspace"}"#, as: RenamingOnEncode.self)
         guard case let .droppedKeys(_, _, path, keys)? = failure else {
@@ -137,7 +137,7 @@ final class StrictDecodeVerifierTests: XCTestCase {
 
     /// ⛔ THE INVARIANT THE WHOLE GATE RESTS ON. Swift
     /// encodes a nil Optional as an OMITTED key, so an explicit null in a
-    /// fixture makes step 4 report a mismatch that is not a real contract break —
+    /// fixture makes step 4 report a mismatch that is not a real contract break,
     /// and the tempting fix, loosening the comparison, disables the unknown-key
     /// check for every other fixture at once.
     func testExplicitNullIsRejectedAndNamesItsPath() {
@@ -153,7 +153,7 @@ final class StrictDecodeVerifierTests: XCTestCase {
     }
 
     /// The null check runs BEFORE the decode, so a fixture that is both
-    /// null-bearing and undecodable reports the null — the more actionable of
+    /// null-bearing and undecodable reports the null, the more actionable of
     /// the two, and the one that explains the other.
     func testNullCheckRunsBeforeDecoding() {
         let failure = gateFailure("null-first.json", #"{"role":null}"#, as: NullableRoster.self)
@@ -318,7 +318,7 @@ final class StrictDecodeVerifierTests: XCTestCase {
 //
 // ⚠️ THESE LIVE IN THE TEST TARGET, NEVER IN Sources/. A broken DTO in the model
 // module would be reachable by feature code and would count against the coverage
-// floors; here it is exactly what it looks like — a fixture for the gate itself.
+// floors; here it is exactly what it looks like, a fixture for the gate itself.
 
 private struct SimpleMember: Codable {
     let email: String
@@ -358,7 +358,7 @@ private struct RenamingOnEncode: Codable {
     private enum EncodeKeys: String, CodingKey { case title }
 }
 
-/// Emits a field the server never sent — what a non-Optional property with a
+/// Emits a field the server never sent, what a non-Optional property with a
 /// client-side default does.
 private struct InventingOnEncode: Codable {
     let success: Bool

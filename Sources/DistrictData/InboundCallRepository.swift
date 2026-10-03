@@ -20,8 +20,8 @@ import Foundation
 /// ⛔ THE TWO REFUSAL CASES ARE NAMED FOR ``DistrictCall``'S
 /// `IncomingAnswerRejection`, WHICH IS THE TYPE THEY BECOME ONE LAYER UP, AND
 /// THEY ARE NOT THAT TYPE BECAUSE THE MODULE GRAPH FORBIDS IT. `DistrictCall`
-/// depends on `DistrictModel` alone — deliberately, so a state machine cannot
-/// start calling routes — and `DistrictData` does not depend on `DistrictCall`,
+/// depends on `DistrictModel` alone, deliberately, so a state machine cannot
+/// start calling routes, and `DistrictData` does not depend on `DistrictCall`,
 /// so this module cannot name that enum without inverting a dependency
 /// `Package.swift` argues for at length. The vocabulary is kept identical
 /// instead, so the App-side mapping is one exhaustive switch with no decisions
@@ -35,7 +35,7 @@ public enum AnswerOutcome: Sendable {
     /// The server minted a credential and it is usable.
     ///
     /// ⛔ `url` AND `token` ARE USED VERBATIM. The room lives on the deployment
-    /// that CREATED it — for an inbound call the bridge that answered the
+    /// that CREATED it, for an inbound call the bridge that answered the
     /// carrier, which for a US or Canadian number is the US hub whatever region
     /// the workspace is in. A client that derived a URL would join a bus that has
     /// never heard of this room and sit in it alone while the caller waited.
@@ -75,7 +75,7 @@ public enum AnswerOutcome: Sendable {
 /// describes a call that is ALREADY ringing a stranger and is billed. Nothing is
 /// placed or billed here: the call exists and somebody is on it, and the only
 /// thing this request decides is whether a human joins. What it DOES do is write
-/// the Redis rendezvous the agent's `ring-app` transfer is blocked on — so
+/// the Redis rendezvous the agent's `ring-app` transfer is blocked on, so
 /// calling it to "pre-warm" a credential would tell the agent a human took the
 /// call while the phone was still ringing in a pocket, and the caller would be
 /// handed to nobody. ⛔ It is called from the ANSWER press and from nowhere else.
@@ -108,7 +108,7 @@ public struct InboundCallRepository: Sendable {
     /// differently, and ``ApiError`` keeps only a status and a sentence.
     ///
     /// - Returns: `.failure` for everything that is not one of the two known
-    ///   refusals — offline, signed out, the rate limit, a 5xx, contract drift —
+    ///   refusals, offline, signed out, the rate limit, a 5xx, contract drift,
     ///   already normalised by ``ApiErrorNormalizer``.
     public func answer(callId: String, workspaceId: String) async -> Result<AnswerOutcome, ApiError> {
         let outcome = await client.sendUnmapped(
@@ -154,7 +154,7 @@ public struct InboundCallRepository: Sendable {
     }
 
     /// ⛔ A BLANK CREDENTIAL IS CONTRACT DRIFT, NOT A CALL. Every field of
-    /// ``CallAnswerResponse`` is required, so `{}` never reaches here — but `""`
+    /// ``CallAnswerResponse`` is required, so `{}` never reaches here, but `""`
     /// decodes perfectly, and the failure would then surface at `engine.connect`
     /// as a media-plane error, on a screen already showing a connected call, for
     /// what was really a server refusal. The Kotlin client makes the identical

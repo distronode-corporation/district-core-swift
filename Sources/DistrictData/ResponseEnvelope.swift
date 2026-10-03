@@ -11,8 +11,8 @@ import Foundation
 ///
 ///   - an empty `workspace/list` envelope reads as **"this account belongs to no
 ///     workspace at all"**, which routes a paying customer to an onboarding or
-///     checkout dead end. That exact conflation — "we could not look" rendered as
-///     "there is nothing" — sends a subscribed customer to a checkout page;
+///     checkout dead end. That exact conflation, "we could not look" rendered as
+///     "there is nothing", sends a subscribed customer to a checkout page;
 ///   - an empty `overview` envelope reads as **four confident zeros**.
 ///
 /// ⛔ IT IS CHECKED BY HAND RATHER THAN BY THE PARSER, and that is deliberate.
@@ -31,7 +31,7 @@ import Foundation
 /// `reject(_:_:)` and `unwrap(_:_:_:)` existed for the era when every repository
 /// hand-picked keys out of an untyped document; once the MVP read surface moved to
 /// DTOs their only caller (`CallsRepository`) stopped needing them and they became
-/// public API with no callers and no tests — which under `ci/coverage-gate.sh`'s
+/// public API with no callers and no tests, which under `ci/coverage-gate.sh`'s
 /// 100% floor is not a neutral leftover but uncovered lines. Deleted rather than
 /// pinned by a test: a test for a helper nothing calls proves only that the helper
 /// still compiles. ``require(_:_:)`` survives because the timeline read is still
@@ -58,7 +58,7 @@ public enum ResponseEnvelope {
     /// The typed equivalent: check a decoded DTO's own `success` flag.
     ///
     /// ⛔ IT IS NOT REDUNDANT NOW THAT THE READS DECODE TYPED, AND THE REASON IS
-    /// NARROWER THAN IT LOOKS. A required non-optional field does reject `{}` —
+    /// NARROWER THAN IT LOOKS. A required non-optional field does reject `{}`,
     /// but it does not reject a well-formed body that happens to say
     /// `success: false`, and two routes on this surface answer exactly that with
     /// a **200**: `messaging/test` reports a credential refusal that way by

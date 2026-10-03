@@ -3,7 +3,7 @@
 /// ⛔ NO LIVEKIT TYPE CROSSES THIS PROTOCOL, AND ON THIS TARGET THAT IS ENFORCED
 /// RATHER THAN AGREED. CI's `verify` job greps `Packages/DistrictCore` for an
 /// `import LiveKit` (and for UIKit, SwiftUI, Security, AuthenticationServices,
-/// CallKit and PushKit) and fails the job, so the SDK — and its WebRTC natives —
+/// CallKit and PushKit) and fails the job, so the SDK, and its WebRTC natives,
 /// stays in `App/`, behind this. A capability the call surface needs is a member
 /// HERE, never a reason to hand the SDK's own objects up.
 ///
@@ -15,8 +15,8 @@
 /// ⚠️ THE KOTLIN CLIENT EXPOSES FOUR `StateFlow`s WHERE THIS EXPOSES ONE STREAM,
 /// and the reason is that a `StateFlow` is a live object that cannot be replayed
 /// into a synchronous reducer. Everything those flows carried is a
-/// ``CallEngineEvent`` here — the connection state, the participant list, the
-/// microphone flag — so a state machine can be driven by handing it a list of
+/// ``CallEngineEvent`` here, the connection state, the participant list, the
+/// microphone flag, so a state machine can be driven by handing it a list of
 /// events with no clock, no task and no media server. That is the whole reason
 /// this target exists.
 ///
@@ -32,9 +32,9 @@ public protocol CallEngine: Sendable {
     /// Join the room.
     ///
     /// ⛔ THE url/token PAIR IS USED VERBATIM AND IS NEVER DERIVED. The room
-    /// exists only on the deployment that CREATED it — the TRUNK's for an
+    /// exists only on the deployment that CREATED it, the TRUNK's for an
     /// outbound dial, the US SIP bridge's for an inbound call, neither of which
-    /// is necessarily the workspace's own region — so a client that built a URL
+    /// is necessarily the workspace's own region, so a client that built a URL
     /// from its region would join a bus that has never heard of this room while
     /// the call it belongs to is live and billed.
     ///
@@ -71,7 +71,7 @@ public protocol CallEngine: Sendable {
 ///
 /// ⛔ ALL VALUE TYPES, WITH NO HANDLE TO ANYTHING THE SDK OWNS. In particular
 /// there is no video-track case: the Kotlin `CallEngine` carries an opaque
-/// `VideoTrackHandle` for the meeting grid, and a CALL never needs one — ⛔ the
+/// `VideoTrackHandle` for the meeting grid, and a CALL never needs one, ⛔ the
 /// softphone publishes no video at all, in either direction. Keeping the box out
 /// of this target is what makes that structural instead of a comment.
 public enum CallEngineEvent: Sendable, Equatable {
@@ -97,7 +97,7 @@ public enum CallEngineEvent: Sendable, Equatable {
     /// accepts, deliberately, so the app can be in the room hearing ring-back
     /// while the far end is still ringing; the SIP bridge adds the callee as a
     /// participant at pickup. ⛔ It means nothing of the kind on an INBOUND call,
-    /// where the room already contains the caller and the AI — see
+    /// where the room already contains the caller and the AI, see
     /// ``IncomingCallController``.
     case participantJoined(CallParticipant)
 
@@ -110,9 +110,9 @@ public enum CallEngineEvent: Sendable, Equatable {
     /// ⚠️ THE KOTLIN CLIENT HAS NO EQUIVALENT AND SAYS SO: its `CallEngine`
     /// "exposes no route to read back", so its speaker flag is documented as the
     /// screen's own belief rather than the device's state. AVAudioSession does
-    /// publish route changes, so this client can hold both — what was ASKED for
+    /// publish route changes, so this client can hold both, what was ASKED for
     /// in ``CallMediaState/speakerRequested`` and what the device REPORTED in
-    /// ``CallMediaState/audioRoute`` — and never has to pass one off as the
+    /// ``CallMediaState/audioRoute``, and never has to pass one off as the
     /// other.
     case audioRouteChanged(AudioRoute)
 
@@ -182,13 +182,13 @@ public enum AudioRoute: String, Sendable, Equatable {
 /// ⛔ THERE IS NO CAMERA COMMAND, ON PURPOSE. See ``CallEngineEvent``.
 ///
 /// ⚠️ NEITHER REDUCER EMITS ONE OF THESE BARE, AND THAT IS DELIBERATE RATHER THAN
-/// CEREMONY. Each wraps it — ``IncomingCallCommand/engine(_:)`` and
-/// ``SoftphoneCommand/engine(_:)`` — because a call also has to tell the OS
+/// CEREMONY. Each wraps it, ``IncomingCallCommand/engine(_:)`` and
+/// ``SoftphoneCommand/engine(_:)``, because a call also has to tell the OS
 /// things the engine knows nothing about, and the OS half cannot be expressed
 /// here: this enum is the seam onto ``CallEngine`` and the whole of its meaning
 /// is "hand this to the media session". A `reportCallEnded` case added to THIS
 /// type would reach `CallStack.perform(_:)`, which drops any command that arrives
-/// with no engine — silently, on exactly the refused-dial path that needs it
+/// with no engine, silently, on exactly the refused-dial path that needs it
 /// most.
 public enum CallCommand: Sendable, Equatable {
     /// ⛔ Both halves verbatim. See ``CallEngine/connect(url:token:)``.
@@ -214,7 +214,7 @@ public enum CallEndReason: Sendable, Equatable {
     /// WHAT MAKES THIS REASON LOAD-BEARING RATHER THAN DESCRIPTIVE. The in-app
     /// button asks CallKit for one before it feeds the reducer and the OS's own
     /// affordance IS one, so the system already knows the call is over and must
-    /// not be told again — see ``SoftphoneSession/exitCommands(for:)``, which
+    /// not be told again, see ``SoftphoneSession/exitCommands(for:)``, which
     /// decides on exactly this case.
     case hungUpLocally
 
@@ -230,7 +230,7 @@ public enum CallEndReason: Sendable, Equatable {
 
     /// The media session could not be established.
     ///
-    /// ⚠️ DISTINCT FROM A REFUSED DIAL, which never produced a call at all — see
+    /// ⚠️ DISTINCT FROM A REFUSED DIAL, which never produced a call at all, see
     /// ``SoftphoneEvent/dialRefused``.
     case failed(message: String?)
 
@@ -238,7 +238,7 @@ public enum CallEndReason: Sendable, Equatable {
     ///
     /// ⛔ NOTHING IS SENT TO THE SERVER FOR THIS, AND THE SAME IS TRUE OF
     /// ``ringTimedOut``. See ``IncomingCallController``, which owns the reasoning
-    /// — the two must be indistinguishable from outside, and the only way to
+    /// the two must be indistinguishable from outside, and the only way to
     /// guarantee that is for neither to send anything.
     case declined
 

@@ -5,14 +5,14 @@ import Foundation
 // ⛔ SPLIT FROM `SchedulingAdminEventTypeDrafts.swift` FOR THE 500-LINE
 // `file_length` CEILING that `swiftlint --strict` promotes to an error, not for a
 // boundary in the domain. Everything in both files is a request body the catalog
-// validates and this side does not — see the ⛔ there.
+// validates and this side does not, see the ⛔ there.
 
 /// One host assignment, as `eventTypes.hosts.put` takes it.
 ///
 /// ⛔ THE PUT IS A FULL REPLACEMENT AND NOT A DELTA, WHICH IS THE ONE THING A
 /// CALLER MUST KNOW ABOUT THIS TYPE: sending an array of one REMOVES every other
 /// host from the event type. The schema also requires the array to be non-empty,
-/// so "remove the last host" is not expressible — the op cannot leave an event
+/// so "remove the last host" is not expressible, the op cannot leave an event
 /// type hostless, and a UI that offers a delete on the final row is offering a 400.
 ///
 /// ⚠️ `userId` IS THE SCHEDULER'S USER ID, taken back from
@@ -35,7 +35,7 @@ public struct SchedulingHostAssignment: Sendable, Equatable {
 ///
 /// ⚠️ `position` IS OPTIONAL ON CREATE AND REQUIRED-LOOKING ON THE ROW. The read
 /// side always carries one; omitting it here lets the fork append, which is what a
-/// form's "Add question" means and is why this is not defaulted to 0 — a literal 0
+/// form's "Add question" means and is why this is not defaulted to 0, a literal 0
 /// would insert at the top.
 ///
 /// ⛔ `options` IS MEANINGFUL ONLY FOR A `select`, and the catalog does not refuse
@@ -83,7 +83,7 @@ public struct SchedulingQuestionChanges: Sendable, Equatable {
 /// answers a ``SchedulingOverrideGroup`` summary and no row at all; without it, a
 /// single ``SchedulingAvailabilityOverride``. That is the union
 /// ``SchedulingOverrideCreated`` exists for, and it is a property of THIS field
-/// rather than of the response — which is why the two are documented together.
+/// rather than of the response, which is why the two are documented together.
 ///
 /// ⚠️ `reason` IS A CLOSED SET (`day_off`, `out_of_office`, `custom_hours`) AND NOT
 /// FREE TEXT, even though ``SchedulingAvailabilityOverride/reason`` is a plain

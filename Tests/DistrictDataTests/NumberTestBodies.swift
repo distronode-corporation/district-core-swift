@@ -10,7 +10,7 @@ import Foundation
 //
 // ⛔ EVERY MULTI-LINE BODY BREAKS BETWEEN JSON TOKENS, NEVER INSIDE A STRING VALUE. A
 // newline inside a value is invalid JSON and the failure it produces is a decode error in
-// the code under test rather than in the fixture — see the ⛔ on
+// the code under test rather than in the fixture, see the ⛔ on
 // `Bodies.subscriptionRefusal`. The long server sentences are therefore built by
 // concatenating Swift literals, which also keeps every line under SwiftLint's 120.
 //
@@ -21,7 +21,7 @@ import Foundation
 // ⛔ NAMED `NumberProvisioningBodies` AND NOT `NumberBodies`, WHICH IS NOT COSMETIC.
 // `NumbersRepositoryTests.swift` already declares a `private enum NumberBodies` for the
 // two marketplace reads. `private` is FILE scope, so an internal type of the same name
-// would shadow inside that file and read as the wrong bodies from every other one — the
+// would shadow inside that file and read as the wrong bodies from every other one, the
 // kind of collision that compiles and then makes a test assert against a neighbour's
 // fixture.
 //
@@ -180,7 +180,7 @@ enum NumberProvisioningBodies {
         "The carrier refused this registration. Fix the items below and submit again."
 
     /// ⛔ CARRIES `failures` AND `reasons`, WHICH `ApiError` DELIBERATELY DROPS. Present
-    /// here so that loss is exercised rather than assumed — the screen's remedy is to
+    /// here so that loss is exercised rather than assumed, the screen's remedy is to
     /// re-read the filing list, where the route stored them verbatim.
     static let submitEvaluationFailed = #"""
     {"success":false,"error":"\#(evaluationFailedMessage)",

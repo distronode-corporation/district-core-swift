@@ -11,13 +11,13 @@ import Foundation
 /// `admin-ops.ts` at all. An image cannot travel through a zod-validated params
 /// object without a base64 inflation on both sides of a hop that already has a
 /// 5 MiB ceiling, and a recording is a **302** to a presigned object the server
-/// refuses to proxy — so one takes multipart and the other decodes no body
+/// refuses to proxy, so one takes multipart and the other decodes no body
 /// whatsoever. Folding either into `perform` would mean a generic that sometimes
 /// does not decode `data`.
 ///
 /// ⚠️ THE FAILURE VOCABULARY IS SHARED ON PURPOSE. Both routes map through
 /// ``SchedulingAdminError``, because a person who could not replace a logo and a
-/// person who could not rename an event type are owed the same five recoveries —
+/// person who could not rename an event type are owed the same five recoveries,
 /// and `admin-fetch.ts` performs the same collapse for the browser.
 public struct SchedulingAdminMediaRepository: Sendable {
     private let client: ApiClient
@@ -30,7 +30,7 @@ public struct SchedulingAdminMediaRepository: Sendable {
     ///
     /// ⛔ IT ANSWERS THE RPC'S ENVELOPE WITHOUT BEING AN RPC. A scheduler refusal
     /// arrives as **HTTP 200** carrying `{ok:false, failure, status}`, exactly as
-    /// on the catalog route and for the same reason — the request reached
+    /// on the catalog route and for the same reason, the request reached
     /// Distronode, cleared auth, cleared the role bar and the far end is what
     /// refused. A caller that read the status alone would report a rejected image
     /// as a successful upload, so the flag is decoded before the payload here just
@@ -47,7 +47,7 @@ public struct SchedulingAdminMediaRepository: Sendable {
     /// file type" arm and inventing a sixth here would make this client disagree
     /// with the browser about one refusal. The mitigation is on the way IN, not on
     /// the way out: offer only ``SchedulingUploadFile/acceptedMimeTypes`` in the
-    /// picker. ⛔ **SVG is not one of them** — it is the obvious thing to want for
+    /// picker. ⛔ **SVG is not one of them**, it is the obvious thing to want for
     /// a logo and it is a script-bearing document.
     public func upload(
         workspaceId: String,
@@ -63,7 +63,7 @@ public struct SchedulingAdminMediaRepository: Sendable {
         )
         switch await client.sendUnmapped(descriptor) {
         case let .failure(error):
-            // ⚠️ ONLY REACHED WHEN NO RESPONSE EXISTS — an unbuildable path, a
+            // ⚠️ ONLY REACHED WHEN NO RESPONSE EXISTS, an unbuildable path, a
             // missing credential, a dead socket.
             throw SchedulingAdminRepository.error(forUnanswered: error)
         case let .success(raw):
@@ -108,8 +108,8 @@ public struct SchedulingAdminMediaRepository: Sendable {
     /// The envelope walk, in the order ``SchedulingAdminRepository`` walks it.
     ///
     /// ⚠️ A `static` RATHER THAN A METHOD because it needs nothing from the
-    /// instance, and `private` because the catalog route's copy — which has the
-    /// `unknown_op` reporter this one cannot have — is the one a caller should
+    /// instance, and `private` because the catalog route's copy, which has the
+    /// `unknown_op` reporter this one cannot have, is the one a caller should
     /// reach for.
     private static func decodeUpload(_ raw: RawResponse) throws -> SchedulingUploadResult {
         guard (200 ... 299).contains(raw.statusCode) else {
@@ -146,7 +146,7 @@ public struct SchedulingAdminMediaRepository: Sendable {
 /// here, before the scheduler is ever asked.
 public struct SchedulingUploadFile: Equatable, Sendable {
     /// ⚠️ Carried for the far end's benefit, but omitting it makes the part a
-    /// plain field rather than a file — at which point `file instanceof File`
+    /// plain field rather than a file, at which point `file instanceof File`
     /// fails and the route answers 400.
     public let fileName: String
     public let mimeType: String

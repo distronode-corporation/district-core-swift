@@ -6,8 +6,8 @@ import Foundation
 ///
 /// ⛔ A WRAPPER RATHER THAN THE RAW DTO, FOR THE REASON ``ConversationList`` IS ONE:
 /// the answer has to be translated into the two vocabularies the rest of this
-/// repository speaks — a ``ThreadSelector`` for the timeline and `mark-read`, and a
-/// ``ReplyTarget`` for the send — and doing that ONCE here is what keeps a caller
+/// repository speaks, a ``ThreadSelector`` for the timeline and `mark-read`, and a
+/// ``ReplyTarget`` for the send, and doing that ONCE here is what keeps a caller
 /// from assembling either by hand. Both translations are one-line and both are the
 /// kind of one-liner that gets written differently the second time.
 ///
@@ -17,7 +17,7 @@ import Foundation
 public struct ResolvedThread: Sendable, Equatable {
     public let response: MessageThreadResponse
 
-    /// `contact:<id>` or `addr:<normalized>` — what `messages/drafts` accepts and
+    /// `contact:<id>` or `addr:<normalized>`, what `messages/drafts` accepts and
     /// what the Inbox threads on.
     public var threadKey: String {
         response.thread.threadKey
@@ -50,7 +50,7 @@ public struct ResolvedThread: Sendable, Equatable {
     /// legitimately have nothing to reply on.
     ///
     /// ⛔ THE ADDRESS IS USED VERBATIM AND MUST NEVER BE RE-DERIVED. It is the
-    /// UNWRAPPED form — the route ran `normalizeAddress` precisely so a
+    /// UNWRAPPED form, the route ran `normalizeAddress` precisely so a
     /// display-name-wrapped `from` (`Paul <paul@example.com>`) cannot end up in `to`
     /// on a send. See the ⛔ on ``MessageThreadTarget/counterpart``.
     public var replyTarget: ReplyTarget {
@@ -84,7 +84,7 @@ public extension InboxRepository {
     ///
     /// ⛔ EVERY FAILURE HERE IS ALLOWED TO DEGRADE TO "the inbox list", AND THE
     /// CALLER MUST WRITE THAT FALLBACK DELIBERATELY. A 404 (not this workspace, or
-    /// no such message — the route answers both identically on purpose), a 409 (a
+    /// no such message, the route answers both identically on purpose), a 409 (a
     /// row with no addressable counterpart), an offline handset and a 403 for a
     /// viewer are four different reasons for the same outcome, and none of them is a
     /// retry. The list is already on screen by then, which is what makes a silent
@@ -95,7 +95,7 @@ public extension InboxRepository {
     /// a multi-tenant account resolves a DIFFERENT tenant and then 404s for a
     /// message that exists.
     ///
-    /// ⚠️ ROLES ARE `["agency","client"]` — the narrow side of a disagreement inside
+    /// ⚠️ ROLES ARE `["agency","client"]`, the narrow side of a disagreement inside
     /// the Inbox, where `timeline` admits `viewer`. Gate the call on
     /// ``WorkspaceRole/allowsMutation(_:)`` like the writes it exists to enable,
     /// rather than treating the 403 as a fault.
@@ -129,7 +129,7 @@ public extension InboxRepository {
     /// call site.
     ///
     /// ⚠️ IT DELETES NOTHING AND THE CUSTOMER SEES NOTHING. A repeat marks zero rows
-    /// and still answers success, so it is safe to press twice — which is why the
+    /// and still answers success, so it is safe to press twice, which is why the
     /// count is returned rather than a Void: zero is the honest answer to "there was
     /// nothing left to clear", and the caller redraws from the list either way.
     ///

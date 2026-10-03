@@ -14,7 +14,7 @@ import XCTest
 /// any pair together produces a screen that is confidently wrong.
 ///
 /// ⚠️ NEITHER ROUTE CARRIES A `success` ENVELOPE, so the bodies below deliberately
-/// have no such key. That is asserted rather than assumed — a repository that
+/// have no such key. That is asserted rather than assumed, a repository that
 /// reached for `ResponseEnvelope.affirm` would fail every one of these.
 final class SchedulingRepositoryTests: XCTestCase {
     // MARK: - Status
@@ -70,7 +70,7 @@ final class SchedulingRepositoryTests: XCTestCase {
 
     /// ⚠️ A `viewer` READS THE CARD AND GETS NO BUTTON. `canManage` is the server
     /// telling the client which controls to draw rather than leaving it to
-    /// re-derive that from a role string — and, like every role signal on this
+    /// re-derive that from a role string, and, like every role signal on this
     /// surface, it is a UX affordance and not the boundary: the enable route
     /// enforces the role itself and answers 403 regardless of what was drawn.
     func testAViewerReadsTheSameFactsWithCanManageFalse() async {
@@ -86,7 +86,7 @@ final class SchedulingRepositoryTests: XCTestCase {
 
     /// ⛔ A 500 IS NOT AN ABSENT TENANCY. The route's catch branch answers
     /// `{error}` on a 500, and a client that mapped it onto "no tenancy" would
-    /// offer Enable to a workspace that already has booking pages — pressing it is
+    /// offer Enable to a workspace that already has booking pages, pressing it is
     /// harmless (the provisioner reuses the row) but the card would be stating
     /// something it does not know.
     func testAServerFailureIsAnErrorRatherThanAnAbsentTenancy() async {
@@ -101,7 +101,7 @@ final class SchedulingRepositoryTests: XCTestCase {
     // MARK: - Enable
 
     /// ⛔ THE ROUTE ANSWERS **202**, AND A CLIENT THAT ONLY ACCEPTED 200 WOULD
-    /// REPORT EVERY SUCCESSFUL ENABLE AS A FAILURE — with the tenancy actually
+    /// REPORT EVERY SUCCESSFUL ENABLE AS A FAILURE, with the tenancy actually
     /// provisioned and the screen claiming otherwise, which is the worst pairing
     /// available here. `ApiErrorNormalizer.isSuccess` is `200...299`, so nothing
     /// special is needed; this test is what proves that rather than assuming it.
@@ -141,7 +141,7 @@ final class SchedulingRepositoryTests: XCTestCase {
     /// ⛔ THE ALLOWLIST REFUSAL IS A REAL ``ApiError`` AND MUST STAY ONE. It never
     /// reached the provisioner: `isSchedulingEnabledFor` refused before any third
     /// party was touched, so there is no tenancy state to report and nothing in the
-    /// body but the sentence. ⚠️ It is also NOT the role gate — an owner of a
+    /// body but the sentence. ⚠️ It is also NOT the role gate, an owner of a
     /// workspace nobody has admitted gets this too, which is why the card reads
     /// `eligible` from the status route instead of offering the button by role.
     func testTheAllowlistRefusalPassesThroughAsA403() async {
@@ -160,8 +160,8 @@ final class SchedulingRepositoryTests: XCTestCase {
     }
 
     /// ⛔ 429 IS THE 5-PER-HOUR-PER-WORKSPACE BRAKE, AND IT IS A REFUSAL RATHER
-    /// THAN A REASON TO RETRY. Each enable reaches two third parties — a tenancy
-    /// at the scheduler and a DNS record at Cloudflare — so a client that retried
+    /// THAN A REASON TO RETRY. Each enable reaches two third parties, a tenancy
+    /// at the scheduler and a DNS record at Cloudflare, so a client that retried
     /// on this would be spending somebody else's quota. ⚠️ Keyed on the WORKSPACE,
     /// so three colleagues pressing the same button share one budget; the sentence
     /// says so and reaches the screen intact.

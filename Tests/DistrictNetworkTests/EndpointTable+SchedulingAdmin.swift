@@ -14,7 +14,7 @@ extension EndpointTable {
     /// which is the opposite decision from the `scheduling/handoff` row three
     /// functions up and is deliberate. `JSONValue.object(_:)` drops nil pairs, and
     /// `next` relies on that so the route's own default fires; `params` must
-    /// SURVIVE as `{}` — the route defaults an absent one to `{}` as well, so the
+    /// SURVIVE as `{}`, the route defaults an absent one to `{}` as well, so the
     /// two agree today, and sending it makes the agreement a contract instead of a
     /// coincidence.
     ///
@@ -54,7 +54,7 @@ extension EndpointTable {
                 .multipart(fields: ["target": "logo"], fileName: "logo.png")
             ),
             // ⛔ A 302 TO A PRESIGNED OBJECT, like `calls/{id}/recording`. The row
-            // says nothing about that — it is a URL assertion — but the endpoint is
+            // says nothing about that, it is a URL assertion, but the endpoint is
             // on `RedirectEndpoints.all` and `EndpointSurfaceTests` is where that
             // is pinned.
             EndpointExpectation(

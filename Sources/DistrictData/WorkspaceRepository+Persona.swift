@@ -9,8 +9,8 @@ import Foundation
 /// 500-LINE `file_length` CEILING, exactly as `ImplementedFixtures+MessageThread.swift` and
 /// `EndpointClassification+SchedulingAdmin.swift` were. Nothing here is a separate
 /// concern from the settings surface next door, and the obligation stated there
-/// — a save is only ever built on a successful ``WorkspaceRepository/config(workspaceId:)``
-/// — covers every method in this file.
+/// a save is only ever built on a successful ``WorkspaceRepository/config(workspaceId:)``
+/// covers every method in this file.
 public extension WorkspaceRepository {
     // MARK: - The vocabularies
 
@@ -18,14 +18,14 @@ public extension WorkspaceRepository {
     ///
     /// ⛔ A FAILURE HERE MUST LEAVE THE FORM READ-ONLY AND MUST NEVER FALL BACK TO A
     /// BUILT-IN CATALOGUE. `PATCH workspace/persona` COERCES rather than rejects, so
-    /// a hardcoded Swift list does not fail when it drifts — every value it offers
+    /// a hardcoded Swift list does not fail when it drifts, every value it offers
     /// is still accepted, stored, and then silently substituted by the agent, with a
     /// 200 and nothing anywhere reporting it. That is the exact failure this route
     /// exists to retire, and a fallback list reintroduces it.
     ///
     /// ⚠️ THE ANSWER IS PER WORKSPACE, NOT PER PROCESS. Each engine's label states
-    /// where its audio is processed — a public residency claim keyed on the
-    /// WORKSPACE's region — so a cache shared across workspaces would tell an EU
+    /// where its audio is processed, a public residency claim keyed on the
+    /// WORKSPACE's region, so a cache shared across workspaces would tell an EU
     /// tenant their audio stays in the EU because a US workspace was read first.
     ///
     /// ⚠️ Rate limited at 60/min per workspace. Generous enough to refetch on an
@@ -57,14 +57,14 @@ public extension WorkspaceRepository {
     /// ⛔ `responseLength` WITHOUT `modelId` IS SILENTLY DISCARDED. The route stores
     /// the level under `aiPersona.responseLength[modelId]` and refuses to guess at
     /// the stored engine, so with no accepted engine id in the SAME request there is
-    /// no key to write under — it writes nothing and answers 200. Callers send the
+    /// no key to write under, it writes nothing and answers 200. Callers send the
     /// pair or neither; ``PersonaModel`` is where that is enforced.
     ///
     /// ⛔ THE SEVEN VOCABULARY FIELDS MUST COME FROM ``personaOptions(workspaceId:)``.
     /// An unrecognised `modelId` is rewritten to `deepgram-pipeline`; an
     /// unrecognised `voice` is stored verbatim and then replaced by the agent's own
     /// fallback at synthesis time. Both answer 200, so a value typed by hand does
-    /// not fail — it produces a persona nobody chose.
+    /// not fail, it produces a persona nobody chose.
     ///
     /// ⚠️ `dgiEnabled` IS AN ENTITLEMENT AS WELL AS A CONSENT FLAG. Turning it ON for
     /// a workspace that is not on Voice Studio answers **403 `dgi_requires_studio`**,
@@ -127,7 +127,7 @@ public extension WorkspaceRepository {
     ///
     /// ⚠️ NO CONFIG READ IS REQUIRED FIRST, UNLIKE EVERY SAVE ON THIS SURFACE. This
     /// route persists nothing, so there is no stored value a blank form could
-    /// destroy — the load-then-edit rule exists for wholesale replacement and does
+    /// destroy, the load-then-edit rule exists for wholesale replacement and does
     /// not apply. What IS required is the options read, because a `modelId` the
     /// registry does not know is coerced to `deepgram-pipeline` and the preview then
     /// runs on an engine nobody chose.
@@ -147,7 +147,7 @@ public extension WorkspaceRepository {
 
     /// Replace the dynamic-persona rules from an editor's drafts.
     ///
-    /// ⛔ WHOLESALE, LIKE THE ARRAY IT REPLACES, AND EVERY ROW GOES BACK — including
+    /// ⛔ WHOLESALE, LIKE THE ARRAY IT REPLACES, AND EVERY ROW GOES BACK, including
     /// the ones this build cannot read. A rule shaped `{id, match, action, target}`
     /// (two of the three rows in the committed fixture) has none of the six keys the
     /// editor owns; ``RoutingRuleDraft/carriedUnchanged()`` sends it byte-identically
@@ -162,7 +162,7 @@ public extension WorkspaceRepository {
     ///
     /// ⚠️ A **400 HERE IS OFTEN A REAL, SPECIFIC REFUSAL** rather than a client
     /// fault: a workspace that restricts voices or models rejects a rule naming one
-    /// outside its allow-list, BY NAME. That sentence is worth showing verbatim —
+    /// outside its allow-list, BY NAME. That sentence is worth showing verbatim,
     /// this client cannot see either list and deliberately does not pre-validate
     /// against a guess.
     ///

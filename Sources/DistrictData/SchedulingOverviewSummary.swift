@@ -56,7 +56,7 @@ public enum SchedulingOverviewSummary {
             // `displayIndex` has already folded every integer into 0...6, so a corrupt
             // `day_of_week` of `9` arrives here as Tuesday and is SUMMARISED rather than
             // skipped. ⚠️ ``SchedulingHoursFormat/weekFromRules(_:)`` checks the WIRE value
-            // instead, before the modulo, and therefore drops the same row — so the two
+            // instead, before the modulo, and therefore drops the same row, so the two
             // screens genuinely disagree about a corrupt rule. That asymmetry is
             // `overview-summary.ts` and `working-hours.ts` verbatim; removing this line
             // would read as a decision to fold, when the truth is that it is inherited,
@@ -112,8 +112,8 @@ public enum SchedulingOverviewSummary {
     ///
     /// ⛔ THE SLUG IS PERCENT-ENCODED AND THE HOST IS NOT. The host came from the
     /// tenancy row and is already a hostname; the slug is customer-authored and can carry
-    /// anything the fork accepted. ⚠️ `urlPathAllowed` is the wrong set here — it permits
-    /// `/`, which would let a slug reach a different path — so the allowed characters are
+    /// anything the fork accepted. ⚠️ `urlPathAllowed` is the wrong set here, it permits
+    /// `/`, which would let a slug reach a different path, so the allowed characters are
     /// stated explicitly, matching `encodeURIComponent`.
     public static func bookingUrlFor(publicHost: String, slug: String) -> String {
         "https://\(publicHost)/book/\(encodeURIComponent(slug))"
@@ -195,7 +195,7 @@ public enum SchedulingOverviewSummary {
     /// `9:00 to 17:00` or `9:00 to 12:00 and 13:00 to 17:00`.
     ///
     /// ⚠️ THE SEPARATOR IS `, ` FOR ALL BUT THE LAST PAIR AND ` and ` BEFORE IT, with no
-    /// Oxford comma — three windows read "a, b and c".
+    /// Oxford comma, three windows read "a, b and c".
     static func windowsPhrase(_ windows: [(start: String, end: String)]) -> String {
         let parts = windows.map { "\(displayTime($0.start)) to \(displayTime($0.end))" }
         // One window or none: `joined()` is that window, or "".

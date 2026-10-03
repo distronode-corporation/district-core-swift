@@ -6,7 +6,7 @@ import Foundation
 // ⛔ IN `Tests/ContractGateSupport/` AND NOT IN `Tests/ContractFixtureTests/`,
 // WHICH IS NOT A FILING PREFERENCE. `allowedExplicitNulls` is composed in
 // `AllowedExplicitNulls+Union.swift` out of groups declared in THIS module, and
-// `ContractFixtureTests` is a different SwiftPM target that depends on it — so a
+// `ContractFixtureTests` is a different SwiftPM target that depends on it, so a
 // group declared over there could never be merged in, and the gate would read the
 // empty set for these three fixtures while a `schedulingB` constant sat beside it
 // looking authoritative. The fourth group is chained in `+Union.swift` in the same
@@ -30,16 +30,16 @@ extension StrictDecodeVerifier {
     /// ⛔ ALL THREE ARE THE SAME FACT SEEN THREE TIMES: a Go slice the scheduler
     /// fork marshals WITHOUT `omitempty`, so a nil slice crosses the wire as an
     /// explicit `null` rather than as an absent key. The server's own schemas say
-    /// so — `userSchema.teams` and `teamSchema.members` are `.nullish()` where
-    /// every other optional array on those rows is `.optional()` — and the same
+    /// so, `userSchema.teams` and `teamSchema.members` are `.nullish()` where
+    /// every other optional array on those rows is `.optional()`, and the same
     /// mechanism is what breaks a page outright when it is missed: with `calendar.status`'s
     /// `unconfigured_providers` typed `.optional()`, every configured tenant's calendar
     /// page reads "could not be read".
     ///
     ///   teams    `SchedulingUser.teams`. Null for a scheduler user who is in no
     ///            team, which row 1 of the users fixture is. ⚠️ Null and `[]` mean
-    ///            the same thing on THIS field — nobody's team membership is
-    ///            "unknown" — which is not true of `members` below.
+    ///            the same thing on THIS field, nobody's team membership is
+    ///            "unknown", which is not true of `members` below.
     ///   members  `SchedulingTeam.members`. Null on a team with no members. ⛔ It
     ///            is null on BOTH team fixtures because they are the SAME team seen
     ///            twice, once through `teams.list` and once through `teams.get`,
@@ -51,7 +51,7 @@ extension StrictDecodeVerifier {
     /// DELIBERATELY NOT LISTED, and they are the entries a reader will most expect
     /// to find here. Both are `.nullish()` on the server and both carry REAL ARRAYS
     /// in `district-scheduling-calendar-status.json`, so an entry would be
-    /// permission for a null these bytes cannot demonstrate — the same call
+    /// permission for a null these bytes cannot demonstrate, the same call
     /// `+Inbox.swift` makes for `message.type`. Their null branch is decoded from
     /// inline bytes in `SchedulingAdminCalendarTests` instead, which proves the
     /// Optional without widening the one escape the no-nulls invariant has.

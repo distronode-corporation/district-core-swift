@@ -17,7 +17,7 @@ import Foundation
 /// ⛔ THREE OUTCOMES THAT ALL LOOK LIKE "IT DID NOT WORK" AND MUST NOT BE
 /// COLLAPSED, which is the whole reason this repository is more than two lines:
 ///
-///   - `tenant == nil` on a status read is the LEGACY state — no row, nobody has
+///   - `tenant == nil` on a status read is the LEGACY state, no row, nobody has
 ///     pressed Enable. Ordinary, and the screen's job is to offer the button (if
 ///     `eligible` and `canManage`), not to report a fault;
 ///   - `ok: false` on an enable is a SUCCESSFUL 202 carrying an operator-facing
@@ -29,8 +29,8 @@ import Foundation
 ///     enables in an hour for this workspace. The screen renders both.
 ///
 /// ⛔ NOTHING HERE POLLS, AND NOTHING HERE MAY LEARN TO. `enable` reaches two
-/// third parties per call — a tenancy at the scheduler and a DNS record at
-/// Cloudflare — and its 5/hour limiter fails open, so a retry loop is somebody
+/// third parties per call, a tenancy at the scheduler and a DNS record at
+/// Cloudflare, and its 5/hour limiter fails open, so a retry loop is somebody
 /// else's API quota and a zone full of records. A caller that wants to know how a
 /// provision ended re-reads ``status(workspaceId:)`` on a human action, which is
 /// what the 202 is telling it to do.
@@ -56,7 +56,7 @@ public struct SchedulingRepository: Sendable {
     ///
     /// ⛔ THE 202 IS A SUCCESS AND THE CLIENT MUST TREAT IT AS ONE.
     /// ``ApiClient/send(_:as:)`` accepts every 2xx (`ApiErrorNormalizer.isSuccess`
-    /// is `200...299`, not `== 200`), so this needs no special case — which is
+    /// is `200...299`, not `== 200`), so this needs no special case, which is
     /// worth saying out loud because the natural mistake is a client that only
     /// accepts 200 and therefore reports every successful enable as a failure,
     /// with the tenancy provisioned and the screen claiming otherwise. A test

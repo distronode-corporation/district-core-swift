@@ -248,7 +248,7 @@ public enum AppLinkResolver {
     /// publishes eight real sub-pages under `/dashboard/district/scheduling` (`event-types`,
     /// `hours`, `bookings`, `calendar`, `team`, `recordings`, `settings`, `developer`) and
     /// the app now draws every one of them, so sending all eight to the hub would be the
-    /// same wrong answer the `openInBrowser` case was introduced to stop — a link that
+    /// same wrong answer the `openInBrowser` case was introduced to stop, a link that
     /// resolved, opened the app, and showed something the user did not ask for. ⚠️ A ninth
     /// name, `overview`, is accepted for the register that the web serves at the scheduling
     /// ROOT; nothing produces that URL today, and it is mapped on the same reasoning the
@@ -340,13 +340,13 @@ public enum AppLinkResolver {
     /// it is the SAFER of the two rather than a widening of the risk. A `calls/<id>`
     /// segment is an opaque id that may not resolve; a `scheduling/<sub>` segment is one
     /// of nine fixed names, and the App target's mapping answers the hub for anything it
-    /// does not recognise — so the worst case is landing one level up, inside the surface
+    /// does not recognise, so the worst case is landing one level up, inside the surface
     /// the URL named, with nothing to fail.
     ///
     /// ⛔ IT IS LOWERCASED HERE AND NOT AT THE CALL SITE. ``section(for:)`` case-folds its
     /// own segment because a shared link is retyped by humans, and a sub-path that did not
     /// get the same treatment would send `/scheduling/Event-Types` to the hub while
-    /// `/Scheduling` reached the section — one rule applied to half a path is worse than
+    /// `/Scheduling` reached the section, one rule applied to half a path is worse than
     /// either rule applied whole.
     private static func detailId(for section: DistrictSection, segments: [String]) -> String? {
         guard section == .calls || section == .scheduling, segments.count > 1 else { return nil }

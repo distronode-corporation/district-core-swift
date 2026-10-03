@@ -1,11 +1,11 @@
 import Foundation
 
-/// The unified Inbox — SMS and email in one thread per counterpart — and the
+/// The unified Inbox, SMS and email in one thread per counterpart, and the
 /// composer's persistence and generation routes.
 ///
 /// ⛔ THE READS ADMIT `viewer`; THE WRITES DO NOT. `conversations`, `timeline`,
 /// `unreadCount` and `searchMessages` allow agency/client/viewer, while `sendMessage`,
-/// `markRead` and `uploadMedia` are agency/client only — so the reply box must be
+/// `markRead` and `uploadMedia` are agency/client only, so the reply box must be
 /// gated on the same role the app already threads through for contacts.
 /// `markRead` excluding viewers is why a viewer left ungated gets a permanent
 /// unread badge plus an error on every tap.
@@ -14,7 +14,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ NOT PAGED, AND NOT BECAUSE NOBODY GOT AROUND TO IT. The server scans a
     /// bounded window of recent messages (500) and GROUPS them into threads, so
-    /// there is no stable offset to page on — a thread's position depends on
+    /// there is no stable offset to page on, a thread's position depends on
     /// messages that may fall outside the window. The response reports `scanned`
     /// and `scanLimit` so the client can say the list is partial instead of
     /// implying it is complete.
@@ -30,15 +30,15 @@ public extension DistrictEndpoints {
     /// One thread's full history: SMS, email AND calls, interleaved.
     ///
     /// ⚠️ TAKES `contactId` WHEN THE THREAD RESOLVED TO A CONTACT AND `address`
-    /// WHEN IT DID NOT — exactly one is required. The server's parameter is still
+    /// WHEN IT DID NOT, exactly one is required. The server's parameter is still
     /// named `phoneNumber` for the address case and now accepts an email in it;
     /// that name is historical and renaming it here would 400.
     ///
     /// ⛔ EXPAND-ONLY PAGING, AND OMITTING BOTH CURSOR ARGUMENTS IS THE NEWEST
-    /// WINDOW — byte for byte the request this made before paging existed. That
+    /// WINDOW, byte for byte the request this made before paging existed. That
     /// works only because nil query entries are DROPPED rather than sent empty:
     /// `before=` present-but-empty becomes `new Date("")`, an Invalid Date, and
-    /// the route answers 400 — every thread open would break.
+    /// the route answers 400, every thread open would break.
     ///
     /// ⛔ `beforeId` WITHOUT `before` IS A 400 FROM THE ROUTE, NOT A DEFAULT. An
     /// id alone cannot say which timestamp it breaks a tie at. The pairing is
@@ -76,7 +76,7 @@ public extension DistrictEndpoints {
     /// badge needs this number without paying for the 500-message scan the list
     /// costs, and the web sidebar polls exactly this route for the same reason.
     ///
-    /// ⚠️ ITS ENVELOPE IS `{success, count, workspaceId}` — the count is a
+    /// ⚠️ ITS ENVELOPE IS `{success, count, workspaceId}`, the count is a
     /// TOP-LEVEL key, not a nested object, and the workspace id is echoed back.
     /// `UnreadCountResponse` is one of the nine DTOs that already exist, so this
     /// is one of the few endpoints that decodes typed today.
@@ -130,19 +130,19 @@ public extension DistrictEndpoints {
 
     /// Send a reply.
     ///
-    /// ⛔ THIS SPENDS REAL MONEY — SMS/MMS segments or a Postmark email — and is
+    /// ⛔ THIS SPENDS REAL MONEY, SMS/MMS segments or a Postmark email, and is
     /// capped server-side at 30 requests per minute PER WORKSPACE (not per user,
     /// because the cost lands on the workspace either way). A client that retried
     /// a send automatically is spending someone's money on its own initiative.
     /// Nothing here may.
     ///
-    /// ⚠️ THE SERVER'S REFUSALS ARE SPECIFIC — unverified sender, exhausted A2P
-    /// registration, per-workspace rate limit — and are surfaced verbatim,
+    /// ⚠️ THE SERVER'S REFUSALS ARE SPECIFIC, unverified sender, exhausted A2P
+    /// registration, per-workspace rate limit, and are surfaced verbatim,
     /// because "could not send" throws all of that away.
     ///
     /// - Parameter mediaUrls: the URLs ``uploadMedia(workspaceId:fileName:mimeType:bytes:)``
     ///   returned. ⛔ Those URLs are ANONYMOUS (`/api/media/<uuid>` answers
-    ///   without a session, because a carrier's MMS fetcher has none) — do not
+    ///   without a session, because a carrier's MMS fetcher has none), do not
     ///   attach the bearer token when loading one back.
     static func sendMessage(
         workspaceId: String,
@@ -170,7 +170,7 @@ public extension DistrictEndpoints {
     /// Mark a thread read.
     ///
     /// ⚠️ `contactId` OR `counterpart`; NEITHER IS A 400. A thread with no
-    /// Contact row has only an address, which is why the server accepts both —
+    /// Contact row has only an address, which is why the server accepts both,
     /// and it validates that at least one is PRESENT, which is why the nils are
     /// dropped rather than sent as explicit nulls.
     ///
@@ -201,7 +201,7 @@ public extension DistrictEndpoints {
     /// SECOND ROUTE. `messages/mark-read` destructures `{workspaceId, contactId,
     /// counterpart, all}` and branches on `all` before it builds any clause; there
     /// is no `mark-read/all` path and inventing one would 404. So this adds no
-    /// ``EndpointID`` case and no row to `EndpointTable` — it is a body, and a
+    /// ``EndpointID`` case and no row to `EndpointTable`, it is a body, and a
     /// route may have several.
     ///
     /// ⛔ AND IT IS THE ONE BODY ON THIS ROUTE WITH NO SELECTOR TO GET WRONG,
@@ -215,8 +215,8 @@ public extension DistrictEndpoints {
     /// ⚠️ NOT DESTRUCTIVE AND NOT IDEMPOTENT-SENSITIVE: it stamps `readAt` on
     /// inbound rows that have none, so a repeat marks nothing and answers
     /// `{success, marked: 0}`. It deletes nothing and it is invisible to the
-    /// customer. ⛔ It is still workspace-wide shared state — every colleague's
-    /// badge clears with it — so it belongs behind a deliberate control rather
+    /// customer. ⛔ It is still workspace-wide shared state, every colleague's
+    /// badge clears with it, so it belongs behind a deliberate control rather
     /// than behind a refresh.
     static func markAllRead(workspaceId: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
@@ -248,7 +248,7 @@ public extension DistrictEndpoints {
     /// ⚠️ THE WORKSPACE IS A QUERY PARAMETER AND IS WORTH SENDING EVEN THOUGH THE
     /// ROUTE WOULD FALL BACK. Omitted, the guard picks the caller's active
     /// workspace, which on a multi-tenant account is a different tenant from the
-    /// one the push named — and the answer would then 404 for a message that
+    /// one the push named, and the answer would then 404 for a message that
     /// exists. The push carries the workspace; pass it.
     ///
     /// ⛔ ANSWERS **409** FOR A ROW WITH NO ADDRESSABLE COUNTERPART, and **404**
@@ -297,7 +297,7 @@ public extension DistrictEndpoints {
     /// One thread's saved draft, or `null` when there is none.
     ///
     /// ⛔ BOTH PARAMETERS, ALWAYS. The SAME path with `threadKey` ABSENT is the
-    /// LIST endpoint — see ``drafts(workspaceId:)`` — which answers
+    /// LIST endpoint, see ``drafts(workspaceId:)``, which answers
     /// `{success, drafts: [...]}`, a different key and a different type. Dropping
     /// the thread key here does not 400; it decodes as a draft-less response and
     /// the composer silently restores nothing.
@@ -334,11 +334,11 @@ public extension DistrictEndpoints {
     /// Upsert a draft.
     ///
     /// ⛔ **PUT, NOT POST.** The route exports GET/PUT/DELETE only; a POST is a
-    /// 405, and the upsert semantics are why PUT is the honest verb — autosave
+    /// 405, and the upsert semantics are why PUT is the honest verb, autosave
     /// has no create-versus-update distinction to express.
     ///
     /// ⛔ NEVER WITH A BLANK BODY. The server answers 400 `code: "empty_body"` and
-    /// means "send DELETE instead" — a blank draft is the absence of one.
+    /// means "send DELETE instead", a blank draft is the absence of one.
     ///
     /// ⚠️ Rate limited at 60 writes/min per WORKSPACE, shared with
     /// ``deleteDraft(workspaceId:threadKey:)``. That is an autosave ceiling rather
@@ -384,7 +384,7 @@ public extension DistrictEndpoints {
 
     /// Generate a reply with the model.
     ///
-    /// ⛔ **SINGULAR `messages/draft` — THIS IS THE BILLED ONE**, and it is one
+    /// ⛔ **SINGULAR `messages/draft`, THIS IS THE BILLED ONE**, and it is one
     /// letter from ``saveDraft(workspaceId:threadKey:body:subject:mediaUrls:)``'s
     /// plural persistence path. One Vertex generation per call, capped at 20/min
     /// per workspace, non-idempotent. Pointing an autosave here would bill a

@@ -7,7 +7,7 @@ import Foundation
 // ⛔ THE THREE CREATE/DELETE PAIRS DO NOT SHARE A RESPONSE CONVENTION AND THE
 // DIFFERENCES ARE THE CONTRACT. `apiKeys.create` and `webhooks.create` answer a
 // row carrying a ONCE-ONLY secret; every delete answers nothing; and
-// `webhooks.patch` — unlike the team patches elsewhere in the catalog — answers
+// `webhooks.patch`, unlike the team patches elsewhere in the catalog, answers
 // **204 with no body**, so a caller must refetch rather than trust an echo. Each
 // method below states which it is, because the wrong assumption fails as a decode
 // error blaming the contract.
@@ -27,11 +27,11 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `apiKeys.create` — mint a key and see its plaintext ONCE.
+    /// `apiKeys.create`, mint a key and see its plaintext ONCE.
     ///
     /// ⛔ THE RETURNED ``SchedulingAPIKeyCreated/key`` IS A LIVE CREDENTIAL AND
     /// THIS IS ITS ONLY APPEARANCE. It must not be logged, must not be persisted,
-    /// and must not be interpolated into a copyable snippet — the web console
+    /// and must not be interpolated into a copyable snippet, the web console
     /// holds it in a modal and drops it from state when the modal closes. Re-read
     /// ``apiKeys(workspaceId:)`` for anything that outlives the sheet.
     func createAPIKey(workspaceId: String, name: String) async throws -> SchedulingAPIKeyCreated {
@@ -43,7 +43,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `apiKeys.delete` — revoke a key. ⚠️ Answers nothing.
+    /// `apiKeys.delete`, revoke a key. ⚠️ Answers nothing.
     func deleteAPIKey(workspaceId: String, keyId: String) async throws -> SchedulingNoContent {
         try await perform(
             .apiKeysDelete,
@@ -55,7 +55,7 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Connected apps
 
-    /// `oauth.connections.list` — third-party apps holding a grant.
+    /// `oauth.connections.list`, third-party apps holding a grant.
     ///
     /// ⚠️ NOT API KEYS, THOUGH THE TABS LOOK ALIKE. A key is minted BY the
     /// customer; a connection is granted TO an app by a person consenting.
@@ -68,7 +68,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `oauth.connections.delete` — sign one app out. ⚠️ Answers nothing.
+    /// `oauth.connections.delete`, sign one app out. ⚠️ Answers nothing.
     func deleteOAuthConnection(workspaceId: String, connectionId: String) async throws -> SchedulingNoContent {
         try await perform(
             .oauthConnectionsDelete,
@@ -100,7 +100,7 @@ public extension SchedulingAdminRepository {
     ///
     /// - Parameter fields: which payload fields are delivered. ⛔ nil MEANS "THE
     ///   FORK'S DEFAULT SET", NOT "NONE", and that default is not the same list the
-    ///   console offers — it omits `event_type_name`, `host_name` and `host_email`,
+    ///   console offers, it omits `event_type_name`, `host_name` and `host_email`,
     ///   so a webhook created with nil arrives missing values the form never offered
     ///   to remove. Send the list explicitly for anything a person configured.
     ///   ⚠️ `attendee_name`, `attendee_email`, `attendee_timezone` and `answers`
@@ -124,7 +124,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `webhooks.patch` — change the events or the fields of an existing webhook.
+    /// `webhooks.patch`, change the events or the fields of an existing webhook.
     ///
     /// ⛔ IT ANSWERS **204 WITH NO BODY**, UNLIKE THE TEAM PATCHES IN THE SAME
     /// CATALOG, so there is no updated row to render and the caller must refetch
@@ -165,7 +165,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `webhooks.deliveries` — the attempt log for one webhook.
+    /// `webhooks.deliveries`, the attempt log for one webhook.
     ///
     /// ⛔ A `failed` ROW WITH NO ``SchedulingWebhookDelivery/responseStatus`` MEANS
     /// NOBODY ANSWERED, which is a different fact from a rejection and the only

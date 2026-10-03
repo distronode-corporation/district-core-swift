@@ -5,7 +5,7 @@ import Foundation
 ///
 /// ⛔ HERE RATHER THAN IN THE VIEW, BECAUSE EVERY ONE OF THEM IS A CORRECTNESS RULE
 /// AND NOT A LAYOUT ONE. Which languages an engine offers, which voice a language
-/// switch lands on, whether a style picker appears at all — each is a claim the
+/// switch lands on, whether a style picker appears at all, each is a claim the
 /// SERVER will not contradict, because the save route coerces instead of refusing.
 /// A rule implemented in a `body` is a rule no Linux test can reach.
 public extension PersonaOptionsResponse {
@@ -33,7 +33,7 @@ public extension PersonaOptionsResponse {
     /// The voice groups for one engine in one language.
     ///
     /// ⚠️ AN EMPTY ARRAY IS A REAL ANSWER. A stored persona can name a language its
-    /// engine does not publish — the save route never refused one — and the honest
+    /// engine does not publish, the save route never refused one, and the honest
     /// rendering is an empty picker with the existing value still shown, never a
     /// silent substitution.
     func voiceGroups(engine engineId: String?, language: String?) -> [PersonaVoiceGroup] {
@@ -62,7 +62,7 @@ public extension PersonaOptionsResponse {
     ///
     /// ⚠️ nil MEANS "THE SERVER PUBLISHED NO DEFAULT FOR THIS COMBINATION", which
     /// is not the same as an error and not the same as an empty string. A caller
-    /// leaves the field as it was rather than clearing it — clearing it would be a
+    /// leaves the field as it was rather than clearing it, clearing it would be a
     /// save that stores `""` and makes the agent fall back to a voice nobody chose.
     func defaultVoice(engine engineId: String?, language: String?) -> String? {
         guard let engineId else { return nil }
@@ -89,7 +89,7 @@ public extension PersonaOptionsResponse {
 /// silently does nothing. `voiceStyle` is read only by Gemini Live (the chained
 /// pipelines have no TTS stage to posture) and `preemptiveTts` is meaningless to it
 /// (a realtime engine does not speculate ahead of its own audio), so each is a
-/// setting the other engine will accept, store and ignore — with a 200.
+/// setting the other engine will accept, store and ignore, with a 200.
 public struct PersonaEngineCapabilities: Sendable, Equatable {
     /// ⛔ THE GEMINI LIVE ENGINE ID, AND IT IS SPELLED OUT RATHER THAN DERIVED. The
     /// options payload marks no engine as realtime, and inferring it from the

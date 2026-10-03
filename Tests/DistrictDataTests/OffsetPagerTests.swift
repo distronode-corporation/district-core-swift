@@ -7,7 +7,7 @@ import XCTest
 final class OffsetPagerTests: XCTestCase {
     /// ⛔ THE SAME ROW ARRIVING ON TWO PAGES IS THE ORDINARY CASE, NOT AN EDGE ONE.
     /// A call arriving mid-scroll shifts every window down, so the row at the old
-    /// boundary is served again — reproduced against the real server on the Kotlin
+    /// boundary is served again, reproduced against the real server on the Kotlin
     /// client, not theorised.
     func testABoundaryRowServedTwiceIsEmittedOnce() async {
         let pages = [
@@ -28,7 +28,7 @@ final class OffsetPagerTests: XCTestCase {
 
     /// ⛔ THE OFFSET ADVANCES BY THE RAW PAGE SIZE, NOT THE DEDUPLICATED ONE.
     /// Skipping ahead by the smaller number re-requests exactly the rows just
-    /// dropped, which are dropped again, forever — a list that never ends and
+    /// dropped, which are dropped again, forever, a list that never ends and
     /// never stops fetching.
     func testTheOffsetAdvancesByRowsReceivedNotRowsKept() async {
         let pager = OffsetPager<String>(
@@ -44,7 +44,7 @@ final class OffsetPagerTests: XCTestCase {
         XCTAssertEqual(offset, 2)
     }
 
-    /// ⚠️ AN EMPTY SLICE WITH `isEnd == false` IS A REAL STATE — every row in that
+    /// ⚠️ AN EMPTY SLICE WITH `isEnd == false` IS A REAL STATE, every row in that
     /// window had been seen. A caller that stops on an empty slice truncates the
     /// feed.
     func testAFullyDuplicateFullPageIsNotTheEnd() async {
@@ -60,7 +60,7 @@ final class OffsetPagerTests: XCTestCase {
         XCTAssertEqual(second.successOnly?.isEnd, false)
     }
 
-    /// ⛔ WITH NO TOTAL, A SHORT PAGE IS THE ONLY END-OF-LIST SIGNAL — the calls
+    /// ⛔ WITH NO TOTAL, A SHORT PAGE IS THE ONLY END-OF-LIST SIGNAL, the calls
     /// feed reports no total, no `hasMore` and no cursor.
     func testWithNoTotalAShortPageEndsTheList() async {
         let pager = OffsetPager<String>(

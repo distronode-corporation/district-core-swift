@@ -9,8 +9,8 @@ import XCTest
 /// ⛔ ITS OWN FILE BECAUSE `WorkspaceWriteRepositoryTests` IS AT 298 LINES AGAINST
 /// SwiftLint's 500 AND THIS SURFACE DESERVES MORE THAN THE REMAINDER. It is the most
 /// destructive call in this client and its failure mode is a **200**: the handler
-/// writes `callDirectory: (callDirectory || [])`, so an empty array — or a body that
-/// omits the key — wipes every human the voice agent can put a live caller through
+/// writes `callDirectory: (callDirectory || [])`, so an empty array, or a body that
+/// omits the key, wipes every human the voice agent can put a live caller through
 /// to, and answers `{success:true}`. There is no undo.
 ///
 /// ⛔ SO THE ASSERTIONS HERE ARE ABOUT THE BYTES THAT WENT OUT, not about the reply.
@@ -28,7 +28,7 @@ final class WorkspaceDirectoryRepositoryTests: XCTestCase {
 
     /// ⛔ THE ROWS GO OUT WHOLE, UNMODELLED KEYS INCLUDED. The route's per-entry zod
     /// schema is `.passthrough()` and the column is `Json`, so a row can carry
-    /// anything anyone ever wrote — and a request rebuilt from a typed model would
+    /// anything anyone ever wrote, and a request rebuilt from a typed model would
     /// strip the rest and answer 200. That is a silent deletion INSIDE a row rather
     /// than of one, which is why the parameter is `[JSONValue]`.
     func testARowsUnmodelledKeysSurviveTheSave() async {
@@ -60,7 +60,7 @@ final class WorkspaceDirectoryRepositoryTests: XCTestCase {
     }
 
     /// ⛔ `type: "app"` IS WHAT MAKES A TRANSFER RING THE PHONE INSTEAD OF DIALLING A
-    /// PSTN NUMBER, and the route validates it as `"pstn" | "app"` — anything else is
+    /// PSTN NUMBER, and the route validates it as `"pstn" | "app"`, anything else is
     /// a 400. It had never been settable from any UI before the directory editor, so
     /// this is the assertion that says the value reaches the column at all.
     func testTheAppTypeReachesTheWire() async {
@@ -109,7 +109,7 @@ final class WorkspaceDirectoryRepositoryTests: XCTestCase {
     /// against an ACCIDENTAL empty save is that the form can only be built on a
     /// successful config read (`SettingsConfigState` has no case for "we could not
     /// load, here is an empty form anyway"), not a repository refusing a request it
-    /// was given. ⚠️ The key is still SENT rather than dropped — an omitted key wipes
+    /// was given. ⚠️ The key is still SENT rather than dropped, an omitted key wipes
     /// the directory just as an empty array does, but only one of the two is what the
     /// caller asked for.
     func testAnEmptyListIsSentAsAnEmptyArrayRatherThanRefusedOrDropped() async {
@@ -123,7 +123,7 @@ final class WorkspaceDirectoryRepositoryTests: XCTestCase {
 
     /// ⛔ A WELL-FORMED `success:false` ON A **200** IS THE ROUTE'S OWN CATCH BRANCH
     /// once the headers are written, and ``SuccessResponse`` does not reject it. The
-    /// envelope check is the only thing that does — and on this route the cost of
+    /// envelope check is the only thing that does, and on this route the cost of
     /// getting it wrong is telling an operator their directory saved when it did not,
     /// after which they will not look at it again.
     func testASaveThatDoesNotAffirmSuccessIsADecodeFailure() async {
@@ -136,7 +136,7 @@ final class WorkspaceDirectoryRepositoryTests: XCTestCase {
 
     /// ⚠️ THE THREE FAILURES A SCREEN HAS TO TELL APART: the viewer exclusion, an
     /// ended session, and a transient outage. ⛔ The 404 is the fourth and it is the
-    /// route's own — a workspace deleted between the role check and the write lands
+    /// route's own, a workspace deleted between the role check and the write lands
     /// there, from the P2025 branch rather than the unreachable guard above it.
     func testTheRefusalsArriveWithTheirStatus() async {
         let viewer = RepositoryTransport(json: #"{"error":"Forbidden"}"#, status: 403)

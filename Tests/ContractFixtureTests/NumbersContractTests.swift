@@ -7,7 +7,7 @@ import XCTest
 ///
 /// ⛔ THE OWNED PAIR IS THE PAIR THE STRICT GATE CANNOT SEPARATE ON ITS OWN. A
 /// clean list and a `partial` one are the same type with two extra keys, and the
-/// gate compares shape rather than values — so "this 200 is describing less
+/// gate compares shape rather than values, so "this 200 is describing less
 /// inventory than the workspace owns" is entirely value-level and only
 /// assertions like these hold it. It is the dangerous middle: not the all-clear
 /// and not the failure, but the answer that decodes perfectly and draws like a
@@ -19,7 +19,7 @@ final class NumbersContractTests: XCTestCase {
     /// THAN NULL. The Twilio implementation swallows a failed pricing lookup and
     /// `JSON.stringify` DROPS the undefined, so a client typing `monthlyPrice` as
     /// required throws on the first search from an account with no Pricing API
-    /// access — in production, with a decode failure that reads like contract
+    /// access, in production, with a decode failure that reads like contract
     /// drift rather than like a missing price.
     ///
     /// ⚠️ `provider` IS THE SERVER'S CHOICE ECHOED BACK, not the one that was
@@ -41,7 +41,7 @@ final class NumbersContractTests: XCTestCase {
         XCTAssertEqual(priced.setupPrice, 0, "a measured zero, not an absence")
 
         let unpriced = response.numbers[1]
-        XCTAssertNil(unpriced.monthlyPrice, "⛔ absent, not null — the lookup was swallowed")
+        XCTAssertNil(unpriced.monthlyPrice, "⛔ absent, not null: the lookup was swallowed")
         XCTAssertNil(unpriced.setupPrice)
         XCTAssertNil(unpriced.currency)
         XCTAssertNil(unpriced.locality, "a toll-free result has no locality to report")
@@ -58,8 +58,8 @@ final class NumbersContractTests: XCTestCase {
     /// read existed, a workspace with live managed DIDs got an empty list, which
     /// is indistinguishable from owning none.
     ///
-    /// ⚠️ A CLEAN LIST CARRIES NEITHER FLAG AT ALL — absent, not false and not an
-    /// empty array — which is why both are Optional and why
+    /// ⚠️ A CLEAN LIST CARRIES NEITHER FLAG AT ALL, absent, not false and not an
+    /// empty array, which is why both are Optional and why
     /// ``OwnedNumbersResponse/failedProviderNames`` is what a caller should read.
     func testACleanOwnedListMixesBothSourcesAndCarriesNeitherDegradationFlag() throws {
         let response = try StrictDecodeVerifier.verify(
@@ -79,7 +79,7 @@ final class NumbersContractTests: XCTestCase {
     /// WAY IT IS: a rebuilt number with a defaulted type and status, a provider
     /// inherited from `messagingConfig.managed`, no webhooks of the tenant's to
     /// report, no recorded price, and an EMPTY capability list rather than an
-    /// absent one — which is a measured "we do not know what this line can do",
+    /// absent one, which is a measured "we do not know what this line can do",
     /// not "it can do nothing".
     func testTheAllFallbacksManagedRowKeepsItsEmptyCapabilitiesAndDropsEverythingElse() throws {
         let response = try StrictDecodeVerifier.verify(
@@ -130,7 +130,7 @@ final class NumbersContractTests: XCTestCase {
 
     /// ⚠️ THE TWO FLAGS READ AS ONE FACT, AND THIS IS THE CASE THAT PROVES IT.
     /// The route sends `failedProviders` only alongside `partial`, so a body
-    /// carrying names WITHOUT the flag is drift rather than a warning — and
+    /// carrying names WITHOUT the flag is drift rather than a warning, and
     /// surfacing names off it would tell an operator their list is short when
     /// nothing said so. Decoded from literal bytes; no fixture holds the pairing.
     func testFailedProviderNamesStayEmptyWhenTheShortListFlagIsNotSet() throws {
@@ -147,7 +147,7 @@ final class NumbersContractTests: XCTestCase {
     /// ⛔ THE OTHER HALF OF THE SAME PAIRING, AND THE ONE THAT WOULD BE A CRASH
     /// RATHER THAN A WRONG LABEL. A `partial: true` with NO `failedProviders` is
     /// drift the server should not produce, but a client that force-unwrapped the
-    /// names off the flag would die on it — and the honest rendering is a warning
+    /// names off the flag would die on it, and the honest rendering is a warning
     /// with no carrier named, not a refusal to draw the list. Decoded from literal
     /// bytes; no fixture holds this pairing either.
     func testAShortListWithNoNamedCarrierWarnsWithoutNamingRatherThanFailing() throws {

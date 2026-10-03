@@ -7,7 +7,7 @@ final class PKCETests: XCTestCase {
     // ── Known-answer vectors ─────────────────────────────────────────────────
     // RFC 7636 Appendix B publishes one verifier/challenge pair. Asserting it
     // is independent confirmation that this implementation is right, not merely
-    // that it agrees with the server — if both sides drifted together, this is
+    // that it agrees with the server, if both sides drifted together, this is
     // what would notice. `PKCEVectorTests` covers the other direction.
     private static let rfcVerifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
     private static let rfcChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
@@ -25,7 +25,7 @@ final class PKCETests: XCTestCase {
         )
     }
 
-    /// base64url(SHA-256(the DECODED 32 octets of the RFC verifier)) — the value
+    /// base64url(SHA-256(the DECODED 32 octets of the RFC verifier)), the value
     /// the natural mistake produces. Computed independently, not by this code.
     private static let rfcChallengeOfDecodedBytes = "38v3YOi6zQgk1xkqk6Y5dvSDoBHqZrTh3mmWHxxWvyk"
 

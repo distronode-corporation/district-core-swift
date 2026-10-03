@@ -6,7 +6,7 @@ import XCTest
 
 /// ⛔ EVERY BODY HERE IS INLINE AND NONE OF IT IS A CONTRACT FIXTURE, which is
 /// the right way round for this file: what is under test is the ENVELOPE, and the
-/// envelope's failure half is a shape no fixture corpus carries — a **200** whose
+/// envelope's failure half is a shape no fixture corpus carries, a **200** whose
 /// meaning is "the scheduler refused". The contract corpus mirrors the Kotlin
 /// client and that client has no scheduling admin at all.
 ///
@@ -54,7 +54,7 @@ final class SchedulingAdminRepositoryTests: XCTestCase {
     }
 
     /// ⛔ AN OP THAT TAKES NOTHING SENDS `"params":{}`, NOT A DROPPED KEY. The
-    /// route defaults an absent `params` to `{}` as well, so the two agree today —
+    /// route defaults an absent `params` to `{}` as well, so the two agree today,
     /// sending it makes the agreement a contract rather than a coincidence.
     func testAnOpWithNoParamsSendsAnEmptyObject() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":{"ok":true}}"#)
@@ -136,7 +136,7 @@ final class SchedulingAdminRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⛔ `unknown_op` MEANS THIS ENUM AND `ADMIN_OPS` HAVE DIVERGED — a
+    /// ⛔ `unknown_op` MEANS THIS ENUM AND `ADMIN_OPS` HAVE DIVERGED, a
     /// programmer error, invisible to the compiler because the op crosses the wire
     /// as a string. The reporter is required, and the app's traps in a debug build,
     /// so this one records instead and proves it is called exactly once.

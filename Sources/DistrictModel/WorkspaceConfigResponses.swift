@@ -1,13 +1,13 @@
 import Foundation
 
-/// `GET /api/district/workspace/config?workspaceId=` — the read a native
+/// `GET /api/district/workspace/config?workspaceId=`, the read a native
 /// mutation form must hydrate from BEFORE it is allowed to save.
 ///
 /// ⛔ WHY THIS ROUTE EXISTS AT ALL, BECAUSE IT EXPLAINS EVERY DECISION BELOW. The
 /// web settings page is a server component: it reads the workspace row during
 /// render and threads it into each form as props, so every form opens
 /// pre-hydrated. A phone has no SSR and no such prop, and three of the save
-/// routes it must reach are WHOLESALE REPLACE rather than merge —
+/// routes it must reach are WHOLESALE REPLACE rather than merge,
 /// `workspace/directory` writes `callDirectory: callDirectory || []`,
 /// `workspace/routing-rules` replaces the whole array, and `workspace/tools`
 /// replaces `toolConfig.allowedTools`. A form that opened empty and saved would
@@ -25,7 +25,7 @@ public struct WorkspaceConfigResponse: Codable, Sendable {
     public let success: Bool
     /// ⚠️ OPTIONAL ONLY BECAUSE A MALFORMED RESPONSE MUST NOT CRASH THE SCREEN.
     /// The route always emits it, so nil here is contract drift rather than a
-    /// state — and the right handling is to report a load failure, never to hand
+    /// state, and the right handling is to report a load failure, never to hand
     /// a form an empty config to save from, which is the exact failure this
     /// whole read prevents.
     public let config: WorkspaceConfig?
@@ -64,7 +64,7 @@ public struct WorkspaceConfig: Codable, Sendable {
     public let routingRules: WireJSON?
     /// ⛔ Replaced wholesale by `workspace/directory`. Staff numbers. Opaque.
     public let callDirectory: WireJSON?
-    /// ⚠️ Opaque and read-only — already narrowed server-side by
+    /// ⚠️ Opaque and read-only, already narrowed server-side by
     /// `redactWorkspaceSecrets`.
     public let messagingConfig: WireJSON?
     /// ⚠️ Opaque and read-only. No native form edits campaign settings.
@@ -80,7 +80,7 @@ public struct WorkspaceConfig: Codable, Sendable {
     public let updatedAt: String?
 }
 
-/// `Workspace.aiPersona` — what the voice agent renders into every system
+/// `Workspace.aiPersona`, what the voice agent renders into every system
 /// prompt.
 ///
 /// ⛔ EVERY FIELD IS MODELLED, AND THE SPLIT THAT MATTERS IS NO LONGER "four
@@ -89,22 +89,22 @@ public struct WorkspaceConfig: Codable, Sendable {
 /// safe native form sends ONLY what the operator actually changed. What decides
 /// whether a field may be OFFERED is where its value comes from:
 ///
-///   * ✏️ FREE TEXT — ``name``, ``greeting``, ``personality``, plus the
+///   * ✏️ FREE TEXT, ``name``, ``greeting``, ``personality``, plus the
 ///     ``dgiEnabled`` consent flag. Stored verbatim, no vocabulary behind them.
-///   * 🎛️ DRAWN FROM A SERVER-SIDE VOCABULARY — ``voice``, ``language``,
+///   * 🎛️ DRAWN FROM A SERVER-SIDE VOCABULARY, ``voice``, ``language``,
 ///     ``modelId``, ``responseLength``, ``temperature``, ``voiceStyle`` and
 ///     ``preemptiveTts``. Every one of them COERCES rather than rejects: an
 ///     unrecognised `modelId` is silently rewritten to `deepgram-pipeline`, an
 ///     unrecognised `voice` is stored verbatim and the agent then speaks in a
 ///     voice nobody chose, and a `responseLength` without a `modelId` is
-///     discarded — all with a 200 and no error anywhere.
-///   * 🔒 NOT WRITTEN BY ANY NATIVE CLIENT — the avatar block below.
+///     discarded, all with a 200 and no error anywhere.
+///   * 🔒 NOT WRITTEN BY ANY NATIVE CLIENT, the avatar block below.
 ///
 /// ⛔ THE MIDDLE GROUP IS EDITABLE THROUGH PICKERS FED BY THE SERVER. The hazard is
 /// not "a phone edits these"; it is "a client offers a value nothing checked", which free text and a hardcoded Swift
 /// list do equally. `GET workspace/persona/options` publishes exactly the
 /// catalogue the web derives its own pickers from, so a native form can offer the
-/// same values and a failed read leaves the controls showing what is stored —
+/// same values and a failed read leaves the controls showing what is stored,
 /// never a built-in list, which would be the drifting second copy the route
 /// exists to retire.
 ///
@@ -118,7 +118,7 @@ public struct AiPersona: Codable, Sendable {
     public let greeting: String?
     /// ✏️ Editable. Rendered into the system prompt.
     public let personality: String?
-    /// ✏️ Editable — the external-lead-enrichment opt-in the published
+    /// ✏️ Editable, the external-lead-enrichment opt-in the published
     /// sub-processor list promises is OFF by default.
     ///
     /// ⛔ ONLY AN EXPLICIT BOOLEAN CHANGES IT SERVER-SIDE; a non-boolean is
@@ -133,7 +133,7 @@ public struct AiPersona: Codable, Sendable {
     /// other; engine-constrained (nova-3 carries only en-US and es-ES).
     public let language: String?
     /// 🎛️ Chosen from `persona/options`. Selects the CALL BRAIN, and an unknown
-    /// value coerces silently — which is why no client may offer a list of its own.
+    /// value coerces silently, which is why no client may offer a list of its own.
     public let modelId: String?
     /// 🎛️ Per-ENGINE spoken-turn length, keyed by ``modelId``. ⛔ The route only
     /// writes it when BOTH arrive together and both are valid, so a client sends
@@ -145,7 +145,7 @@ public struct AiPersona: Codable, Sendable {
     /// `persona/options` rather than restated by a client.
     public let temperature: Double?
     /// 🎛️ Chosen from `persona/options`. Capped at 100 characters server-side, and
-    /// read by the realtime engine only — the chained pipelines store and ignore it.
+    /// read by the realtime engine only, the chained pipelines store and ignore it.
     public let voiceStyle: String?
     /// 🎛️ Paid speculative synthesis, and meaningless to the realtime engine. ⛔ The
     /// agent reads it as `bool(...)`, so only a real boolean may ever be sent.
@@ -173,12 +173,12 @@ public struct AiPersona: Codable, Sendable {
     public let videoRecording: Bool?
 }
 
-/// `Workspace.toolConfig` — what the agent may DO on a call, and the accounts it
+/// `Workspace.toolConfig`, what the agent may DO on a call, and the accounts it
 /// does it through.
 ///
 /// ⛔ ``allowedTools`` IS THE ONE FIELD ON THIS WHOLE SURFACE WRITTEN WHOLESALE.
 /// Every other key here is merged per field by `PATCH workspace/tools`, so
-/// omitting it preserves it — but `allowedTools` is set to exactly what arrived,
+/// omitting it preserves it, but `allowedTools` is set to exactly what arrived,
 /// and omitting it is a 400 rather than a no-op. That asymmetry is why this is a
 /// DTO rather than another opaque blob: the loaded list has to be carried back
 /// with its ORDER AND CONTENT intact.
@@ -191,7 +191,7 @@ public struct ToolConfig: Codable, Sendable {
     /// operator who opened the screen to look at it. ⚠️ And an empty list is a
     /// real, different answer: the operator turned everything off on purpose.
     public let allowedTools: [String]?
-    /// ⚠️ Read-only here — merged server-side, so an omitted key preserves it.
+    /// ⚠️ Read-only here, merged server-side, so an omitted key preserves it.
     /// ⛔ Sending `""` would CLEAR it, which is why nothing here sends it.
     public let calendarId: String?
     /// ⚠️ Read-only. `google` or `microsoft` server-side; free text on the wire.

@@ -90,7 +90,7 @@ public struct MeetingsPage: Sendable {
 /// corrupt and it is not an error, so the rest of the page is still served.
 /// ⚠️ THE CHECK IS A PREFIX TEST AND NOT ``RoomName``, on purpose: that type
 /// additionally restricts the suffix to `[a-zA-Z0-9-]` to match the web lobby,
-/// while the server's own regex ends in `.+` and admits underscores — so a real
+/// while the server's own regex ends in `.+` and admits underscores, so a real
 /// room like `meet_ws-contract-test_standup` is a valid name this client must
 /// READ and would refuse to MINT. Validating a name we did not construct against
 /// the minting rule would hide live meetings from their own list. It is also why
@@ -101,9 +101,9 @@ public struct MeetingsPage: Sendable {
 /// someone checks right after a meeting ends, and a stale copy answers "where
 /// are my minutes" with a snapshot from before they existed.
 ///
-/// ⛔ NOTHING HERE MINTS A ROOM TOKEN. Joining is a separate capability — a
+/// ⛔ NOTHING HERE MINTS A ROOM TOKEN. Joining is a separate capability, a
 /// signed, short-lived credential whose guest invite is transferable for twelve
-/// hours — and it does not belong on the type that reads the archive.
+/// hours, and it does not belong on the type that reads the archive.
 public struct MeetingsRepository: Sendable {
     private let client: ApiClient
 
@@ -115,7 +115,7 @@ public struct MeetingsRepository: Sendable {
     ///
     /// ⛔ `[MeetingSummary].self`, WITH NO WRAPPER. `NextResponse.json(results)`
     /// is what the route does; a DTO expecting `{success, …}` fails to decode
-    /// every response it sends. This is one of the three bare-array routes — see
+    /// every response it sends. This is one of the three bare-array routes, see
     /// ``BareArrayEndpoints``.
     ///
     /// ⛔ THE SERVER CAPS THIS AT 50 AND APPLIES THE CAP BEFORE THIS CLIENT FILTERS,
@@ -147,7 +147,7 @@ public struct MeetingsRepository: Sendable {
 
     /// One meeting in full.
     ///
-    /// ⛔ NO ENVELOPE HERE EITHER — the route returns the raw row, so there is no
+    /// ⛔ NO ENVELOPE HERE EITHER, the route returns the raw row, so there is no
     /// `success` flag and a 404 arrives as an ``ApiError`` rather than as a body.
     /// ⚠️ That 404 is also what a meeting id from ANOTHER workspace produces,
     /// because the lookup is scoped on both id and workspaceId: "not yours" and

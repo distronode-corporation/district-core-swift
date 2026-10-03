@@ -5,7 +5,7 @@ import Foundation
 import XCTest
 
 /// The five `eventTypes.*` wrappers that address something HANGING OFF an event
-/// type — its hosts, its test email, its booking questions and its slots.
+/// type, its hosts, its test email, its booking questions and its slots.
 ///
 /// ⛔ SPLIT FROM `SchedulingAdminRepositoryEventTypesTests.swift` FOR SwiftLint's
 /// 300-line `type_body_length`, which `--strict` promotes to an error. The two
@@ -23,7 +23,7 @@ import XCTest
 /// key and a wrong value all still fail.
 ///
 /// ⛔ EVERY PATCH IS ASSERTED IN BOTH POLARITIES. `JSONValue.object(_:)` drops a nil
-/// pair, so "leave alone" is spelled by ABSENCE — and a test that only ever sent a
+/// pair, so "leave alone" is spelled by ABSENCE, and a test that only ever sent a
 /// fully populated draft would pass identically against a builder that ignored nil
 /// and sent nulls, which the server reads as a different instruction.
 final class SchedulingEventTypeChildrenTests: XCTestCase {

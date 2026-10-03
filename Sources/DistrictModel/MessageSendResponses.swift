@@ -1,6 +1,6 @@
 import Foundation
 
-/// `POST /api/district/messages/send` — the reply that leaves the building.
+/// `POST /api/district/messages/send`, the reply that leaves the building.
 ///
 /// ⛔ METERED AND NON-IDEMPOTENT. Every 2xx is a carrier segment or a Postmark
 /// send that has already been paid for. Nothing in this client may retry it, and
@@ -11,8 +11,8 @@ import Foundation
 /// the route's success branches build the key unconditionally; the Kotlin type
 /// also decodes the refusal body through this shape, while this client routes
 /// non-2xx through `ApiErrorEnvelope`. ⚠️ Those refusals are worth surfacing
-/// VERBATIM rather than replacing — an unverified sender, an exhausted A2P
-/// registration, the per-workspace 30/min cap — because "Could not send" throws
+/// VERBATIM rather than replacing, an unverified sender, an exhausted A2P
+/// registration, the per-workspace 30/min cap, because "Could not send" throws
 /// all of that away.
 public struct SendMessageResponse: Codable, Sendable {
     public let success: Bool
@@ -23,7 +23,7 @@ public struct SendMessageResponse: Codable, Sendable {
 ///
 /// ⛔ THE WHOLE ROW, NOT A RECEIPT, AND THE KOTLIN TYPE GOT THIS WRONG ONCE. It
 /// modelled five fields out of the thirteen the server sends, so ``status`` was
-/// being thrown away — the only field distinguishing "accepted by the carrier and
+/// being thrown away, the only field distinguishing "accepted by the carrier and
 /// still queued" from "delivered", i.e. a reply that went out from one that is
 /// about to fail. Caught by pinning `district-message-send.json`, not by anything
 /// in the app.
@@ -31,7 +31,7 @@ public struct SendMessageResponse: Codable, Sendable {
 /// ⛔ ONE ENDPOINT, TWO SHAPES, WHICH IS WHY FOUR FIELDS ARE OPTIONAL. The SMS
 /// branch sends ``externalId`` and ``accountId`` and no ``subject``; the email
 /// branch sends ``subject`` and neither of the other two. All three fixtures are
-/// gated for exactly this reason — a single fixture would have made one branch's
+/// gated for exactly this reason, a single fixture would have made one branch's
 /// fields look mandatory, and the strict gate compares key sets per fixture, so a
 /// DTO proven against one branch is proven against half the responses.
 ///
@@ -45,7 +45,7 @@ public struct SentMessage: Codable, Sendable {
     /// ⚠️ OPTIONAL EVEN THOUGH ALL THREE FIXTURES CARRY IT. The column is
     /// nullable and the route passes it through untouched, so a send whose
     /// provider returned no id would break a non-optional field on a response
-    /// that had otherwise succeeded — the worst moment for a decode failure on a
+    /// that had otherwise succeeded, the worst moment for a decode failure on a
     /// route that has already spent money. Matches the Kotlin DTO.
     public let messageSid: String?
     public let workspaceId: String
@@ -59,7 +59,7 @@ public struct SentMessage: Codable, Sendable {
     public let direction: String
     /// `sms`, `email` or `whatsapp`.
     public let type: String
-    /// The PROVIDER's word for where the message got to — `queued` from Twilio,
+    /// The PROVIDER's word for where the message got to, `queued` from Twilio,
     /// `sent` from Postmark.
     ///
     /// ⚠️ NOT NORMALISED AND NOT REPLACED WITH A BOOLEAN. The two channels
@@ -96,7 +96,7 @@ public enum MessageChannel {
 /// ⚠️ ``marked`` IS A COUNT AND ZERO IS A SUCCESS, the same shape as
 /// ``DeviceRevokeResponse/revoked``: a thread whose messages another agent
 /// already opened marks nothing, and that is the ordinary race rather than a
-/// failure. Both resolve to the same action — redraw from the list.
+/// failure. Both resolve to the same action, redraw from the list.
 public struct MarkReadResponse: Codable, Sendable {
     public let success: Bool
     /// ⚠️ Zero is a success. See the type note.

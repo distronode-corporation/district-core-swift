@@ -7,8 +7,8 @@ extension ApiError {
     /// outcome.
     ///
     /// ⚠️ MATCHED BY PREFIX RATHER THAN IN FULL, because the sentence carries the
-    /// response's BYTE COUNT — deliberately, so "the server sent nothing" can be
-    /// told apart from "the server sent a shape we do not know" — and a test that
+    /// response's BYTE COUNT, deliberately, so "the server sent nothing" can be
+    /// told apart from "the server sent a shape we do not know", and a test that
     /// pinned the whole string would have to hard-code the length of every
     /// fixture body it uses. ⛔ It carries no body preview at all: these bodies
     /// are call transcripts and contact records, and ``ApiError/message`` can
@@ -70,7 +70,7 @@ final class RepositoryTransport: HTTPTransport, @unchecked Sendable {
     /// ⛔ ASSERTING THE BYTES IS THE ONLY WAY TO PIN A DROPPED KEY. `contacts/update`
     /// rebuilds every column it is sent from the body, so "did this request carry a
     /// phoneNumber" is a question about the encoded document rather than about the
-    /// arguments — and ``JSONValue/object(_:)`` drops a nil pair silently by design.
+    /// arguments, and ``JSONValue/object(_:)`` drops a nil pair silently by design.
     /// ``JSONWire/encode(_:)`` sorts keys, so the comparison is deterministic.
     ///
     /// ⚠️ A REQUEST WITH NO BODY IS SKIPPED, NOT RENDERED AS `""`. `contacts/delete`
@@ -257,13 +257,13 @@ enum Bodies {
     """#
 
     /// ⚠️ CARRIES `status` AS WELL, which `ApiErrorEnvelope` deliberately does not
-    /// model — the repository branches on `code` and never decodes that key, so
+    /// model, the repository branches on `code` and never decodes that key, so
     /// the extra field being ignored here is the behaviour under test.
     ///
     /// ⛔ THE SENTENCE IS BUILT BY CONCATENATION RATHER THAN WRAPPED INSIDE THE
     /// JSON, and the same goes for the dormancy body below. A raw multi-line
     /// string may break between JSON tokens (`Bodies.overview` does), but a
-    /// newline INSIDE a string value is invalid JSON — and the failure it
+    /// newline INSIDE a string value is invalid JSON, and the failure it
     /// produces is a decode error in the repository under test, which reads as a
     /// bug in the code rather than in the fixture.
     static let subscriptionRefusal =

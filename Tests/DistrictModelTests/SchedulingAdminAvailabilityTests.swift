@@ -6,7 +6,7 @@ import XCTest
 ///
 /// ⚠️ THE OVERRIDE ROW ITSELF IS TESTED IN `SchedulingAdminResponsesTests`, beside
 /// the create union. What is added here is the pair the LIST op
-/// answers — a row that came from a range beside one that did not — because that
+/// answers, a row that came from a range beside one that did not, because that
 /// is the difference between "delete this day" and "delete this holiday" and the
 /// two ops that spelling chooses between are different ops.
 final class SchedulingAdminAvailabilityTests: XCTestCase {
@@ -48,7 +48,7 @@ final class SchedulingAdminAvailabilityTests: XCTestCase {
 
     /// ⛔ `event_type_id` IS `.nullable()` AND **NOT** `.optional()` IN THE CATALOG,
     /// so the key is always on the wire. A row without it is a contract break, and
-    /// modelling the field as merely optional would have swallowed that silently —
+    /// modelling the field as merely optional would have swallowed that silently,
     /// which matters because absent would then read as "global" for a body that has
     /// lost the field entirely.
     func testARuleWithNoEventTypeKeyAtAllIsStillDecodedAsGlobal() throws {

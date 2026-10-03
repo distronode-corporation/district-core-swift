@@ -24,7 +24,7 @@ import Foundation
 /// `UIApplication.registerForRemoteNotifications()`; PushKit issues an entirely
 /// separate one to `PKPushRegistry`. A single remembered value would make the
 /// VoIP register skip because the ALERT token was unchanged, and the phone would
-/// then be reachable for notifications and unreachable for ringing — which is the
+/// then be reachable for notifications and unreachable for ringing, which is the
 /// half nobody notices until a call is missed. ⚠️ Two named pairs rather than one
 /// pair taking a ``PushTokenKind``: the kind is a `DistrictNetwork` type and this
 /// protocol's implementation lives in `App/`, where the fewer types it has to
@@ -50,7 +50,7 @@ public protocol PushTokenMemory: Sendable {
 /// Collapsing them into `Void` would lose the only two facts a caller can act on:
 /// whether a request was actually spent against a 20/min per-account ceiling, and
 /// whether there was a token to spend it on at all. Collapsing "nothing to
-/// register" into a FAILURE would be worse — a handset with no APNs token is an
+/// register" into a FAILURE would be worse, a handset with no APNs token is an
 /// ordinary state (the user declined notifications, or the simulator has no push
 /// service), not a fault to report.
 public enum PushRegistrationOutcome: Equatable, Sendable {
@@ -116,12 +116,12 @@ public struct PushTokenRepository: Sendable {
     ///
     /// ⛔ AN EMPTY TOKEN IS REFUSED WITHOUT A REQUEST, AND IT IS A REAL CASE
     /// RATHER THAN A GUARD FOR TIDINESS. Sending one spends a request against the
-    /// 20/min ceiling to be told 400 — and a client that read that 400 as
+    /// 20/min ceiling to be told 400, and a client that read that 400 as
     /// "registration failed" would retry it.
     ///
     /// ⛔ `platform` IS SENT EXPLICITLY AS `"ios"` BY THE ENDPOINT, AND IT IS
     /// MANDATORY. The route's schema DEFAULTS it to `"android"`, so omitting it
-    /// works and silently mislabels every row this client writes — and the
+    /// works and silently mislabels every row this client writes, and the
     /// server's push sender selects the APNs payload from exactly that column.
     /// See ``DistrictEndpoints/registerPushToken(token:)``.
     ///
@@ -146,8 +146,8 @@ public struct PushTokenRepository: Sendable {
     /// ``PushTokenKind``.
     ///
     /// ⛔ AND IT MUST NOT BE CALLED BEFORE A SIGN-IN. PushKit issues its
-    /// credential as soon as `desiredPushTypes` is set, which is at LAUNCH — long
-    /// before there is a bearer — so the sequencing (hold the token, register it
+    /// credential as soon as `desiredPushTypes` is set, which is at LAUNCH, long
+    /// before there is a bearer, so the sequencing (hold the token, register it
     /// when the session gate reaches signed-in) belongs to `PushRegistrar` in the
     /// app target. Called early this spends a 401 against a 20/min per-account
     /// ceiling and records nothing.
@@ -236,7 +236,7 @@ public struct PushTokenRepository: Sendable {
     ///
     /// ⛔ THE LOCAL HALF OF SIGN-OUT, AND IT RUNS AFTER THE REVOKE RATHER THAN
     /// INSTEAD OF ``unregister()``. It exists for the paths where no unregister
-    /// was attempted at all — a session ended by the SERVER (revoked from another
+    /// was attempted at all, a session ended by the SERVER (revoked from another
     /// device, or a refresh rejected), where nothing local ever ran. Without it
     /// the next account to sign in on this handset would find its own token
     /// remembered, skip the register, and never claim the installation row.
@@ -244,7 +244,7 @@ public struct PushTokenRepository: Sendable {
     /// ⛔ BOTH TOKENS, FOR THE SAME REASON ``unregister()`` CLEARS BOTH. A VoIP
     /// token left remembered across a server-ended session would make the next
     /// account's `registerVoip` skip, and the previous account's calls would keep
-    /// ringing a handset somebody else is now holding — the loudest possible
+    /// ringing a handset somebody else is now holding, the loudest possible
     /// version of the failure this method exists to prevent.
     public func forgetRegistration() {
         memory.forgetRegisteredToken()

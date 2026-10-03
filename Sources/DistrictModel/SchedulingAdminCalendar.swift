@@ -8,7 +8,7 @@ import Foundation
 // connections, so a viewer connecting their own Google account is not a tenancy
 // change. See `SchedulingAdminOp+Access.swift`.
 //
-// ⚠️ SNAKE_CASE ON THE WIRE — the scheduler fork's convention, spelled out in
+// ⚠️ SNAKE_CASE ON THE WIRE, the scheduler fork's convention, spelled out in
 // `CodingKeys` rather than converted. Same note as `SchedulingAdminBookings.swift`.
 
 /// One calendar account the caller has connected.
@@ -47,13 +47,13 @@ public struct SchedulingCalendarConnection: Codable, Sendable {
 /// are Go slices the fork marshals WITHOUT `omitempty`, so a nil slice crosses
 /// the wire as an explicit `null` rather than as an absent key.
 /// `unconfigured_providers` is nil exactly when Google AND Microsoft are both
-/// configured — i.e. on every production tenant — and typing it `.optional()`
+/// configured, i.e. on every production tenant, and typing it `.optional()`
 /// makes the whole calendar page read "could not be read" for every customer. The
 /// Optional here therefore covers BOTH absence and null, which is
 /// what a Swift Optional already does; the note exists so nobody narrows it.
 ///
 /// ⚠️ THE CONTRACT FIXTURE CARRIES REAL ARRAYS FOR BOTH, so neither has an
-/// `allowedExplicitNulls` entry and neither should get one — an entry is
+/// `allowedExplicitNulls` entry and neither should get one, an entry is
 /// permission for a null the bytes demonstrate, and permission for one they do
 /// not would keep being granted the day the server stops sending it. The null
 /// branch is decoded from inline bytes in `SchedulingAdminCalendarTests` instead,
@@ -72,7 +72,7 @@ public struct SchedulingCalendarStatus: Codable, Sendable {
     public let providers: [String]?
     public let connections: [SchedulingCalendarConnection]
     /// The subset of ``providers`` the instance has NOT been given credentials
-    /// for. ⚠️ Null on a fully configured instance — the common case.
+    /// for. ⚠️ Null on a fully configured instance, the common case.
     public let unconfiguredProviders: [String]?
     /// The provider of the destination connection, when there is one.
     public let provider: String?
@@ -91,7 +91,7 @@ public struct SchedulingCalendarStatus: Codable, Sendable {
 ///
 /// ⚠️ A CONFIRMATION, NOT A CONNECTION ROW. It carries neither an id nor the
 /// provider, so it cannot be appended to
-/// ``SchedulingCalendarStatus/connections`` — re-read the status after a
+/// ``SchedulingCalendarStatus/connections``, re-read the status after a
 /// successful connect rather than synthesising a row from these two fields.
 ///
 /// ⛔ `accountEmail` IS WHAT THE SERVER RESOLVED, NOT WHAT WAS SENT. CalDAV
@@ -112,14 +112,14 @@ public struct SchedulingCaldavConnection: Codable, Sendable {
 ///
 /// ⛔ ONLY `id` AND `name` ARE GUARANTEED. Row 1 of
 /// `district-scheduling-calendars.json` is a read-only holiday calendar carrying
-/// exactly those two — the four flags are ABSENT rather than false — so a client
+/// exactly those two, the four flags are ABSENT rather than false, so a client
 /// that typed any of them non-optional would throw on a subscription calendar,
 /// which almost every Google account has. ⚠️ Absent is not the same as false to a
 /// reader even though it renders the same: absent means the fork did not say.
 ///
 /// ⚠️ THIS IS ALSO THE REQUEST SHAPE. `calendar.connections.calendars.put` takes
 /// an array of exactly these objects, which is why the type carries a public
-/// memberwise initialiser — the PUT is "send back the GET's rows with the flags
+/// memberwise initialiser, the PUT is "send back the GET's rows with the flags
 /// you changed", and building it from anything else risks dropping a calendar the
 /// user never touched.
 public struct SchedulingCalendarSelection: Codable, Sendable {
@@ -170,8 +170,8 @@ public struct SchedulingCalendarSelections: Codable, Sendable {
 /// What `zoom.status` answers.
 ///
 /// ⛔ READ ONLY, AND THE ONLY ZOOM OP IN THE CATALOG. `GET|PATCH
-/// /v1/settings/zoom` hold the INSTANCE's Zoom credentials — shared by every
-/// tenancy on the deployment — and are excluded from the allowlist for the same
+/// /v1/settings/zoom` hold the INSTANCE's Zoom credentials, shared by every
+/// tenancy on the deployment, and are excluded from the allowlist for the same
 /// reason the other `/v1/settings/*` routes are. Nothing on this client can
 /// change Zoom's configuration, by construction.
 ///

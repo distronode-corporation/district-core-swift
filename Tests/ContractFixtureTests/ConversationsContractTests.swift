@@ -11,7 +11,7 @@ import XCTest
 /// BRANCH: it shipped broken on the Kotlin client, where the thread screen used
 /// the thread's own identity as the recipient and asked the server to text a
 /// cuid. `messages/send` hands `to` straight to the carrier or to Postmark, so
-/// it failed at the provider and read as an inbox that could not reply — on the
+/// it failed at the provider and read as an inbox that could not reply, on the
 /// majority of threads, since the server folds every counterpart that resolves
 /// to a Contact into that form.
 final class ConversationsContractTests: XCTestCase {
@@ -19,7 +19,7 @@ final class ConversationsContractTests: XCTestCase {
 
     /// ⛔ THE THREAD MIXES SMS AND EMAIL, AND EVERY FIELD THAT LOOKS LIKE THE
     /// ANSWER IS THE WRONG ONE. `key` is the email address, `kind` is `email`,
-    /// `channels` lists both — and the reply still goes out by TEXT, because
+    /// `channels` lists both, and the reply still goes out by TEXT, because
     /// `canSms` is server-decided and the contact holds a number. Reading `kind`
     /// or `channels` instead is precisely how the web's reply box decided a
     /// customer who had only ever emailed could not be sent an SMS.
@@ -44,7 +44,7 @@ final class ConversationsContractTests: XCTestCase {
     // MARK: - The unresolved thread
 
     /// ⚠️ AN UNRESOLVED ADDRESS **IS** THE IDENTITY OF ITS THREAD, so the title
-    /// falls back to the counterpart and never to a placeholder — "Unknown"
+    /// falls back to the counterpart and never to a placeholder, "Unknown"
     /// would hide the one piece of information available. Row 1 carries four
     /// explicit nulls for exactly this reason: the counterpart matched no
     /// Contact, and the thread is still perfectly usable.
@@ -64,7 +64,7 @@ final class ConversationsContractTests: XCTestCase {
         XCTAssertEqual(target.channel, MessageChannel.sms)
     }
 
-    /// ⛔ THE RECIPIENT IS AN ADDRESS, NEVER A THREAD IDENTITY — stated once
+    /// ⛔ THE RECIPIENT IS AN ADDRESS, NEVER A THREAD IDENTITY, stated once
     /// across the whole fixture so a row added by a regeneration is covered too.
     /// `messages/send` does not resolve a Contact id; a `contact:` or `addr:`
     /// prefix reaching the carrier fails at the provider and surfaces as a raw
@@ -86,8 +86,8 @@ final class ConversationsContractTests: XCTestCase {
     }
 
     /// ⚠️ `scanned == scanLimit` WOULD MEAN THE LIST MAY BE INCOMPLETE. There is
-    /// no page to request — the server groups a bounded window of recent
-    /// messages — so it is a truthfulness signal rather than an error, and the
+    /// no page to request, the server groups a bounded window of recent
+    /// messages, so it is a truthfulness signal rather than an error, and the
     /// fixture deliberately sits well inside the window.
     func testTheScanWindowIsReportedRatherThanPaged() throws {
         let response = try conversations()
@@ -105,7 +105,7 @@ final class ConversationsContractTests: XCTestCase {
 final class ReplyTargetTests: XCTestCase {
     /// ⛔ THE PUBLIC INITIALISER EXISTS SO A CONSUMER OUTSIDE `DistrictModel` CAN
     /// REBUILD A TARGET IT IS CARRYING, and it is asserted here because a
-    /// synthesised memberwise initialiser would be internal — the app target
+    /// synthesised memberwise initialiser would be internal, the app target
     /// would stop compiling with no line in this module having changed.
     ///
     /// ⚠️ ASSERTS THE FIELDS LAND IN THE ORDER THEY ARE LABELLED. Two `String`s
@@ -131,7 +131,7 @@ final class ReplyTargetTests: XCTestCase {
     /// ⛔ THE TWO CHECKS ARE SEQUENTIAL, NOT EXCLUSIVE, AND TURNING THEM INTO AN
     /// `else if` IS THE EDIT THAT BREAKS THIS. A thread the server marks
     /// sendable on both channels, whose only usable address is an email, has to
-    /// fall THROUGH the SMS branch and reply by email — otherwise a customer who
+    /// fall THROUGH the SMS branch and reply by email, otherwise a customer who
     /// can be reached becomes one who cannot.
     func testAThreadWithNoUsableNumberFallsThroughToEmail() throws {
         let row = try thread(counterpart: "ada@example.com", canSms: true, canEmail: true)
@@ -214,7 +214,7 @@ final class ReplyTargetTests: XCTestCase {
 
     /// ⚠️ AN EMPTY `channels` DECIDES NOTHING AND MUST NOT. The server accumulates
     /// it from the nullable `Message.type`, so a thread of rows written before that
-    /// column existed reports `[]` — an absence of evidence, not evidence of SMS.
+    /// column existed reports `[]`, an absence of evidence, not evidence of SMS.
     func testAThreadThatReportsNoChannelsKeepsTheSmsFirstOrder() throws {
         let row = try thread(
             contactPhone: "+14165550150",
@@ -241,7 +241,7 @@ final class ReplyTargetTests: XCTestCase {
     }
 
     /// ⚠️ A THREAD WITH NOTHING TO REPLY ON HAS AN EMPTY LIST, not a list of one
-    /// nil — the caller draws no reply box either way, and `first` is what
+    /// nil, the caller draws no reply box either way, and `first` is what
     /// ``ConversationSummary/replyTarget`` returns.
     func testAnUnsendableThreadHasNoTargetsAtAll() throws {
         XCTAssertTrue(try thread().replyTargets.isEmpty)
@@ -252,7 +252,7 @@ final class ReplyTargetTests: XCTestCase {
     /// dispatching a blank recipient to the carrier.
     ///
     /// ⚠️ AND THE TRIM IS A PROBE, NOT A REWRITE: what goes out is the server's
-    /// own string, padding and all. The Kotlin client does the same — a client
+    /// own string, padding and all. The Kotlin client does the same, a client
     /// that trimmed would be sending an address the server never stored.
     func testABlankStoredAddressFallsBackToTheCounterpart() throws {
         let padded = try thread(counterpart: " +14165550159 ", contactPhone: "   ", canSms: true)
@@ -281,7 +281,7 @@ final class ReplyTargetTests: XCTestCase {
     /// can OFFER a channel instead of merely naming one, and a `Route` has to be
     /// `Hashable` because `NavigationPath` demands it. Dropping this conformance
     /// breaks navigation in the App target, which is a tier with no test lane at all
-    /// — so the assertion lives here, on the tier that can run.
+    /// so the assertion lives here, on the tier that can run.
     ///
     /// ⚠️ THE CONFORMANCE IS SYNTHESISED (both stored properties are `String`), so
     /// there is no hand-written `hash(into:)` that can drift from `==`. What is worth
@@ -295,7 +295,7 @@ final class ReplyTargetTests: XCTestCase {
         XCTAssertNotEqual(sms, email)
         // ⚠️ THE SET IS THE ASSERTION AND `hashValue` IS DELIBERATELY NOT COMPARED.
         // Swift seeds `String` hashing per process, so two distinct values are not
-        // GUARANTEED to hash differently — an inequality assertion on `hashValue`
+        // GUARANTEED to hash differently, an inequality assertion on `hashValue`
         // would be a test that can only fail by luck. Set membership is the behaviour
         // anything downstream actually depends on.
         XCTAssertEqual(Set([sms, email, sms]).count, 2)
@@ -330,7 +330,7 @@ private func conversations() throws -> ConversationsResponse {
 ///
 /// ⚠️ THE DEFAULTS ARE THE UNSENDABLE CASE. `canSms` and `canEmail` are
 /// server-decided, so a test that wants a replyable thread has to say which
-/// channel the server allowed — the same way the row itself does.
+/// channel the server allowed, the same way the row itself does.
 private func thread(
     counterpart: String = "+14165550134",
     contactName: String? = nil,
@@ -360,7 +360,7 @@ private func thread(
 }
 
 /// `"value"` or `null`, so an unresolved contact field is written the way the
-/// server writes it — an explicit null rather than an omitted key.
+/// server writes it, an explicit null rather than an omitted key.
 private func jsonString(_ value: String?) -> String {
     guard let value else { return "null" }
     return "\"\(value)\""

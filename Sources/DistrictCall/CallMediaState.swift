@@ -56,7 +56,7 @@ extension CallMediaState {
     /// ⛔ THE TERMINAL EVENTS ARE NOT HANDLED HERE, DELIBERATELY.
     /// ``CallEngineEvent/disconnected(reason:)`` and
     /// ``CallEngineEvent/failed(message:)`` end the call, which is a decision
-    /// about the PHASE and belongs to whichever machine owns it — the two
+    /// about the PHASE and belongs to whichever machine owns it, the two
     /// machines end for different reasons and emit different commands. Reaching
     /// them here would mean a media helper could silently end a call.
     mutating func apply(_ event: CallEngineEvent) {

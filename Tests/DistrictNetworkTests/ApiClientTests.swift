@@ -86,7 +86,7 @@ final class ApiClientTests: XCTestCase {
 
     /// ⚠️ FIELDS ARE EMITTED IN SORTED ORDER. Swift's dictionary order is seeded
     /// per process, so without the sort the same upload produces different bytes
-    /// on every run — which makes a byte assertion flaky rather than wrong, i.e.
+    /// on every run, which makes a byte assertion flaky rather than wrong, i.e.
     /// the worst kind of test. Today the route sends one field; this pins the
     /// ordering before a second one ever arrives.
     func testMultipartFieldsAreEmittedInSortedOrder() throws {
@@ -119,7 +119,7 @@ final class ApiClientTests: XCTestCase {
     }
 
     /// ⚠️ A 2xx THAT DOES NOT MATCH THE DECLARED SHAPE IS A DECODE FAILURE, not an
-    /// HTTP one, and it carries no body preview — the bodies that fail here are
+    /// HTTP one, and it carries no body preview, the bodies that fail here are
     /// transcripts and contact records.
     func testATypedResponseThatDoesNotMatchIsADecodeFailure() {
         let transport = TestTransport(json: #"{"success":true}"#)

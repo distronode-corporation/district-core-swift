@@ -1,6 +1,6 @@
 // ⚠️ `@testable` FOR THE MEMBERWISE INITIALISERS AND FOR NOTHING ELSE. These DTOs
 // are `public struct`s with `public let` members, so their synthesised memberwise
-// initialiser is INTERNAL — a plain import can decode one and cannot build one. The
+// initialiser is INTERNAL, a plain import can decode one and cannot build one. The
 // real decode is proven against the real fixture in `ContractFixtureTests`; what is
 // built here are deliberately small catalogues shaped to make each lookup rule fail
 // loudly if it is reversed. `ApiErrorTests` and `PushPayloadTests` do the same.
@@ -12,7 +12,7 @@ import XCTest
 ///
 /// ⛔ THE DECODE IS NOT THE INTERESTING HALF AND IS NOT TESTED HERE. `ContractFixtureTests`
 /// already runs the real 2,970-line fixture through `StrictDecodeVerifier`, which
-/// re-encodes and compares key sets per path — a stronger assertion than anything this
+/// re-encodes and compares key sets per path, a stronger assertion than anything this
 /// file could write by hand. What is untested by that is the set of RULES a picker
 /// follows, every one of which the server will decline to contradict: `PATCH
 /// workspace/persona` coerces an unknown engine and stores an unknown voice verbatim,
@@ -109,7 +109,7 @@ final class PersonaOptionsTests: XCTestCase {
     // MARK: - Which languages
 
     /// ⛔ THE TWO LISTS DIFFER IN BOTH DIRECTIONS. Showing the general list on
-    /// Deepgram offers Hindi, whose Deepgram voice catalogue is empty — so the voice
+    /// Deepgram offers Hindi, whose Deepgram voice catalogue is empty, so the voice
     /// picker below it would be blank and the save would store a language the engine
     /// cannot speak.
     func testDeepgramGetsItsOwnLanguageListAndEverythingElseGetsTheGeneralOne() {
@@ -141,7 +141,7 @@ final class PersonaOptionsTests: XCTestCase {
 
     /// ⛔ A PAIR WITH NO CATALOGUE IS EMPTY, NOT A FALLBACK TO THE ENGINE'S OTHER
     /// LANGUAGE. A stored persona genuinely can name a language its engine does not
-    /// publish — the save route never refused one — and quietly showing another
+    /// publish, the save route never refused one, and quietly showing another
     /// language's voices is how an operator picks one that cannot speak theirs.
     func testAnUnpublishedPairHasNoVoicesRatherThanTheWrongOnes() {
         XCTAssertTrue(catalogue().voiceGroups(engine: Self.gemini, language: "hi-IN").isEmpty)
@@ -161,7 +161,7 @@ final class PersonaOptionsTests: XCTestCase {
     // MARK: - Which voice a switch lands on
 
     /// ⛔ THE PER-LANGUAGE MAP WINS FOR DEEPGRAM. A Deepgram voice id encodes its own
-    /// language — `dg-en-1` cannot speak Dutch — and the save route stores the
+    /// language, `dg-en-1` cannot speak Dutch, and the save route stores the
     /// mismatch happily, so switching language has to move the voice with it.
     func testDeepgramTakesItsDefaultFromTheLanguageAndNotFromTheEngine() {
         let options = catalogue()
@@ -199,7 +199,7 @@ final class PersonaOptionsTests: XCTestCase {
     // MARK: - What each engine's controls do
 
     /// ⛔ THE TWO FLAGS ARE OPPOSITES AND NEITHER IS "the engine supports it". Both
-    /// engines ACCEPT both fields and one of the two ignores each — with a 200 — so a
+    /// engines ACCEPT both fields and one of the two ignores each, with a 200, so a
     /// control shown to the wrong engine is a setting that silently does nothing.
     func testTheStyleAndSpeculationControlsBelongToOppositeEngines() {
         let gemini = PersonaEngineCapabilities(engineId: Self.gemini)

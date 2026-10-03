@@ -4,13 +4,13 @@ import Foundation
 ///
 /// ⚠️ SEGMENTS, NOT A TEMPLATE, matching how ``DistrictPaths`` builds every
 /// other path in this client. Nothing user-supplied is interpolated into any of
-/// them, so the segment discipline is convention here rather than a defence —
+/// them, so the segment discipline is convention here rather than a defence,
 /// but a string template is the shape that invites the next path to take an id.
 ///
 /// ⛔ THEY ARE NOT IN ``DistrictPaths`` AND HAVE NO ``EndpointID``, WHICH IS THE
 /// SAME GUARD `calls/outbound` RELIES ON RATHER THAN AN OMISSION. Those are the
 /// raw materials of ``ApiRequestDescriptor``, and a descriptor is a request
-/// ``ApiClient`` will attach a bearer to — which these four routes must never
+/// ``ApiClient`` will attach a bearer to, which these four routes must never
 /// be: the credential is the code (exchange), Apple's identity token, or the
 /// refresh token itself (refresh, revoke). Giving them an `EndpointID` would
 /// also put them in the untyped/typed/redirect partition that
@@ -26,8 +26,8 @@ enum NativeAuthPaths {
 
     /// ⚠️ A SIBLING OF `token`, NOT A VARIANT OF IT. The two routes mint the
     /// same credential and return the same five keys, but they authenticate
-    /// completely different things — a PKCE code this app minted a challenge
-    /// for, against an identity token Apple signed — so they are separate
+    /// completely different things, a PKCE code this app minted a challenge
+    /// for, against an identity token Apple signed, so they are separate
     /// handlers with separate rate-limit buckets on the server.
     static let apple = nativeAuth + ["apple"]
 }
@@ -78,8 +78,8 @@ public struct NativeAuthClient<
     ///
     /// ⚠️ A 400 IS `rejected` HERE AND `rateLimited` ON THE REFRESH PATH, WHICH
     /// LOOKS INCONSISTENT AND IS NOT. The token route answers one opaque
-    /// `invalid_grant` 400 for every refusal — expired, replayed, PKCE mismatch,
-    /// redirect mismatch — and all four mean "start the login over". On refresh,
+    /// `invalid_grant` 400 for every refusal, expired, replayed, PKCE mismatch,
+    /// redirect mismatch, and all four mean "start the login over". On refresh,
     /// a 400 means our own body was malformed and the token was provably never
     /// rotated, so signing the user out would punish a client bug.
     public func exchangeCode(_ request: CodeExchangeRequest) async -> CodeExchangeResult<Wire.Tokens> {
@@ -123,10 +123,10 @@ public struct NativeAuthClient<
     ///
     /// ⛔ THE SAME STATUS MAP AS ``exchangeCode(_:)``, READ OFF THE ROUTE RATHER
     /// THAN ASSUMED FROM THE SIBLING. The server's Apple route answers one opaque
-    /// `invalid_grant` 400 for every refusal it can make — a signature that does
+    /// `invalid_grant` 400 for every refusal it can make, a signature that does
     /// not verify, a wrong audience, an expired token, a nonce that does not
     /// match, a subject it cannot resolve, an address whose verification was
-    /// withdrawn — and all of them mean "start the sign-in over". It rate-limits
+    /// withdrawn, and all of them mean "start the sign-in over". It rate-limits
     /// at 429 before doing any of that work, and its own catch answers 500.
     ///
     /// ⛔ AND ONE STATUS THE SIBLING DOES NOT HAVE: 403 IS `noAccount`. The route
@@ -150,7 +150,7 @@ public struct NativeAuthClient<
     ) async -> CodeExchangeResult<Wire.Tokens> {
         // ⚠️ THE ENCODE IS INSIDE THE `try?` DELIBERATELY. `JSONEncoder` can only
         // fail here on a value it cannot represent, and every property of the
-        // request is a `String`, so the throw is unreachable — giving it its own
+        // request is a `String`, so the throw is unreachable, giving it its own
         // branch would be a line no input can cover and a claim no test can make.
         // Collapsing it into "no answer" is also the honest outcome: nothing was
         // sent.
@@ -195,7 +195,7 @@ public struct NativeAuthClient<
             // THE TOKEN", AND COLLAPSING THEM BURNS SESSIONS. See
             // `RefreshResult.notSent`: opening the app offline marks the token
             // pending, fails to send it, and the next launch reads marker ==
-            // stored token as an interrupted refresh — one offline app-open
+            // stored token as an interrupted refresh, one offline app-open
             // costing a re-login.
             //
             // ⛔ THE CONCRETE `URLError` CHECK IS NOT REDUNDANT WITH THE PROTOCOL
@@ -232,7 +232,7 @@ public struct NativeAuthClient<
         case 200:
             // ⚠️ A 200 THIS BUILD CANNOT PARSE IS THE WORST CASE, NOT THE BEST:
             // the server HAS rotated the token and the successor is unreadable.
-            // Ambiguous, so the coordinator must keep its marker set — which is
+            // Ambiguous, so the coordinator must keep its marker set, which is
             // what `transportFailure` does and `rejected` would not.
             guard let tokens = Self.tokens(from: response) else { return .transportFailure }
             return .success(tokens)
@@ -255,8 +255,8 @@ public struct NativeAuthClient<
     /// ⛔ ONLY A 200 LETS THE CREDENTIAL GO, AND THAT IS THE OPPOSITE SHAPE TO
     /// ``refresh(refreshToken:)``. There, a 401 is fatal to the session and a
     /// 5xx is ambiguous. Here, the route answers 200 for an unknown token ON
-    /// PURPOSE — its header: "sign-out has one job: end the session and leave
-    /// the client certain it may discard its credential" — and it split the 503
+    /// PURPOSE, its header: "sign-out has one job: end the session and leave
+    /// the client certain it may discard its credential", and it split the 503
     /// out specifically so a failed database write stops being reported as a
     /// completed sign-out. Since nothing in either answer confirms whether a
     /// token existed, a 200 is the only evidence that the server will not honour
@@ -271,7 +271,7 @@ public struct NativeAuthClient<
     /// ⚠️ `isProvablyUnsent` IS DELIBERATELY NOT CONSULTED. It exists so a
     /// refresh can tell an unspent token from a possibly-spent one; a revoke has
     /// no such distinction, because every failure to get an answer means the
-    /// same thing — try again later.
+    /// same thing, try again later.
     public func revoke(refreshToken: String) async -> Revoke {
         // ⚠️ ONE KEY, matching `RevokeSchema` (`z.object({ refreshToken:
         // z.string().min(1).max(512) })`), and never in the URL: a query
@@ -308,9 +308,9 @@ public struct NativeAuthClient<
     /// overload below; both end at the same request, so the headers and the
     /// redirect policy cannot drift between them.
     private func post(_ segments: [String], payload: JSONValue) async throws -> HTTPResponse {
-        // ⚠️ THE THROW IS UNREACHABLE FOR THESE THREE BODIES — only a
+        // ⚠️ THE THROW IS UNREACHABLE FOR THESE THREE BODIES, only a
         // non-finite `Double` makes `JSONWire` fail and every value in all
-        // three payloads is a string — so it is propagated rather than given
+        // three payloads is a string, so it is propagated rather than given
         // a fallback. A `?? Data()` here would be a branch no input can take,
         // i.e. a line that can never be covered and a claim that can never be
         // tested, and it would send an EMPTY body where every caller already

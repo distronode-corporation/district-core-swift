@@ -7,8 +7,8 @@ import XCTest
 /// The typed `bookings.*` wrappers.
 ///
 /// ⛔ WHAT IS UNDER TEST IS THE PAIRING, NOT THE TRANSPORT.
-/// `SchedulingAdminRepositoryTests` already proves the envelope — the 200 that is
-/// a failure, the refusal mapping, the decode guard — against a trivial payload.
+/// `SchedulingAdminRepositoryTests` already proves the envelope, the 200 that is
+/// a failure, the refusal mapping, the decode guard, against a trivial payload.
 /// These assert the two things a generic `perform` cannot check for itself: that
 /// each wrapper sends the OP NAME the catalog knows it by, and that it names the
 /// response TYPE that op actually answers. Both cross the wire as nothing at all,
@@ -30,7 +30,7 @@ final class SchedulingAdminBookingsRepositoryTests: XCTestCase {
 
     // MARK: - The list, and its filters
 
-    /// ⚠️ AN UNFILTERED LIST SENDS `"params":{}` RATHER THAN DROPPING THE KEY —
+    /// ⚠️ AN UNFILTERED LIST SENDS `"params":{}` RATHER THAN DROPPING THE KEY,
     /// every optional filter is omitted by `JSONValue.object(_:)`, and `allHosts:
     /// false` omits `scope` entirely because `z.literal("all")` has no other legal
     /// value.
@@ -140,7 +140,7 @@ final class SchedulingAdminBookingsRepositoryTests: XCTestCase {
     // MARK: - The three writes, which all answer a booking
 
     /// ⚠️ THE REASON IS OPTIONAL AND IS DROPPED WHEN ABSENT rather than sent as
-    /// null — an explicit null would fail the catalog's `.optional()` validation
+    /// null, an explicit null would fail the catalog's `.optional()` validation
     /// instead of meaning "no reason".
     func testCancellingWithoutAReasonSendsOnlyTheId() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":\#(Self.bookingRow)}"#)
@@ -198,7 +198,7 @@ final class SchedulingAdminBookingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ A `slot_taken` REFUSAL IS A **200**, and it must reach the caller as a
-    /// failure rather than as a decode error — which is only true because the
+    /// failure rather than as a decode error, which is only true because the
     /// repository reads the envelope's flag before the payload. Reschedule is the
     /// one op on this surface that meets it in normal use.
     func testAReschedulingCollisionArrivesAsAFailureRatherThanADecodeError() async {

@@ -2,8 +2,8 @@ import Foundation
 
 /// The CRM and the two District Global Intelligence writes.
 ///
-/// ⛔ THE THREE CONTACT MUTATIONS USE THREE DIFFERENT HTTP CONVENTIONS — POST +
-/// body, PATCH + body, DELETE + query — and all three exclude `viewer`
+/// ⛔ THE THREE CONTACT MUTATIONS USE THREE DIFFERENT HTTP CONVENTIONS, POST +
+/// body, PATCH + body, DELETE + query, and all three exclude `viewer`
 /// server-side.
 public extension DistrictEndpoints {
     /// One page of the CRM, newest first.
@@ -30,7 +30,7 @@ public extension DistrictEndpoints {
 
     /// One contact, in exactly the shape a list row has.
     ///
-    /// ⚠️ THE ID IS A QUERY PARAMETER HERE, NOT A PATH SEGMENT — this route
+    /// ⚠️ THE ID IS A QUERY PARAMETER HERE, NOT A PATH SEGMENT, this route
     /// predates the `/calls/{id}` style and was not changed. `contacts/{id}` 404s.
     static func contact(workspaceId: String, contactId: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
@@ -46,7 +46,7 @@ public extension DistrictEndpoints {
 
     /// Create a contact.
     ///
-    /// ⚠️ A CONTACT NEEDS A PHONE NUMBER **OR** AN EMAIL — contacts became
+    /// ⚠️ A CONTACT NEEDS A PHONE NUMBER **OR** AN EMAIL, contacts became
     /// email-first. (`bulk-create` disagrees and requires a phone per row,
     /// silently counting an email-only row as invalid; that inconsistency is
     /// server-side and is not smoothed over here. `bulk-create` is not ported at
@@ -79,7 +79,7 @@ public extension DistrictEndpoints {
     /// Update a contact.
     ///
     /// ⛔ THE SERVER EXPECTS **PATCH**, AND THIS IS THE ONLY ROUTE IN THE ENTIRE
-    /// API WHERE `workspaceId` IS MANDATORY — omitting it once made Prisma drop
+    /// API WHERE `workspaceId` IS MANDATORY, omitting it once made Prisma drop
     /// the tenant filter, so the route now validates it explicitly. This client
     /// therefore cannot apply one "the server can resolve the workspace" policy
     /// across the surface.
@@ -129,7 +129,7 @@ public extension DistrictEndpoints {
 
     /// Delete a contact.
     ///
-    /// ⛔ **DELETE WITH QUERY PARAMETERS AND NO BODY** — a third convention within
+    /// ⛔ **DELETE WITH QUERY PARAMETERS AND NO BODY**, a third convention within
     /// one section. Answers 404 when nothing matched, which for a delete means it
     /// was already gone.
     static func deleteContact(workspaceId: String, contactId: String) -> ApiRequestDescriptor {
@@ -147,7 +147,7 @@ public extension DistrictEndpoints {
     /// Queue a DGI enrichment for one contact.
     ///
     /// ⛔ NOT IDEMPOTENT AND IT SPENDS MONEY. One request schedules one external
-    /// crawl and one LLM synthesis. Nothing in this client may retry it — an
+    /// crawl and one LLM synthesis. Nothing in this client may retry it, an
     /// enrichment that timed out may well have been queued, and re-sending spends
     /// a second model run on the same contact.
     ///
@@ -155,7 +155,7 @@ public extension DistrictEndpoints {
     /// that 403 is the product rather than boilerplate: it names the exact
     /// settings page that turns the feature on. Show it VERBATIM.
     ///
-    /// ⚠️ ANSWERS 200 WITH `status: "pending"` in under 100ms — it reports that
+    /// ⚠️ ANSWERS 200 WITH `status: "pending"` in under 100ms, it reports that
     /// work was SCHEDULED, never that a dossier exists. Poll ``contact(workspaceId:contactId:)``
     /// afterwards and read `dgiStatus`.
     static func enrichContact(workspaceId: String, contactId: String) -> ApiRequestDescriptor {
@@ -177,13 +177,13 @@ public extension DistrictEndpoints {
     /// request types: one costs money and the other destroys data, and a single
     /// function taking a flag would make those one character apart.
     ///
-    /// ⛔ THIS DELETES THE DOSSIER, NOT THE CONTACT, and it is not recoverable —
+    /// ⛔ THIS DELETES THE DOSSIER, NOT THE CONTACT, and it is not recoverable,
     /// the crawl has to be paid for again. ⛔ AND IT RESETS `dgiStatus` TO
     /// **NULL**, NOT "pending": nothing is re-queued, so a client that
     /// optimistically showed "pending" would spin forever against a job that does
     /// not exist.
     ///
-    /// ⚠️ **POST, NOT DELETE**, even though this removes data — the route exports
+    /// ⚠️ **POST, NOT DELETE**, even though this removes data, the route exports
     /// POST only. It is not deleting a RESOURCE; it is nulling four columns on
     /// one that stays.
     static func clearContactIntel(workspaceId: String, contactId: String) -> ApiRequestDescriptor {

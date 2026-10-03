@@ -5,7 +5,7 @@ import Foundation
 /// ⛔ THIS IS A CLOSED LIST AND THAT IS THE SECURITY PROPERTY, NOT THE
 /// BOOKKEEPING. ``ApiRequestDescriptor``'s initialiser is internal, so the only
 /// requests the public API can express are the ones ``DistrictEndpoints`` builds
-/// — and there is no case here for `calls/outbound` (the AI campaign dialer: a
+/// and there is no case here for `calls/outbound` (the AI campaign dialer: a
 /// human dialling through it would find the voice agent on their own line) or
 /// for any `video_` room (a billable Tavus avatar, concurrency ceiling 1, never
 /// exercised in production). Both are UNCONSTRUCTIBLE rather than discouraged.
@@ -26,8 +26,8 @@ import Foundation
 /// catches up.
 ///
 /// ⚠️ ``searchMessages`` IS A DIFFERENT KIND OF GAP. `messages/search` has
-/// existed on the SERVER the whole time and no client of ours — web, Kotlin or
-/// this one — has ever called it, so the parity diff will report it missing on
+/// existed on the SERVER the whole time and no client of ours, web, Kotlin or
+/// this one, has ever called it, so the parity diff will report it missing on
 /// the Kotlin side indefinitely rather than until that client catches up.
 public enum EndpointID: String, Sendable, CaseIterable {
     // Workspaces + overview
@@ -80,7 +80,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     ///
     /// ⛔ IT IS THE ONLY THING THAT MAKES A MESSAGE PUSH ACTIONABLE, because every
     /// other endpoint on this surface is addressed by THREAD. The payload carries a
-    /// `messageId` and deliberately carries nothing else — a `threadKey` is a raw
+    /// `messageId` and deliberately carries nothing else, a `threadKey` is a raw
     /// phone number or email address whenever the thread has no `Contact` row, and
     /// a notification is readable by the OS. So the deep link and both shade
     /// actions spend one authenticated request rather than widening the payload.
@@ -133,7 +133,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // ⛔ `personaOptions` EXISTS BECAUSE `workspace/persona` COERCES. An
     // unrecognised `modelId` is silently rewritten to `deepgram-pipeline` and an
     // unrecognised `voice` is stored verbatim and then replaced by the agent's own
-    // fallback at synthesis time — both answering 200, both producing a persona
+    // fallback at synthesis time, both answering 200, both producing a persona
     // nobody chose with nothing anywhere reporting it. The web form never has that
     // problem because it derives its pickers from the same modules the route
     // reads; this is that derivation, on the wire. A hardcoded Swift catalogue
@@ -141,7 +141,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     //
     // ⛔ `personaPreviewToken` MINTS A LIVE, BILLED SESSION. It is an invitation
     // for the voice agent to join a room and start burning STT/LLM/TTS minutes, it
-    // is capped at 10/min per WORKSPACE, and it is not idempotent — nothing in
+    // is capped at 10/min per WORKSPACE, and it is not idempotent, nothing in
     // this client may retry it. See
     // ``DistrictEndpoints/previewToken(workspaceId:form:)``.
     //
@@ -159,13 +159,13 @@ public enum EndpointID: String, Sendable, CaseIterable {
 
     // Who answers a call, and whether this person can be rung
     //
-    // ⛔ FOUR CASES FOR TWO PATHS, because each is GET + PATCH — the same split
+    // ⛔ FOUR CASES FOR TWO PATHS, because each is GET + PATCH, the same split
     // `desk/settings` makes, and what lets `EndpointTableTests` assert a method
     // per entry so a read cannot be expressed as a write.
     //
     // ⛔ AND THE TWO PATHS ARE NOT ONE SURFACE. `call-handling` is a WORKSPACE
     // setting; `availability` is a fact about the CALLER'S OWN membership row and
-    // writes nobody else's — the route takes no email and no user id, deliberately.
+    // writes nobody else's, the route takes no email and no user id, deliberately.
     //
     // ⚠️ NO KOTLIN COUNTERPART YET, like the scheduling pair, the inbox search and
     // the support and desk families. The raw values are still spelled as Kotlin
@@ -192,7 +192,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case saveCreatorCell
     case testMessagingCredentials
 
-    // District Desk — the tenant's OWN customers' tickets
+    // District Desk, the tenant's OWN customers' tickets
     //
     // ⛔ NOT THE SUPPORT DESK. `/api/district/support/*` is the tenant raising
     // something WITH DISTRONODE; this family is the tenant's customers raising
@@ -238,7 +238,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // `/admin`. It has no case here for the reason it never had one: it answers a
     // **302** whose `Location` is a one-time sign-in credential, so the App target
     // fetches it with redirects DISABLED and hands the URL to the browser.
-    // ``RedirectEndpoints`` is not the home for it either — that list is for
+    // ``RedirectEndpoints`` is not the home for it either, that list is for
     // targets that are presigned OBJECTS, where following the redirect wastes
     // bandwidth rather than SPENDING a credential on a transport nobody sees.
     //
@@ -271,7 +271,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // ⛔ FIVE CASES FOR FIVE ROUTES, INCLUDING TWO THAT ARE **NOT IDEMPOTENT**.
     // `replyToSupportRequest` posts a public comment into a live human queue, and
     // `closeSupportRequest` posts an audit comment BEFORE it transitions the
-    // request — so a repeat of either leaves a second visible message in a
+    // request, so a repeat of either leaves a second visible message in a
     // customer's own thread. See ``SupportResubmit``.
     //
     // ⚠️ THESE RAW VALUES NAME NO KOTLIN FUNCTION, and they are the third such
@@ -301,7 +301,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // inside the app, which is App Store Review Guideline 3.1.1: an in-app purchase or
     // nothing. With no case here and no ``DistrictPaths`` constant, and with
     // ``ApiRequestDescriptor``'s initialiser internal, `workspace/numbers/purchase` is
-    // UNCONSTRUCTIBLE from outside this module rather than merely undocumented — the
+    // UNCONSTRUCTIBLE from outside this module rather than merely undocumented, the
     // same mechanism that holds out `calls/outbound`, for an entirely different reason.
     // ⛔ 3.1.1 ALSO COVERS STEERING, so nothing links to the web marketplace either.
     // `EndpointSurfaceTests` pins both halves.
@@ -351,7 +351,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case createSipTrunk
     case verifyService
     case setVerifyServiceEnabled
-    /// ⛔ BILLABLE PER CALL, a GET, and it admits `viewer`. One tap, one lookup — never
+    /// ⛔ BILLABLE PER CALL, a GET, and it admits `viewer`. One tap, one lookup, never
     /// on a keystroke, on appear, or in a retry loop. See
     /// ``DistrictPaths/workspaceLookup``.
     case lookupNumber

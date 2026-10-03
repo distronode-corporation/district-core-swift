@@ -7,7 +7,7 @@ final class ApiURLTests: XCTestCase {
 
     /// ⛔ THE `+` CASE IS WHY THIS IS NOT `URLComponents`. That type's default
     /// query encoding leaves `+` literal, and a server that form-decodes reads it
-    /// as a SPACE — so a timeline read for `+15555550123` would address
+    /// as a SPACE, so a timeline read for `+15555550123` would address
     /// ` 15555550123` and answer an empty thread, which reads as "no messages"
     /// rather than as an encoding bug. E.164 is the ordinary form this API's
     /// address selector carries.

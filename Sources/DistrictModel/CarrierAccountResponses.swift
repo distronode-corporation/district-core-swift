@@ -12,7 +12,7 @@ import Foundation
 // a bare `{success:true}` and the truth is re-read.
 //
 // ⚠️ NONE OF THESE HAS A CONTRACT FIXTURE. The shared contract corpus mirrors the
-// Android client and that client has no carrier-account surface — so
+// Android client and that client has no carrier-account surface, so
 // ⛔ `ContractManifest.expectedFixtureCount` MUST NOT MOVE for them. What pins
 // the shapes is the route source, quoted per type, and
 // `CarrierAccountRepositoryTests`.
@@ -33,17 +33,17 @@ import Foundation
 /// ⛔ ``domainSid`` AND ``ipAclSid`` ARE OPTIONAL BECAUSE OF HOW THE ROW IS STORED, NOT
 /// BECAUSE THE RESOURCES ARE OPTIONAL. The list parses these out of a packed
 /// `productRef` string (`name|domain|ips|domainSid|ipAclSid`) and writes an explicit
-/// null for a part that is not there — which is every row created before real
+/// null for a part that is not there, which is every row created before real
 /// provisioning was wired up. A row with nulls describes a billing item with no Twilio
 /// resources behind it, which is worth surfacing rather than hiding.
 ///
 /// ⚠️ ``domain`` IS ALWAYS PRESENT EVEN WHEN THE PACKED STRING IS MALFORMED, because
-/// the route builds it by template interpolation — so a truncated `productRef` yields
+/// the route builds it by template interpolation, so a truncated `productRef` yields
 /// the literal `undefined.sip.twilio.com` rather than a missing key. A domain reading
 /// like that is a corrupt row, not a decode problem.
 public struct SipTrunk: Codable, Sendable {
     /// The `ManagedBillingItem` row id, which is the only identifier this client has
-    /// for a trunk — there is no per-trunk route to use it on.
+    /// for a trunk, there is no per-trunk route to use it on.
     public let id: String
     public let name: String
     /// ⚠️ Fully qualified, `<label>.sip.twilio.com`. See the type doc.
@@ -88,7 +88,7 @@ public struct SipTrunkCreatedResponse: Codable, Sendable {
 
 // MARK: - The Verify (OTP) service
 
-/// `GET`/`POST /api/district/workspace/verify` — one type for three bodies.
+/// `GET`/`POST /api/district/workspace/verify`, one type for three bodies.
 ///
 /// ⛔ THIS IS THE SERVICE'S CONFIGURATION, NOT THE OTP FLOW. `workspace/verify/start`
 /// and `workspace/verify/check` send and check a code and are deliberately not ported.
@@ -97,7 +97,7 @@ public struct SipTrunkCreatedResponse: Codable, Sendable {
 ///
 /// ⛔ ENABLE AND DISABLE ARE NOT SYMMETRICAL AND THE SID IS WHERE IT SHOWS. Enabling
 /// creates a REAL, carrier-billable Verify Service; disabling deliberately does NOT
-/// delete it and only clears our pointer — so a workspace can be `enabled: false` while
+/// delete it and only clears our pointer, so a workspace can be `enabled: false` while
 /// a billable OTP sender it once created is still alive on the carrier account,
 /// invisible from here. A screen must not describe disabling as removing anything.
 ///
@@ -177,8 +177,8 @@ public struct TollFreeVerificationResponse: Codable, Sendable {
 
 /// What the carrier knows about one number.
 ///
-/// ⛔ AN INVALID NUMBER STILL COST MONEY. `valid: false` arrives on a **200** — the
-/// route translates Twilio's own 404 itself — so this is not a cheap "no such number"
+/// ⛔ AN INVALID NUMBER STILL COST MONEY. `valid: false` arrives on a **200**, the
+/// route translates Twilio's own 404 itself, so this is not a cheap "no such number"
 /// answer and must never be used to probe.
 ///
 /// ⚠️ EVERY FIELD BUT ``valid`` AND ``phoneNumber`` IS AN EXPLICIT NULL RATHER THAN

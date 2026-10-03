@@ -14,12 +14,12 @@ public extension TypedEndpoints {
     /// parameterised on the response type and decodes whatever the CALLER names,
     /// so what is fixed at this layer is the ENVELOPE (`{ok:true,data}` /
     /// `{ok:false,failure,status}`) rather than the payload. That still satisfies
-    /// the rule this list states — a repository decodes it, rather than handing
+    /// the rule this list states, a repository decodes it, rather than handing
     /// back bytes.
     ///
     /// ⛔ AND NEITHER GOES THROUGH ``ApiClient/send(_:as:)``. A failed op is a
     /// **200** carrying `{ok:false}`, so the ordinary typed send would report a
-    /// scheduler outage as a decode failure at best — and as success at worst, if
+    /// scheduler outage as a decode failure at best, and as success at worst, if
     /// the named type happened to tolerate the shape. Both use
     /// ``ApiClient/sendUnmapped(_:)``, like `workspace/list`'s degraded 503, and for
     /// the same reason: the error body IS the answer.

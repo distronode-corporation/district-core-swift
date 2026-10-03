@@ -8,7 +8,7 @@ import XCTest
 /// ⚠️ THE STRICT GATE AND THESE TESTS DO DIFFERENT JOBS. `StrictDecodeVerifier`
 /// proves the key set matches the server's exactly and deliberately compares no
 /// values; what it therefore cannot notice is a fixture REGENERATED against
-/// thinner data — every key still present, every awkward branch gone. The three
+/// thinner data, every key still present, every awkward branch gone. The three
 /// branches this surface exists to keep apart are all value-level: a metric
 /// measured at zero, a metric never metered, and a month with nothing metered at
 /// all. They are pinned here.
@@ -64,7 +64,7 @@ final class UsageContractTests: XCTestCase {
 
     /// ⛔ THE SPARSE ROWS ARE THE POINT OF THIS FIXTURE. Its second and third
     /// months omit the metrics nobody metered rather than nulling them, so this is
-    /// the shape that proves absence survives the round trip — Swift writes a nil
+    /// the shape that proves absence survives the round trip, Swift writes a nil
     /// Optional as an ABSENT key, so a DTO that defaulted these would re-encode
     /// keys the server never sent and fail the gate's key-set walk.
     ///
@@ -97,7 +97,7 @@ final class UsageContractTests: XCTestCase {
 
     /// ⛔ AN EMPTY ARRAY IS "NOTHING HAS EVER BEEN METERED", NOT A FAILURE. The
     /// server appends only months that had rows, so a workspace nobody has metered
-    /// answers this on a 200 — and no committed fixture carries it, which is why
+    /// answers this on a 200, and no committed fixture carries it, which is why
     /// the branch is decoded from literal bytes here.
     func testAnEmptyHistoryIsASuccessfulAnswer() throws {
         let response = try decode(UsageHistoryResponse.self, from: #"{"success":true,"usage":[]}"#)
@@ -108,7 +108,7 @@ final class UsageContractTests: XCTestCase {
 
     /// ⚠️ `whatsappInbound` IS MODELLED THOUGH NO FIXTURE CARRIES IT. `UsageMetric`
     /// declares it server-side, so the day one is recorded the key must land on the
-    /// property rather than being ignored — and a decode-only proof is the only one
+    /// property rather than being ignored, and a decode-only proof is the only one
     /// available while the corpus has no row with it.
     func testTheUnfixturedWhatsAppInboundMetricStillDecodes() throws {
         let month = try decode(UsageMonth.self, from: #"{"month":"2026-09","whatsappInbound":3.5}"#)

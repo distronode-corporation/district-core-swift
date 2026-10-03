@@ -1,7 +1,7 @@
 import Foundation
 
-/// The verbs this API uses. There is no single mutation convention — see
-/// ``ApiRequestDescriptor`` — so the method travels with the descriptor rather
+/// The verbs this API uses. There is no single mutation convention, see
+/// ``ApiRequestDescriptor``, so the method travels with the descriptor rather
 /// than being implied by the helper that sends it.
 ///
 /// ⛔ WITHIN THE CONTACTS SECTION ALONE THERE ARE THREE: `create` is POST with a
@@ -43,7 +43,7 @@ public struct HTTPRequest: Sendable, Equatable {
 /// One inbound response: the status, the headers and whatever bytes came back.
 ///
 /// ⚠️ A 3xx IS A LEGITIMATE OUTCOME HERE, NOT AN ERROR. `calls/{id}/recording`
-/// answers **302 with a `Location`** and the client must not follow it — see
+/// answers **302 with a `Location`** and the client must not follow it, see
 /// ``ApiClient/redirectTarget(_:)``. That is the whole reason this type carries
 /// headers at all.
 public struct HTTPResponse: Sendable, Equatable {
@@ -63,7 +63,7 @@ public struct HTTPResponse: Sendable, Equatable {
     /// package will run against disagree in practice: Darwin's `URLSession`
     /// canonicalises them, the libcurl-backed Linux one does not. A literal
     /// `headers["Location"]` therefore works on a Mac and returns nil on Linux
-    /// — which would present as "the recording has no URL" rather than as
+    /// which would present as "the recording has no URL" rather than as
     /// a platform difference.
     public func header(_ name: String) -> String? {
         let wanted = name.lowercased()
@@ -78,8 +78,8 @@ public struct HTTPResponse: Sendable, Equatable {
 ///
 /// ⛔ NOTHING IN `DistrictNetwork` OR `DistrictData` MAY TOUCH `URLSession`
 /// DIRECTLY, AND THAT IS THE ARCHITECTURE RATHER THAN A PREFERENCE. `URLSession`
-/// on Linux is libcurl-backed and behaves differently from Darwin's — redirect
-/// handling, header casing and error domains all diverge — and this package must
+/// on Linux is libcurl-backed and behaves differently from Darwin's, redirect
+/// handling, header casing and error domains all diverge, and this package must
 /// keep building and testing on Linux CI. That difference is absorbed at this protocol and must never
 /// reach an endpoint or a repository.
 ///

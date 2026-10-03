@@ -3,7 +3,7 @@ import Foundation
 /// Minimal, VALID District Desk bodies.
 ///
 /// ⚠️ WRITTEN FROM THE ROUTE SOURCE, NOT FROM A CONTRACT FIXTURE, because there is no
-/// desk fixture in the contract corpus — the corpus mirrors the Kotlin client and
+/// desk fixture in the contract corpus, the corpus mirrors the Kotlin client and
 /// that client has no desk. Every required key is present and nothing else
 /// is, so a test can be about envelope handling rather than about JSON.
 ///
@@ -13,7 +13,7 @@ import Foundation
 /// has none of the former, which is recorded in `EndpointClassification+Desk.swift`
 /// rather than papered over here.
 ///
-/// ⚠️ ITS OWN FILE because two suites share it — the same reason `MessagingTestBodies`
+/// ⚠️ ITS OWN FILE because two suites share it, the same reason `MessagingTestBodies`
 /// and `WorkflowTestBodies` have one.
 enum DeskBodies {
     static func settings(enabled: Bool, success: Bool = true) -> String {
@@ -57,7 +57,7 @@ enum DeskBodies {
     // ⚠️ THERE IS DELIBERATELY NO SWIFT-SIDE `expectedSummary` HERE. A memberwise
     // initialiser for ``DeskTicketSummary`` is internal to `DistrictModel`, and making
     // it public purely so a test could build one would add production API that only a
-    // test calls — which under the 100% coverage floor is a public surface nothing in
+    // test calls, which under the 100% coverage floor is a public surface nothing in
     // the app exercises. Assert the fields that matter instead.
 
     static func tickets(ids: [String], status: String = "open", source: String = "manual") -> String {
@@ -93,7 +93,7 @@ enum DeskBodies {
         """#
     }
 
-    /// ⚠️ A REAL REPLY WITH THE `notified` KEY MISSING — contract drift rather than a
+    /// ⚠️ A REAL REPLY WITH THE `notified` KEY MISSING, contract drift rather than a
     /// shape the route sends, which is exactly why the fallback needs pinning.
     static func replyWithoutNotified() -> String {
         #"""

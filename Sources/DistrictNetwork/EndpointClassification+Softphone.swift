@@ -4,7 +4,7 @@ public extension TypedEndpoints {
     /// Ending a direct softphone call at the CARRIER.
     ///
     /// ⚠️ ITS OWN FILE RATHER THAN ONE MORE LINE IN `EndpointClassification.swift`,
-    /// which is a lint ceiling and not a taxonomy — that file sits at SwiftLint's
+    /// which is a lint ceiling and not a taxonomy, that file sits at SwiftLint's
     /// 500-line `file_length` and the commentary on its lists is the point of them.
     /// ``TypedEndpoints/callHandling`` and ``TypedEndpoints/desk`` are the
     /// precedent. ⛔ A family declared here and not unioned into

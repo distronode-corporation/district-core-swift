@@ -85,7 +85,7 @@ final class NumberWriteRepositoryTests: XCTestCase {
 
     // MARK: - Release
 
-    /// ⚠️ A CLEAN RELEASE OMITS `warnings` ENTIRELY — absent, not an empty array — which is
+    /// ⚠️ A CLEAN RELEASE OMITS `warnings` ENTIRELY, absent, not an empty array, which is
     /// why the field is Optional and why `warningLines` exists.
     func testACleanReleaseCarriesNoWarningsAtAll() async throws {
         let transport = RepositoryTransport(json: #"{"success":true}"#)
@@ -107,7 +107,7 @@ final class NumberWriteRepositoryTests: XCTestCase {
 
     /// ⛔ A **200 WITH `warnings` IS NOT A PARTIAL RELEASE, AND SWALLOWING THE ARRAY IS THE
     /// EXPENSIVE MISTAKE.** The number is gone; what failed is a cleanup step after the
-    /// irreversible part — and one of those steps is ending the monthly charge, so a client
+    /// irreversible part, and one of those steps is ending the monthly charge, so a client
     /// that dropped this would leave an operator believing they had stopped a charge they
     /// had not. The flag is therefore carried through INSIDE the success, exactly as
     /// ``OwnedNumbersResponse/partial`` is.
@@ -172,8 +172,8 @@ final class NumberWriteRepositoryTests: XCTestCase {
 
     /// ⛔ A NON-IDEMPOTENT WRITE IS REPEATABLE ONLY WHEN THE FAILURE **PROVES** IT DID NOT
     /// HAPPEN, which on this surface means a 4xx: the server refused before it did any
-    /// work — the role guard, the ownership check against the hub index, the rate limiter,
-    /// a malformed body — so nothing was spent.
+    /// work, the role guard, the ownership check against the hub index, the rate limiter,
+    /// a malformed body, so nothing was spent.
     func testANonIdempotentWriteIsRepeatableOnlyAfterARefusal() {
         for status in [400, 403, 404, 409, 413, 415, 422, 429, 499] {
             XCTAssertTrue(
@@ -184,14 +184,14 @@ final class NumberWriteRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE THREE AMBIGUOUS FAILURES DISARM THE CONTROL, AND `.decoding` IS THE ONE THAT
-    /// READS AS HARMLESS. It is only ever produced from a **2xx** — `ApiErrorNormalizer`
-    /// guards on `isSuccess` — so the server answered success and the write DID happen. A
+    /// READS AS HARMLESS. It is only ever produced from a **2xx**, `ApiErrorNormalizer`
+    /// guards on `isSuccess`, so the server answered success and the write DID happen. A
     /// repeat spends it again, guaranteed rather than possibly. A 5xx and a transport
     /// failure are genuinely unknown, which is the same answer for a different reason.
     ///
     /// ⚠️ A 3xx CANNOT REACH THE 4xx BRANCH AND THAT IS DELIBERATE: `ApiErrorNormalizer`
     /// maps anything outside 2xx to `.http`, so an unfollowed redirect arrives as
-    /// `.http(302, …)` and is treated as ambiguous — the safe direction for a status nobody
+    /// `.http(302, …)` and is treated as ambiguous, the safe direction for a status nobody
     /// on this surface has reasoned about.
     func testAnAmbiguousFailureRefusesToRearmANonIdempotentWrite() {
         let ambiguous: [ApiError] = [
@@ -210,7 +210,7 @@ final class NumberWriteRepositoryTests: XCTestCase {
 
     /// ⚠️ THE 4xx BRANCH IS SAFE HERE FOR A REASON WORTH PINNING, BECAUSE IT IS NOT SAFE
     /// EVERYWHERE. On the release route a **403** AFTER a successful release is the
-    /// EXPECTED answer — the ownership row the guard needs has just been deleted — so a
+    /// EXPECTED answer, the ownership row the guard needs has just been deleted, so a
     /// re-armed control that is pressed again gets the same 403 and spends nothing. What
     /// makes that acceptable is that the second failure is also free; it is emphatically
     /// not evidence the first attempt failed, and a screen must not word it that way.

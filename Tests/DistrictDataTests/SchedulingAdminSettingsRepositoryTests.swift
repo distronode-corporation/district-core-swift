@@ -8,7 +8,7 @@ import XCTest
 ///
 /// ⛔ WHAT IS UNDER TEST IS THE PAIRING, NOT THE JSON. `perform` is generic and
 /// decodes whatever the caller names, so the only thing a named method adds is
-/// that the op string, the params and the response type agree — and all three are
+/// that the op string, the params and the response type agree, and all three are
 /// invisible to the compiler, because the op crosses the wire as a string and the
 /// type is chosen at the call site. Each test therefore asserts the BODY BYTES as
 /// well as the decoded value; a method wired to the wrong op still returns a
@@ -33,7 +33,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ A SPARSE PATCH SENDS ONLY WHAT WAS SET. ``JSONValue/object(_:)`` drops
-    /// nil pairs, and the fork leaves an absent field alone — so the body here is
+    /// nil pairs, and the fork leaves an absent field alone, so the body here is
     /// the difference between changing one preference and resetting eleven.
     func testUpdateMeSendsOnlyTheFieldsThatWereSet() async throws {
         let transport = RepositoryTransport(json: envelope(Self.meBody))
@@ -84,7 +84,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ AN UPDATE THAT SETS NOTHING SENDS `{}` RATHER THAN DROPPING THE KEY —
+    /// ⚠️ AN UPDATE THAT SETS NOTHING SENDS `{}` RATHER THAN DROPPING THE KEY,
     /// the same rule the descriptor states for an op that takes no params.
     func testAnEmptyUpdateSendsAnEmptyParamsObject() async throws {
         let transport = RepositoryTransport(json: envelope(Self.meBody))
@@ -92,8 +92,8 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
         XCTAssertEqual(transport.bodies, [#"{"op":"me.patch","params":{},"workspaceId":"ws_1"}"#])
     }
 
-    /// ⚠️ THE NO-BODY OPS ANSWER `{"ok":true,"data":{"ok":true}}` — an outer flag
-    /// and an inner one — because the catalog's `NO_CONTENT` rewrites a 204 before
+    /// ⚠️ THE NO-BODY OPS ANSWER `{"ok":true,"data":{"ok":true}}`, an outer flag
+    /// and an inner one, because the catalog's `NO_CONTENT` rewrites a 204 before
     /// it leaves the route.
     func testDeleteAvatarDecodesTheRewrittenNoContent() async throws {
         let transport = RepositoryTransport(json: envelope(#"{"ok":true}"#))
@@ -113,7 +113,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ ALL SEVEN FIELDS TRAVEL, AND THE TWO IMAGE URLs DO NOT. The patch is
-    /// REPLACE at the far end — an omitted `privacy_url` CLEARS it — and
+    /// REPLACE at the far end, an omitted `privacy_url` CLEARS it, and
     /// `logo_url` is not on the schema at all, so a body carrying one would be a
     /// 400 naming a field that does not exist.
     func testUpdateBrandingRoundTripsEveryFieldAndOmitsTheImageUrls() async throws {
@@ -163,7 +163,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE TWO IMAGE DELETES ARE THE ONLY WAY TO CLEAR EITHER URL, and they are
-    /// separate ops rather than one with a target — so a method wired to the wrong
+    /// separate ops rather than one with a target, so a method wired to the wrong
     /// one clears the wrong picture and answers success.
     func testTheTwoBrandingImageDeletesAreDistinctOps() async throws {
         let logo = RepositoryTransport(json: envelope(#"{"ok":true}"#))
@@ -198,7 +198,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE PATCH SENDS `enabled` AND NOTHING ELSE. The schema is
-    /// `z.strictObject`, so a second key is a 400 naming it — `stt_api_key` above
+    /// `z.strictObject`, so a second key is a 400 naming it, `stt_api_key` above
     /// all, which would put a tenant's credential on the shared instance.
     func testNotetakerReadAndWriteUseTheirOwnOps() async throws {
         let read = RepositoryTransport(json: envelope(#"{"enabled":false}"#))
@@ -240,7 +240,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ PASSING NEITHER SENDS `{}` — a valid no-op that still spends a write
+    /// ⚠️ PASSING NEITHER SENDS `{}`, a valid no-op that still spends a write
     /// from the workspace's budget, which is why a caller should decide not to send
     /// it rather than rely on the server ignoring it.
     func testUpdatingLLMSettingsWithNoArgumentsStillSendsAnEmptyObject() async throws {

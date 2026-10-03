@@ -7,7 +7,7 @@ import XCTest
 /// ⛔ THE CONTRACT FIXTURES ARE NOT WHAT THESE ASSERT AND MUST NOT BE DUPLICATED
 /// HERE. `ContractFixtureTests` runs the committed bodies through the strict
 /// decode/re-encode walk, which is what pins the wire SHAPE; what this file pins
-/// is the branches a single fixture cannot hold at once — an absent key and a
+/// is the branches a single fixture cannot hold at once, an absent key and a
 /// present one on the same field, a discriminated shape in both of its states.
 final class SchedulingAdminBookingsTests: XCTestCase {
     private let decoder = JSONDecoder()
@@ -51,7 +51,7 @@ final class SchedulingAdminBookingsTests: XCTestCase {
 
     /// ⛔ FOUR KEYS IS A LEGAL BOOKING, AND IT IS THE ROW THAT BREAKS A CARELESS
     /// DTO. `bookingSchema` requires only `id`, `start_at`, `end_at` and `status`
-    /// — not the event type and not the host — so a screen has to be able to draw
+    /// not the event type and not the host, so a screen has to be able to draw
     /// this.
     func testASparseBookingDecodesWithOnlyTheFourRequiredKeys() throws {
         let booking = try decode(
@@ -159,7 +159,7 @@ final class SchedulingAdminBookingsTests: XCTestCase {
     }
 
     /// ⚠️ `type` IS THE QUESTION'S INPUT KIND AND `value` IS A STRING WHATEVER IT
-    /// SAYS — a multi-select answer is pre-joined by the fork — so nothing should
+    /// SAYS, a multi-select answer is pre-joined by the fork, so nothing should
     /// branch on `type` to decide how to decode.
     func testASelectAnswerStillDecodesAsAString() throws {
         let answer = try decode(

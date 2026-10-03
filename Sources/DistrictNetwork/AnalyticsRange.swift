@@ -2,7 +2,7 @@ import Foundation
 
 /// The analytics window, as an enum rather than a string.
 ///
-/// ⛔ AN UNRECOGNISED `timeRange` IS NOT AN ERROR SERVER-SIDE — the route
+/// ⛔ AN UNRECOGNISED `timeRange` IS NOT AN ERROR SERVER-SIDE, the route
 /// silently falls back to 7d and answers **200**. So a wrong value serves a
 /// week's figures under whatever heading the UI is showing, with nothing anywhere
 /// reporting a problem. ``wire`` is the only thing standing between this client
@@ -32,7 +32,7 @@ public enum AnalyticsRange: Sendable, CaseIterable {
 ///
 /// ⚠️ SENT EXPLICITLY EVEN THOUGH THE SERVER DEFAULTS IT. The column is NOT NULL
 /// and the route's zod schema defaults the field to `"android"`, so omitting it
-/// works — and would label every iOS row as an Android one, which is the row the
+/// works, and would label every iOS row as an Android one, which is the row the
 /// server's push sender selects an APNs payload from.
 public enum PushPlatform {
     public static let ios = "ios"

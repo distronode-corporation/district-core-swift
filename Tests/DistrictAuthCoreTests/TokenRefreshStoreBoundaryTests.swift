@@ -7,8 +7,8 @@ import XCTest
 ///
 /// ⛔ SPLIT OUT OF `TokenRefreshCoordinatorTests` BECAUSE THAT FILE HIT THE
 /// 500-LINE `file_length` CEILING, not because these are a lesser tier. Every
-/// case here is one where the obvious handling of a store error — treat it as
-/// "no session", or let the error propagate — is a PERMANENT sign-out for a
+/// case here is one where the obvious handling of a store error, treat it as
+/// "no session", or let the error propagate, is a PERMANENT sign-out for a
 /// user whose device was merely locked for a moment.
 final class TokenRefreshStoreBoundaryTests: XCTestCase {
     private func makeCoordinator(
@@ -123,7 +123,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
     /// ⛔ A LOGIN COMPLETING BESIDE A QUEUED REFRESH MUST NOT COST A ROTATION.
     /// The store reads inside `acquire` are suspension points, so `adopt` can
     /// land in the middle of them; without the re-check that follows those
-    /// reads, this refreshes a credential that is seconds old — and every
+    /// reads, this refreshes a credential that is seconds old, and every
     /// avoidable refresh is one closer to the shared per-user limiter that
     /// degrades the account's other devices.
     func testALoginLandingMidAcquisitionPreemptsTheRefresh() async {
@@ -145,7 +145,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
 
 // MARK: - Helpers
 
-/// A store whose session reads fine but whose MARKER read throws — the one
+/// A store whose session reads fine but whose MARKER read throws, the one
 /// combination `SpyTokenStore`'s single `failReads` flag cannot express, and the
 /// only way to reach the coordinator's second store-failure branch.
 private actor ReadableSessionUnreadableMarkerStore: TokenStore {

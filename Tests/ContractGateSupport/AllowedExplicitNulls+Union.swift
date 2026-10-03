@@ -25,7 +25,7 @@ public extension StrictDecodeVerifier {
     /// because `merging` is applied pairwise and each application traps. ⛔ A group
     /// declared in a new file and NOT chained in here would silently exempt
     /// nothing, and its fixture would then fail the gate for a reason nobody would
-    /// look for — so add the `.merging` in the same commit as the group.
+    /// look for, so add the `.merging` in the same commit as the group.
     static let allowedExplicitNulls: [String: Set<String>] = base
         .merging(inbox) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")

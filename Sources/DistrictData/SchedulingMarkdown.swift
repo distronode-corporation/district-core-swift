@@ -6,7 +6,7 @@ import Foundation
 /// notes are written by a model from a customer conversation, so their text is untrusted
 /// input; the web renders these as React children (text nodes) and never through
 /// `dangerouslySetInnerHTML`. The iOS equivalent is `Text`, which draws a string and
-/// cannot be talked into anything else. ⚠️ Nothing here is a sanitiser — the safety comes
+/// cannot be talked into anything else. ⚠️ Nothing here is a sanitiser, the safety comes
 /// from the SINK, and a future edit that renders a block as `AttributedString(markdown:)`
 /// would reintroduce exactly what this shape avoids.
 public enum SchedulingNotesBlock: Equatable, Sendable {
@@ -126,7 +126,7 @@ public enum SchedulingMarkdown {
 
     /// ⚠️ SPLIT ON `\r\n` OR `\n`, MATCHING THE SOURCE'S `/\r?\n/`. A bare `\r` is NOT a
     /// separator to the source, so `components(separatedBy: .newlines)` is the
-    /// wrong tool — it would also split on `\u{2028}`, which a model can emit inside a
+    /// wrong tool, it would also split on `\u{2028}`, which a model can emit inside a
     /// sentence.
     static func splitLines(_ source: String) -> [String] {
         source.replacingOccurrences(of: "\r\n", with: "\n").components(separatedBy: "\n")

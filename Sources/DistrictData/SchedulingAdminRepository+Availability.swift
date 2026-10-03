@@ -6,7 +6,7 @@ import Foundation
 //
 // ⛔ TWO SHAPES OF AVAILABILITY AND THEY ARE NOT LAYERS OF ONE THING. A RULE is a
 // weekly window that repeats forever; an OVERRIDE is a dated exception to it.
-// Reading one to answer a question about the other gives a plausible wrong answer —
+// Reading one to answer a question about the other gives a plausible wrong answer,
 // "is this member free on the 24th" is both, and neither op answers it alone.
 // `eventTypes.slots` is the op that composes them, which is why it lives with the
 // event types and not here.
@@ -19,12 +19,12 @@ import Foundation
 public extension SchedulingAdminRepository {
     // MARK: - Weekly rules
 
-    /// `availability.rules.list` — the weekly windows.
+    /// `availability.rules.list`, the weekly windows.
     ///
     /// ⛔ AN `eventTypeId` FILTERS TO THAT EVENT TYPE'S OWN RULES AND DOES **NOT**
     /// INCLUDE THE GLOBAL ONES. A nil `event_type_id` on a row means "every event
     /// type" (see ``SchedulingAvailabilityRule``), so the rules that actually govern
-    /// one event type are the filtered list UNIONED with the global ones — which is
+    /// one event type are the filtered list UNIONED with the global ones, which is
     /// two calls, and is why this argument is not defaulted to a value that looks
     /// like it answers the question.
     func availabilityRules(
@@ -39,7 +39,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `availability.rules.create` — one new weekly window.
+    /// `availability.rules.create`, one new weekly window.
     ///
     /// ⚠️ A nil `eventTypeId` DROPS THE KEY, which the fork reads as the global
     /// rule. The schema is `.nullable().optional()`, so an explicit null and an
@@ -47,7 +47,7 @@ public extension SchedulingAdminRepository {
     /// nils, so this sends the absent spelling.
     ///
     /// - Parameters:
-    ///   - dayOfWeek: 0...6, **Sunday first** — not `Calendar`'s 1...7 `weekday`.
+    ///   - dayOfWeek: 0...6, **Sunday first**, not `Calendar`'s 1...7 `weekday`.
     ///   - startTime: zero-padded `HH:MM`. The fork refuses `9:00`.
     ///   - endTime: zero-padded `HH:MM`.
     func createAvailabilityRule(
@@ -70,10 +70,10 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `availability.rules.patch` — a sparse update of one weekly window.
+    /// `availability.rules.patch`, a sparse update of one weekly window.
     ///
     /// ⛔ `event_type_id` IS NOT PATCHABLE. The schema takes only the day and the
-    /// two times, so moving a rule between event types means delete and create —
+    /// two times, so moving a rule between event types means delete and create,
     /// and a UI that offered the move as an edit would be offering a 400 on a field
     /// the server never reads.
     func patchAvailabilityRule(
@@ -96,7 +96,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `availability.rules.delete` — removes one weekly window.
+    /// `availability.rules.delete`, removes one weekly window.
     func deleteAvailabilityRule(workspaceId: String, id: String) async throws {
         _ = try await perform(
             .availabilityRulesDelete,
@@ -108,7 +108,7 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Dated overrides
 
-    /// `availability.overrides.list` — every dated exception.
+    /// `availability.overrides.list`, every dated exception.
     ///
     /// ⚠️ IT TAKES NO PARAMS AT ALL: no date window, no event type. The whole list
     /// comes back and any narrowing is this side's job.
@@ -121,7 +121,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `availability.overrides.create` — one dated exception, or a whole range.
+    /// `availability.overrides.create`, one dated exception, or a whole range.
     ///
     /// ⛔ THE ANSWER HAS TWO STRUCTURALLY DIFFERENT SHAPES AND THE DRAFT IS WHAT
     /// DECIDES WHICH. With ``SchedulingOverrideDraft/endDate`` set, the op answers a
@@ -148,7 +148,7 @@ public extension SchedulingAdminRepository {
     // ⚠️ `availability.overrides.patch` HAS NO WRAPPER: the app's overrides sheet only
     // creates, lists and deletes, so moving or editing a day is delete and create.
 
-    /// `availability.overrides.delete` — removes ONE day.
+    /// `availability.overrides.delete`, removes ONE day.
     ///
     /// ⚠️ ON A ROW THAT CAME FROM A RANGE THIS LEAVES THE REST OF THE RANGE IN
     /// PLACE, which is usually not what "delete this holiday" means. Check
@@ -163,7 +163,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `availability.overrides.deleteGroup` — removes every day of a range.
+    /// `availability.overrides.deleteGroup`, removes every day of a range.
     ///
     /// ⛔ THE PARAM IS `groupId`, camelCase, ALONE IN THIS FAMILY. Every other key
     /// the scheduler ops take is snake_case; this one is spelled `groupId` in the

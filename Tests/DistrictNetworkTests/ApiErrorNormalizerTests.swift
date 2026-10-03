@@ -21,35 +21,35 @@ final class ApiErrorNormalizerTests: XCTestCase {
     func testTheThreeEnvelopesAllReachTheSameApiError() {
         let rows: [Row] = [
             Row(
-                name: "{success, error} — a route's own 400",
+                name: "{success, error}: a route's own 400",
                 statusCode: 400,
                 body: #"{"success":false,"error":"Missing workspaceId"}"#,
                 expected: .http(status: 400, message: "Missing workspaceId"),
                 line: #line
             ),
             Row(
-                name: "{error} — the shared auth guard's 401",
+                name: "{error}: the shared auth guard's 401",
                 statusCode: 401,
                 body: #"{"error":"Unauthorized"}"#,
                 expected: .http(status: 401, message: "Unauthorized"),
                 line: #line
             ),
             Row(
-                name: "{error} — the shared auth guard's 404 for a user with no workspace",
+                name: "{error}: the shared auth guard's 404 for a user with no workspace",
                 statusCode: 404,
                 body: #"{"error":"User has no workspace"}"#,
                 expected: .http(status: 404, message: "User has no workspace"),
                 line: #line
             ),
             Row(
-                name: "{error} — rateLimitedResponse's 429",
+                name: "{error}: rateLimitedResponse's 429",
                 statusCode: 429,
                 body: #"{"error":"Too many requests. Please try again shortly."}"#,
                 expected: .http(status: 429, message: "Too many requests. Please try again shortly."),
                 line: #line
             ),
             Row(
-                name: "{error, code} — conversations' 500",
+                name: "{error, code}: conversations' 500",
                 statusCode: 500,
                 body: #"{"error":"Something went wrong.","code":"INTERNAL_ERROR"}"#,
                 expected: .http(status: 500, message: "Something went wrong."),
@@ -190,7 +190,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
             ),
             Row(
                 // ⚠️ THE SAME STATUS AND THE SAME SHAPE AS THE ROW ABOVE, and
-                // through this function the two are indistinguishable — `code`
+                // through this function the two are indistinguishable, `code`
                 // has nowhere to travel on `ApiError`. The recovery is pinned
                 // separately below.
                 name: "district-dial-dormant.json at 403",
@@ -228,7 +228,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
         XCTAssertEqual(dormant.message, ApiErrorEnvelope.lenient(dormantBody)?.message)
     }
 
-    /// ⚠️ THE CODE AND THE REGION LIST DO NOT TRAVEL ON `ApiError` — it has
+    /// ⚠️ THE CODE AND THE REGION LIST DO NOT TRAVEL ON `ApiError`, it has
     /// nowhere to put them, so normalisation is lossy on purpose and the loss has
     /// to be recoverable. A caller that must tell "we could not look" from "there
     /// is nothing" decodes the same bytes again: `ApiErrorEnvelope.lenient(_:)`
@@ -252,7 +252,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
 
     /// ⛔ THE REFRESH COORDINATOR'S ONLY SIGNAL. `ApiError.isUnauthorized` is
     /// `httpStatus == 401`, so the status has to survive normalisation for a body
-    /// of any shape — including no body at all, which is what an edge-generated
+    /// of any shape, including no body at all, which is what an edge-generated
     /// 401 looks like. 403 is deliberately NOT unauthorized: refreshing a token
     /// cannot fix "authenticated but not permitted".
     func testUnauthorizedSurvivesEveryBodyShape() {
@@ -266,7 +266,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
     // MARK: - The 2xx path
 
     /// A 2xx only reaches this function when the caller could not decode the
-    /// declared contract, so it maps to ``ApiError/decoding(_:)`` — never to
+    /// declared contract, so it maps to ``ApiError/decoding(_:)``, never to
     /// `.http`, which would report contract drift as a server refusal and send
     /// the user to a retry button that cannot help.
     func testSuccessStatusesMapToDecoding() {
@@ -309,8 +309,8 @@ final class ApiErrorNormalizerTests: XCTestCase {
     }
 
     /// ⚠️ THE BOUNDARY IS 2xx, NOT `< 400`. A 3xx here is a redirect the transport
-    /// did not follow — the recording route answers 302 with a `Location` the app
-    /// reads — and calling that contract drift would blame the wrong layer.
+    /// did not follow, the recording route answers 302 with a `Location` the app
+    /// reads, and calling that contract drift would blame the wrong layer.
     func testOnlyTwoHundredsAreTreatedAsSuccess() {
         XCTAssertTrue(ApiErrorNormalizer.isSuccess(200))
         XCTAssertTrue(ApiErrorNormalizer.isSuccess(299))

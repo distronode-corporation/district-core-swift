@@ -34,7 +34,7 @@ public struct RawResponse: Sendable, Equatable {
 ///
 /// ⛔ THE RECORDING ROUTE ANSWERS 302 AND THE `Location` IS THE ANSWER. Following
 /// it would stream the whole audio file through this process to learn its
-/// address. ⚠️ AND THE URL IS PERISHABLE — a presigned object URL — so it must be
+/// address. ⚠️ AND THE URL IS PERISHABLE, a presigned object URL, so it must be
 /// resolved at the moment of playback and never cached or persisted.
 public struct RedirectTarget: Sendable, Equatable {
     public let statusCode: Int

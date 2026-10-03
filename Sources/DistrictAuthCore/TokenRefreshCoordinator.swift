@@ -3,9 +3,9 @@ import Foundation
 /// The single source of a usable access token.
 ///
 /// ⛔ THE INVARIANT THIS ACTOR EXISTS TO PROTECT: A REFRESH TOKEN IS NEVER SENT
-/// TWICE. The server's rotation is mandatory — `rotateNativeSession` claims the
+/// TWICE. The server's rotation is mandatory, `rotateNativeSession` claims the
 /// presented row with an atomic `updateMany(where: { rotatedAt: nil })` and
-/// mints a successor — and a token that arrives already-rotated is treated as
+/// mints a successor, and a token that arrives already-rotated is treated as
 /// theft, because the server cannot tell a duplicated credential from a
 /// retrying client. Its response is to revoke the entire `familyId` chain and
 /// log `[auth] Native refresh replay detected`. Every plausible way of sending
@@ -18,22 +18,22 @@ import Foundation
 ///      guarantees a thundering herd at the 10-minute boundary. Closed by
 ///      refreshing ``earlyRefreshMarginMilliseconds`` early.
 ///   3. PROCESS DEATH MID-REFRESH. The response is lost, the disk still holds a
-///      token the server has rotated. Closed by the pending marker — see
-///      ``TokenStore`` — which turns this into a deliberate re-login instead of
+///      token the server has rotated. Closed by the pending marker, see
+///      ``TokenStore``, which turns this into a deliberate re-login instead of
 ///      a false replay alarm.
 ///   4. PERSISTING THE SUCCESSOR TOO LATE. Closed by resolving the write BEFORE
 ///      the new access token becomes visible to any caller.
 ///   5. A FAILED WRITE DISCARDING THE SUCCESSOR. Closed by ``unpersistedSession``
-///      — see ``adoptRotated(_:deviceId:)``.
+///      see ``adoptRotated(_:deviceId:)``.
 ///
 /// ⛔ EXACTLY ONE OF THESE EXISTS PER PROCESS, HELD BY `AppContainer`. Two
 /// coordinators means two single-flight gates, either of which can present the
-/// same refresh token — failure mode 1 with the guard intact and useless. A test
+/// same refresh token, failure mode 1 with the guard intact and useless. A test
 /// constructs `AppContainer` precisely so this stays asserted.
 ///
 /// ⚠️ THE SERVER ACCEPTS THAT CASE 3 SIGNS THE USER OUT, AND SO MUST THE UI.
 /// There is no recovery: the client does not have the successor token and never
-/// will. The server states the tradeoff explicitly — the alternative is
+/// will. The server states the tradeoff explicitly, the alternative is
 /// being unable to distinguish theft from packet loss and resolving it in the
 /// attacker's favour. Design the re-login prompt for it rather than treating it
 /// as an error.
@@ -156,7 +156,7 @@ public actor TokenRefreshCoordinator {
     /// The fast path only consults the clock, so it would keep handing back that
     /// dead token for the remainder of its 10 minutes.
     ///
-    /// ⛔ THE TOKEN ARGUMENT IS NOT DECORATION — it makes this safe under
+    /// ⛔ THE TOKEN ARGUMENT IS NOT DECORATION, it makes this safe under
     /// concurrency. Two requests can 401 together; the first invalidates and
     /// refreshes, the second then calls this with the OLD token and must not
     /// wipe the good one that just replaced it.
@@ -304,8 +304,8 @@ public actor TokenRefreshCoordinator {
             return .reauthRequired(.refreshRejected)
 
         case .rateLimited:
-            // ⛔ The token was NOT consumed — the server rate-limits before
-            // rotating — so the marker MUST be cleared. Leaving it set would
+            // ⛔ The token was NOT consumed, the server rate-limits before
+            // rotating, so the marker MUST be cleared. Leaving it set would
             // make the next attempt report `interruptedRefresh` and sign the
             // user out over a transient 429.
             try? await store.clearRefreshPending()
@@ -320,7 +320,7 @@ public actor TokenRefreshCoordinator {
         case .transportFailure:
             // ⚠️ The marker is deliberately LEFT SET. The request may have
             // reached the server and rotated the token even though the response
-            // did not arrive — indistinguishable from here. Clearing it would
+            // did not arrive, indistinguishable from here. Clearing it would
             // let a later attempt present the possibly-spent token and revoke
             // the family. Leaving it set costs a re-login in the ambiguous case.
             return .reauthRequired(.refreshUnreachable)
@@ -337,7 +337,7 @@ public actor TokenRefreshCoordinator {
     /// ⛔ A FAILED WRITE DOES NOT DISCARD THE PAIR, AND THAT IS THE WHOLE REASON
     /// THIS IS NOT `try await store.write(...)` WITH THE ERROR PROPAGATED. The
     /// predecessor is already spent server-side, so the successor held here is
-    /// the ONLY credential that can still refresh this session — dropping it on
+    /// the ONLY credential that can still refresh this session, dropping it on
     /// a transient Keychain failure would convert "the device was locked for a
     /// moment" into a permanent sign-out. It is kept in memory, the session
     /// keeps working for the life of the process, and every later refresh
@@ -387,7 +387,7 @@ public enum ReauthReason: Sendable, Equatable {
     case noSession
 
     /// A refresh was in flight when the process died. The stored token is
-    /// presumed spent. ⚠️ NOT A SECURITY EVENT — see ``TokenStore``.
+    /// presumed spent. ⚠️ NOT A SECURITY EVENT, see ``TokenStore``.
     case interruptedRefresh
 
     /// The 60-day sliding window elapsed without the app being opened.
@@ -411,7 +411,7 @@ public enum RetryReason: Sendable, Equatable {
     /// The refresh request provably never left the device.
     case refreshNotSent
 
-    /// The token store could not be read — a locked device, typically. The
+    /// The token store could not be read, a locked device, typically. The
     /// session is intact; this says nothing about whether one exists.
     case storeUnavailable
 

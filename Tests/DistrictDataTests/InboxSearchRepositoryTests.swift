@@ -63,7 +63,7 @@ final class InboxSearchRepositoryTests: XCTestCase {
 
     /// ⛔ THE SHORT-QUERY BRANCH OMITS `limit` ENTIRELY, AND THIS IS THE TEST THE
     /// WHOLE OPTIONAL EXISTS FOR. A `q` under two characters answers
-    /// `{"success":true,"results":[]}` — not `limit: null`, not `limit: 0`, ABSENT —
+    /// `{"success":true,"results":[]}`, not `limit: null`, not `limit: 0`, ABSENT,
     /// so a non-optional `Int` would decode every ordinary response and then fail on
     /// the first person who types one letter. That failure would surface as "this
     /// version of the app could not read that response" on the commonest input there
@@ -85,7 +85,7 @@ final class InboxSearchRepositoryTests: XCTestCase {
     // MARK: - The cap, reported rather than inferred
 
     /// ⚠️ A FULL PAGE MEANS OLDER MATCHES EXIST. There is no offset to page on, so
-    /// this is a caption rather than a pager — the same signal `scanned`/`scanLimit`
+    /// this is a caption rather than a pager, the same signal `scanned`/`scanLimit`
     /// carries on the conversation list.
     func testAFullPageOfResultsIsCapped() async {
         let transport = RepositoryTransport(json: Self.results(count: 3, limit: 3))
@@ -106,8 +106,8 @@ final class InboxSearchRepositoryTests: XCTestCase {
         XCTAssertEqual(result.successOnly?.isCapped, false)
     }
 
-    /// ⛔ SEVERAL HITS MAY SHARE ONE `threadKey` — the same conversation matched
-    /// twice — so the list identity is the MESSAGE id. Keying on the thread would
+    /// ⛔ SEVERAL HITS MAY SHARE ONE `threadKey`, the same conversation matched
+    /// twice, so the list identity is the MESSAGE id. Keying on the thread would
     /// collapse rows the server deliberately sent separately, and a duplicate
     /// identifier in a SwiftUI `ForEach` is a rendering fault rather than a
     /// cosmetic repeat.
@@ -196,7 +196,7 @@ final class InboxSearchRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ THE NAME COLUMN IS NULLABLE **AND** CAN HOLD AN EMPTY STRING, so a nil
-    /// check alone lets a blank title through — a row with no visible identity at
+    /// check alone lets a blank title through, a row with no visible identity at
     /// all, which reads as a rendering failure rather than as a missing name.
     func testABlankContactNameOnAHitFallsBackToTheCounterpart() throws {
         let body = Self.resolvedEmailHitBody.replacingOccurrences(of: "Ada Lovelace", with: "   ")

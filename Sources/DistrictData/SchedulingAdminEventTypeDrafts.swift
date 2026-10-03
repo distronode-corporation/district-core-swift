@@ -7,7 +7,7 @@ import Foundation
 // OPTIONAL" TYPE WOULD BE A LIE IN BOTH DIRECTIONS. `create` REQUIRES `slug`,
 // `name` and `duration_minutes` and accepts fourteen fields in total; `patch`
 // requires only the slug it is addressed by and accepts twenty-eight, fourteen of
-// which `create` refuses outright — `rr_strategy`, `is_active`, `is_public`,
+// which `create` refuses outright, `rr_strategy`, `is_active`, `is_public`,
 // `archived`, the five `msg_*`, the four `subj_*` and `reminders`. Sharing one
 // type would offer a create form fourteen controls whose every use is a **400
 // `invalid_params`** naming a field the operator was invited to fill in.
@@ -36,7 +36,7 @@ import Foundation
 /// ⚠️ FOURTEEN FIELDS AND NOT SIXTEEN: `price_cents` and `currency` are REFUSED by
 /// the catalog rather than merely absent from it (`refuseEventTypeExtras`), because
 /// a tenancy that believed it was charging for consultations would not be. There is
-/// nothing to add here the day the platform sells them — the server has to change
+/// nothing to add here the day the platform sells them, the server has to change
 /// first.
 public struct SchedulingEventTypeDraft: Sendable, Equatable {
     public var slug: String
@@ -73,7 +73,7 @@ public struct SchedulingEventTypeDraft: Sendable, Equatable {
 /// The fields `eventTypes.patch` may change, all of them optional.
 ///
 /// ⛔ nil IS "LEAVE ALONE", NOT "CLEAR". Every pair here is dropped from the body
-/// when nil, so there is no way through this type to null a column — which is the
+/// when nil, so there is no way through this type to null a column, which is the
 /// correct default for a sparse patch and is also a limitation worth knowing:
 /// clearing a custom confirmation message back to the scheduler's default is not
 /// something the catalog's schema expresses at all (the fields are
@@ -85,7 +85,7 @@ public struct SchedulingEventTypeDraft: Sendable, Equatable {
 /// ``SchedulingAdminRepository/patchEventType(workspaceId:slug:changes:)`` because
 /// it addresses the row; the server's schema requires it in `params` as well and
 /// strips it after validating, so the repository puts it back. ⛔ A rename is
-/// therefore NOT expressible here on purpose — the schema's `slug` is the address,
+/// therefore NOT expressible here on purpose, the schema's `slug` is the address,
 /// and sending a different one would read as "rename" to a caller and as "patch a
 /// row that does not exist" to the server.
 public struct SchedulingEventTypeChanges: Sendable, Equatable {
@@ -126,8 +126,8 @@ public struct SchedulingEventTypeChanges: Sendable, Equatable {
     /// Minutes before the booking at which each reminder is sent, at most five.
     ///
     /// ⛔ `[]` IS A REAL INSTRUCTION AND IS NOT DROPPED: it turns every reminder
-    /// off. nil leaves the schedule alone. The read side spells the third state —
-    /// never configured — as `null`, which this type cannot send.
+    /// off. nil leaves the schedule alone. The read side spells the third state,
+    /// never configured, as `null`, which this type cannot send.
     public var reminders: [Int]?
 
     /// An empty set of changes.

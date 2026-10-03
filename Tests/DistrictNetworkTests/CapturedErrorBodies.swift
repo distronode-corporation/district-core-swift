@@ -7,17 +7,17 @@ import Foundation
 /// ⛔ COPIED RATHER THAN LOADED, AND ONLY BECAUSE THESE ARE ERROR SHAPES. The
 /// fixture loader belongs to the strict contract gate, which is what pins the
 /// SUCCESS shapes the app renders. Error shapes are deliberately not gate-pinned
-/// on either client — the Kotlin client pins four of them by hand for the same
+/// on either client, the Kotlin client pins four of them by hand for the same
 /// reason these are here: the cost of a missed field is a vaguer sentence, not
 /// wrong data.
 ///
 /// ⚠️ EVERY ONE OF THESE IS A DIFFERENT ENVELOPE, WHICH IS THE POINT. Two of the
 /// three shapes appear below; the third (the shared auth guard's bare `{error}`)
-/// has no fixture of its own because it is not a route's output at all — it is
+/// has no fixture of its own because it is not a route's output at all, it is
 /// what `if (error) return error` returns on every 401/403/404 in the API, so it
 /// is written out longhand in the tests instead.
 enum CapturedErrorBodies {
-    /// `district-workspace-list-degraded.json` — the `{error, code}` envelope,
+    /// `district-workspace-list-degraded.json`, the `{error, code}` envelope,
     /// with NO `success` key at all. ⛔ This is the body that would make a strict
     /// `{success, error}` DTO throw, and its `code` is what stops the app drawing
     /// "you have no workspaces" over "one region did not answer".
@@ -33,7 +33,7 @@ enum CapturedErrorBodies {
     }
     """
 
-    /// `district-enrich-disabled.json` — a route's own `{success: false, error}`,
+    /// `district-enrich-disabled.json`, a route's own `{success: false, error}`,
     /// with `success` PRESENT AND FALSE and no `code` to branch on. The sentence
     /// is the whole product here: it names the settings page the opt-in lives on.
     static let enrichDisabled = """
@@ -45,7 +45,7 @@ enum CapturedErrorBodies {
     }
     """
 
-    /// `district-dial-subscription.json` — `{success, error, code, status}`, the
+    /// `district-dial-subscription.json`, `{success, error, code, status}`, the
     /// widest error body in the suite and the one that proves `status` is real.
     static let dialSubscription = """
     {
@@ -57,7 +57,7 @@ enum CapturedErrorBodies {
     }
     """
 
-    /// `district-dial-dnc.json` — a 403 whose refusal carries no code at all, so
+    /// `district-dial-dnc.json`, a 403 whose refusal carries no code at all, so
     /// the sentence is the only specific thing a client has.
     static let dialDoNotCall = """
     {
@@ -66,7 +66,7 @@ enum CapturedErrorBodies {
     }
     """
 
-    /// `district-dial-dormant.json` — the SAME 403 shape as the DNC refusal with
+    /// `district-dial-dormant.json`, the SAME 403 shape as the DNC refusal with
     /// one key more. ⛔ That key is the entire difference between a dead end and
     /// an instruction: `workspace_dormant` is what tells the app to point at the
     /// dashboard's reactivation route rather than draw a refusal the operator

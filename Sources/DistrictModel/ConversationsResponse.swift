@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/conversations?workspaceId=` — the unified Inbox list.
+/// `GET /api/district/conversations?workspaceId=`, the unified Inbox list.
 ///
 /// ⛔ "UNIFIED" IS THE WHOLE POINT, AND IT IS WHY ``ConversationSummary/threadKey``
 /// EXISTS. One thread can mix SMS and email, because a customer's phone number
@@ -10,14 +10,14 @@ import Foundation
 ///
 /// ⚠️ NOT PAGED, AND THAT IS A SERVER PROPERTY THIS CLIENT MUST RESPECT. The
 /// server scans a bounded window of recent messages (``scanLimit``, 500) and
-/// groups what it finds — so this is "recent conversations", not "all
+/// groups what it finds, so this is "recent conversations", not "all
 /// conversations", and there is no page to request.
 public struct ConversationsResponse: Codable, Sendable {
     public let success: Bool
     public let conversations: [ConversationSummary]
     /// How many messages the server actually scanned to build this list.
     ///
-    /// ⚠️ `scanned == scanLimit` MEANS THE LIST MAY BE INCOMPLETE — an older
+    /// ⚠️ `scanned == scanLimit` MEANS THE LIST MAY BE INCOMPLETE, an older
     /// conversation with no recent traffic falls outside the window entirely. It
     /// is not an error and there is nothing to fetch; it is a truthfulness
     /// signal, and the UI says so rather than implying the list is everything.
@@ -31,7 +31,7 @@ public struct ConversationsResponse: Codable, Sendable {
 /// ⚠️ ``key`` AND ``kind`` ARE MODELLED EVEN THOUGH BOTH ARE DEPRECATED
 /// SERVER-SIDE, AND THAT IS A REVERSAL THE KOTLIN CLIENT ALREADY MADE. Omitting
 /// them is not neutral: the strict gate compares key sets, so an unmodelled
-/// field is a dropped key and a hard failure — relaxing the gate for this one
+/// field is a dropped key and a hard failure, relaxing the gate for this one
 /// type would retire the check that catches a genuinely NEW field. They are
 /// carried and documented instead.
 ///
@@ -46,7 +46,7 @@ public struct ConversationSummary: Codable, Sendable {
     /// it only so a browser running a previous JS bundle against a freshly
     /// deployed server keeps working. One customer's phone and their email are
     /// two different strings, so this cannot identify a thread that mixes
-    /// channels — the fixture's folded thread has `key = "ada@contract.test"`
+    /// channels, the fixture's folded thread has `key = "ada@contract.test"`
     /// while carrying SMS from the contact's phone number.
     public let key: String
     /// Stable thread identity: `contact:<id>` when the counterpart resolves to a
@@ -58,7 +58,7 @@ public struct ConversationSummary: Codable, Sendable {
     public let threadKey: String
     /// The counterpart as stored on the most recent message, in display form.
     public let counterpart: String
-    /// Every normalized address that folds into this thread — a contact-keyed
+    /// Every normalized address that folds into this thread, a contact-keyed
     /// thread carries the phone AND the email, so a deep link or a search hit on
     /// either one lands on the already-open conversation.
     public let matchKeys: [String]
@@ -71,7 +71,7 @@ public struct ConversationSummary: Codable, Sendable {
     public let kind: String
     /// Distinct message types present in the thread, e.g. `["sms", "email"]`.
     public let channels: [String]
-    /// nil when the counterpart resolves to no Contact — an explicit null on the
+    /// nil when the counterpart resolves to no Contact, an explicit null on the
     /// wire, which is what `district-conversations.json`'s second row pins.
     public let contactId: String?
     public let contactName: String?
@@ -92,7 +92,7 @@ public extension ConversationSummary {
     /// What to show as the thread's title.
     ///
     /// ⚠️ FALLS BACK TO THE RAW COUNTERPART, NEVER TO A PLACEHOLDER. An
-    /// unresolved address IS the identity of that thread — a phone number is a
+    /// unresolved address IS the identity of that thread, a phone number is a
     /// perfectly good label, and "Unknown" would hide the one piece of
     /// information available.
     var displayName: String {
@@ -106,7 +106,7 @@ public extension ConversationSummary {
     ///
     /// ⛔ THE RECIPIENT IS AN ADDRESS, NEVER A THREAD IDENTITY, AND THIS WAS A
     /// LIVE BUG ON THE OTHER CLIENT. `messages/send` takes `to` as a phone
-    /// number or an email and hands it straight to the carrier or to Postmark —
+    /// number or an email and hands it straight to the carrier or to Postmark,
     /// it does not resolve a Contact id. Sending ``threadKey``'s `contact:<id>`
     /// portion as `to` dispatches an SMS to a cuid, which fails at the provider
     /// and surfaces as a raw 500. Since the server folds any counterpart that
@@ -129,7 +129,7 @@ public extension ConversationSummary {
     /// ⛔ SMS MUST NOT WIN UNCONDITIONALLY, OR EMAIL GETS ANSWERED WITH BILLABLE
     /// SMS. ``canSms`` is `contact ? !!contactPhone : kind === "phone"`
     /// server-side, so ANY thread whose contact has a number on file is sendable
-    /// by SMS — including a thread the customer has only ever emailed. A reply
+    /// by SMS, including a thread the customer has only ever emailed. A reply
     /// there costs a carrier segment and arrives outside the mail thread the
     /// customer was reading. The picker is the caller's job.
     ///
@@ -142,7 +142,7 @@ public extension ConversationSummary {
     ///
     /// ⚠️ AN EMPTY ``channels`` DECIDES NOTHING. The server accumulates it from
     /// `Message.type`, which is nullable on rows written before that column
-    /// existed, so a thread of such rows reports `[]` — an absence of evidence,
+    /// existed, so a thread of such rows reports `[]`, an absence of evidence,
     /// and the order falls back to the previous SMS-first behaviour.
     ///
     /// ⚠️ WHATSAPP CANNOT BE ORDERED HERE AT ALL, AND THAT IS A WIRE GAP RATHER
@@ -162,7 +162,7 @@ public extension ConversationSummary {
         }
         // ⚠️ THE TWO CHECKS STAY SEQUENTIAL, NOT EXCLUSIVE. A thread the server marks
         // sendable on both, whose only usable address is an email, has to fall THROUGH
-        // the SMS branch — otherwise a customer who can be reached becomes one who
+        // the SMS branch, otherwise a customer who can be reached becomes one who
         // cannot. That was true of the `if`/`if` this replaced and it is still the rule.
         return prefersEmail ? email + sms : sms + email
     }
@@ -171,7 +171,7 @@ public extension ConversationSummary {
     ///
     /// ⚠️ READ ONLY BY ``replyTargets``, and only to ORDER two channels the server
     /// has already permitted. Never to decide whether a channel is available at
-    /// all — that is the ⛔ on ``canSms``.
+    /// all, that is the ⛔ on ``canSms``.
     private var prefersEmail: Bool {
         channels.contains(MessageChannel.email) && !channels.contains(MessageChannel.sms)
     }
@@ -180,7 +180,7 @@ public extension ConversationSummary {
     /// when it is of the right kind.
     ///
     /// ⚠️ ONE HELPER FOR BOTH CHANNELS, because they differ in nothing but the
-    /// `@` test — and two hand-inlined copies of this fallback are how one of
+    /// `@` test, and two hand-inlined copies of this fallback are how one of
     /// them ends up sending an email address to a carrier.
     private func address(stored: String?, counterpartIsAnAddress: Bool) -> String? {
         if let stored, !stored.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -201,14 +201,14 @@ public extension ConversationSummary {
 /// decisions.
 ///
 /// ⚠️ `Hashable` IS REQUIRED RATHER THAN CONVENIENT, AND IT IS SYNTHESISED. A
-/// `Route` in the App target has to be `Hashable` — `NavigationPath` demands it,
+/// `Route` in the App target has to be `Hashable`, `NavigationPath` demands it,
 /// and the thread destination now carries the whole ORDERED SET of targets so the
 /// composer can offer a channel rather than merely naming one. Both stored
 /// properties are `String`, so Swift synthesises the conformance and there is no
 /// hand-written `hash(into:)` to keep in step with `==`.
 /// ⛔ IT DOES NOT MAKE A TARGET A KEY. Two threads can legitimately share one
-/// `(to, channel)` pair — the same person reached from a contact-keyed thread and
-/// from an address-keyed one — so this type must never be used to identify a
+/// `(to, channel)` pair, the same person reached from a contact-keyed thread and
+/// from an address-keyed one, so this type must never be used to identify a
 /// thread. ``ConversationSummary/threadKey`` is what does that.
 public struct ReplyTarget: Sendable, Hashable {
     public let to: String
@@ -226,7 +226,7 @@ public struct ReplyTarget: Sendable, Hashable {
     /// `OffsetSlice`, which the app target genuinely cannot construct.
     ///
     /// ⚠️ IT DOES NOT WEAKEN THE ⚠️ ABOVE. The pair still has to be CHOSEN in one
-    /// place — that place is ``ConversationSummary/replyTarget``, and every
+    /// place, that place is ``ConversationSummary/replyTarget``, and every
     /// caller of this initialiser is carrying its answer rather than making its
     /// own. Never derive a channel here from the shape of an address.
     public init(to: String, channel: String) {
@@ -240,7 +240,7 @@ public struct ConversationLastMessage: Codable, Sendable {
     public let body: String
     /// `inbound` or `outbound`.
     public let direction: String
-    /// `sms`, `email` or `whatsapp` — ⚠️ nil on older rows, which is why this is
+    /// `sms`, `email` or `whatsapp`, ⚠️ nil on older rows, which is why this is
     /// the one Optional here.
     public let type: String?
     public let status: String

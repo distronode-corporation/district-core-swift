@@ -1,13 +1,13 @@
 import Foundation
 
-/// `GET /api/district/messages/{id}?workspaceId=` — one message id exchanged for
+/// `GET /api/district/messages/{id}?workspaceId=`, one message id exchanged for
 /// the THREAD it belongs to.
 ///
 /// ⛔ THIS ROUTE EXISTS BECAUSE THE PUSH PAYLOAD MAY NOT CARRY THE ANSWER, AND
 /// WIDENING THE PAYLOAD IS THE BUG IT PREVENTS. A message push is
 /// `{type, category, workspaceId, messageId}` and nothing else: a notification is
 /// readable by the operating system and by any installed notification-listener
-/// app, so `threadKey` is precisely the field that cannot travel in it — it is
+/// app, so `threadKey` is precisely the field that cannot travel in it, it is
 /// `addr:<address>` whenever the thread has no `Contact` row, which is to say a
 /// customer's raw phone number or email address, on a lock screen. Same for
 /// ``MessageThreadTarget/counterpart``. Both are safe HERE and only here, because
@@ -23,8 +23,8 @@ import Foundation
 /// ⚠️ ROLES ARE `["agency","client"]`, THE NARROWER SIDE OF A DISAGREEMENT WITHIN
 /// THE INBOX. `timeline` admits `viewer` and this does not, because both actions
 /// this resolver exists to enable (reply, mark read) are on the narrow list. It is
-/// not a containment claim — a viewer already reaches every fact below through
-/// `conversations` and `timeline` — so gate the CALL on the same role the writes
+/// not a containment claim, a viewer already reaches every fact below through
+/// `conversations` and `timeline`, so gate the CALL on the same role the writes
 /// are gated on rather than treating a 403 here as a surprise.
 ///
 /// ⚠️ A 404 SAYS NOTHING ABOUT WHICH KIND OF MISS IT WAS. The route's predicate is
@@ -34,7 +34,7 @@ import Foundation
 ///
 /// ⛔ AND A **409** IS A REAL ANSWER RATHER THAN A FAULT. A row whose counterpart
 /// does not normalise has no thread to open and nothing to reply to, and the route
-/// answers 409 instead of a 200 with a null thread — which is what keeps
+/// answers 409 instead of a 200 with a null thread, which is what keeps
 /// ``thread`` non-Optional here. Do not model it as nullable to "be safe": that
 /// would make every caller branch on a state only a malformed row produces
 /// (`Message.from` defaults to `""`).
@@ -81,7 +81,7 @@ public struct MessageThreadMessage: Codable, Sendable, Equatable {
 /// Assembling them from independent guesses is how a draft is saved against one
 /// thread and displayed in another.
 public struct MessageThreadTarget: Codable, Sendable, Equatable {
-    /// `contact:<id>` or `addr:<normalized>` — the server's own form, minted by
+    /// `contact:<id>` or `addr:<normalized>`, the server's own form, minted by
     /// the same helpers `conversations` uses, so this route and the Inbox list
     /// agree about the same message.
     public let threadKey: String
@@ -99,7 +99,7 @@ public struct MessageThreadTarget: Codable, Sendable, Equatable {
     ///
     /// ⛔ SERVER-DECIDED FROM THE STORED `type`, FALLING BACK TO THE ADDRESS SHAPE
     /// ONLY WHERE THE COLUMN IS NULL. That fallback is the route's, not this
-    /// client's, and it is the one place an `@` test is legitimate — a client that
+    /// client's, and it is the one place an `@` test is legitimate, a client that
     /// repeated it would be a second, disagreeing decision, which is exactly what
     /// ``ReplyTarget`` exists to prevent.
     public let channel: String

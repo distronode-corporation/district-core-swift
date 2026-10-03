@@ -6,7 +6,7 @@ import Foundation
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `+MessageThread.swift` and `+SchedulingAdmin.swift`
 // were. SwiftLint's `file_length` warning is an ERROR under `--strict`, so a line
-// added inline reds the LINT job rather than the gate — a failure a long way from
+// added inline reds the LINT job rather than the gate, a failure a long way from
 // the change that caused it.
 
 extension ImplementedFixtures {
@@ -15,7 +15,7 @@ extension ImplementedFixtures {
     /// ⛔ SIXTEEN FIXTURES, AND EVERY ONE OF THEM IS GATED THROUGH
     /// ``SchedulingAdminSuccess`` RATHER THAN AGAINST THE ROW TYPE DIRECTLY. The
     /// bytes on disk are the whole RPC envelope, `{ok, data}`, because that is what
-    /// `POST /api/district/scheduling/admin` puts on the wire — and the gate
+    /// `POST /api/district/scheduling/admin` puts on the wire, and the gate
     /// compares KEY SETS, so a fixture gated against the row alone would be
     /// reported as two dropped keys before it ever looked at the row. The four
     /// envelope fixtures in `+SchedulingAdmin` prove the wrapper; these sixteen are
@@ -37,14 +37,14 @@ extension ImplementedFixtures {
     ///
     /// ⚠️ THE TWO NOTES FIXTURES AND THE TWO TEAM FIXTURES ARE EACH A PAIR THAT
     /// MUST STAY SEPARATE. `-booking-notes.json` and `-booking-notes-regenerated.json`
-    /// are structurally different bodies from two ops — the regenerate response has
-    /// no `updated_at` KEY in its schema at all — so sharing a type would model a
+    /// are structurally different bodies from two ops, the regenerate response has
+    /// no `updated_at` KEY in its schema at all, so sharing a type would model a
     /// key one op never sends. `-teams.json` and `-team.json` are the SAME team seen
     /// through `teams.list` and `teams.get`, and pinning both is what makes either
     /// read failing visible on its own.
     ///
     /// ⛔ `district-scheduling-ok.json` IS BYTE-IDENTICAL TO
-    /// `district-scheduling-no-content.json` — both are `{"ok":true,"data":{"ok":true}}`,
+    /// `district-scheduling-no-content.json`, both are `{"ok":true,"data":{"ok":true}}`,
     /// which is easy to get wrong from the names alone (it is NOT a bare
     /// `{"ok":true}`). It is gated against the same
     /// ``SchedulingNoContent``, and the duplication is worth keeping: they reach the
@@ -55,7 +55,7 @@ extension ImplementedFixtures {
     ///
     /// ⚠️ THREE OF THE SIXTEEN CARRY AN EXPLICIT NULL and are gated anyway, through
     /// exact `allowedExplicitNulls` paths in `AllowedExplicitNulls+SchedulingB.swift`
-    /// — `$.data[1].teams` on the users list, and `members` on both team bodies. The
+    /// `$.data[1].teams` on the users list, and `members` on both team bodies. The
     /// other thirteen carry none, checked against the fixture BYTES rather than
     /// inferred from the DTOs: every optional on them is an ABSENT key, which a nil
     /// Optional already round-trips.
@@ -64,7 +64,7 @@ extension ImplementedFixtures {
     }
 
     /// ⚠️ ROW 1 OF THE LIST IS THE POINT OF THE LIST. It is a cancelled booking
-    /// carrying four keys and nothing else — no event type, no host, no attendees —
+    /// carrying four keys and nothing else, no event type, no host, no attendees,
     /// because only `id`, `start_at`, `end_at` and `status` are required by
     /// `bookingSchema`. A DTO that typed the event type or the host non-optional
     /// passes every other fixture here and fails on that row.
@@ -88,8 +88,8 @@ extension ImplementedFixtures {
         ]
     }
 
-    /// ⚠️ ROW 1 OF `-calendars.json` IS A SUBSCRIPTION CALENDAR WITH TWO KEYS —
-    /// `id` and `name` — and every Google account has one. All four flags on
+    /// ⚠️ ROW 1 OF `-calendars.json` IS A SUBSCRIPTION CALENDAR WITH TWO KEYS,
+    /// `id` and `name`, and every Google account has one. All four flags on
     /// ``SchedulingCalendarSelection`` are Optional because of that row.
     private static var calendarFixtures: [ImplementedFixture] {
         [

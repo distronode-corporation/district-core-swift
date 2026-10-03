@@ -15,7 +15,7 @@ final class NumberDocumentRepositoryTests: XCTestCase {
 
     /// ⛔ THE UPLOAD'S REPLY IS NOT A LIST ROW, WHICH IS WHY IT HAS ITS OWN TYPE. It
     /// answers `createdAt` rather than `updatedAt` and carries neither `stored` nor
-    /// `submitted`, so a caller cannot splice it into a registration's documents array —
+    /// `submitted`, so a caller cannot splice it into a registration's documents array,
     /// and inventing the two booleans would claim the carrier holds a copy it does not.
     func testAnUploadAnswersItsOwnNarrowRowRatherThanAListRow() async throws {
         let transport = RepositoryTransport(json: NumberProvisioningBodies.documentUploaded)
@@ -131,7 +131,7 @@ final class NumberDocumentRepositoryTests: XCTestCase {
     }
 
     /// ⛔ A **502 CHANGED NOTHING AND THE ROW IS STILL THERE.** This route deletes the
-    /// object first and the row second — the opposite of the desk logo's order — because
+    /// object first and the row second, the opposite of the desk logo's order, because
     /// `storageKey` is the only pointer to the bytes and dropping the row first would
     /// abandon an identity document in a bucket under a name nobody can reconstruct. So a
     /// failed removal is retryable and must not be drawn as done.
@@ -207,8 +207,8 @@ final class NumberDocumentRepositoryTests: XCTestCase {
 
     /// ⛔ A **422 IS "YOUR PAPERWORK IS WRONG"** AND A **502 IS "WE COULD NOT REACH THE
     /// CARRIER"**, AND BOTH ARRIVE AS PLAIN FAILURES CARRYING ONLY THEIR SENTENCE. The
-    /// 422's `failures` and `reasons` do NOT survive ``ApiError`` — the fixture carries
-    /// both so the loss is exercised rather than assumed — which is why the screen's
+    /// 422's `failures` and `reasons` do NOT survive ``ApiError``, the fixture carries
+    /// both so the loss is exercised rather than assumed, which is why the screen's
     /// obligation after a refusal is to re-read the filing list, where the route stored
     /// them verbatim.
     func testTheTwoSubmitRefusalsStayDistinctAndCarryOnlyTheirSentence() async {

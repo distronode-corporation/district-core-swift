@@ -52,7 +52,7 @@ final class InboxRepositoryTests: XCTestCase {
 
     /// ⛔ OMITTING BOTH CURSOR ARGUMENTS IS THE NEWEST WINDOW, byte for byte the
     /// request this made before paging existed. `before=` present-but-empty becomes
-    /// `new Date("")` server-side and the route answers 400 — every thread open
+    /// `new Date("")` server-side and the route answers 400, every thread open
     /// would break.
     func testANoCursorTimelineReadSendsNoCursorParameters() async {
         let transport = RepositoryTransport(json: Self.oneRowTimeline)
@@ -84,8 +84,8 @@ final class InboxRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⛔ THE CURSOR IS A PAIR OR NOTHING. `beforeId` without `before` is a 400 —
-    /// an id alone cannot say which timestamp it breaks a tie at — which is why
+    /// ⛔ THE CURSOR IS A PAIR OR NOTHING. `beforeId` without `before` is a 400,
+    /// an id alone cannot say which timestamp it breaks a tie at, which is why
     /// ``ThreadCursor`` cannot hold half of itself.
     func testACursorSendsBothHalvesTogether() async {
         let transport = RepositoryTransport(json: Self.oneRowTimeline)
@@ -153,7 +153,7 @@ final class InboxRepositoryTests: XCTestCase {
         XCTAssertNil(restored)
     }
 
-    /// ⛔ THE PLURAL, CHEAP PATH — with BOTH parameters. The same path without
+    /// ⛔ THE PLURAL, CHEAP PATH, with BOTH parameters. The same path without
     /// `threadKey` is the LIST endpoint, which decodes as a draft-less response and
     /// silently restores nothing.
     func testASavedDraftIsRestoredFromThePluralPath() async throws {
@@ -171,7 +171,7 @@ final class InboxRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ READ ONCE PER INBOX LOAD TO BADGE THE LIST, NOT PER ROW — one indexed
+    /// ⚠️ READ ONCE PER INBOX LOAD TO BADGE THE LIST, NOT PER ROW, one indexed
     /// query against one request per visible conversation.
     func testTheDraftsListIsReadOncePerInboxLoad() async {
         let body = #"{"success":true,"drafts":[\#(Bodies.draft(threadKey: "contact:c_1"))]}"#
@@ -189,7 +189,7 @@ final class InboxRepositoryTests: XCTestCase {
     /// ⛔ REFUSED LOCALLY, AND NOTHING IS SENT. The route answers 400 `empty_body`
     /// and means "send DELETE instead"; doing that substitution silently here would
     /// hide the bug until an offline queue replayed the two writes out of order.
-    /// ⚠️ Whitespace counts as blank — a composer cleared to a stray space is still
+    /// ⚠️ Whitespace counts as blank, a composer cleared to a stray space is still
     /// the absence of a draft.
     func testABlankDraftIsRefusedLocallyWithoutSpendingTheRoundTrip() async {
         let transport = RepositoryTransport(queue: [])
@@ -220,7 +220,7 @@ final class InboxRepositoryTests: XCTestCase {
         XCTAssertEqual(request.url.absoluteString, "https://www.distronode.com/api/district/messages/drafts")
     }
 
-    /// ⚠️ IDEMPOTENT, AND THE RESPONSE IS DISCARDED DELIBERATELY — what matters is
+    /// ⚠️ IDEMPOTENT, AND THE RESPONSE IS DISCARDED DELIBERATELY, what matters is
     /// whether the write landed, not what it echoed.
     func testDeletingADraftIsIdempotentAndDiscardsTheBody() async throws {
         let transport = RepositoryTransport(json: #"{"success":true,"deleted":0}"#)
@@ -249,7 +249,7 @@ final class InboxRepositoryTests: XCTestCase {
 
     /// ⛔ THE RECIPIENT IS AN ADDRESS, NEVER A THREAD IDENTITY. `to` goes straight
     /// to the carrier; sending `contact:<id>` dispatches an SMS to a cuid and fails
-    /// at the provider as a raw 500 — and that is MOST threads.
+    /// at the provider as a raw 500, and that is MOST threads.
     func testSendingUsesTheResolvedReplyTargetNotTheThreadIdentity() async throws {
         let transport = RepositoryTransport(json: Bodies.sentSms())
         let row = try conversation(Bodies.conversation(threadKey: "contact:c_1", contactId: "c_1"))
@@ -304,7 +304,7 @@ final class InboxRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE URL IT RETURNS IS AN ANONYMOUS CAPABILITY URL and must be loaded back
-    /// WITHOUT this client's bearer token — a carrier's MMS fetcher has no session
+    /// WITHOUT this client's bearer token, a carrier's MMS fetcher has no session
     /// either, and attaching one would send a credential to a route that does not
     /// need it.
     func testAnAcceptedAttachmentReturnsTheAnonymousCapabilityUrl() async {

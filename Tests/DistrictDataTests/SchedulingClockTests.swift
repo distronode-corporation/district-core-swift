@@ -28,7 +28,7 @@ final class SchedulingClockTests: XCTestCase {
         XCTAssertEqual([unknown.day, unknown.hour], [12, 2])
     }
 
-    /// ⛔ MIDNIGHT IS `0`, NEVER `24` — the property the TypeScript's `% 24` exists to
+    /// ⛔ MIDNIGHT IS `0`, NEVER `24`, the property the TypeScript's `% 24` exists to
     /// guarantee and that `Calendar` gives for free.
     func testMidnightIsZeroAndNotTwentyFour() throws {
         let instant = try XCTUnwrap(WireInstant.parse("2026-09-12T00:00:00Z"))

@@ -8,14 +8,14 @@ import XCTest
 // `XCTAssertEqual(await someActor.value, x)` does not compile at all:
 // "'await' in an autoclosure that does not support concurrency". Nearly
 // everything in this module is actor-isolated, so without these wrappers every
-// assertion would have to hoist its subject into a local first — which reads as
+// assertion would have to hoist its subject into a local first, which reads as
 // ceremony and, worse, makes it easy to assert against a value captured several
 // statements before the thing that was supposed to change it.
 //
 // ⛔ AND THE SUBJECT IS A TRAILING CLOSURE RATHER THAN AN `@autoclosure () async`,
 // WHICH IS THE NON-OBVIOUS HALF. The autoclosure form compiles, but SwiftFormat's
 // `hoistAwait` rule rewrites `await expectEqual(await x.y(), z)` to
-// `await expectEqual(x.y(), z)` — and THAT does not compile, because an async
+// `await expectEqual(x.y(), z)`, and THAT does not compile, because an async
 // autoclosure still needs its suspension marked at the argument site. The
 // resulting error ("actor-isolated instance method cannot be called from outside
 // of the actor") points at the actor rather than at the formatter that moved the
@@ -113,7 +113,7 @@ actor SpyTokenStore: TokenStore {
     ///
     /// ⛔ THE ONLY WAY TO PROVE THE SIGN-OUT ORDERING. "The outbox write is
     /// durable before the wipe" is a claim about SEQUENCE, and a pair of
-    /// end-state assertions cannot distinguish it from the reverse order — both
+    /// end-state assertions cannot distinguish it from the reverse order, both
     /// leave an outbox entry and no session. See `SignOutCoordinatorTests`.
     enum Operation: Equatable {
         case read
@@ -135,7 +135,7 @@ actor SpyTokenStore: TokenStore {
     private(set) var clears = 0
     private(set) var markerWrites = 0
     private(set) var markerClears = 0
-    /// Every session ever written, in order — the "no lost update" evidence.
+    /// Every session ever written, in order, the "no lost update" evidence.
     private(set) var writtenSessions: [PersistedSession] = []
     private(set) var operations: [Operation] = []
 
@@ -344,7 +344,7 @@ actor NeverRefreshClient: RefreshClient {
 /// RETURNS AN ARRAY. Returning a collection out of a task group nested inside a
 /// `Task` defeats the region-based isolation checker, which refuses with
 /// "pattern that the region based isolation checker does not understand how to
-/// check. Please file a bug" — a diagnostic that reads like a compiler fault
+/// check. Please file a bug", a diagnostic that reads like a compiler fault
 /// rather than like a shape to avoid.
 actor OutcomeCollector {
     private(set) var outcomes: [AccessTokenOutcome] = []

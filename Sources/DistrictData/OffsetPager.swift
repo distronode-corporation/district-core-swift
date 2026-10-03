@@ -23,7 +23,7 @@ public struct OffsetPage<Item: Sendable>: Sendable {
 /// whether the feed is finished.
 public struct OffsetSlice<Item: Sendable>: Sendable {
     /// ⚠️ DEDUPLICATED. This can be SHORTER than the page the server sent, and it
-    /// can legitimately be EMPTY while ``isEnd`` is false — every row in that
+    /// can legitimately be EMPTY while ``isEnd`` is false, every row in that
     /// window had already been seen. A caller that stops on an empty slice
     /// truncates the feed.
     public let items: [Item]
@@ -67,7 +67,7 @@ public struct OffsetSlice<Item: Sendable>: Sendable {
 ///
 /// ⛔ 2. THE OFFSET MUST ADVANCE BY THE RAW PAGE SIZE, NOT THE DEDUPLICATED SIZE.
 /// The server counts offsets over its own rows, so skipping ahead by a smaller
-/// number re-requests exactly the rows just dropped — which are dropped again,
+/// number re-requests exactly the rows just dropped, which are dropped again,
 /// forever. That is a list that never ends and never stops fetching.
 ///
 /// ⛔ 3. DEDUPLICATION IS PER INSTANCE, AND THAT IS LOAD-BEARING. A pull-to-
@@ -124,7 +124,7 @@ public actor OffsetPager<Item: Sendable> {
     /// Fetch the next window.
     ///
     /// - Parameter limit: ⚠️ THE SERVER CLAMPS IT TO 100 and a non-positive value
-    ///   falls back to its DEFAULT of 10 rather than being clamped up — so
+    ///   falls back to its DEFAULT of 10 rather than being clamped up, so
     ///   passing 0 quietly yields ten rows and a first page that looks like the
     ///   whole feed. Ask for what you want, under 100.
     public func loadNext(limit: Int) async -> Result<OffsetSlice<Item>, ApiError> {
@@ -155,7 +155,7 @@ public actor OffsetPager<Item: Sendable> {
     /// Start again from the top with an empty dedup set.
     ///
     /// ⚠️ THIS IS WHAT A PULL-TO-REFRESH CALLS, and clearing ``seenIDs`` is the
-    /// point of it rather than an afterthought — see ⛔ 3 on the type. For a
+    /// point of it rather than an afterthought, see ⛔ 3 on the type. For a
     /// newest-first feed, restarting from offset 0 is also the only honest answer:
     /// an anchor position cannot be translated back into an offset that still
     /// means the same thing once rows have been inserted above it.

@@ -7,9 +7,9 @@ import XCTest
 /// The softphone dial.
 ///
 /// ⛔ THESE ASSERTIONS ARE ABOUT WHICH SENTENCE AN OPERATOR SEES, NOT ABOUT
-/// DECODING. Three of this route's refusals need three different remedies —
+/// DECODING. Three of this route's refusals need three different remedies,
 /// "that number opted out", "billing lapsed, fix it on the web", "ask us to turn
-/// this workspace back on" — and only two of them publish a `code`. The third is
+/// this workspace back on", and only two of them publish a `code`. The third is
 /// separated from the role refusal and from the route's own 400s and 500 by the
 /// SHAPE of its envelope, so the negative cases below are the load-bearing half
 /// of this file: each one proves a body that must NOT become a DNC refusal.
@@ -73,7 +73,7 @@ final class DialRepositoryTests: XCTestCase {
 
     /// ⛔ THE UNCODED ONE. A `{success:false, error}` at 403 is the route's own
     /// compliance refusal, and the sentence carried here is the server's rather
-    /// than this client's — see the ⛔ on `DialRepository`.
+    /// than this client's, see the ⛔ on `DialRepository`.
     func testAnOptedOutNumberIsADoNotCallRefusalCarryingTheServersSentence() async {
         let transport = RepositoryTransport(json: Bodies.dncRefusal, status: 403)
 
@@ -117,9 +117,9 @@ final class DialRepositoryTests: XCTestCase {
     // MARK: - The bodies that must NOT become a DNC refusal
 
     /// ⛔ THE ROLE REFUSAL IS A BARE `{error}` WITH NO `success` KEY, and that
-    /// absence is the whole discriminator. The Kotlin client cannot see it —
+    /// absence is the whole discriminator. The Kotlin client cannot see it,
     /// `ApiResult.HttpFailure` keeps status, message and code and drops
-    /// `success` — which is why it folds DNC into its catch-all and this one does
+    /// `success`, which is why it folds DNC into its catch-all and this one does
     /// not.
     func testTheRoleRefusalPassesThroughRatherThanReadingAsADoNotCall() async {
         let transport = RepositoryTransport(
@@ -165,7 +165,7 @@ final class DialRepositoryTests: XCTestCase {
         XCTAssertEqual(result.failureOnly, .http(status: 400, message: "Invalid phone number"))
     }
 
-    /// ⚠️ THE RATE LIMIT IS A 429 BARE `{error}` — a backstop against a stuck
+    /// ⚠️ THE RATE LIMIT IS A 429 BARE `{error}`, a backstop against a stuck
     /// finger, not a refusal with a remedy. It passes through so the dialer can
     /// say "try again shortly" rather than anything about the number.
     func testTheRateLimitPassesThrough() async {
@@ -181,7 +181,7 @@ final class DialRepositoryTests: XCTestCase {
 
     /// ⚠️ AN EDGE 403 IS HTML, NOT JSON. `ApiErrorEnvelope.lenient` answers nil,
     /// so `success` is absent rather than false and the structural test cannot
-    /// fire — which is the behaviour that keeps a captive portal from
+    /// fire, which is the behaviour that keeps a captive portal from
     /// impersonating a compliance refusal.
     func testANonJsonForbiddenBodyPassesThroughWithNoMessage() async {
         let transport = RepositoryTransport(json: "<html>403 Forbidden</html>", status: 403)
@@ -196,8 +196,8 @@ final class DialRepositoryTests: XCTestCase {
     /// ⛔ A 200 THAT DOES NOT AFFIRM SUCCESS IS NOT A PLACED CALL, and this is the
     /// one route where reporting a refusal for a call that WAS placed is
     /// possible: the row is written and the carrier instructed before the body is
-    /// built. Joining a room on an unaffirmed envelope is still worse — it shows
-    /// a working call over a failure — so it fails, and the dialer's copy owns
+    /// built. Joining a room on an unaffirmed envelope is still worse, it shows
+    /// a working call over a failure, so it fails, and the dialer's copy owns
     /// the "the attempt may have gone out" caveat.
     func testATwoHundredThatDoesNotAffirmSuccessIsADecodeFailure() async {
         let transport = RepositoryTransport(
@@ -213,7 +213,7 @@ final class DialRepositoryTests: XCTestCase {
 
     /// ⚠️ A 200 MISSING A CREDENTIAL IS CONTRACT DRIFT, NOT CONNECTIVITY. Every
     /// field of `DialResponse` is required, so `{}` fails to decode rather than
-    /// producing a well-formed response holding an empty token — which is the
+    /// producing a well-formed response holding an empty token, which is the
     /// shape Kotlin has to guard by hand, because its DTO defaults every field.
     func testATwoHundredThatIsNotADialResponseIsAShapeMismatch() async {
         let transport = RepositoryTransport(json: #"{"success":true}"#)

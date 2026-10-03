@@ -12,7 +12,7 @@ import Foundation
 /// UNIVERSAL LIST ENVELOPE ON THIS SURFACE. `admin-ops.ts` defines
 /// `items = (schema) => z.object({ items: z.array(schema) })` and uses it for
 /// `apiKeys.list`, `oauth.connections.list`, `webhooks.list` and
-/// `webhooks.deliveries` — while `recordings.list` and `recordings.consent`
+/// `webhooks.deliveries`, while `recordings.list` and `recordings.consent`
 /// declare their own key by hand. Reaching for this on one of those two throws a
 /// missing-key error that reads like an outage; see ``SchedulingRecordingList``.
 public struct SchedulingItems<Item: Codable & Sendable>: Codable, Sendable {
@@ -35,7 +35,7 @@ public struct SchedulingAPIKey: Codable, Equatable, Sendable {
     /// ⛔ NULLABLE ON THE WIRE, NOT ABSENT, AND THE DIFFERENCE DECIDES THE CELL.
     /// The fork scans it into a `*string` and marshals a JSON `null` for a key
     /// that has never been used, and the catalog types it `.nullable().optional()`
-    /// — so this Optional covers both spellings and "never used" is the meaning of
+    /// so this Optional covers both spellings and "never used" is the meaning of
     /// nil. ⚠️ It carries an entry in the explicit-null register for exactly this
     /// reason; an `=== undefined` style check on the far side renders the string
     /// "null" into the cell, which is the bug `developer-format.ts` records.
@@ -52,8 +52,8 @@ public struct SchedulingAPIKey: Codable, Equatable, Sendable {
 /// The one and only sight of a minted key's plaintext.
 ///
 /// ⛔ `key` IS THE CREDENTIAL AND IT IS RETURNED ONCE. It is in the catalog's
-/// allowlist deliberately — the op exists so a customer can mint a key for their
-/// OWN integrations, and a mint that never shows the key is useless — but that
+/// allowlist deliberately, the op exists so a customer can mint a key for their
+/// OWN integrations, and a mint that never shows the key is useless, but that
 /// makes this the one DTO on the surface a client must not log, must not persist
 /// and must not interpolate into a copyable snippet. The web console holds it in
 /// a modal and drops it from state when the modal closes; anything native should
@@ -116,7 +116,7 @@ public struct SchedulingOAuthConnection: Codable, Equatable, Sendable {
 /// The seven events a webhook may subscribe to.
 ///
 /// ⛔ A CLOSED SET AT THE FAR END, AND A NAME THIS ENUM GETS WRONG IS A HARD
-/// **400** (`unknown event: <name>`) ON CREATE **AND** ON PATCH — not an ignored
+/// **400** (`unknown event: <name>`) ON CREATE **AND** ON PATCH, not an ignored
 /// key. Copied from `validWebhookEvents` in the fork's `webhook_handler.go`, which
 /// `webhooks.create`'s `z.enum` and `WEBHOOK_EVENTS` in `developer-format.ts` also
 /// copy. ⚠️ Three hand-kept copies of one list is deliberate: deriving any of them
@@ -125,8 +125,8 @@ public struct SchedulingOAuthConnection: Codable, Equatable, Sendable {
 ///
 /// ⛔ THIS TYPE IS FOR THE REQUEST SIDE ONLY AND ``SchedulingWebhook/events`` IS
 /// DELIBERATELY `[String]`. The RESPONSE schema types the array `z.string()` with
-/// no enum, so a row created before an event was renamed — or by some other
-/// client — can legitimately carry a value this enum does not have, and a
+/// no enum, so a row created before an event was renamed, or by some other
+/// client, can legitimately carry a value this enum does not have, and a
 /// throwing decode there would take out the whole webhooks tab over one stale
 /// row. Strict on the way out, lenient on the way in.
 public enum SchedulingWebhookEvent: String, Codable, Equatable, Sendable, CaseIterable {
@@ -142,7 +142,7 @@ public enum SchedulingWebhookEvent: String, Codable, Equatable, Sendable, CaseIt
 /// One configured webhook.
 ///
 /// ⛔ NO `secret` ON THE LIST, AND THE FORK DOES NOT SEND ONE. It is minted once,
-/// on create — see ``SchedulingWebhookCreated``. Same rule as the API keys.
+/// on create, see ``SchedulingWebhookCreated``. Same rule as the API keys.
 public struct SchedulingWebhook: Codable, Equatable, Sendable {
     public let id: String
     /// ⚠️ `https://` only, enforced by the route rather than by the fork, which
@@ -155,7 +155,7 @@ public struct SchedulingWebhook: Codable, Equatable, Sendable {
     /// Which payload fields are delivered. ⛔ NULLABLE ON THE WIRE, AND nil MEANS
     /// "THE FORK'S DEFAULT SET", NOT "NONE". A row created before field selection
     /// existed has no list, and the fork substitutes its own `defaultFields` at
-    /// delivery time — so a screen that rendered nil as an empty selection would
+    /// delivery time, so a screen that rendered nil as an empty selection would
     /// show every box unticked for a webhook that is sending data. ⚠️ Row 1 of
     /// the fixture carries the explicit null, with an entry in the register.
     public let fields: [String]?
@@ -228,7 +228,7 @@ public struct SchedulingWebhookDelivery: Codable, Equatable, Sendable {
     public let event: String
     /// `delivered`, `pending`, `failed`, and whatever the fork adds.
     public let status: String
-    /// How many times it has been tried, including the first. ⚠️ Required — a
+    /// How many times it has been tried, including the first. ⚠️ Required, a
     /// delivery row always has at least one attempt.
     public let attemptCount: Int
     /// ⚠️ Absent on a delivery not bound to a booking (a `recording.completed`

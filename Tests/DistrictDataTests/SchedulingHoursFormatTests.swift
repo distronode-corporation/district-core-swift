@@ -28,7 +28,7 @@ final class SchedulingHoursFormatTests: XCTestCase {
         XCTAssertEqual(Hours.displayDay(1), 0)
     }
 
-    /// ⚠️ WRITTEN TOTAL FOR NEGATIVES, so a caller cannot produce an array index of -1 —
+    /// ⚠️ WRITTEN TOTAL FOR NEGATIVES, so a caller cannot produce an array index of -1,
     /// which in Swift is a crash rather than the `undefined` the source would give.
     func testTheConversionsAreTotalForNegatives() {
         XCTAssertTrue((0 ... 6).contains(Hours.wireDay(-1)))
@@ -57,7 +57,7 @@ final class SchedulingHoursFormatTests: XCTestCase {
     }
 
     /// ⛔ AN EVENT-TYPE-SCOPED RULE IS NOT PART OF THE WORKING WEEK, so the grid must not
-    /// draw it — an edit there would silently rewrite one event type's availability.
+    /// draw it, an edit there would silently rewrite one event type's availability.
     func testAnEventTypeScopedRuleIsNotInTheGrid() throws {
         let rules = try [
             SchedulingFixture.rule(eventTypeId: "et1", dayOfWeek: 1, start: "09:00", end: "17:00"),
@@ -253,7 +253,7 @@ final class SchedulingHoursFormatTests: XCTestCase {
         XCTAssertTrue(Hours.upcomingOverrides(overrides, today: "2026-09-12").isEmpty)
     }
 
-    /// ⚠️ TODAY ITSELF IS KEPT — the comparison is `>=`, because a day off today is very
+    /// ⚠️ TODAY ITSELF IS KEPT, the comparison is `>=`, because a day off today is very
     /// much still relevant.
     func testTodayItselfIsKept() throws {
         let overrides = try [SchedulingFixture.override(id: "o1", date: "2026-09-12")]
@@ -268,7 +268,7 @@ final class SchedulingHoursFormatTests: XCTestCase {
 
     /// ⛔ TWO OVERRIDES ON THE SAME DATE KEEP THE FORK'S OWN ORDER. Swift's sort is not
     /// stable and JavaScript's is, so without the index tiebreak these two could swap
-    /// between runs — an intermittent difference from the browser.
+    /// between runs, an intermittent difference from the browser.
     func testTiedStartsKeepTheirIncomingOrder() throws {
         let overrides = try (1 ... 8).map {
             try SchedulingFixture.override(id: "o\($0)", date: "2026-09-12", reason: "r\($0)")

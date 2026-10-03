@@ -8,7 +8,7 @@ public extension JSONValue {
     /// WITHOUT IT `workspace/directory` AND `workspace/routing-rules` WERE UNUSABLE FROM
     /// THIS CLIENT. Both routes replace their stored array outright and validate each row
     /// with a zod `.passthrough()`, so the only safe request is the loaded rows with the
-    /// operator's edits applied — and the loaded rows arrive as ``WireJSON`` while the
+    /// operator's edits applied, and the loaded rows arrive as ``WireJSON`` while the
     /// request builders take ``JSONValue``. `SettingsConfigReadModel` recorded the gap in
     /// prose ("carrying a rule back BYTE-IDENTICALLY across those two types needs a
     /// conversion that does not exist, and a lossy one would strip the keys nothing
@@ -16,7 +16,7 @@ public extension JSONValue {
     ///
     /// ⛔ IT IS LOSSLESS, AND THE ONE LINE THAT MAKES IT SO IS THE `object` ARM. It builds
     /// `.object([String: JSONValue])` DIRECTLY rather than going through
-    /// ``JSONValue/object(_:)``, whose whole job is to DROP nil pairs — correct for a
+    /// ``JSONValue/object(_:)``, whose whole job is to DROP nil pairs, correct for a
     /// request this client authors field by field, and catastrophic here: a `null` inside
     /// an opaque blob is part of the value, and dropping it would delete a key on a route
     /// that answers 200 either way. ⚠️ `.null` therefore maps to `.null` rather than to an

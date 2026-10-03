@@ -23,13 +23,13 @@ final class NumberSurfaceTests: XCTestCase {
     /// `scheduling/sso` because a descriptor would spend a one-time credential on a
     /// transport nobody sees. This one is a POLICY boundary: buying a number charges a
     /// setup fee AND opens a recurring monthly charge for a service consumed inside the
-    /// app, which is App Store Review Guideline 3.1.1 — an in-app purchase or it is not
+    /// app, which is App Store Review Guideline 3.1.1, an in-app purchase or it is not
     /// offered at all. Same mechanism, different argument.
     ///
     /// ⛔ AND 3.1.1 COVERS STEERING, SO THERE IS NOTHING TO TAP EITHER. That half cannot
     /// be asserted here (a URL in a copy file is not an endpoint), so it is held by
     /// ``MarketplaceCopy`` carrying no `webPath`, `webURL` or open action, and by the ⛔ at
-    /// the top of `MarketplaceView.swift` — which records this exact reasoning being got
+    /// the top of `MarketplaceView.swift`, which records this exact reasoning being got
     /// wrong once under a 3.1.3(b) citation that read as diligence and was what let the
     /// button stand.
     ///
@@ -64,14 +64,14 @@ final class NumberSurfaceTests: XCTestCase {
     }
 
     /// ⛔ THE OTP FLOW IS ABSENT TOO, AND FOR AN ORDINARY SCOPING REASON RATHER THAN A
-    /// POLICY ONE — which is worth pinning precisely so the two absences are not
+    /// POLICY ONE, which is worth pinning precisely so the two absences are not
     /// conflated by the next reader. `workspace/verify/start` and `workspace/verify/check`
     /// are live POSTs (agency/client) that send and check a code; an OTP entry screen owns
     /// its own retry, expiry and attempt-ceiling states, so it is a feature rather than two
     /// descriptors. Nothing about them is forbidden.
     ///
     /// ⚠️ THE ASSERTION IS ON THE SEGMENTS RATHER THAN ON A CASE NAME, because the two
-    /// configuration endpoints legitimately address `workspace/verify` — what must not
+    /// configuration endpoints legitimately address `workspace/verify`, what must not
     /// appear is a `start` or `check` segment under it.
     func testTheOtpStartAndCheckRoutesAreNotReachable() {
         for row in EndpointTable.all() where row.descriptor.segments.contains("verify") {
@@ -124,7 +124,7 @@ final class NumberSurfaceTests: XCTestCase {
     /// anything; `numbers/configure` and `numbers/release` read `req.json()` FIRST and
     /// hand the parsed value to `requireWorkspaceRole`, so a query parameter alone is a
     /// 400 "Missing workspaceId or phoneNumber". Getting either backwards is a refusal
-    /// from a request that reads correctly — the same class of mistake the ⛔ on
+    /// from a request that reads correctly, the same class of mistake the ⛔ on
     /// ``DistrictPaths/deskLogo`` records for the multipart pair.
     func testTheNumberFamilyCarriesTheWorkspaceInTwoPlacesOnPurpose() throws {
         let create = DistrictEndpoints.createNumberRegistration(
@@ -146,7 +146,7 @@ final class NumberSurfaceTests: XCTestCase {
 
     /// ⛔ THE BILLABLE LOOKUP MUST ENCODE ITS `+` AS `%2B`. A literal `+` in a query value
     /// arrives at the server as a SPACE after form decoding, so the lookup would be
-    /// performed for ` 14165550100` — a spent carrier call answering `valid: false`, which
+    /// performed for ` 14165550100`, a spent carrier call answering `valid: false`, which
     /// reads as a bad number rather than as an encoding bug. This is the exact failure
     /// ``ApiURL`` refuses `URLComponents.queryItems` over, asserted here on the one route
     /// where the wrong answer also costs money.

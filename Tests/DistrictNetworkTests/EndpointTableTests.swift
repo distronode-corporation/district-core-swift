@@ -58,7 +58,7 @@ final class EndpointTableTests: XCTestCase {
         // ⛔ `workspace/numbers/purchase` IS DELIBERATELY ABSENT and must stay that
         // way. It is a setup fee plus a recurring charge for a service consumed in
         // the app, i.e. App Store Guideline 3.1.1, so it gets no `EndpointID`, no
-        // path, no descriptor and no row — and `NumberSurfaceTests` asserts its
+        // path, no descriptor and no row, and `NumberSurfaceTests` asserts its
         // absence so that adding one fails rather than ships.
         //
         // ⚠️ `contacts/block` AND `contacts/blocked` EXIST FOR App Store Guideline 1.2,
@@ -74,8 +74,8 @@ final class EndpointTableTests: XCTestCase {
         // ⚠️ IF YOU COUNT ROWS WITH A GREP, EXCLUDE THIS FILE. Spelling the row
         // constructor's name in a comment here makes a `grep -c` over
         // `EndpointTable*.swift` report one more than the real rows, which reads
-        // exactly like a duplicate row. The assertions are immune — they compare the
-        // built array against `EndpointID.allCases` — but the ad-hoc check a reader
+        // exactly like a duplicate row. The assertions are immune, they compare the
+        // built array against `EndpointID.allCases`, but the ad-hoc check a reader
         // reaches for first is not.
         XCTAssertEqual(rows.count, 118)
     }
@@ -103,7 +103,7 @@ final class EndpointTableTests: XCTestCase {
             // `desk/logo` carries it in the QUERY and sends no fields at all. A
             // hard-coded expectation was true of the only multipart row that existed
             // and would have gone green against the second one having the media
-            // route's part list — which is exactly the mistake that leaves the desk
+            // route's part list, which is exactly the mistake that leaves the desk
             // route's `requireWorkspaceRole` with null while the URL reads correctly.
             case let (.multipart(part), .multipart(fields, fileName)):
                 XCTAssertEqual(part.fields, fields, "\(row.id.rawValue): wrong multipart fields")
@@ -155,7 +155,7 @@ final class EndpointTableTests: XCTestCase {
     }
 
     /// ⚠️ `JSONEncoder` ESCAPES `/` AS `\/` ON LINUX AND NOT ON DARWIN, and both
-    /// are valid JSON that decodes identically — so a byte-exact assertion on a
+    /// are valid JSON that decodes identically, so a byte-exact assertion on a
     /// body containing a URL would pass on this runner and fail the day anything
     /// runs on a Mac. The escape is normalised away rather than the URL removed,
     /// because `mediaUrls` carrying the upload route's own URL is the case worth

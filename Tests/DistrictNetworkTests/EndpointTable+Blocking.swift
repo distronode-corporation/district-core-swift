@@ -5,20 +5,20 @@ extension EndpointTable {
     /// The two Guideline 1.2 moderation rows.
     ///
     /// ⛔ THE BODY IS ASSERTED BYTE-EXACT AND IT IS THE ONLY THING PINNING THIS
-    /// WIRE SHAPE. Neither route has a contract fixture — the corpus is generated
+    /// WIRE SHAPE. Neither route has a contract fixture, the corpus is generated
     /// by the server's suite and owned by the Android side, and
-    /// `ContractManifest.expectedFixtureCount` asserts EXACTLY the files on disk —
+    /// `ContractManifest.expectedFixtureCount` asserts EXACTLY the files on disk,
     /// so these strings and `ContactBlockBodies` are the whole contract on this
     /// client. Same position `createContact` is in.
     ///
     /// ⛔ ONE ROW PER ENDPOINT AND THE SECOND BODY SHAPE LIVES ELSEWHERE, WHICH IS
     /// FORCED RATHER THAN CHOSEN. `testEveryEndpointHasExactlyOneRow` asserts
     /// `Set(ids).count == ids.count`, so a second `.setContactBlocked` row for the
-    /// by-number/unblock form would fail the table outright. That shape matters —
+    /// by-number/unblock form would fail the table outright. That shape matters,
     /// ``JSONValue/object(_:)`` drops a nil pair silently by design, so "did this
     /// request carry a `phoneNumber`" is a question about the encoded document
     /// rather than about the arguments, and the by-number call is the one an inbox
-    /// thread with an unresolved counterpart makes — so it is pinned byte-exact in
+    /// thread with an unresolved counterpart makes, so it is pinned byte-exact in
     /// `ContactsBlockRepositoryTests` instead, off `RepositoryTransport.bodies`.
     /// Same instrument, different file.
     ///

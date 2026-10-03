@@ -44,14 +44,14 @@ public extension NumbersRepository {
     /// Provision a SIP trunk.
     ///
     /// ⛔ ``NumberWriteRepeat/once``. It creates an IP Access Control List, its member
-    /// addresses and a Twilio SIP Domain, and opens a recurring $25/month charge — and
+    /// addresses and a Twilio SIP Domain, and opens a recurring $25/month charge, and
     /// there is no route to undo any of it. ⚠️ Only ONE failure path rolls the Twilio
     /// side back (a workspace lookup miss, answered 404); every other partial failure
     /// leaves what it created, so a blind retry can double the resources AND the charge.
     /// That is why a failure here must not silently re-arm the control.
     ///
     /// ⛔ AT LEAST ONE IP OR CIDR RANGE IS REQUIRED and an empty list is a **400** rather
-    /// than an open trunk — the correct direction, since a SIP domain with no ACL is an
+    /// than an open trunk, the correct direction, since a SIP domain with no ACL is an
     /// endpoint anybody can register against. Blank entries are dropped server-side, so
     /// an all-blank list is the same 400 as an empty one.
     ///
@@ -82,7 +82,7 @@ public extension NumbersRepository {
     ///
     /// ⛔ THIS IS THE SERVICE'S CONFIGURATION, NOT THE OTP FLOW.
     /// `workspace/verify/start` and `workspace/verify/check` send and check a code and
-    /// are deliberately unported — an OTP entry screen owns its own retry, expiry and
+    /// are deliberately unported, an OTP entry screen owns its own retry, expiry and
     /// attempt-ceiling states. Named here so nobody has to rediscover them.
     ///
     /// ⚠️ ADMITS `viewer` WHILE THE WRITE DOES NOT.
@@ -100,8 +100,8 @@ public extension NumbersRepository {
     ///
     /// ⛔ ``NumberWriteRepeat/once``, AND THE REASON IS THE ASYMMETRY RATHER THAN THE
     /// COST OF ONE CALL. Enabling creates a REAL, carrier-billable Twilio Verify
-    /// Service. Disabling deliberately does NOT delete it — verification history is
-    /// preserved — and only clears our pointer. So an enable/disable/enable loop mints
+    /// Service. Disabling deliberately does NOT delete it, verification history is
+    /// preserved, and only clears our pointer. So an enable/disable/enable loop mints
     /// an unbounded number of billable OTP senders, each outliving the workspace's
     /// pointer to it and needing to be reaped by hand in the Twilio console. ⚠️ The
     /// route's 10/hour limit covers BOTH directions and sits above the `!enabled`
@@ -113,7 +113,7 @@ public extension NumbersRepository {
     /// carrier account, invisible from here.
     ///
     /// ⚠️ AN ENABLE ON AN ALREADY-CONFIGURED WORKSPACE IS A CHEAP SHORT-CIRCUIT
-    /// answering the stored sid, which is what caps the steady state at one service —
+    /// answering the stored sid, which is what caps the steady state at one service,
     /// but only while the pointer survives, which the disable path removes.
     ///
     /// ⚠️ THE ANSWER IS ADOPTABLE: both branches echo `enabled` and the enable branch
@@ -182,7 +182,7 @@ public extension NumbersRepository {
     ///
     /// ⛔ `optInImageUrls` MUST BE NON-EMPTY AND MUST BE THE TENANT'S OWN EVIDENCE.
     /// Reviewers open every URL by hand and reject the filing days later with error
-    /// 30509 if one does not load, so the route refuses an empty list up front — a 400
+    /// 30509 if one does not load, so the route refuses an empty list up front, a 400
     /// now beats losing days. ⛔ And a Distronode-owned asset could never satisfy it in
     /// principle: this is a BYOK flow, every workspace is a different business, and the
     /// evidence has to demonstrate THAT business's declared opt-in. The placeholder this
@@ -196,7 +196,7 @@ public extension NumbersRepository {
     /// number, the second is a mis-wired account.
     /// - Parameter verification: ⛔ A TYPE RATHER THAN SEVEN LOOSE ARGUMENTS. See
     ///   ``TollFreeVerificationDraft``. ⚠️ It was already under SwiftLint's parameter ceiling
-    ///   here — three of the seven carried defaults, which the rule does not count — and it is a
+    ///   here, three of the seven carried defaults, which the rule does not count, and it is a
     ///   draft anyway, because the ceiling was never the reason: six of the seven are strings.
     func submitTollFreeVerification(
         workspaceId: String,
@@ -217,8 +217,8 @@ public extension NumbersRepository {
     /// ⛔ ``NumberWriteRepeat/once`` ON A **GET**, WHICH IS THE POINT. Twilio bills every
     /// Lookup and Line Type Intelligence costs more than a basic one, so the ordinary
     /// safety of an idempotent read does not apply: repeating it is free of side effects
-    /// and not free of money. It is also the widest-open billable route on this surface —
-    /// a GET that admits `viewer`, the lowest role — and nothing downstream caps it. The
+    /// and not free of money. It is also the widest-open billable route on this surface,
+    /// a GET that admits `viewer`, the lowest role, and nothing downstream caps it. The
     /// only brake is 60/minute per workspace, which is a runaway brake rather than a
     /// budget.
     ///
@@ -228,7 +228,7 @@ public extension NumbersRepository {
     /// defensible on a desktop form and is not on a phone where a scroll can re-run an
     /// effect. ⚠️ This is why there is deliberately no convenience that takes a list.
     ///
-    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200 CARRYING `info.valid: false`**, not a 404 —
+    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200 CARRYING `info.valid: false`**, not a 404,
     /// the route translates Twilio's own 404 itself. The money is spent either way, so
     /// "invalid" is not a cheap answer and must not be probed for.
     ///

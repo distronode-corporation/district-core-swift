@@ -71,8 +71,8 @@ public enum SchedulingTeamFormat {
     /// District's members and the scheduler's users, as one list.
     ///
     /// ⛔ DISTRICT'S ORDER FIRST, THEN SCHEDULER-ONLY ROWS. The second pass is what
-    /// surfaces somebody who has left the workspace but still holds bookings — the
-    /// stranded host the screen warns about — and dropping it would hide exactly the
+    /// surfaces somebody who has left the workspace but still holds bookings, the
+    /// stranded host the screen warns about, and dropping it would hide exactly the
     /// person an operator needs to deal with.
     ///
     /// ⚠️ A DUPLICATE ADDRESS IS SKIPPED AFTER THE FIRST, and the scheduler-side lookup

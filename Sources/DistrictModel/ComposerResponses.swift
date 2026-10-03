@@ -13,7 +13,7 @@ import Foundation
 // ⛔ `messages/media` WRITES BYTES INTO POSTGRES AND HANDS BACK AN ANONYMOUS
 // CAPABILITY URL. See `UploadedMedia.url`.
 
-/// `POST /api/district/messages/media` — the response to a multipart attachment
+/// `POST /api/district/messages/media`, the response to a multipart attachment
 /// upload.
 ///
 /// ⚠️ THE ENVELOPE IS NOT THE MEDIA. The useful value is ``media``'s `url`, which
@@ -34,7 +34,7 @@ public struct MediaUploadResponse: Codable, Sendable {
 ///
 /// ⛔ ``url`` IS AN ANONYMOUS CAPABILITY URL AND MUST NOT BE FETCHED WITH THE
 /// BEARER TOKEN. It is `/api/media/<uuid>` and answers to anyone, deliberately,
-/// because a carrier's MMS fetcher has no session either — which is also why the
+/// because a carrier's MMS fetcher has no session either, which is also why the
 /// id is a uuid rather than a guessable sequence. Attaching this client's
 /// `Authorization` header to it would send an access token to a route that does
 /// not need one: a credential-leak surface for no benefit.
@@ -55,7 +55,7 @@ public struct UploadedMedia: Codable, Sendable {
 /// One persisted, unsent reply.
 ///
 /// ⛔ AUTHOR-SCOPED, UNLIKE EVERYTHING ELSE IN THE INBOX. A message's read state
-/// is workspace-level — one agent opening a thread marks it read for the team —
+/// is workspace-level, one agent opening a thread marks it read for the team,
 /// but a draft is unfinished thought, and a colleague reading it reads it as a
 /// decision. The server keys the row by `authorEmail` as well, so two agents hold
 /// their own draft on the same thread. This client never sends an author: the
@@ -71,11 +71,11 @@ public struct UploadedMedia: Codable, Sendable {
 ///
 /// ⚠️ ``subject`` IS EMAIL-ONLY AND ARRIVES AS AN EXPLICIT `null` ON AN SMS
 /// THREAD. `district-drafts-list.json`'s second row carries `"subject": null`,
-/// which is one of the paths in `StrictDecodeVerifier.allowedExplicitNulls` —
+/// which is one of the paths in `StrictDecodeVerifier.allowedExplicitNulls`,
 /// the column is nullable and the route passes it through rather than omitting
 /// the key.
 public struct MessageDraft: Codable, Sendable {
-    /// `contact:<id>` or `addr:<normalized>` — the same thread identity the
+    /// `contact:<id>` or `addr:<normalized>`, the same thread identity the
     /// Inbox list uses, and the only safe list key.
     public let threadKey: String
     /// ⛔ Never blank. See the type note.
@@ -90,7 +90,7 @@ public struct MessageDraft: Codable, Sendable {
 }
 
 /// `GET /api/district/messages/drafts?workspaceId=&threadKey=` and
-/// `PUT /api/district/messages/drafts` — one thread's unsent draft, read or
+/// `PUT /api/district/messages/drafts`, one thread's unsent draft, read or
 /// upserted.
 ///
 /// ⛔ `draft: null` IS THE NORMAL ANSWER TO THE READ, NOT AN ERROR, AND THE
@@ -98,7 +98,7 @@ public struct MessageDraft: Codable, Sendable {
 /// draft; a 404 would make the composer's ordinary open path look like a fault in
 /// every log. A client that treated a null draft as a failure would show an error
 /// on the common case. `district-draft-null.json` pins that branch and IS gated,
-/// through the one-path `allowedExplicitNulls` entry `$.draft` — the null is the
+/// through the one-path `allowedExplicitNulls` entry `$.draft`, the null is the
 /// contract here, not an artefact of the fixture.
 ///
 /// ⛔ NEVER SEND A BLANK BODY ON THE PUT. The route answers 400 with
@@ -116,7 +116,7 @@ public struct DraftResponse: Codable, Sendable {
     public let draft: MessageDraft?
 }
 
-/// `GET /api/district/messages/drafts?workspaceId=` with no `threadKey` — every
+/// `GET /api/district/messages/drafts?workspaceId=` with no `threadKey`, every
 /// unsent draft the signed-in author holds in this workspace.
 ///
 /// ⛔ ONE KEY APART FROM ``DraftResponse`` AND A DIFFERENT SHAPE: the same route
@@ -132,12 +132,12 @@ public struct DraftResponse: Codable, Sendable {
 /// preserves that order rather than re-sorting.
 public struct MessageDraftsResponse: Codable, Sendable {
     public let success: Bool
-    /// ⚠️ ALWAYS AN ARRAY, NEVER NULL AND NEVER OMITTED — an author with nothing
+    /// ⚠️ ALWAYS AN ARRAY, NEVER NULL AND NEVER OMITTED, an author with nothing
     /// saved gets `[]`. Emptiness is therefore the "nothing to restore" test.
     public let drafts: [MessageDraft]
 }
 
-/// `POST /api/district/messages/draft` (SINGULAR) — AI reply GENERATION, not
+/// `POST /api/district/messages/draft` (SINGULAR), AI reply GENERATION, not
 /// persistence.
 ///
 /// ⛔ NON-IDEMPOTENT AND BILLABLE. Every call is one Vertex/Gemini generation

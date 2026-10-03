@@ -6,7 +6,7 @@ import Foundation
 ///
 /// ⛔ TWO CASES, BECAUSE A SUCCESS MAY LEGITIMATELY CARRY NO TICKET AND THAT IS NOT AN
 /// ERROR. When the submitted `idempotencyKey` has already produced a ticket the route
-/// answers `{success: true, deduplicated: true}` and nothing else — deliberately,
+/// answers `{success: true, deduplicated: true}` and nothing else, deliberately,
 /// since reporting a retried submit as a failure would make it look broken and invite
 /// a third. Collapsing this into `DeskTicketSummary?` would push the same fork onto
 /// every caller as an `if let`, which is where it gets read as "the create failed".
@@ -28,7 +28,7 @@ public enum DeskTicketCreation: Sendable, Equatable {
 /// ⛔ AND ``deduplicatedWithoutBody`` IS A REAL, REACHABLE STATE RATHER THAN A
 /// DEFENSIVE BRANCH. Two concurrent submits, or Redis dying between the claim and the
 /// cached-result read, produce a bare `{success: true, deduplicated: true}`. No second
-/// row was written — which is the property that matters — but there is nothing to add
+/// row was written, which is the property that matters, but there is nothing to add
 /// to the thread, so a caller has to refetch rather than append. Treating it as an
 /// ordinary success leaves the reply invisible until something else reloads.
 public enum DeskReplyOutcome: Sendable, Equatable {
@@ -58,14 +58,14 @@ public struct DeskReply: Sendable, Equatable {
 /// ⛔ TWO FACTS, AND COLLAPSING THEM IS THE ONE ANSWER THIS CALL MUST NEVER GIVE. The
 /// column is cleared first and the stored object second: clearing the column is what
 /// stops the image appearing on the tenant's customer-facing page, and deleting the
-/// object is what stops the bytes being served at all — which is what an abuse
+/// object is what stops the bytes being served at all, which is what an abuse
 /// takedown actually needs. A response saying the bytes are gone when they are not is
 /// exactly what the route's own header forbids.
 public struct DeskLogoRemoval: Sendable, Equatable {
     public let settings: DeskSettings
     /// ⛔ False means the image is off the page and MAY STILL BE DOWNLOADABLE from the
     /// URL it had. ⚠️ It is also false for the ordinary idempotent case, a workspace
-    /// that had no logo — which is why ``DeskRepository/removeLogo(workspaceId:)``
+    /// that had no logo, which is why ``DeskRepository/removeLogo(workspaceId:)``
     /// only ever reports it when there was something to delete.
     public let objectRemoved: Bool
 }
@@ -84,7 +84,7 @@ public struct DeskLogoRemoval: Sendable, Equatable {
 /// `workspace/config` makes. It is not an oversight: these payloads carry a customer's
 /// name, email address and phone number in the clear plus the correspondence about
 /// them. So the ENTRY POINT is hidden from a viewer rather than the controls being
-/// disabled — a screen whose every call 403s is worse than no row.
+/// disabled, a screen whose every call 403s is worse than no row.
 ///
 /// ⛔ NOTHING HERE IS RETRIED, AND TWO OF THE WRITES CARRY A CLIENT-MINTED
 /// IDEMPOTENCY KEY INSTEAD. That key is the retry story: it must be minted per SUBMIT
@@ -138,7 +138,7 @@ public struct DeskRepository: Sendable {
     /// being present precisely because an empty body is always a client bug.
     ///
     /// ⛔ THE ECHO IS ADOPTED, NEVER THE VALUES THAT WERE SENT. The route answers the
-    /// whole stored row, so this write needs no re-read — and the row is what a later
+    /// whole stored row, so this write needs no re-read, and the row is what a later
     /// read will see, which a locally-assembled copy would not be.
     ///
     /// ⚠️ `publicLogoUrl` IS ABSENT FROM THIS SIGNATURE ON PURPOSE and must stay
@@ -176,9 +176,9 @@ public struct DeskRepository: Sendable {
     /// than after it is uploaded.
     ///
     /// ⚠️ THE TWO CHEAP CHECKS RUN FIRST, and they are a courtesy rather than a
-    /// control: see ``DeskLogoLimits``. Everything the server actually enforces — the
+    /// control: see ``DeskLogoLimits``. Everything the server actually enforces, the
     /// magic-number sniff that refuses an SVG whatever its filename claims, the pixel
-    /// bounds, the animation check — happens there and cannot be anticipated here.
+    /// bounds, the animation check, happens there and cannot be anticipated here.
     ///
     /// ⚠️ IT ECHOES THE WHOLE SETTINGS ROW, like the PATCH, so a caller adopts that
     /// rather than assembling a new URL. There is no optimistic preview to be had: a
@@ -231,7 +231,7 @@ public struct DeskRepository: Sendable {
 
     /// The workspace's tickets, most recently updated first.
     ///
-    /// ⛔ AN EMPTY LIST IS A REAL ANSWER AND MUST NOT RENDER AS A FAILURE — nor as "the
+    /// ⛔ AN EMPTY LIST IS A REAL ANSWER AND MUST NOT RENDER AS A FAILURE, nor as "the
     /// desk is off", which is a different fact with a different screen and comes from
     /// ``settings(workspaceId:)``.
     ///
@@ -261,7 +261,7 @@ public struct DeskRepository: Sendable {
     /// `requesterEmail: ""` fails `.email()` and takes the whole object down, so a
     /// phone-only ticket would 400 with "A subject and a description are required",
     /// naming two fields that were both filled in. A form hands over whatever is in
-    /// its boxes, so the trim-to-nil belongs on this tier rather than in each screen —
+    /// its boxes, so the trim-to-nil belongs on this tier rather than in each screen,
     /// which is exactly why the draft is rebuilt below rather than passed through.
     ///
     /// ⚠️ `idempotencyKey` MUST BE MINTED PER SUBMIT. Held across submits it swallows
@@ -337,7 +337,7 @@ public struct DeskRepository: Sendable {
     ///
     /// ⛔ APPEND ONLY ``DeskReply/message`` AND ONLY ON ``DeskReplyOutcome/posted(_:)``.
     /// The other case means the reply is safe and unduplicated and this response
-    /// cannot show it, so the thread must be refetched — not left looking as though
+    /// cannot show it, so the thread must be refetched, not left looking as though
     /// nothing was sent, and not filled in from the draft.
     ///
     /// ⛔ NOT RETRIED. Resending without a key appends a second message to a customer's
@@ -396,7 +396,7 @@ public struct DeskRepository: Sendable {
     /// ⛔ THE TICKET AND THE MESSAGE ARE REQUIRED TOGETHER OR NOT AT ALL. A response
     /// carrying one without the other has never been observed and is not a state the
     /// route defines; treating it as `posted` would mean inventing the half that is
-    /// missing, and the degraded replay is exactly the right answer for it — the reply
+    /// missing, and the degraded replay is exactly the right answer for it, the reply
     /// is safe, and this response cannot show it.
     private func replyOutcome(_ response: DeskReplyResponse) -> DeskReplyOutcome {
         guard let ticket = response.ticket, let message = response.message else {
@@ -435,7 +435,7 @@ public struct DeskRepository: Sendable {
 ///
 /// ⛔ THE THINGS THAT ACTUALLY MAKE THIS ROUTE SAFE ARE NOT MIRRORED AND CANNOT BE.
 /// The server sniffs magic numbers, so an SVG renamed `logo.png` with a
-/// `image/png` header passes every check below and is refused there — which is the
+/// `image/png` header passes every check below and is refused there, which is the
 /// point, since an SVG is a script container being published to a
 /// Distronode-controlled domain. The pixel bounds (16 to 2000) need an image decoder
 /// this module does not have. A 415 or a 400 naming the rule is the honest way to
@@ -458,7 +458,7 @@ public enum DeskLogoLimits {
     /// passed, never that the upload will succeed.
     ///
     /// ⚠️ SHAPED AS AN ``ApiError/http(status:message:)`` CARRYING THE ROUTE'S OWN
-    /// STATUS — 415 for the type and 413 for the size — so a caller has one failure
+    /// STATUS, 415 for the type and 413 for the size, so a caller has one failure
     /// path and the sentence it shows is the same one a real refusal would produce.
     public static func refusal(mimeType: String, byteCount: Int) -> ApiError? {
         guard allowedMimeTypes.contains(mimeType) else {

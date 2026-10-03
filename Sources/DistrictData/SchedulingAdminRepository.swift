@@ -8,12 +8,12 @@ import Foundation
 /// DECISION RATHER THAN AN ECONOMY. The server owns the catalog: the scheduler
 /// path, the HTTP verb, the params schema and the response allowlist all live in
 /// `admin-ops.ts`, and every one of them is a thing a second copy here would
-/// silently disagree with. What this layer owns is the ENVELOPE — which is the
+/// silently disagree with. What this layer owns is the ENVELOPE, which is the
 /// one piece of the contract the catalog does not describe and every op shares.
 ///
 /// ⛔ IT GOES THROUGH ``ApiClient/sendUnmapped(_:)``, AND ANY EDIT THAT "TIDIES"
 /// THAT INTO ``ApiClient/send(_:as:)`` BREAKS IT IN THE QUIET DIRECTION. A failed
-/// op is a **200** carrying `{ok:false, failure, status}` — the request reached
+/// op is a **200** carrying `{ok:false, failure, status}`, the request reached
 /// us, cleared auth, cleared the role bar, validated, and the scheduler refused.
 /// `send(_:as:)` would hand those bytes to `JSONDecoder` against the caller's
 /// type: usually a ``ApiError/decoding(_:)`` blaming the contract for an outage,
@@ -30,7 +30,7 @@ import Foundation
 /// validator and it runs server-side; a second, laxer copy here would refuse
 /// bodies the server accepts (a client-side bug nobody can work around) or accept
 /// bodies it rejects (a **400** the user cannot act on). `params` is passed
-/// through verbatim, PATH KEYS INCLUDED — see
+/// through verbatim, PATH KEYS INCLUDED, see
 /// ``DistrictEndpoints/schedulingAdmin(workspaceId:op:params:)``.
 public struct SchedulingAdminRepository: Sendable {
     /// Called when the server reports an `op` name this client sent and it does
@@ -43,8 +43,8 @@ public struct SchedulingAdminRepository: Sendable {
     /// - Parameter reportUnknownOp: what to do about a **400 `unknown_op`**.
     ///
     ///   ⛔ THAT REFUSAL IS A PROGRAMMER ERROR AND NOTHING A USER CAN ACT ON. It
-    ///   means ``SchedulingAdminOp`` and `ADMIN_OPS` have diverged — a key renamed
-    ///   or withdrawn on the server — which is invisible to the compiler, because
+    ///   means ``SchedulingAdminOp`` and `ADMIN_OPS` have diverged, a key renamed
+    ///   or withdrawn on the server, which is invisible to the compiler, because
     ///   the op crosses the wire as a string. The app passes a reporter that traps
     ///   in a debug build, so the divergence is found by whoever caused it, and is
     ///   a no-op in release, where a crash would be a far worse answer than the
@@ -64,7 +64,7 @@ public struct SchedulingAdminRepository: Sendable {
     ///
     /// ⚠️ THE RESPONSE TYPE IS THE CALLER'S CHOICE AND IS NOT CHECKED AGAINST THE
     /// OP. Nothing on this side knows that `eventTypes.list` answers a list of
-    /// event types — the catalog does, and it is not importable from Swift. Naming
+    /// event types, the catalog does, and it is not importable from Swift. Naming
     /// the wrong type is a ``SchedulingAdminError/decoding(_:)`` at runtime rather
     /// than a compile error, which is the cost of not duplicating 75 schemas. Use
     /// ``SchedulingNoContent`` for the sixteen ops that answer nothing.
@@ -81,7 +81,7 @@ public struct SchedulingAdminRepository: Sendable {
         )
         switch await client.sendUnmapped(descriptor) {
         case let .failure(error):
-            // ⚠️ ONLY REACHED WHEN NO RESPONSE EXISTS — an unbuildable path, a
+            // ⚠️ ONLY REACHED WHEN NO RESPONSE EXISTS, an unbuildable path, a
             // missing credential, a dead socket. `sendUnmapped` skips the status
             // mapping, so every answered request arrives on the other arm with
             // its body intact.
@@ -135,7 +135,7 @@ public struct SchedulingAdminRepository: Sendable {
     /// left to be discovered: on this route a 413 is a params object over 5 MiB,
     /// which no user action shortens and no retry fixes, so neither answer is
     /// clearly right. If the two clients are ever made to agree, agree in ONE
-    /// place — this comment and `admin-fetch.ts` are the pair.
+    /// place, this comment and `admin-fetch.ts` are the pair.
     private func refusal(_ raw: RawResponse, op: SchedulingAdminOp) -> SchedulingAdminError {
         let body = try? JSONDecoder().decode(SchedulingAdminErrorBody.self, from: raw.body)
         let code = body?.error ?? ""
@@ -168,7 +168,7 @@ public struct SchedulingAdminRepository: Sendable {
     /// transport failure: ``ApiClient`` answers `.http(status: 401, message: nil)`
     /// without sending anything when the token provider returns nil. Routing it
     /// through the same status mapping is what makes "signed out" and "refused"
-    /// one answer, which is correct — both mean this member cannot do it now.
+    /// one answer, which is correct, both mean this member cannot do it now.
     static func error(forUnanswered error: ApiError) -> SchedulingAdminError {
         switch error {
         case let .http(status, _):

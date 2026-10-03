@@ -12,7 +12,7 @@ struct ImplementedFixture {
 /// The fixtures that have a Swift DTO, and what decodes each one.
 ///
 /// ⛔ THE PAIRING IS THE ASSERTION. Naming a fixture here is a claim that the
-/// listed type models it exactly — no dropped keys, no invented ones — and
+/// listed type models it exactly, no dropped keys, no invented ones, and
 /// `StrictDecodeVerifier` is what proves the claim on every run. Moving a name
 /// out of `ContractManifest.unimplemented` without adding it here fails the
 /// suite, because every fixture on disk has to be in exactly one of the two
@@ -24,13 +24,13 @@ struct ImplementedFixture {
 /// `StrictDecodeVerifier.allowedExplicitNulls`, whose size is asserted by
 /// `ContractManifest.expectedAllowedNullPaths` rather than written here, because
 /// a stated count goes stale. A blanket "no fixture with a null" rule would
-/// hold out whole surfaces — overview, the calls feed and detail, contacts,
-/// conversations, the workspace list and the workspace config — over fields
+/// hold out whole surfaces, overview, the calls feed and detail, contacts,
+/// conversations, the workspace list and the workspace config, over fields
 /// whose nullability is not in doubt.
 ///
 /// ⛔ WHAT HAS NOT CHANGED IS THAT AN ENTRY IS PER PATH. There is no wildcard and
 /// no per-fixture waiver, so a null anywhere the list does not name is still a
-/// hard failure — including on a row a regeneration adds.
+/// hard failure, including on a row a regeneration adds.
 enum ImplementedFixtures {
     static var all: [ImplementedFixture] {
         authAndSessions + push + membership + meetings + overview
@@ -52,7 +52,7 @@ enum ImplementedFixtures {
             gate("district-device-revoke.json", DeviceRevokeResponse.self),
             // ⛔ THE READ THAT MAKES THE TWO REVOKES ABOVE USABLE, AND IT ARRIVED
             // LAST. Its two rows are the whole point: row 0 is a fully populated
-            // device, row 1 nulls `deviceName` and `lastUsedAt` together — the
+            // device, row 1 nulls `deviceName` and `lastUsedAt` together, the
             // "signed in, never yet refreshed, sent no name" shape that every
             // session passes through for its first ten minutes. Both nulls have
             // exact `allowedExplicitNulls` paths; a DTO that regressed either
@@ -72,9 +72,9 @@ enum ImplementedFixtures {
     // MARK: - Push registration
 
     /// ⛔ A DIFFERENT `devices` SURFACE FROM THE ONE ABOVE, AND THE TWO 404 EACH
-    /// OTHER. `district-devices.json` describes `/api/auth/native/devices` —
+    /// OTHER. `district-devices.json` describes `/api/auth/native/devices`,
     /// SESSION management on a public proxy prefix. These two describe
-    /// `/api/district/devices/{register, unregister}` — PUSH registration behind
+    /// `/api/district/devices/{register, unregister}`, PUSH registration behind
     /// the default-deny middleware. The names are one word apart, and a client
     /// that crossed them reads as broken rather than as misrouted, which is why
     /// they are gated in their own section rather than beside the device list.
@@ -150,7 +150,7 @@ enum ImplementedFixtures {
             // TYPES. The DNC 403 and the dormancy 403 are the route's own
             // `{success,error[,code]}`; the 402 is the shared subscription
             // guard's, and it carries a fourth key (`status`) that
-            // `ApiErrorEnvelope` deliberately does not model — the strict gate
+            // `ApiErrorEnvelope` deliberately does not model, the strict gate
             // would drop it on re-encode.
             gate("district-dial-dnc.json", ApiErrorEnvelope.self),
             // ⚠️ SAME TYPE AS THE DNC REFUSAL, OPPOSITE PRODUCT ANSWER. This one
@@ -179,7 +179,7 @@ enum ImplementedFixtures {
     /// ⛔ ONE ROUTE, TWO RESPONSE TYPES, AND THE PAIRING BELOW IS THE ASSERTION.
     /// `workspace/usage` answers an OBJECT for the current month and an ARRAY when
     /// `history=true`, so gating both against one type would either fail or, worse,
-    /// pass against a DTO loose enough to accept either — which is exactly the
+    /// pass against a DTO loose enough to accept either, which is exactly the
     /// confusion that reads a single month as an empty history.
     private static var meteredUsage: [ImplementedFixture] {
         [
@@ -194,7 +194,7 @@ enum ImplementedFixtures {
             gate("district-usage-empty.json", UsageResponse.self),
             // ⚠️ THE SPARSE ROWS ARE THE POINT OF THIS ONE. Its second and third
             // months OMIT the metrics nobody metered rather than nulling them, so
-            // it is the fixture that proves absent and zero stay distinguishable —
+            // it is the fixture that proves absent and zero stay distinguishable,
             // and, because Swift writes a nil Optional as an absent key, that the
             // round trip does not invent the keys back.
             gate("district-usage-history.json", UsageHistoryResponse.self),
@@ -228,17 +228,17 @@ enum ImplementedFixtures {
             gate("district-drafts-list.json", MessageDraftsResponse.self),
             gate("district-draft-null.json", DraftResponse.self),
             // The thread list. Its unresolved-address row nulls all four contact
-            // fields — a conversation with someone who is not a contact yet.
+            // fields, a conversation with someone who is not a contact yet.
             gate("district-conversations.json", ConversationsResponse.self),
             // The timeline page, including its `pageInfo` block.
             //
             // ⚠️ NEITHER FIXTURE CARRIES A SINGLE NULL, WHICH IS WHY NEITHER
-            // NEEDS AN `allowedExplicitNulls` ENTRY — and that is worth stating,
+            // NEEDS AN `allowedExplicitNulls` ENTRY, and that is worth stating,
             // because `TimelinePageInfo`'s two cursor fields ARE nullable and the
             // natural assumption is that a paging block must be the place a null
             // shows up. It is not: they are null together only on an EMPTY page,
             // and no empty-page fixture exists. The Optionals on `TimelineEvent`
-            // are absences, not nulls — `duration`/`summary`/`hasTranscript` on a
+            // are absences, not nulls, `duration`/`summary`/`hasTranscript` on a
             // message row, `subject` off an email, `mediaUrls` with no
             // attachments.
             //
@@ -246,7 +246,7 @@ enum ImplementedFixtures {
             // first page pins the field UNION (a missed call, an answered call
             // with a summary and a transcript flag, an outbound SMS, an MMS with
             // `mediaUrls`, an email with `subject`), while the page fixture is
-            // the only one where `hasMore` is TRUE — i.e. the only proof the
+            // the only one where `hasMore` is TRUE, i.e. the only proof the
             // "there is an older window" branch decodes at all.
             gate("district-timeline.json", TimelineResponse.self),
             gate("district-timeline-page.json", TimelineResponse.self),
@@ -263,7 +263,7 @@ enum ImplementedFixtures {
             gate("district-enrich-disabled.json", ApiErrorEnvelope.self),
             gate("district-directory-patch.json", SuccessResponse.self),
             // The paged feed and one row in full. Thirteen nulls between them are
-            // unenriched columns, not absent data — see AllowedExplicitNulls.
+            // unenriched columns, not absent data, see AllowedExplicitNulls.
             gate("district-contacts.json", ContactListResponse.self),
             gate("district-contact-detail.json", ContactDetailResponse.self),
         ]
@@ -274,7 +274,7 @@ enum ImplementedFixtures {
     private static var workspaceConfig: [ImplementedFixture] {
         [
             // ⚠️ The two list fixtures are gated with the rest of the workspace
-            // surface above, not here — one fixture, one gate, or the counted
+            // surface above, not here, one fixture, one gate, or the counted
             // burn-down starts double-counting itself.
             //
             // The full config and the freshly-created one. `-sparse` is where
@@ -306,8 +306,8 @@ enum ImplementedFixtures {
     // MARK: - Scheduling
 
     /// ⛔ FOUR FIXTURES FOR ONE ROUTE, AND NOT ONE OF THEM IS REDUNDANT. All four
-    /// have the SAME key set — the status route serialises the whole selection and
-    /// derives `bookingUrl` with a `?? null`, so nothing is ever omitted — which
+    /// have the SAME key set, the status route serialises the whole selection and
+    /// derives `bookingUrl` with a `?? null`, so nothing is ever omitted, which
     /// means the key-set walk alone cannot tell them apart, and a single fixture
     /// would pin the DTO against exactly one state's nulls. What differs is which
     /// columns are empty:
@@ -316,20 +316,20 @@ enum ImplementedFixtures {
     ///                 is in before anyone presses Enable, and the one that must
     ///                 never render as a failure.
     ///   provisioning  A row with no `lastReadyAt`, no `lastError` and no
-    ///                 `bookingUrl`, and `hasCredentials: false` — the tenancy
+    ///                 `bookingUrl`, and `hasCredentials: false`, the tenancy
     ///                 exists and the platform call has not stored a key yet.
     ///   ready         Everything populated, `bookingUrl` present. The only state
     ///                 that carries a link.
     ///   error         ⛔ THE MOST INFORMATIVE ONE. `lastReadyAt` AND `publicHost`
     ///                 AND `hasCredentials` are all populated while `bookingUrl` is
-    ///                 null — a tenancy that WAS ready, still owns its host and its
+    ///                 null, a tenancy that WAS ready, still owns its host and its
     ///                 credential, and cannot serve bookings right now. A DTO that
     ///                 rebuilt the URL from the host would publish a dead link, and
     ///                 this is the fixture that would catch it.
     ///
     /// ⚠️ THE ENABLE FIXTURE IS THE `ok: true` BRANCH ONLY. The corpus carries no
     /// `ok: false` body, so that branch is decoded from literal bytes in
-    /// `SchedulingContractTests` — the same treatment `UsageHistoryResponse`'s
+    /// `SchedulingContractTests`, the same treatment `UsageHistoryResponse`'s
     /// empty array gets, and for the same reason.
     private static var scheduling: [ImplementedFixture] {
         [

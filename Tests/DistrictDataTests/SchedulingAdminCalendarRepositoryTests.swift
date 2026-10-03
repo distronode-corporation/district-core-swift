@@ -11,7 +11,7 @@ import XCTest
 /// `account`; the PUT and the destination write take it as `account_email`. The
 /// Swift parameter is `accountEmail` on all four so a caller never has to know,
 /// and getting the mapping backwards is an `invalid_params` naming a field the
-/// caller did send — which is the least legible failure on this surface.
+/// caller did send, which is the least legible failure on this surface.
 final class SchedulingAdminCalendarRepositoryTests: XCTestCase {
     private func repository(_ transport: RepositoryTransport) -> SchedulingAdminRepository {
         SchedulingAdminRepository(client: .repositoryTest(transport), reportUnknownOp: { _ in })
@@ -197,7 +197,7 @@ final class SchedulingAdminCalendarRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ `account` AGAIN ON THE DELETE — the same value as the destination write's
+    /// ⚠️ `account` AGAIN ON THE DELETE, the same value as the destination write's
     /// `account_email`, one op apart.
     func testDeletingAConnectionSendsAccount() async throws {
         let transport = RepositoryTransport(json: Self.noContent)

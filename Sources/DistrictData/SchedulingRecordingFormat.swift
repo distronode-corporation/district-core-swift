@@ -65,8 +65,8 @@ public enum SchedulingRecordingFormat {
     /// What one participant answered when told the meeting was being recorded.
     ///
     /// ⛔ RENDER WHAT IT SAYS AND FILL NO GAPS. These rows are the evidence for a
-    /// two-party-consent jurisdiction, and `pending` is a real and common state — the
-    /// guest left before the prompt resolved — which is never "granted by default". The
+    /// two-party-consent jurisdiction, and `pending` is a real and common state, the
+    /// guest left before the prompt resolved, which is never "granted by default". The
     /// repository's own header makes the same demand on the way in.
     ///
     /// ⚠️ "No answer recorded" IS THE DEFAULT ARM, so a decision string this build does
@@ -93,7 +93,7 @@ public enum SchedulingRecordingFormat {
     /// `Stored` or `None`.
     ///
     /// ⚠️ ABSENT IS `None`, NOT `Stored`. A row whose `has_file` the fork did not send
-    /// has no proven object behind it, and the download beside it would 404 — see the ⚠️
+    /// has no proven object behind it, and the download beside it would 404, see the ⚠️
     /// on ``SchedulingAdminMediaRepository/recordingDownloadURL(workspaceId:recordingId:)``,
     /// which answers a 404 with a JSON body rather than a redirect and therefore arrives
     /// as a generic unknown failure.

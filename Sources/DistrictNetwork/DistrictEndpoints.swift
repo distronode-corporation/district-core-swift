@@ -4,7 +4,7 @@ import Foundation
 ///
 /// ⛔ THE ONLY WAY TO BUILD AN ``ApiRequestDescriptor``. Its initialiser is
 /// internal, so what this type declares is exactly what this client can ask for
-/// — see the ⛔ on ``EndpointID``. Adding a route means adding a case there, a
+/// see the ⛔ on ``EndpointID``. Adding a route means adding a case there, a
 /// function here, and a row in `EndpointTableTests`, and the count assertion in
 /// that suite fails if the third is skipped.
 ///
@@ -20,7 +20,7 @@ import Foundation
 public enum DistrictEndpoints {
     /// Workspaces the signed-in user may operate on.
     ///
-    /// ⚠️ TAKES NO `workspaceId` — it is USER-scoped, and is the one district
+    /// ⚠️ TAKES NO `workspaceId`, it is USER-scoped, and is the one district
     /// route guarded by `requireAuth` rather than `requireWorkspaceRole`. An
     /// account with no workspaces gets a normal empty list here, whereas a
     /// workspace-scoped route answers 404 "User has no workspace".
@@ -35,7 +35,7 @@ public enum DistrictEndpoints {
     /// The dashboard landing screen.
     ///
     /// - Parameter workspaceId: ⚠️ PASSING NIL IS LEGAL AND MAKES THE SERVER
-    ///   CHOOSE — it falls back to the first workspace of its own membership
+    ///   CHOOSE, it falls back to the first workspace of its own membership
     ///   listing. Prefer passing it: this client holds no selection cookie, so
     ///   the server's fallback cannot know which workspace the user picked, and
     ///   omitting it on a multi-workspace account silently reports on the wrong

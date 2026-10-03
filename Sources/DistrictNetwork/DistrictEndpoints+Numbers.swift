@@ -11,7 +11,7 @@ import Foundation
 /// is UNCONSTRUCTIBLE from outside this module rather than merely undocumented.
 /// `EndpointSurfaceTests` pins that.
 /// ⛔ 3.1.1 ALSO COVERS STEERING, so nothing in this client links to the web
-/// marketplace either — not a button, not a Safari sheet, not a tappable URL.
+/// marketplace either, not a button, not a Safari sheet, not a tappable URL.
 /// ``MarketplaceCopy/readOnly`` names the site in prose and stops. The ⛔ at the top
 /// of `MarketplaceView.swift` explains why a 3.1.3(b) citation does not license a
 /// button here.
@@ -35,9 +35,9 @@ public extension DistrictEndpoints {
     /// Which carriers this workspace has credentials for, and what they say.
     ///
     /// ⛔ NO `success` FLAG AT ALL, AND TWO DIFFERENT KEY SETS. A workspace with no
-    /// resolvable credentials answers `{connected: false, provider: null}` —
+    /// resolvable credentials answers `{connected: false, provider: null}`,
     /// SINGULAR, and always null. Anything else answers `{connected, providers:
-    /// {…}}` — PLURAL, a map keyed by carrier id. One letter apart, mutually
+    /// {…}}`, PLURAL, a map keyed by carrier id. One letter apart, mutually
     /// exclusive, and a decoder that modelled only the plural would read a
     /// disconnected workspace as contract drift. See ``ProviderStatusResponse``,
     /// which is why nothing may reach for `ResponseEnvelope.affirm` on this route.
@@ -45,7 +45,7 @@ public extension DistrictEndpoints {
     /// ⚠️ A MANAGED PROVIDER REPORTS CONNECTIVITY AND NOTHING ELSE, and that is a
     /// privacy property rather than an omission. `getAccountInfo` describes the
     /// AUTHENTICATING account, which for a managed provider is the platform's own
-    /// shared one — so its name, prepaid balance and total number count are
+    /// shared one, so its name, prepaid balance and total number count are
     /// Distronode's figures plus every other managed tenant's, never this caller's.
     /// The route short-circuits those before asking the carrier anything.
     ///
@@ -74,7 +74,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ A `requirements` OF **NULL IS NOT A FAILURE**. It means the country
     /// publishes no regulation for that number type, i.e. no registration is
-    /// required — a real and common answer. A failed lookup THROWS and arrives as a
+    /// required, a real and common answer. A failed lookup THROWS and arrives as a
     /// 500, so the two stay distinguishable; collapsing them would tell a customer
     /// to file paperwork that does not exist, or that none is needed when we simply
     /// could not ask.
@@ -85,7 +85,7 @@ public extension DistrictEndpoints {
     ///     than an empty answer. Sent as typed; the server owns the normalisation.
     ///   - numberType: ⚠️ THE QUERY PARAMETER IS SPELLED **`type`**, not
     ///     `numberType`, and the route defaults it to `local`. Twilio's own
-    ///     vocabulary is `local`, `mobile`, `national`, `toll free` — note the SPACE
+    ///     vocabulary is `local`, `mobile`, `national`, `toll free`, note the SPACE
     ///     in the last one, which is the carrier's spelling and not `tollFree`.
     ///     ⛔ That is a different vocabulary from ``searchNumbers``' `type`, which
     ///     takes `local`/`tollFree`/`mobile`. Two routes, two spellings, one word
@@ -95,7 +95,7 @@ public extension DistrictEndpoints {
     ///     the same country, so a form built for one from the other's regulation asks
     ///     for papers they do not have. ⚠️ Anything other than the literal
     ///     `"individual"` reads as `business`, which is the carrier's default and
-    ///     what every customer buying through us is today — so a typo silently
+    ///     what every customer buying through us is today, so a typo silently
     ///     answers the business question.
     static func numberRequirements(
         workspaceId: String,
@@ -129,7 +129,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ IT DEGRADES RATHER THAN FAILS, WHICH IS WHY A STATUS MAY BE STALE. A
     /// workspace whose carrier credentials are missing, or a carrier having a bad
-    /// minute, still gets "here are your four registrations" with the STORED status —
+    /// minute, still gets "here are your four registrations" with the STORED status,
     /// showing it late is strictly better than showing nothing. So a screen must not
     /// present a status as live-as-of-now.
     ///
@@ -138,7 +138,7 @@ public extension DistrictEndpoints {
     /// choice: the search response is byte-frozen by an Android contract fixture, so
     /// widening it breaks a client decoding with `ignoreUnknownKeys = false`.
     ///
-    /// ⚠️ EXCLUDES `viewer` ON BOTH VERBS — the list carries a customer's filing
+    /// ⚠️ EXCLUDES `viewer` ON BOTH VERBS, the list carries a customer's filing
     /// status and their rejection reasons.
     static func numberRegistrations(workspaceId: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
@@ -169,14 +169,14 @@ public extension DistrictEndpoints {
     /// ⚠️ ITS REFUSALS ARE NOT ALL 400 AND TWO OF THEM ARE ORDINARY ANSWERS. **409**
     /// is either "you already have a registration for this country and number type"
     /// (one per workspace per pair, the schema's own constraint) or "this combination
-    /// publishes no regulation, so there is nothing to file" — the second is not an
+    /// publishes no regulation, so there is nothing to file", the second is not an
     /// error at all and must not read as one. **502** is "we could not read that
     /// country's requirements", which is retryable. Surface the server's sentence;
     /// this client can pre-compute none of them.
     ///
     /// - Parameters:
-    ///   - numberType: ⚠️ Validated against Twilio's vocabulary — `local`, `mobile`,
-    ///     `national`, `toll free` — and defaulted to `local`. Note the SPACE in the
+    ///   - numberType: ⚠️ Validated against Twilio's vocabulary, `local`, `mobile`,
+    ///     `national`, `toll free`, and defaulted to `local`. Note the SPACE in the
     ///     last one.
     ///   - endUserType: ⚠️ `business` or `individual`, defaulted to `business`.
     ///     Anything else is a 400 here, unlike
@@ -213,7 +213,7 @@ public extension DistrictEndpoints {
     /// nothing else; `desk/logo` sends NO fields and reads the workspace off the
     /// query; this one reads the workspace off the QUERY **and** sends two fields
     /// that are not the workspace. Copying either neighbour's parts is a 400 from a
-    /// request whose URL reads correctly — which is precisely why
+    /// request whose URL reads correctly, which is precisely why
     /// `EndpointTable.ExpectedBody.multipart` carries its fields per row.
     ///
     /// ⛔ THE WORKSPACE IS IN THE QUERY BECAUSE `formData()` BUFFERS THE WHOLE BODY
@@ -243,7 +243,7 @@ public extension DistrictEndpoints {
     ///
     /// - Parameter document: ⛔ A TYPE RATHER THAN FIVE LOOSE ARGUMENTS. Four of them are
     ///   strings, so a transposition at a call site would compile and file a document against
-    ///   the wrong requirement — and the requirement name is what the later push reads to decide
+    ///   the wrong requirement, and the requirement name is what the later push reads to decide
     ///   what is still unsatisfied. See ``RegulatoryDocumentUpload``.
     static func uploadRegistrationDocument(
         workspaceId: String,
@@ -320,7 +320,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ A **422 IS "YOUR PAPERWORK IS WRONG" AND THE FILING STAYS A DRAFT**; a
     /// **502 IS "WE COULD NOT REACH THE CARRIER"** and is retryable. Two answers, two
-    /// next actions, and the route separates them on purpose — a 502 dressed as a 422
+    /// next actions, and the route separates them on purpose, a 502 dressed as a 422
     /// would send a customer to re-check documents that are perfectly correct.
     /// ⚠️ THE 422's DETAIL DOES NOT SURVIVE ``ApiError``. That body carries
     /// `failures`, `reasons`, `missingFields` or `missingRequirements` alongside
@@ -330,7 +330,7 @@ public extension DistrictEndpoints {
     /// `rejectionReasons`. Read the list again after a refusal.
     ///
     /// ⚠️ THE REVIEW EMAIL IS THE SESSION'S, resolved by auth, never anything a
-    /// request supplied — so there is no address parameter here and cannot be one.
+    /// request supplied, so there is no address parameter here and cannot be one.
     ///
     /// - Parameter endUserAttributes: ⛔ FLAT, AND THE REGULATION DECIDES THE KEYS.
     ///   Text, numbers, true/false or a list of text; a nested object, an explicit
@@ -366,7 +366,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ IT IS NOT THE HARMLESS ONE IT SOUNDS LIKE, AND ITS FAILURE MODE IS A 200. On
     /// Twilio the number-level voice URLs and a trunk binding are MUTUALLY EXCLUSIVE,
-    /// so the route restates the EU trunk binding on every call — a reconfigure that
+    /// so the route restates the EU trunk binding on every call, a reconfigure that
     /// sent only the URLs would UNBIND an EU DID from the EU trunk, and the number
     /// would keep ringing while being answered by the United States hub,
     /// contradicting what `/sovereign/data-residency` publishes. Nothing about that is
@@ -388,7 +388,7 @@ public extension DistrictEndpoints {
     /// indistinguishable from success at this layer. Reconnect that account; do not
     /// retry.
     ///
-    /// ⚠️ ANSWERS A BARE `{success: true}` — no echo, so a caller needing fresh state
+    /// ⚠️ ANSWERS A BARE `{success: true}`, no echo, so a caller needing fresh state
     /// re-reads ``ownedNumbers(workspaceId:)``. Its errors are `{error: …}` with no
     /// `success: false`, which is why nothing here affirms an envelope.
     static func configureNumber(workspaceId: String, phoneNumber: String) -> ApiRequestDescriptor {
@@ -411,14 +411,14 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ IRREVERSIBLE, AND THE MOST DESTRUCTIVE CALL ON THIS FAMILY. The number
     /// returns to the general pool, so it is generally NOT reclaimable, and every
-    /// inbound call and message routed to it stops — the tenant's callers reach
+    /// inbound call and message routed to it stops, the tenant's callers reach
     /// nothing. It needs an explicit confirmation, and a failed attempt must NOT
     /// silently re-arm the control. ⚠️ Unlike a purchase there is no carrier balance
     /// that eventually stops a runaway: a loop keeps working until the workspace has
     /// no numbers left, and the only brake is 10/hour per workspace.
     ///
     /// ⛔ A **200 MAY CARRY `warnings`, AND THAT IS NOT A PARTIAL RELEASE.** The
-    /// number is gone; what failed is a cleanup step AFTER the irreversible part —
+    /// number is gone; what failed is a cleanup step AFTER the irreversible part,
     /// the inbound trunk still lists it, or its monthly charge could not be ended. A
     /// client that dropped the array would leave an operator believing they had
     /// stopped a charge they had not. See ``NumberReleaseResponse``.

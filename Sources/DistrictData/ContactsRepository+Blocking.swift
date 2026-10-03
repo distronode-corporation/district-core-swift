@@ -42,7 +42,7 @@ extension BlockSubject {
 /// ⛔ ON ``ContactsRepository`` RATHER THAN A `ModerationRepository`, BECAUSE THE
 /// IDENTITY IS A CONTACT ROW. A block is a column on the same row `rename` and
 /// `delete` write, reached through the same `workspaceId`, so a second repository
-/// would be a second name for one surface — and `AppContainer`'s own ⚠️ says a
+/// would be a second name for one surface, and `AppContainer`'s own ⚠️ says a
 /// repository per feature is what makes two `ApiClient`s, and therefore two
 /// `TokenRefreshCoordinator`s, easy to write by accident.
 ///
@@ -58,7 +58,7 @@ public extension ContactsRepository {
     /// write on this surface is the opposite: `enrich` buys a crawl and an LLM run,
     /// `clear-intel` destroys data that costs money to rebuild, `update` replaces
     /// every column it knows about, and `create` mints a permanent row. ⚠️ That
-    /// permission is a property of THIS route and does not generalise — do not
+    /// permission is a property of THIS route and does not generalise, do not
     /// wrap it in a loop either, because a caller holding the retry is what keeps
     /// it deliberate.
     ///
@@ -71,7 +71,7 @@ public extension ContactsRepository {
     /// ``ContactsRepository/delete(workspaceId:contactId:)``. There, "the row is
     /// already gone" is the outcome the caller asked for; here it means the contact
     /// could not be found at all, and reporting "blocked" for a row nobody wrote is
-    /// a claim about moderation that did not happen — which is the one claim
+    /// a claim about moderation that did not happen, which is the one claim
     /// Guideline 1.2 is about.
     ///
     /// ⚠️ A **403** IS THE ROLE. Every contact mutation excludes `viewer`
@@ -97,7 +97,7 @@ public extension ContactsRepository {
     /// ⛔ AN EMPTY ARRAY IS A REAL ANSWER AND IS THE COMMON ONE, so the envelope
     /// check is what keeps it apart from a failure. Reading a failed request as
     /// "nobody is blocked" would offer an Unblock control on somebody who is still
-    /// blocked, and hide the badge that says they are — on the one surface whose
+    /// blocked, and hide the badge that says they are, on the one surface whose
     /// whole purpose is telling an operator that a caller has been shut out.
     ///
     /// ⚠️ THE ROWS ARE RETURNED AS SENT, INCLUDING ANY WHOSE ``BlockedContact/blockedAt``

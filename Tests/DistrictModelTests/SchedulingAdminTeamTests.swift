@@ -5,8 +5,8 @@ import XCTest
 /// The `users.*` and `teams.*` row DTOs, decoded from inline bytes.
 ///
 /// ⛔ THE TWO NULLABLE ARRAYS ON THIS SURFACE ARE PROVED IN BOTH POLARITIES HERE.
-/// `SchedulingUser.teams` and `SchedulingTeam.members` are `.nullish()` — Go
-/// slices the fork marshals without `omitempty` — so each has to decode from an
+/// `SchedulingUser.teams` and `SchedulingTeam.members` are `.nullish()`, Go
+/// slices the fork marshals without `omitempty`, so each has to decode from an
 /// explicit `null`, from an absent key AND from a populated array. The committed
 /// fixtures demonstrate the null (which is why all three have
 /// `allowedExplicitNulls` entries); the other two polarities have no fixture and
@@ -77,7 +77,7 @@ final class SchedulingAdminTeamTests: XCTestCase {
     }
 
     /// ⚠️ `.nullish()` PERMITS AN ABSENT KEY TOO, and no fixture carries that
-    /// polarity — a DTO that handled only the null would throw on it.
+    /// polarity, a DTO that handled only the null would throw on it.
     func testAUserWithNoTeamsKeyAtAllStillDecodes() throws {
         let user = try decode(
             SchedulingUser.self,
@@ -174,7 +174,7 @@ final class SchedulingAdminTeamTests: XCTestCase {
         XCTAssertEqual(team.createdAt, "2026-09-01T09:30:00Z")
         XCTAssertEqual(team.memberCount, 2)
         XCTAssertEqual(team.members?.count, 2)
-        // ⛔ `0` IS A REAL PRIORITY AND NOT AN ABSENCE — it is the front of the
+        // ⛔ `0` IS A REAL PRIORITY AND NOT AN ABSENCE, it is the front of the
         // rotation, which is why the field is non-optional and must never default.
         XCTAssertEqual(team.members?[0].routingPriority, 0)
         XCTAssertEqual(team.members?[0].avatarUrl, "https://example.test/a.png")
@@ -203,7 +203,7 @@ final class SchedulingAdminTeamTests: XCTestCase {
     }
 
     /// ⚠️ ABSENT IS NOT `0` ON `member_count`, so nothing may render a zero it was
-    /// not sent — and the `members` key may be absent rather than null here too.
+    /// not sent, and the `members` key may be absent rather than null here too.
     func testATeamWithNeitherMembersNorACountStillDecodes() throws {
         let team = try decode(SchedulingTeam.self, #"{"id":"t_3","name":"Ops","slug":"ops"}"#)
         XCTAssertNil(team.memberCount)

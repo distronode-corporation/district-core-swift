@@ -13,7 +13,7 @@ import Foundation
 /// ⚠️ ``phoneNumber`` IS OPTIONAL BECAUSE CONTACTS ARE EMAIL-FIRST. A contact with
 /// no number is legal and any number of them coexist in one workspace (see the ⚠️
 /// on ``Contact/phoneNumber``), so a non-Optional here would fail to decode the row
-/// for an email-only caller — which is a caller who can still be blocked. Optional
+/// for an email-only caller, which is a caller who can still be blocked. Optional
 /// also absorbs both wire shapes: an explicit `null` and an omitted key.
 ///
 /// ⚠️ ``blockedAt`` IS AN ISO-8601 STRING RATHER THAN AN INSTANT, like every other
@@ -59,8 +59,8 @@ public extension BlockedContact {
 ///
 /// ⛔ THE ANSWER IS THE RESULTING STATE, NOT AN ACKNOWLEDGEMENT, AND THAT IS WHY
 /// THE CLIENT ADOPTS IT RATHER THAN THE VALUE IT SENT. A caller that blocked by
-/// `phoneNumber` does not know the `contactId` until this body arrives — the server
-/// upserts the contact — so the reply is the only place the identity of the row
+/// `phoneNumber` does not know the `contactId` until this body arrives, the server
+/// upserts the contact, so the reply is the only place the identity of the row
 /// that was just blocked exists. Assuming the request's own `blocked` flag would
 /// also leave a UI badge and a database row free to disagree after a coerced write.
 ///
@@ -99,7 +99,7 @@ public extension ContactBlockResponse {
 ///
 /// ⛔ AN EMPTY ARRAY IS A LEGITIMATE ANSWER AND THE ENVELOPE CHECK IS WHAT KEEPS IT
 /// DISTINGUISHABLE FROM A FAILURE. Most workspaces have blocked nobody, so "none"
-/// is the ordinary reply — and a failed read rendered as "none" would show an
+/// is the ordinary reply, and a failed read rendered as "none" would show an
 /// Unblock control to somebody who is still blocked and hide the badge that says
 /// so. ``blocked`` is non-Optional because `findMany` always emits the array.
 public struct BlockedContactsResponse: Codable, Sendable {

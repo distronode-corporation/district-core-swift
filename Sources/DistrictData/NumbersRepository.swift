@@ -13,7 +13,7 @@ import Foundation
 /// ⛔ **THERE IS NO PURCHASE METHOD AND THERE MUST NOT BE.**
 /// `workspace/numbers/purchase` charges a setup fee AND opens a recurring monthly
 /// charge for a service consumed inside the app, which is App Store Review Guideline
-/// 3.1.1 — an in-app purchase or nothing at all. It has no ``EndpointID`` case, no
+/// 3.1.1, an in-app purchase or nothing at all. It has no ``EndpointID`` case, no
 /// path constant and no descriptor, so `ApiClient` could not be handed a request for
 /// it even by a caller inside this module. `EndpointSurfaceTests` pins that.
 /// ⛔ 3.1.1 COVERS STEERING, so no method here returns a URL to the web marketplace
@@ -41,7 +41,7 @@ import Foundation
 public struct NumbersRepository: Sendable {
     /// ⚠️ INTERNAL RATHER THAN `private`, AND THE ONE REASON IS THE SIBLING FILES.
     /// `private` is FILE scope in Swift, so an extension declared in
-    /// `NumbersRepository+Provisioning.swift` could not reach it — and the alternative
+    /// `NumbersRepository+Provisioning.swift` could not reach it, and the alternative
     /// is a second repository type over the same routes. Still module-internal, so nothing outside
     /// `DistrictData` can borrow the client.
     let client: ApiClient
@@ -68,7 +68,7 @@ public struct NumbersRepository: Sendable {
     ///
     /// ⚠️ ENVELOPE FIRST. Every field of the response would survive a `{}` body
     /// except the two required ones, and the answer a caller would act on from a
-    /// half-decoded search is "no numbers available" — the exact answer that
+    /// half-decoded search is "no numbers available", the exact answer that
     /// sends someone off to try a different area code.
     public func search(
         workspaceId: String,
@@ -95,7 +95,7 @@ public struct NumbersRepository: Sendable {
     /// ⛔ THE `partial` FLAG IS CARRIED THROUGH INSIDE THE SUCCESS RATHER THAN
     /// CONVERTED INTO A FAILURE. "One carrier did not answer, here is the rest"
     /// is a different fact from both "here is everything" and "we could not
-    /// look", and only the caller can render the middle one — a short list plus
+    /// look", and only the caller can render the middle one, a short list plus
     /// a banner naming the carrier. Collapsing it either way loses information
     /// the operator needs: upward, it hides real inventory behind an error;
     /// downward, it draws an incomplete list as a complete one. See

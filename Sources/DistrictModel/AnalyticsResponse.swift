@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/analytics?workspaceId=&range=` — telephony analytics for
+/// `GET /api/district/analytics?workspaceId=&range=`, telephony analytics for
 /// one workspace over one window.
 ///
 /// ⛔ EVERY NUMBER HERE IS DERIVED SERVER-SIDE, IN SQL, OVER THE FULL WINDOW,
@@ -9,13 +9,13 @@ import Foundation
 /// of them, ``AnalyticsMetrics/conversionRate`` is already a rounded percentage,
 /// and the neutral sentiment band is a REMAINDER that is never queried. A client
 /// that re-derived any of those from the other fields would disagree with the
-/// web console about the same data — two surfaces quoting different numbers to
+/// web console about the same data, two surfaces quoting different numbers to
 /// the same operator, with nothing on either screen to say which is wrong.
 ///
 /// ⚠️ EVERY KEY IS ALWAYS PRESENT ON A 200. The route builds one literal object
 /// with no conditional spreads, so nothing here is Optional except the one field
 /// the server explicitly nulls (see ``CallVolumeDelta/pct``). Failures arrive as
-/// a non-2xx `ApiErrorEnvelope`, which is why — unlike the Kotlin DTO — this
+/// a non-2xx `ApiErrorEnvelope`, which is why, unlike the Kotlin DTO, this
 /// type carries no `error` field.
 public struct AnalyticsResponse: Codable, Sendable {
     public let success: Bool
@@ -65,7 +65,7 @@ public struct AnalyticsMetrics: Codable, Sendable {
 ///
 /// ⛔ ``pct`` IS THE ONE EXPLICIT NULL ON THIS ROUTE AND NULL MEANS "New", NOT
 /// ZERO. A workspace with no prior period has no baseline, so there is no
-/// percentage to state — the route computes `prior > 0 ? … : null` rather than
+/// percentage to state, the route computes `prior > 0 ? … : null` rather than
 /// inventing a divide-by-zero or a fake 0%. Rendering null as "0%" tells a
 /// brand-new customer their call volume is flat when in fact this is their first
 /// week.
@@ -106,7 +106,7 @@ public enum CallVolumeDirection {
 ///
 /// ⛔ ``date`` AND ``isoDate`` ARE NOT INTERCHANGEABLE, AND ONLY ONE OF THEM IS
 /// MACHINE-READABLE. ``date`` is a DISPLAY string the server localised to the
-/// OPERATOR'S timezone ("Aug 15") — it carries no year and shifts with the
+/// OPERATOR'S timezone ("Aug 15"), it carries no year and shifts with the
 /// reader, so parsing it is not merely fragile but wrong. Render it verbatim.
 /// ``isoDate`` is the same bucket's UTC calendar date ("2026-08-15") and is the
 /// only field that may be sorted, diffed or re-bucketed.
@@ -139,8 +139,8 @@ public struct FunnelStage: Codable, Sendable {
 ///
 /// ⛔ ``color`` IS A SERVER-CHOSEN HEX STRING CARRIED AS AN OPAQUE `String`, NOT
 /// PARSED HERE. Nothing server-side constrains it to `#rrggbb`, and a DTO that
-/// decoded it into a colour type would fail the WHOLE response — every metric,
-/// every trend point — over a presentational detail. Parse it leniently at
+/// decoded it into a colour type would fail the WHOLE response, every metric,
+/// every trend point, over a presentational detail. Parse it leniently at
 /// render time with a theme-token fallback, so a malformed colour costs a shade
 /// rather than the screen.
 ///
@@ -154,8 +154,8 @@ public struct SentimentSlice: Codable, Sendable {
 }
 
 // ⚠️ THE WINDOW ITSELF (`AnalyticsRange`) LIVES IN `DistrictNetwork`, NOT HERE,
-// AND IT MUST NOT BE RE-DECLARED IN THIS MODULE. It is a REQUEST concern — the
-// `range` query parameter — and the reason it is a type rather than a String is
+// AND IT MUST NOT BE RE-DECLARED IN THIS MODULE. It is a REQUEST concern, the
+// `range` query parameter, and the reason it is a type rather than a String is
 // that the route falls back to 7d with a 200 for anything it does not recognise,
 // which is a request-side guard. A second copy here would be ambiguous to any
 // file importing both modules, and the two would drift.

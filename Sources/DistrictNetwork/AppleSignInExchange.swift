@@ -8,14 +8,14 @@ import Foundation
 /// which is what the WEB leg spends against Apple's token endpoint with a minted
 /// ES256 client secret. This route does not: it verifies the identity token
 /// against Apple's published JWKS directly, so a body carrying the code is a
-/// schema failure — a 400 that is indistinguishable from a rejected token.
+/// schema failure, a 400 that is indistinguishable from a rejected token.
 ///
 /// ⛔ `Encodable` RATHER THAN A ``JSONValue`` LITERAL, WHICH IS A DELIBERATE
 /// DEPARTURE FROM ``CodeExchangeRequest``. The sibling's body is assembled by
 /// hand inside ``NativeAuthClient/exchangeCode(_:)``, so its field names live at
 /// the call site and are only pinned by a test that reads the encoded bytes.
 /// Here the names live on the type, where the compiler carries them, and the
-/// same test still reads the bytes — the point of the route being new is that
+/// same test still reads the bytes, the point of the route being new is that
 /// the shape can be declared once instead of typed twice.
 ///
 /// ⚠️ `deviceName` IS DROPPED WHEN NIL RATHER THAN SENT AS `null`, and that is
@@ -27,7 +27,7 @@ import Foundation
 /// `encode(to:)` could not quietly change it.
 public struct AppleNativeSignInRequest: Encodable, Sendable, Equatable {
     /// ⛔ `z.enum(["ios", "android"])`, AND NOT A PARAMETER. It is not the
-    /// caller's choice — this client is the iOS one — and a settable field is
+    /// caller's choice, this client is the iOS one, and a settable field is
     /// how a device ends up listed as the wrong platform in the settings device
     /// list. The sibling holds the same value as a static constant; here it is a
     /// stored property because the body is synthesised from the type.

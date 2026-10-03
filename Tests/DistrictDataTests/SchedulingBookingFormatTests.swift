@@ -98,7 +98,7 @@ final class SchedulingBookingFormatTests: XCTestCase {
         )
     }
 
-    /// ⚠️ UNPADDED HOUR, PADDED MINUTE — the same shape as the register and NOT the
+    /// ⚠️ UNPADDED HOUR, PADDED MINUTE, the same shape as the register and NOT the
     /// recordings table's.
     func testTheTableHourIsUnpadded() {
         XCTAssertEqual(

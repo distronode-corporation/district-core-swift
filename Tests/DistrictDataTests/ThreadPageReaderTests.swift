@@ -47,8 +47,8 @@ final class ThreadPageReaderTests: XCTestCase {
     }
 
     /// ⛔ BOTH HALVES OR NOTHING. `beforeId` without `before` is a 400 from the
-    /// route, and both `pageInfo` fields are nullable — they are null together on an
-    /// empty page — so a half-populated block must produce no cursor rather than
+    /// route, and both `pageInfo` fields are nullable, they are null together on an
+    /// empty page, so a half-populated block must produce no cursor rather than
     /// half of one.
     func testAHalfPopulatedPageInfoProducesNoCursorAtAll() throws {
         let onlyTimestamp = #""pageInfo":{"hasMore":true,"oldest":"2026-08-19T09:00:00.000Z","oldestId":null}"#
@@ -67,7 +67,7 @@ final class ThreadPageReaderTests: XCTestCase {
 
     /// ⛔ A MISSING `timeline` KEY IS A MALFORMED RESPONSE, NOT AN EMPTY THREAD. The
     /// route builds the key unconditionally on its success path, so absence means
-    /// the body is not the one this route sends — and rendering it as "no messages
+    /// the body is not the one this route sends, and rendering it as "no messages
     /// yet" shows an empty conversation for a customer who has one.
     func testAMissingTimelineArrayIsAMalformedResponseNotAnEmptyThread() throws {
         let document = try XCTUnwrap(JSONWire.decode(Data(#"{"success":true}"#.utf8)))
@@ -87,7 +87,7 @@ final class ThreadPageReaderTests: XCTestCase {
     // MARK: - Per-row reading
 
     /// ⛔ COUNTED, NOT SWALLOWED, AND NOT FATAL EITHER. A customer with a hundred
-    /// messages must not lose all of them to one unreadable row — but a silent drop
+    /// messages must not lose all of them to one unreadable row, but a silent drop
     /// is a thread quietly missing somebody's reply, so the count travels with the
     /// page and the UI says the history is incomplete.
     ///
@@ -173,7 +173,7 @@ final class ThreadPageReaderTests: XCTestCase {
 
     /// ⚠️ RAW STRINGS, LIKE EVERY DTO IN `DistrictModel`. Neither column is a
     /// database enum, and decoding into a Swift enum would fail closed on a value
-    /// the server adds later — taking out the whole thread rather than one label.
+    /// the server adds later, taking out the whole thread rather than one label.
     /// ⛔ `missed` is call-only.
     func testTheVocabulariesAreTheServersOwnStrings() {
         XCTAssertEqual(ThreadEventKind.sms, "sms")
@@ -240,7 +240,7 @@ final class ThreadPageReaderTests: XCTestCase {
     /// ⛔ THE FALLBACK IS NOT DEAD CODE, AND THIS IS THE TEST THAT SAYS SO. A
     /// pre-`pageInfo` document decodes typed perfectly well (``pageInfo`` is
     /// Optional), so ``ThreadPageReader/read(_:)`` never reaches the fallback for
-    /// it — which means nothing about the fallback's handling of the old shape is
+    /// it, which means nothing about the fallback's handling of the old shape is
     /// proven by reading it through the front door. Driven directly here instead.
     func testTheFallbackStillHandlesAPreviousGenerationDocumentOnItsOwn() throws {
         let document = try XCTUnwrap(JSONWire.decode(Data(#"{"success":true,"timeline":[\#(Self.smsRow)]}"#.utf8)))
@@ -254,7 +254,7 @@ final class ThreadPageReaderTests: XCTestCase {
 
     /// ⛔ A ROW THE DTO ACCEPTS IS NOT A ROW THAT CAN BE RENDERED. `id` is
     /// non-Optional on ``TimelineEvent``, so an EMPTY id decodes typed cleanly and
-    /// never reaches the fallback — the typed mapping has to drop and count it
+    /// never reaches the fallback, the typed mapping has to drop and count it
     /// itself, or an unrenderable row would be waved through on exactly the path
     /// that runs in production.
     func testTheTypedPathDropsAndCountsARowWithAnEmptyIdOrTimestamp() throws {

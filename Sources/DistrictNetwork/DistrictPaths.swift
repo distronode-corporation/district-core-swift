@@ -9,14 +9,14 @@ import Foundation
 /// `/api/district/admin/transcript`.
 ///
 /// ⚠️ INTERNAL. These are the raw materials of ``ApiRequestDescriptor``, whose
-/// initialiser is also internal — see its ⛔. Exporting them would hand feature
+/// initialiser is also internal, see its ⛔. Exporting them would hand feature
 /// code the ability to assemble a path this client has deliberately not ported.
 enum DistrictPaths {
     private static let district = ["api", "district"]
 
     /// ⚠️ NOT `private`, UNLIKE ``district``, AND THE ONE REASON IS THE SIBLING FILE.
     /// `private` is FILE scope in Swift, so `DistrictPaths+Numbers.swift` could not
-    /// see it — and the alternative there was a second literal `["api",
+    /// see it, and the alternative there was a second literal `["api",
     /// "district", "workspace"]`, which is exactly the duplication this whole type
     /// exists to prevent. Still internal to the module, so nothing outside
     /// `DistrictNetwork` can assemble a path from it; see the ⚠️ on the type.
@@ -25,8 +25,8 @@ enum DistrictPaths {
     static let workspaceList = workspace + ["list"]
 
     /// ⚠️ UNDER THE WORKSPACE PATH FAMILY, NOT BESIDE ``analytics``. The two
-    /// routes back one screen but they are unrelated server-side — usage is a
-    /// workspace-administration read and analytics is a telephony one — and
+    /// routes back one screen but they are unrelated server-side, usage is a
+    /// workspace-administration read and analytics is a telephony one, and
     /// inventing `/api/district/usage` to make them look like siblings would 404.
     static let workspaceUsage = workspace + ["usage"]
 
@@ -38,9 +38,9 @@ enum DistrictPaths {
     static let workspaceBilling = workspace + ["billing"]
 
     /// ⛔ THE READ THAT EXISTS FOR THIS CLIENT AND FOR NOTHING ELSE, AND THE
-    /// WRITES IT GUARDS. The web settings page never needed `workspace/config` —
+    /// WRITES IT GUARDS. The web settings page never needed `workspace/config`,
     /// it is a server component that hydrates its forms from the row during
-    /// render — so this is the one path here with no browser caller at all.
+    /// render, so this is the one path here with no browser caller at all.
     /// Pointing a form at any of the three wholesale-replace writes without
     /// going through it first is how a save becomes a delete.
     static let workspaceConfig = workspace + ["config"]
@@ -55,7 +55,7 @@ enum DistrictPaths {
     /// available here.
     ///
     /// ⚠️ `preview-token` IS HYPHENATED AND `options` IS NOT, which is the server's
-    /// own inconsistency rather than a choice available here — the same shape
+    /// own inconsistency rather than a choice available here, the same shape
     /// `knowledge-mode` has beside `knowledge`.
     static let workspacePersonaOptions = workspacePersona + ["options"]
     static let workspacePersonaPreviewToken = workspacePersona + ["preview-token"]
@@ -64,14 +64,14 @@ enum DistrictPaths {
 
     /// ⛔ THE OTHER TWO WHOLESALE-REPLACE WRITES. `directory` is a **PATCH** and
     /// `routing-rules` is a **POST**, which is the server's asymmetry rather than
-    /// a choice available here — pointing either at the other's verb would 405.
+    /// a choice available here, pointing either at the other's verb would 405.
     static let workspaceDirectory = workspace + ["directory"]
     static let workspaceRoutingRules = workspace + ["routing-rules"]
 
     /// ⛔ TWO ROUTES, TWO SCOPES, AND THE SECOND ONE IS NOT ABOUT THE WORKSPACE.
     /// `call-handling` is a WORKSPACE setting: which of the agent and the app
     /// answers a call, and how long the app rings. `availability` is a fact about
-    /// the CALLER'S OWN membership row in that workspace — it writes nobody else's,
+    /// the CALLER'S OWN membership row in that workspace, it writes nobody else's,
     /// and takes no email or user id to do it with. Reading them as one surface is
     /// how a UI ends up offering to set a colleague's availability.
     ///
@@ -82,7 +82,7 @@ enum DistrictPaths {
 
     /// ⚠️ TWO SEPARATE ROUTES, NOT A NESTED ONE. The document store is
     /// `workspace/knowledge` and the source choice is its SIBLING
-    /// `workspace/knowledge-mode` — not `workspace/knowledge/mode`, which does
+    /// `workspace/knowledge-mode`, not `workspace/knowledge/mode`, which does
     /// not exist.
     static let workspaceKnowledge = workspace + ["knowledge"]
     static let workspaceKnowledgeMode = workspace + ["knowledge-mode"]
@@ -90,7 +90,7 @@ enum DistrictPaths {
     /// ⛔ ONE PATH, TWO VERBS, AND THE PATCH IS SIX DIFFERENT OPERATIONS. GET
     /// reads the redacted account list; PATCH creates, edits, re-points the
     /// default, sets a per-channel sender, writes the creator cell number, and
-    /// DELETES an account — dispatched on an `action` string in the body. There
+    /// DELETES an account, dispatched on an `action` string in the body. There
     /// are no per-action sub-paths: `messaging/default` and `messaging/delete`
     /// do not exist and would 404.
     ///
@@ -110,7 +110,7 @@ enum DistrictPaths {
 
     /// ⛔ ONE PATH, FOUR VERBS, AND ITS SIBLING IS A SEPARATE ROUTE. The roster
     /// lives at `workspace/members` (GET/POST/PATCH/DELETE) and the display name
-    /// at `workspace/rename` — NOT `workspace/members/rename` and not a `name`
+    /// at `workspace/rename`, NOT `workspace/members/rename` and not a `name`
     /// field on the members PATCH, both of which would 404 or be ignored.
     ///
     /// ⚠️ AND THEIR ROLE GUARDS DIFFER: the members WRITES are agency-only while
@@ -155,7 +155,7 @@ enum DistrictPaths {
     /// ⛔ A SIBLING OF ``callsToken`` AND EMPHATICALLY NOT THE SAME ROUTE, even
     /// though both mint a LiveKit token under `calls/`. `token` signs a
     /// credential for a room that already exists and persists nothing; `dial`
-    /// CREATES a call — it writes a `Call` row, tells the carrier to ring a
+    /// CREATES a call, it writes a `Call` row, tells the carrier to ring a
     /// telephone, and spends the workspace's minutes.
     ///
     /// ⛔ `calls/outbound` IS THE THIRD ROUTE IN THIS FAMILY AND IT IS ABSENT
@@ -163,7 +163,7 @@ enum DistrictPaths {
     /// `call_` room the voice agent joins and speaks in, so a human dialling
     /// through it would find an agent on their own line. There is no constant for
     /// it, no ``EndpointID`` case for it, and ``ApiRequestDescriptor``'s
-    /// initialiser is internal — so it is unconstructible from outside this
+    /// initialiser is internal, so it is unconstructible from outside this
     /// module rather than merely undocumented. `EndpointSurfaceTests` pins that.
     static let callsDial = calls + ["dial"]
 
@@ -198,7 +198,7 @@ enum DistrictPaths {
     /// ⚠️ A TOP-LEVEL DISTRICT ROUTE, NOT A `workspace/` ONE, even though it
     /// takes a `workspaceId` query parameter like the workspace family does.
     /// `workspace/meetings` would 404. The detail route is this path plus the id
-    /// — there is no `meetings/detail` segment.
+    /// there is no `meetings/detail` segment.
     static let meetings = district + ["meetings"]
 
     /// ⛔ ONE PATH, FOUR VERBS, AND ONLY TWO ARE REACHABLE FROM THIS CLIENT. GET
@@ -218,7 +218,7 @@ enum DistrictPaths {
     ///
     /// ⛔ `block` IS A STATE ASSERTION, NOT A TOGGLE, AND THE PATH IS THE SAME FOR
     /// BOTH DIRECTIONS. The body carries `blocked: Bool`, so the route is
-    /// idempotent and a repeat writes the same row — which is what makes it the one
+    /// idempotent and a repeat writes the same row, which is what makes it the one
     /// contact mutation a caller may safely send again after an ambiguous failure.
     /// A `contacts/unblock` sibling would have made "am I blocked" a question about
     /// which of two routes last answered.
@@ -244,7 +244,7 @@ enum DistrictPaths {
     /// trustworthy input in the app: a push payload's `messageId` is a string the
     /// sender chose and the OS handed over unauthenticated. ``ApiPath/build(_:)``
     /// encodes each element as exactly ONE segment, so an id of `a/../../admin`
-    /// cannot turn `messages/{id}` into another route — which is the bug the
+    /// cannot turn `messages/{id}` into another route, which is the bug the
     /// Kotlin client shipped on `calls/{id}/transcript` before its paths were
     /// segment lists.
     ///
@@ -253,7 +253,7 @@ enum DistrictPaths {
     /// ``messagesSearch``, ``messagesMedia``, ``messagesDrafts`` and
     /// ``messagesDraft``. A message whose id happened to be `send` would address
     /// the send route with a GET; it answers 405 rather than sending anything,
-    /// because ids here are cuids and the route exports POST only — worth knowing
+    /// because ids here are cuids and the route exports POST only, worth knowing
     /// rather than worth guarding, since the server owns the id space.
     static func messageThreadTarget(_ id: String) -> [String] {
         messages + [id]
@@ -287,7 +287,7 @@ enum DistrictPaths {
     /// route in it is workspace-scoped by a `workspaceId` the caller supplies.
     /// `workspace/scheduling` would 404. Same shape as ``meetings``.
     ///
-    /// ⛔ AND `scheduling/sso` IS ABSENT WITHOUT BEING RETIRED — A DISTINCTION
+    /// ⛔ AND `scheduling/sso` IS ABSENT WITHOUT BEING RETIRED, A DISTINCTION
     /// THIS COMMENT'S NEIGHBOURS GOT WRONG. It answers a **302** carrying a
     /// one-time sign-in URL, so it is not a JSON body and has no descriptor here
     /// and no ``EndpointID`` case; the App target fetches it as a bearer request
@@ -305,14 +305,14 @@ enum DistrictPaths {
     /// ⛔ ONE PATH FOR SEVENTY-FIVE OPERATIONS, AND THAT IS THE SECURITY MODEL
     /// RATHER THAN AN ECONOMY. The route takes an `op` NAME out of the body and
     /// resolves the scheduler path itself, so this client cannot address a
-    /// scheduler route the server's catalog does not name — including the ones a
+    /// scheduler route the server's catalog does not name, including the ones a
     /// tenant must never reach (instance credentials shared by every tenancy, the
     /// platform API that can delete any tenancy, and the ownership transfer). See
     /// ``SchedulingAdminOp``.
     static let schedulingAdmin = scheduling + ["admin"]
 
     /// ⛔ THE THIRD MULTIPART ROUTE ON THIS SURFACE, AND THE WORKSPACE TRAVELS IN
-    /// THE **QUERY** — like ``deskLogo`` and unlike ``messagesMedia``. That is not
+    /// THE **QUERY**, like ``deskLogo`` and unlike ``messagesMedia``. That is not
     /// a style choice at either end: the workspace id has to be readable BEFORE
     /// `req.formData()`, or an anonymous client can make a 4-vCPU origin parse a
     /// body up to Cloudflare's 100 MB for a request it was always going to refuse.
@@ -347,7 +347,7 @@ enum DistrictPaths {
     /// desk is their customers writing to them. The two families are one segment
     /// apart, they carry the same kinds of noun (a request, a thread, a reply) and
     /// pointing one at the other would show a tenant somebody else's
-    /// correspondence — so the labels on every screen keep them apart and so does
+    /// correspondence, so the labels on every screen keep them apart and so does
     /// this comment. `district/support/tickets` does not exist and would 404.
     ///
     /// ⚠️ THE IDENTIFIER IN THE PATH IS A **JIRA ISSUE KEY** (`DA-42`), NOT A
@@ -359,7 +359,7 @@ enum DistrictPaths {
     static let supportRequests = support + ["requests"]
 
     /// ⛔ FUNCTIONS RATHER THAN CONSTANTS, AND THE LAST TWO PUT THE KEY IN THE
-    /// MIDDLE OF THE PATH — the shape that invites string interpolation, exactly as
+    /// MIDDLE OF THE PATH, the shape that invites string interpolation, exactly as
     /// ``callAnswer(_:)`` does. A key is encoded as ONE segment by
     /// ``ApiPath/build(_:)``.
     static func supportRequest(_ key: String) -> [String] {
@@ -381,12 +381,12 @@ enum DistrictPaths {
     /// ⛔ THREE UNRELATED FAMILIES SHARE THE WORD `desk` AND ONLY THIS ONE BELONGS
     /// TO THIS CLIENT.
     ///
-    ///   - `/api/district/desk/…` — HERE. The tenant's own queue, bearer-authenticated,
+    ///   - `/api/district/desk/…`, HERE. The tenant's own queue, bearer-authenticated,
     ///     `agency`/`client` only, RLS-scoped to the workspace.
-    ///   - `/api/district/support/…` — the MIRROR IMAGE: the tenant raising something
+    ///   - `/api/district/support/…`, the MIRROR IMAGE: the tenant raising something
     ///     with DISTRONODE, filed into our Atlassian project. Same auth, opposite
     ///     direction, and its reply field is spelled differently (see ``deskTicketReply(_:)``).
-    ///   - `/api/desk/threads/{handle}` — the PUBLIC page a tenant's CUSTOMER opens
+    ///   - `/api/desk/threads/{handle}`, the PUBLIC page a tenant's CUSTOMER opens
     ///     from their notification email. It authenticates with a capability token and
     ///     an HttpOnly cookie rather than a bearer, and it is the only surface that may
     ///     show a stranger a thread. There is no constant for it and no ``EndpointID``
@@ -402,13 +402,13 @@ enum DistrictPaths {
     /// ⛔ ONE PATH, TWO VERBS, AND THE PATCH IS A MERGE RATHER THAN A REPLACE. GET
     /// reads the row; PATCH writes only the keys it is sent and REJECTS an empty body
     /// with a 400 rather than answering a no-op 200. That is the opposite convention
-    /// from ``workspaceTools`` and ``workspaceDirectory``, which replace wholesale —
+    /// from ``workspaceTools`` and ``workspaceDirectory``, which replace wholesale,
     /// so the obligation those carry (load before you save) does not apply here, and
     /// sending a whole form's state through this route is what WOULD introduce it.
     static let deskSettings = desk + ["settings"]
 
     /// ⛔ ONE PATH, TWO VERBS, AND THE POST IS THE ONLY MULTIPART CALL ON THIS SURFACE
-    /// BESIDES ``messagesMedia`` — with the workspace carried DIFFERENTLY. This route
+    /// BESIDES ``messagesMedia``, with the workspace carried DIFFERENTLY. This route
     /// reads `searchParams.get("workspaceId")`; `messages/media` reads it off
     /// `req.formData()`. Copying the media upload's part list here leaves the query
     /// empty and the request is refused before the bytes are looked at, while the URL
@@ -421,8 +421,8 @@ enum DistrictPaths {
     static let deskLogo = desk + ["logo"]
 
     /// ⛔ ONE PATH, TWO VERBS, AND THE `status` QUERY PARAMETER IS A FILTER ON THE GET
-    /// ONLY. An unrecognised value there is IGNORED rather than refused — the route
-    /// answers the full queue — so a typo presents as "the filter did nothing" rather
+    /// ONLY. An unrecognised value there is IGNORED rather than refused, the route
+    /// answers the full queue, so a typo presents as "the filter did nothing" rather
     /// than as an error, which is why the filter is typed at the call site.
     static let deskTickets = desk + ["tickets"]
 
@@ -461,7 +461,7 @@ enum DistrictPaths {
     static let billing = ["api", "billing"]
 
     /// ⛔ NOT UNDER `district` EITHER. Device management lives under
-    /// `/api/auth/native/` — the same family as token exchange and refresh —
+    /// `/api/auth/native/`, the same family as token exchange and refresh,
     /// because a native session is an AUTH object rather than a district
     /// resource.
     ///

@@ -60,7 +60,7 @@ extension EndpointTable {
     /// ⛔ FOUR ROWS FOR TWO PATHS, and the two PATCH rows are where this table earns
     /// its keep. `saveCallHandling` drops a nil field through
     /// ``JSONValue/object(_:)``, so the body below proves that a mode-only save really
-    /// does send only the mode — the route accepts either field alone and REFUSES a
+    /// does send only the mode, the route accepts either field alone and REFUSES a
     /// body carrying neither. And `appRingSeconds` is asserted as `20` rather than
     /// `20.0`: a `Double` that encodes with a decimal point is fractional as far as
     /// the route's `.int()` is concerned, and the refusal is a 400 nobody can act on.

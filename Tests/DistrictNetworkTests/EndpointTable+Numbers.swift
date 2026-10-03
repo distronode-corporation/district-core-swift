@@ -35,7 +35,7 @@ extension EndpointTable {
                 "\(host)/api/district/workspace/provider/status?workspaceId=ws_1"
             ),
             // ⚠️ THE QUERY PARAMETER IS `type`, NOT `numberType`, AND ITS VOCABULARY IS
-            // TWILIO'S — `local`, `mobile`, `national`, `toll free` WITH A SPACE. That is
+            // TWILIO'S, `local`, `mobile`, `national`, `toll free` WITH A SPACE. That is
             // a different vocabulary from `numbers/search`'s `type`, which takes
             // `tollFree`. Two routes, one parameter name, two spellings.
             EndpointExpectation(

@@ -278,7 +278,7 @@ final class SchedulingOverviewSummaryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ UNPADDED HOUR, PADDED MINUTE — the register's shape.
+    /// ⚠️ UNPADDED HOUR, PADDED MINUTE, the register's shape.
     func testTheHourIsUnpaddedAndTheMinuteIsPadded() throws {
         XCTAssertEqual(
             try Summary.bookingWhen(startAt: "2026-09-12T09:05:00Z", timezone: "UTC", now: now()),

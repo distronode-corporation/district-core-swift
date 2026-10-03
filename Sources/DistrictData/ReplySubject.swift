@@ -5,7 +5,7 @@ import Foundation
 /// ⛔ IT EXISTS BECAUSE THE SERVER SUBSTITUTES A LITERAL WHEN THE CLIENT SENDS
 /// NOTHING. `messages/send` is
 /// `const emailSubject = (typeof subject === "string" && subject.trim()) || "Message from District"`,
-/// and this client never sent one — so every email an operator had ever replied
+/// and this client never sent one, so every email an operator had ever replied
 /// with was titled "Message from District". Two costs, and the second is the
 /// worse one: the customer's mail client threads on the subject, so the reply
 /// arrived detached from the message it answered, and every reply the workspace
@@ -13,7 +13,7 @@ import Foundation
 ///
 /// ⛔ AND IT NEVER INVENTS ONE. A thread with no email in it has no subject to
 /// answer, and a manufactured line ("Your enquiry", the workspace's name, the
-/// date) would be this client asserting a topic nobody chose — a smaller version
+/// date) would be this client asserting a topic nobody chose, a smaller version
 /// of exactly the bug above. When nothing can be derived this returns nil and the
 /// operator writes the subject themselves; the composer refuses to send an email
 /// without one rather than letting the server's literal through.
@@ -41,7 +41,7 @@ public enum ReplySubject {
     ///
     /// ⚠️ AN ALREADY-PREFIXED SUBJECT IS RETURNED UNCHANGED, so a long exchange
     /// does not accumulate `Re: Re: Re:`. The test is case-insensitive because the
-    /// prefix arrives from whatever wrote it — a customer's mail client, not this
+    /// prefix arrives from whatever wrote it, a customer's mail client, not this
     /// app.
     ///
     /// ⚠️ A BLANK SUBJECT IS NOT A SUBJECT. The column is nullable AND can hold an

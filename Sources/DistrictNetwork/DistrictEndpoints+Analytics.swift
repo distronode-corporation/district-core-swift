@@ -7,7 +7,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ ONE ROUTE, TWO OPERATIONS, AND **NEITHER IS IDEMPOTENT**.
     /// `POST /api/district/hq` branches on the PRESENCE of the `confirm` key in
-    /// the body, not on a path or a method — there is no `/hq/confirm` to point
+    /// the body, not on a path or a method, there is no `/hq/confirm` to point
     /// at, and inventing one would 404.
     ///
     /// ⚠️ STATELESS: the server holds no conversation. The client sends the
@@ -39,7 +39,7 @@ public extension DistrictEndpoints {
 
     /// Execute the write the operator approved.
     ///
-    /// ⛔ THIS EXECUTES A REAL WRITE — a persona change, a deletion, a routing
+    /// ⛔ THIS EXECUTES A REAL WRITE, a persona change, a deletion, a routing
     /// replacement, an outbound campaign, or a real email or SMS to a customer.
     /// ⛔ NO AUTOMATIC RE-CONFIRM, EVER: a confirm that timed out may well have
     /// executed, and re-sending it deletes a second contact or sends a second
@@ -51,7 +51,7 @@ public extension DistrictEndpoints {
     ///   rebuilt argument object is a different instruction from the one the
     ///   operator approved.
     ///
-    /// ⚠️ A tool name that is not a genuine write tool answers **400**, not 403 —
+    /// ⚠️ A tool name that is not a genuine write tool answers **400**, not 403,
     /// the server refuses to let a crafted confirm body invoke a read tool.
     static func hqConfirm(
         workspaceId: String,
@@ -75,7 +75,7 @@ public extension DistrictEndpoints {
     /// The analytics window.
     ///
     /// ⛔ THE RANGE IS AN ``AnalyticsRange``, NOT A STRING, BECAUSE AN
-    /// UNRECOGNISED `timeRange` IS NOT AN ERROR — the server silently serves 7d
+    /// UNRECOGNISED `timeRange` IS NOT AN ERROR, the server silently serves 7d
     /// with a 200. See that type.
     static func analytics(workspaceId: String, range: AnalyticsRange) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
@@ -96,7 +96,7 @@ public extension DistrictEndpoints {
     ///
     /// ⚠️ THE TWO NILS ARE PASSED EXPLICITLY RATHER THAN OMITTED, so the call
     /// site reads as the same request as ``usageHistory(workspaceId:months:)``
-    /// with the history switch off — and so a reader can see that the plain read
+    /// with the history switch off, and so a reader can see that the plain read
     /// is genuinely `history` ABSENT rather than `history=false`, which the
     /// server would also accept but which is a different claim about the route.
     static func usage(workspaceId: String) -> ApiRequestDescriptor {
@@ -116,7 +116,7 @@ public extension DistrictEndpoints {
     ///
     /// ⚠️ SAME PATH AS ``usage(workspaceId:)``, SWITCHED BY A QUERY PARAMETER, AND
     /// THE RESPONSE TYPE CHANGES WITH IT: `usage` is an OBJECT there and an ARRAY
-    /// here. That is why these are two functions rather than one with a flag —
+    /// here. That is why these are two functions rather than one with a flag,
     /// one function would have to return a union, and a caller able to confuse
     /// them could read a single month as an empty history.
     ///
@@ -150,7 +150,7 @@ public extension DistrictEndpoints {
     /// operator is invited to retry.
     ///
     /// ⚠️ The server hardcodes the result limit (10) and the capability filter
-    /// (sms+voice), so neither is offered here — a parameter for either would be a
+    /// (sms+voice), so neither is offered here, a parameter for either would be a
     /// control the route ignores.
     static func searchNumbers(
         workspaceId: String,
@@ -188,7 +188,7 @@ public extension DistrictEndpoints {
         )
     }
 
-    /// The workspace's plan, status, overage state and this month's usage — with
+    /// The workspace's plan, status, overage state and this month's usage, with
     /// NO Stripe call.
     ///
     /// ⛔ THE ABSENCE OF STRIPE IS THE FEATURE. Every field comes from columns the
@@ -196,14 +196,14 @@ public extension DistrictEndpoints {
     /// available as our own origins are. ``stripeBilling()`` is only as available
     /// as Stripe is.
     ///
-    /// ⛔ BILLING IS READ ONLY IN THIS CLIENT AND THAT IS NOT REVISITABLE — App
+    /// ⛔ BILLING IS READ ONLY IN THIS CLIENT AND THAT IS NOT REVISITABLE, App
     /// Store Review Guideline 3.1.3(b). `POST /api/billing` cancels
     /// subscriptions, changes plans, edits payment methods and applies promo
     /// codes; none of it is ported, and **no purchase CTA and no link-out to the
     /// Stripe portal** may be added either. A link-out is what turns a compliant
     /// status screen into a rejected one.
     ///
-    /// ⛔ A SUCCESSFUL RESPONSE MAY CARRY `usage: null` — "nothing metered this
+    /// ⛔ A SUCCESSFUL RESPONSE MAY CARRY `usage: null`, "nothing metered this
     /// month", not "zero of everything".
     static func workspaceBilling(workspaceId: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
@@ -226,7 +226,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ AND IT ANSWERS **200 WHEN STRIPE IS DOWN**, with
     /// `billingUnavailable: true` and empty arrays. Render "billing is
-    /// temporarily unavailable" — never a free or unstarted account. The
+    /// temporarily unavailable", never a free or unstarted account. The
     /// no-customer response is the same body WITHOUT the flag and does
     /// legitimately mean the latter.
     static func stripeBilling() -> ApiRequestDescriptor {

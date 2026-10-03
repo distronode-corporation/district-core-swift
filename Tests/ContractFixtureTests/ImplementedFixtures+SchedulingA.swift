@@ -6,7 +6,7 @@ import Foundation
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `+MessageThread.swift` and `+SchedulingAdmin.swift`
 // were. SwiftLint's `file_length` warning is an ERROR under `--strict`, so a line
-// added inline reds the LINT job rather than the gate — a failure a long way from
+// added inline reds the LINT job rather than the gate, a failure a long way from
 // the change that caused it.
 
 extension ImplementedFixtures {
@@ -24,8 +24,8 @@ extension ImplementedFixtures {
     /// ⛔ THE LIST OPS GO THROUGH `SchedulingItems`, WHICH IS NOT THE UNIVERSAL LIST
     /// ENVELOPE ON THIS SURFACE. The catalog's `items(T)` helper wraps eight reads;
     /// `recordings.list` and `recordings.consent` declare their key by hand and are
-    /// not this group's. `eventTypes.slots` is a third shape again — three keys of
-    /// its own, none of them `items` — which is why ``SchedulingSlots`` exists
+    /// not this group's. `eventTypes.slots` is a third shape again, three keys of
+    /// its own, none of them `items`, which is why ``SchedulingSlots`` exists
     /// rather than a fourth reuse.
     ///
     /// ⛔ THE TWO OVERRIDE-CREATE FIXTURES ARE THE TWO ARMS OF ONE UNION AND ARE
@@ -33,7 +33,7 @@ extension ImplementedFixtures {
     /// `-override-range.json` is `{group_id, reason, start, end, days}` with no `id`
     /// at all, and `start`/`end` there are DATES rather than the `HH:MM` times the
     /// row carries. ``SchedulingOverrideCreated`` disambiguates on `id`, not on
-    /// `group_id` — a row created as part of a range CARRIES a group id — and the
+    /// `group_id`, a row created as part of a range CARRIES a group id, and the
     /// gate re-encodes, so an `encode(to:)` that wrapped either arm in a
     /// discriminator would fail here and nowhere else.
     ///
@@ -43,8 +43,8 @@ extension ImplementedFixtures {
     /// grows a key, only one of them should fail.
     ///
     /// ⛔ NINE OF THE TWELVE CARRY EXPLICIT NULLS, through 34 exact paths in
-    /// `AllowedExplicitNulls+SchedulingA.swift`. The three that do not —
-    /// `-hosts.json`, `-test-email.json`, `-override-range.json` — must NOT be
+    /// `AllowedExplicitNulls+SchedulingA.swift`. The three that do not,
+    /// `-hosts.json`, `-test-email.json`, `-override-range.json`, must NOT be
     /// given an entry: their optionals are absent keys, which a nil `Optional`
     /// already round-trips.
     static var schedulingA: [ImplementedFixture] {

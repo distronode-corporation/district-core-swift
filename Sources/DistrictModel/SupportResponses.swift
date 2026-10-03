@@ -27,8 +27,8 @@ public enum SupportRequestKind: String, Sendable, CaseIterable {
 ///
 /// ⛔ THE THREAD IS RETURNED IN FULL HERE, AND THAT IS DELIBERATE RATHER THAN AN
 /// OVERSIGHT TO HARDEN. The neighbouring VOICE path
-/// `/api/internal/support-lookup` returns status and nothing else — no summary, no
-/// description, no comment body — because a phone call is authenticated by caller
+/// `/api/internal/support-lookup` returns status and nothing else, no summary, no
+/// description, no comment body, because a phone call is authenticated by caller
 /// ID and caller ID is spoofable, so reading a thread aloud would leak whatever
 /// the customer and our agents wrote each other to whoever dialled. This surface
 /// is the opposite case: it runs under the operator's own session bearer, inside
@@ -38,7 +38,7 @@ public enum SupportRequestKind: String, Sendable, CaseIterable {
 ///
 /// ⚠️ ``author`` IS A SUBSTITUTION, NOT THE VENDOR'S DISPLAY NAME. The route
 /// answers "Distronode Support" or "You" and never passes an agent's real name
-/// through — an agent's name is theirs, and a support thread should read as the
+/// through, an agent's name is theirs, and a support thread should read as the
 /// company. So it is display copy the server owns, and it is the string to SHOW.
 /// ⛔ It is not the string to BRANCH on: see ``knownRole``.
 ///
@@ -62,7 +62,7 @@ public struct SupportMessage: Codable, Sendable, Equatable {
     /// Who to show as the writer: "Distronode Support" or "You".
     public let author: String
 
-    /// The message text. ⚠️ PLAIN TEXT — the desk stores Atlassian's own rendering
+    /// The message text. ⚠️ PLAIN TEXT, the desk stores Atlassian's own rendering
     /// and the server sends it as-is. Nothing here may be interpreted as markup.
     public let body: String
 
@@ -104,7 +104,7 @@ public extension SupportMessage {
 ///
 /// ⚠️ THIS IS THE SERVER'S `WorkspaceTicketSummary` SERIALISED WHOLE. The route
 /// spreads the value rather than re-listing its fields, deliberately, so that one
-/// place is auditable — which also means a field dropped from that type vanishes
+/// place is auditable, which also means a field dropped from that type vanishes
 /// from this payload silently. Every field below is non-Optional except
 /// ``issueKey``, because every underlying column carries a default or is
 /// substituted on the way out.
@@ -113,7 +113,7 @@ public extension SupportMessage {
 /// STATE RATHER THAN AN ERROR. A request is claimed locally before Atlassian is
 /// called, so between the two there is a real, visible row with no key. ``filed``
 /// is the flag that says which side of that line it is on, and ``id`` is what a
-/// caller keys a list on — it is stable from the moment of submission where the
+/// caller keys a list on, it is stable from the moment of submission where the
 /// key is not.
 public struct SupportRequestSummary: Codable, Sendable, Equatable {
     /// Atlassian's key (`DA-42`), or nil while the request is still being opened.
@@ -126,7 +126,7 @@ public struct SupportRequestSummary: Codable, Sendable, Equatable {
 
     /// The customer-facing status, or the synthetic `Received` while unfiled.
     ///
-    /// ⚠️ THE DESK'S OWN WORD, AND THE LIVE WORKFLOW IS LOCALISED — measured
+    /// ⚠️ THE DESK'S OWN WORD, AND THE LIVE WORKFLOW IS LOCALISED, measured
     /// transitions on a real request included `完成` and `等待客户`. So this is a
     /// string to display and never one to match on. ``statusCategory`` is the
     /// language-independent discriminator.
@@ -195,7 +195,7 @@ public struct SupportRequestDetail: Codable, Sendable, Equatable {
     ///
     /// ⛔ AN EMPTY THREAD IS A REAL ANSWER. A request that has just been filed has
     /// no comments yet, and the description the customer typed is the ticket's own
-    /// body rather than a message — so the commonest freshly-opened request shows
+    /// body rather than a message, so the commonest freshly-opened request shows
     /// an empty conversation and must not read as a failure.
     public let messages: [SupportMessage]
 
@@ -204,7 +204,7 @@ public struct SupportRequestDetail: Codable, Sendable, Equatable {
     /// ⛔ THE SERVER'S ANSWER, ADOPTED RATHER THAN RE-DERIVED. It is
     /// `filed && !isResolvedCategory(statusCategory)` today, but the second half
     /// was `!== "done"` server-side until it was found to be true for every
-    /// resolved request — so the dashboard offered Close on tickets that were
+    /// resolved request, so the dashboard offered Close on tickets that were
     /// already closed, forever. A client that recomputed it would be free to make
     /// the same mistake again.
     public let closeable: Bool
@@ -257,7 +257,7 @@ public struct SupportRequestListResponse: Codable, Sendable {
 ///
 /// ⚠️ ``request`` IS NON-OPTIONAL BECAUSE THE ROUTE ALWAYS EMITS IT ON A 200.
 /// Every refusal is a **404** carrying `{success:false,error}`, which
-/// ``ApiClient/send(_:as:)`` never decodes — it maps the status first. So a 200
+/// ``ApiClient/send(_:as:)`` never decodes, it maps the status first. So a 200
 /// without the object is contract drift, and failing to decode is the right
 /// verdict rather than handing a screen an empty request it would then draw.
 public struct SupportRequestDetailResponse: Codable, Sendable {
@@ -348,7 +348,7 @@ public struct SupportReplyResponse: Codable, Sendable {
 ///
 /// ⛔ ``statusName`` IS THE DESK'S OWN WORD FOR THE RESOLVED STATE AND MUST BE
 /// ADOPTED. The live workflow is localised, so a client that substituted "Closed"
-/// would print English over a status Atlassian spells in another language — the
+/// would print English over a status Atlassian spells in another language, the
 /// same trap that made a name-matching close implementation report "you cannot
 /// close this request" on a workflow that plainly could.
 ///

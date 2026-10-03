@@ -104,7 +104,7 @@ final class DeskTicketRepositoryTests: XCTestCase {
 
     /// ⛔ BLANK OPTIONALS ARE ABSENT FROM THE BYTES, NEVER `""`. An empty
     /// `requesterEmail` fails `.email()` and takes the whole object down, and the
-    /// route then reports a missing subject and description — naming two fields that
+    /// route then reports a missing subject and description, naming two fields that
     /// were both filled in.
     func testCreatingATicketOmitsBlankRequesterFieldsRatherThanSendingEmptyStrings() async {
         let transport = RepositoryTransport(json: DeskBodies.createdTicket(id: "tkt_a"))
@@ -322,7 +322,7 @@ final class DeskTicketRepositoryTests: XCTestCase {
 
     /// ⛔ THE DEGRADED REPLAY IS A REACHABLE STATE, NOT A DEFENSIVE BRANCH: two
     /// concurrent submits, or Redis dying between the claim and the cached-result
-    /// read. No second row was written, and there is nothing to append — so a caller
+    /// read. No second row was written, and there is nothing to append, so a caller
     /// must refetch rather than treat this as an ordinary success.
     func testADeduplicatedReplyWithNoBodyIsItsOwnOutcome() async {
         let transport = RepositoryTransport(json: #"{"success":true,"deduplicated":true}"#)
@@ -339,7 +339,7 @@ final class DeskTicketRepositoryTests: XCTestCase {
 
     /// ⚠️ HALF A BODY IS TREATED AS THE DEGRADED REPLAY RATHER THAN AS A POST. A
     /// ticket with no message would mean inventing the row that is missing, and the
-    /// reply is safe either way — refetching is the answer that cannot mislead.
+    /// reply is safe either way, refetching is the answer that cannot mislead.
     func testAReplyCarryingATicketButNoMessageDegradesRatherThanInventingOne() async {
         let transport = RepositoryTransport(json: DeskBodies.replyWithoutMessage())
 
@@ -354,7 +354,7 @@ final class DeskTicketRepositoryTests: XCTestCase {
 
     /// ⚠️ AN ABSENT `notified` READS AS "NOT SENT", NOT AS "UNKNOWN". No shape the
     /// route sends omits the key alongside a real message, so this is contract drift
-    /// — and false is the answer that cannot mislead, because it states no email went
+    /// and false is the answer that cannot mislead, because it states no email went
     /// out, which is something a caller can act on. Claiming the customer was emailed
     /// on the strength of a missing key is the failure worth ruling out.
     func testAReplyWithNoNotifiedKeyReportsNotNotifiedRatherThanAssumingSent() async {

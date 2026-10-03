@@ -13,7 +13,7 @@ import Foundation
 ///
 /// ⛔ ALL FIVE ADMIT `agency` AND `client` AND EXCLUDE `viewer`, which is unusual
 /// on this surface: most reads here widen to every role and only the writes
-/// narrow. The route's own header states why — these payloads are support
+/// narrow. The route's own header states why, these payloads are support
 /// CORRESPONDENCE rather than operational status, and a read-only seat exists to
 /// watch operations. So the READ is gated too, and a viewer must not be offered
 /// the destination at all rather than being walked into a 403.
@@ -54,7 +54,7 @@ public extension DistrictEndpoints {
     /// ⛔ `kind` IS A CLOSED VOCABULARY AND THE PARAMETER IS ``SupportRequestKind``
     /// RATHER THAN A `String` FOR THAT REASON. The route maps the short kind onto a
     /// Jira request type id server-side precisely so a caller cannot file into an
-    /// arbitrary type on the desk — one whose portal form we do not populate, which
+    /// arbitrary type on the desk, one whose portal form we do not populate, which
     /// 400s at Atlassian AFTER the local claim row already exists. A bare string
     /// here would be a client that could earn that.
     ///
@@ -62,7 +62,7 @@ public extension DistrictEndpoints {
     /// NOTHING MAY BE ADDED TO IT. This is backed by a real Atlassian service desk,
     /// where `requestFieldValues` may only carry the fields the REQUEST TYPE
     /// exposes on its portal form and an unknown field is a hard **400** rather
-    /// than an ignored key — the failure that cost every ticket the platform tried
+    /// than an ignored key, the failure that cost every ticket the platform tried
     /// to file (`The field 'labels' is not valid for this request type 'Problem'`).
     /// Do not add a field here because it looks available.
     ///
@@ -73,7 +73,7 @@ public extension DistrictEndpoints {
     ///   retry that carries the SAME key collapses onto the first request; a retry
     ///   that mints a fresh one puts a second ticket in a human's queue. It is
     ///   Optional because an older client that omits it still works, just without
-    ///   that protection — which is a compatibility allowance and not an invitation.
+    ///   that protection, which is a compatibility allowance and not an invitation.
     ///
     /// ⚠️ RATE LIMITED 10/HOUR PER **WORKSPACE**, not per caller, plus a durable
     /// 5/day bound per requester hash that survives a Redis outage. A refusal is a
@@ -107,8 +107,8 @@ public extension DistrictEndpoints {
     /// One request and its whole conversation.
     ///
     /// ⛔ THIS RETURNS FULL CONTENT, AND THAT IS CORRECT HERE. The neighbouring
-    /// voice path `/api/internal/support-lookup` deliberately returns STATUS ONLY —
-    /// no summary, no description, no comment body — because a phone call is
+    /// voice path `/api/internal/support-lookup` deliberately returns STATUS ONLY,
+    /// no summary, no description, no comment body, because a phone call is
     /// authenticated by caller ID and caller ID is spoofable. This route is not
     /// that: it runs under the operator's own session bearer inside an
     /// authenticated app and is scoped by `requireWorkspaceRole`, so withholding
@@ -175,12 +175,12 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ NOT IDEMPOTENT, AND THE REASON IS THE ORDER THE SERVER WORKS IN.
     /// `closeRequestAsRequester` resolves the done-category transition, then posts a
-    /// PUBLIC audit comment naming who asked, then applies it — the comment first,
+    /// PUBLIC audit comment naming who asked, then applies it, the comment first,
     /// deliberately, so the attribution survives a transition that fails. So a
     /// repeat that still finds a transition leaves a SECOND "Closed at the
     /// requester's request by …" in the customer's own thread. ⚠️ A repeat against
     /// an ALREADY-resolved request is harmless (no transition is found, so it
-    /// returns 409 before commenting) — but which of the two a retry lands on is
+    /// returns 409 before commenting), but which of the two a retry lands on is
     /// exactly what an ambiguous failure does not tell us. See ``SupportResubmit``.
     ///
     /// ⚠️ **409 `not-closeable` IS AN ANSWER, NOT AN ERROR.** The desk's workflow
@@ -191,7 +191,7 @@ public extension DistrictEndpoints {
     ///
     /// ⚠️ THE REPLY CARRIES THE RESOLVED `statusName` AND THE CALLER SHOULD ADOPT
     /// IT. It is the desk's own word for the state, and the live workflow is
-    /// localised — a client that substituted "Closed" would print English over a
+    /// localised, a client that substituted "Closed" would print English over a
     /// status Atlassian spells in another language.
     static func closeSupportRequest(workspaceId: String, key: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(

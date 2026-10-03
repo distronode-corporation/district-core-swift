@@ -38,7 +38,7 @@ final class SchedulingHandoffClientTests: XCTestCase {
     // MARK: - Status mapping, probed on production rather than read off a doc
 
     /// ⛔ 401 IS "NO BEARER SENT" AND 403 IS "A BEARER THAT DOES NOT VERIFY". They are
-    /// different remedies — sign in again versus you may not do this — and the route
+    /// different remedies, sign in again versus you may not do this, and the route
     /// really does answer both, so both are pinned.
     func test_IOS_SCH_07_noBearerIsAnUnauthorized() async {
         let result = await mint(status: 401, body: #"{"error":"Unauthorized"}"#)

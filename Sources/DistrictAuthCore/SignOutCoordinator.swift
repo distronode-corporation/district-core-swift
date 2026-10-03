@@ -6,7 +6,7 @@ import Foundation
 /// ⛔ THE LOCAL WIPE HAPPENS REGARDLESS OF THE REVOKE'S RESULT. Those are two
 /// separate decisions and both are deliberate. The server is asked FIRST because
 /// the refresh token is the credential the revoke route authenticates with, so
-/// it has to be read before ``TokenRefreshCoordinator/forget()`` destroys it —
+/// it has to be read before ``TokenRefreshCoordinator/forget()`` destroys it,
 /// afterwards there is nothing left to revoke WITH. It is wiped ANYWAY because
 /// the user asked to sign out now: a device left looking signed in because a
 /// server could not be reached is the worse of the two failures, and it is the
@@ -36,7 +36,7 @@ public struct SignOutCoordinator: Sendable {
 
     /// ⚠️ TAKES THE ONE ``TokenRefreshCoordinator``, NEVER BUILDS ONE. Two
     /// coordinators means two single-flight gates, either of which can present
-    /// the same refresh token — see the ⛔ on that type.
+    /// the same refresh token, see the ⛔ on that type.
     public init(
         coordinator: TokenRefreshCoordinator,
         store: any TokenStore,
@@ -51,8 +51,8 @@ public struct SignOutCoordinator: Sendable {
     ///
     /// ⚠️ A DEVICE WITH NO STORED SESSION IS A NO-OP FOR THE REVOKE HALF, NOT AN
     /// ERROR. Sign-out is reachable from a settings screen in states where the
-    /// store is empty — after a Keychain failure, or a session the coordinator
-    /// already cleared — and there is nothing to revoke with. The wipe still
+    /// store is empty, after a Keychain failure, or a session the coordinator
+    /// already cleared, and there is nothing to revoke with. The wipe still
     /// runs.
     ///
     /// ⛔ A THROWN STORE READ SKIPS THE REVOKE RATHER THAN ABORTING THE
@@ -87,7 +87,7 @@ public struct SignOutCoordinator: Sendable {
     ///
     /// ⚠️ IT CANNOT TOUCH THE CURRENT SESSION, WHICH IS WHAT MAKES RUNNING IT
     /// UNCONDITIONALLY SAFE. `revokeNativeSession` matches on the presented
-    /// token's hash alone — not on its family and not on the user — so an entry
+    /// token's hash alone, not on its family and not on the user, so an entry
     /// written before a re-login revokes exactly the one dead row it names.
     ///
     /// ⚠️ ON A DEFERRAL THE ENTRY IS LEFT EXACTLY AS IT WAS. There is no attempt

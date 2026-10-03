@@ -7,7 +7,7 @@ import XCTest
 ///
 /// ⛔ ITS OWN FILE BECAUSE OF SwiftLint's 500-LINE `file_length`, and because the
 /// seam is real rather than arbitrary. `EndpointSurfaceTests.swift` asserts what this
-/// client must NOT be able to ask for — absences, each pinned by walking the
+/// client must NOT be able to ask for, absences, each pinned by walking the
 /// expressible surface. This one asserts how many things it CAN ask for and that the
 /// three classification lists partition them exactly. The two answer different
 /// questions and move for different reasons: the negative tests change when a refusal
@@ -37,7 +37,7 @@ extension EndpointSurfaceTests {
         // ⛔ AN ENDPOINT MOVES FROM UNTYPED TO TYPED WHEN A REPOSITORY DECODES IT, NOT
         // WHEN A TYPE EXISTS. A DTO can be proven by the contract gate while nothing in
         // `DistrictData` decodes it, and until then the route answers bytes on every
-        // path a screen can reach — which is the ⛔ at the top of `UntypedEndpoints`.
+        // path a screen can reach, which is the ⛔ at the top of `UntypedEndpoints`.
         //
         // ⚠️ THE PARTITION FIXES THE TOTAL TO `EndpointID.allCases`, NOT TO A NUMBER. A
         // route that lands typed from its first commit (descriptor, DTO and repository
@@ -77,7 +77,7 @@ extension EndpointSurfaceTests {
         // would download the object (for `scheduling/admin/download/{id}`, a
         // multi-hundred-megabyte video) to learn its address.
         // ⚠️ A 302 IS NOT ENOUGH TO JOIN THIS LIST. `scheduling/sso` answers one too
-        // and is deliberately absent — its `Location` is a single-use sign-in
+        // and is deliberately absent, its `Location` is a single-use sign-in
         // credential rather than an object, so it has no `EndpointID` at all.
         XCTAssertEqual(redirect.count, 2)
     }

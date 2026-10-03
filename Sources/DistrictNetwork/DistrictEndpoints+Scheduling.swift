@@ -9,7 +9,7 @@ import Foundation
 /// calendar-OAuth round trip still spends it with an explicit `next=/v1/calendar/connect…`, and
 /// that the **410 `scheduler_console_retired`** fires only for a `next` that lands
 /// on `/admin`. What it lacks is a DESCRIPTOR, for two reasons that still hold: it
-/// is not a JSON body, and it does not belong on ``RedirectEndpoints`` either —
+/// is not a JSON body, and it does not belong on ``RedirectEndpoints`` either,
 /// that list exists for `calls/{id}/recording` and now
 /// ``EndpointID/schedulingAdminDownload``, whose targets are presigned OBJECT
 /// URLs, and the failure modes are opposite. Following a recording redirect wastes
@@ -22,19 +22,19 @@ import Foundation
 /// ⚠️ THE ADMIN SURFACE IS A SEPARATE FILE. The scheduler's admin surfaces reach
 /// the app through the one RPC in
 /// `DistrictEndpoints+SchedulingAdmin.swift`; this file stays the two routes about
-/// the TENANCY itself — whether it exists, and bringing one into existence.
+/// the TENANCY itself, whether it exists, and bringing one into existence.
 public extension DistrictEndpoints {
     /// What the Scheduling card renders: eligibility, whether this member may
     /// act, and the tenancy row if there is one.
     ///
-    /// ⚠️ READABLE BY EVERY ROLE INCLUDING `viewer` — it reports whether the
+    /// ⚠️ READABLE BY EVERY ROLE INCLUDING `viewer`, it reports whether the
     /// workspace has booking pages and where they are, which is the same class of
     /// fact as "this workspace has a phone number". The response's `canManage` is
     /// what decides which buttons to draw.
     ///
     /// ⛔ TAKES A NON-OPTIONAL `workspaceId`, UNLIKE ``overview(workspaceId:)``.
     /// The route would accept an absent one and let `requireWorkspaceRole` pick a
-    /// default from the caller's own membership listing — but this client holds no
+    /// default from the caller's own membership listing, but this client holds no
     /// selection cookie, so on a multi-workspace account that default silently
     /// reports on the wrong workspace, and here the wrong answer is a booking URL
     /// belonging to somebody else's tenancy. The overview keeps its Optional for
@@ -54,8 +54,8 @@ public extension DistrictEndpoints {
 
     /// Provision this workspace's scheduling tenancy.
     ///
-    /// ⛔ IT CREATES REAL THINGS AT TWO THIRD PARTIES — a tenancy at the scheduler
-    /// and a DNS record at Cloudflare — so it is never fired on a timer, never
+    /// ⛔ IT CREATES REAL THINGS AT TWO THIRD PARTIES, a tenancy at the scheduler
+    /// and a DNS record at Cloudflare, so it is never fired on a timer, never
     /// retried and never looped. The server's own brake is 5 per hour PER
     /// WORKSPACE (three colleagues pressing the same button share one budget), and
     /// a sixth call answers **429**. That limiter fails open, so it is not a
@@ -71,7 +71,7 @@ public extension DistrictEndpoints {
     /// role check asks whether this person may act for this workspace; the
     /// allowlist asks whether this workspace is one anybody has decided to
     /// provision at all. While the feature is dark the second answer is no for
-    /// everybody, so even an owner gets **403** — which is why the card must read
+    /// everybody, so even an owner gets **403**, which is why the card must read
     /// `eligible` from the status route instead of offering the button by role.
     ///
     /// ⚠️ THE WORKSPACE TRAVELS IN THE BODY. The route reads `req.json()` first
@@ -89,7 +89,7 @@ public extension DistrictEndpoints {
     /// Mint a one-time hand-off URL into the tenant's scheduler.
     ///
     /// ⛔ IT DOES NOT REPLACE `scheduling/sso`. That route answers 410 for one
-    /// `next` value — one that lands on `/admin` — and mints normally for the
+    /// `next` value, one that lands on `/admin`, and mints normally for the
     /// calendar-OAuth leg it still serves. The real difference is the TRANSPORT:
     /// `sso` is a 302 whose `Location` the client reads without following, and this
     /// one answers JSON, so it decodes like everything else. The URL it carries is

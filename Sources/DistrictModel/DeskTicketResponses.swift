@@ -11,8 +11,8 @@ import Foundation
 /// only field of the two that may be used for that.
 ///
 /// ⚠️ `status` AND `source` ARE FREE TEXT ON THE WIRE. Both columns are plain `TEXT`
-/// server-side — chosen so adding a state never needs a migration on four databases
-/// — so an unrecognised value is DISPLAYED as itself rather than switched on
+/// server-side, chosen so adding a state never needs a migration on four databases
+/// so an unrecognised value is DISPLAYED as itself rather than switched on
 /// exhaustively. Branch on ``knownStatus`` and on ``fromCall``, both of which answer
 /// honestly for a value this build has not learned. Same call ``KnowledgeDocument``
 /// makes about its own `status`.
@@ -85,7 +85,7 @@ public struct DeskTicketSummary: Codable, Sendable, Equatable {
 /// One message in a ticket's thread.
 ///
 /// ⛔ THE SERVER SENDS NO AUTHOR LABEL AND THIS TYPE DOES NOT INVENT ONE.
-/// `DeskMessageView` is deliberately narrow — `{id, authorType, body, createdAt}` —
+/// `DeskMessageView` is deliberately narrow, `{id, authorType, body, createdAt}`,
 /// so a label has to be derived from ``authorType`` plus the ticket's requester at
 /// the point of display. That is a UI decision with a trap in it: the fallback in a
 /// shared thread renderer names DISTRONODE, which is the wrong company on a tenant's
@@ -141,8 +141,8 @@ public enum DeskMessageAuthor: String, Sendable, CaseIterable, Equatable {
 /// only job is to undo a shape the server does not send, and a hand-written decoder
 /// on this surface is a place for a key to go missing silently.
 ///
-/// ⚠️ IT IS NOT A SUPERSET OF THE LIST ROW BY ACCIDENT — it is the same `select` plus
-/// the thread — but nothing may rely on decoding one payload as the other. The list
+/// ⚠️ IT IS NOT A SUPERSET OF THE LIST ROW BY ACCIDENT, it is the same `select` plus
+/// the thread, but nothing may rely on decoding one payload as the other. The list
 /// route sends no `messages`, so a detail decoded from a list row would be a ticket
 /// whose conversation is permanently empty.
 public struct DeskTicketDetail: Codable, Sendable, Equatable {
@@ -199,7 +199,7 @@ public struct DeskTicketDetail: Codable, Sendable, Equatable {
     ///
     /// ⛔ WHAT A STATUS CHANGE APPLIES. Resolving stamps `resolvedAt` and reopening
     /// CLEARS it, both server-side, so adopting the requested status alone would leave
-    /// a reopened ticket carrying a resolution time in the past — and every "time to
+    /// a reopened ticket carrying a resolution time in the past, and every "time to
     /// resolution" figure computed from it is then wrong in a way that looks plausible.
     public func adopting(_ ticket: DeskTicketSummary) -> DeskTicketDetail {
         adopting(ticket, messages: messages)
@@ -228,7 +228,7 @@ public struct DeskTicketDetail: Codable, Sendable, Equatable {
 
 /// `GET /api/district/desk/tickets`.
 ///
-/// ⛔ AN EMPTY ARRAY IS A REAL ANSWER AND MUST NEVER RENDER AS A FAILURE — nor as
+/// ⛔ AN EMPTY ARRAY IS A REAL ANSWER AND MUST NEVER RENDER AS A FAILURE, nor as
 /// "the desk is off", which is a different fact with a different screen. It is a
 /// workspace whose customers have not raised anything, which is where every workspace
 /// starts. ``tickets`` is non-Optional because `findMany` always emits the array, so
@@ -255,7 +255,7 @@ public struct DeskTicketResponse: Codable, Sendable {
 ///
 /// ⛔ A SUCCESS MAY CARRY NO TICKET, AND THAT IS NOT AN ERROR. When the client's
 /// `idempotencyKey` has already produced a ticket the route answers
-/// `{success: true, deduplicated: true}` and nothing else — deliberately, because
+/// `{success: true, deduplicated: true}` and nothing else, deliberately, because
 /// reporting a retried submit as a failure would make it look broken and invite a
 /// third. See ``DeskTicketCreation``.
 ///
@@ -285,7 +285,7 @@ public struct DeskTicketCreateResponse: Codable, Sendable {
 /// its result under the idempotency claim and replays it, but two concurrent submits
 /// (or Redis dying between the claim and the read) produce a bare
 /// `{success: true, deduplicated: true}`. No second row was written either way, which
-/// is the property that matters — but there is nothing to add to the thread, and a
+/// is the property that matters, but there is nothing to add to the thread, and a
 /// client that treated the absence as an ordinary success would leave the reply
 /// invisible until a refetch. ``DeskReplyOutcome`` is where that fork is made
 /// explicit rather than left to an `if let`.
@@ -307,8 +307,8 @@ public struct DeskReplyResponse: Codable, Sendable {
 /// `POST /api/district/desk/tickets/{id}/status`.
 ///
 /// ⚠️ THE ECHOED TICKET IS ADOPTED, NEVER THE STATUS THAT WAS ASKED FOR. The route
-/// writes `resolvedAt` alongside the column — setting it on resolve and CLEARING it
-/// on reopen — so the row that comes back carries a fact the request did not, and a
+/// writes `resolvedAt` alongside the column, setting it on resolve and CLEARING it
+/// on reopen, so the row that comes back carries a fact the request did not, and a
 /// screen that kept its own requested value would show a resolved ticket with a
 /// resolution time it no longer has.
 public struct DeskTicketStatusResponse: Codable, Sendable {

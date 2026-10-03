@@ -40,7 +40,7 @@ public struct ApiClient: Sendable {
     /// ⛔ ONE HOST FOR EVERY REGION. Per-region base URLs were considered and
     /// rejected on the Kotlin side: Cloudflare already routes a request to the
     /// right origin, so region-specific hosts would duplicate that logic in the
-    /// client and go stale independently. It also would not help — a workspace's
+    /// client and go stale independently. It also would not help, a workspace's
     /// region is a property of its DATA, not of which origin can serve it, and a
     /// bearer token works on any of them where a host-only session cookie would
     /// not.
@@ -54,7 +54,7 @@ public struct ApiClient: Sendable {
     /// ``SchedulingHandoffClient`` reads a URL out of a response body and hands it to
     /// a browser; without a host to compare against, "https" alone would let an
     /// influenced body redirect a signed-in operator anywhere. ⚠️ `baseURL` itself
-    /// stays private — a caller that could read the whole URL would start assembling
+    /// stays private, a caller that could read the whole URL would start assembling
     /// paths by hand, which is exactly what ``ApiRequestDescriptor`` exists to stop.
     public var baseHost: String? {
         baseURL.host?.lowercased()
@@ -119,7 +119,7 @@ public struct ApiClient: Sendable {
     /// that needs one has to see the bytes.
     ///
     /// ⚠️ THE `Result` STILL FAILS FOR EVERYTHING THAT NEVER PRODUCED A RESPONSE
-    /// — an unbuildable path, a missing credential, a dead socket. Only the
+    /// an unbuildable path, a missing credential, a dead socket. Only the
     /// status mapping is skipped, so a caller cannot accidentally treat "offline"
     /// as a body it can read.
     public func sendUnmapped(_ descriptor: ApiRequestDescriptor) async -> Result<RawResponse, ApiError> {

@@ -23,7 +23,7 @@ public enum SchedulingLocationValueKind: Sendable, Equatable {
 /// The location types the catalog permits on an event type.
 ///
 /// ⛔ SEVEN, AND `zoom` IS ABSENT DELIBERATELY RATHER THAN FORGOTTEN. The fork's
-/// own DB CHECK accepts eight — the eighth is `zoom` — so nothing downstream
+/// own DB CHECK accepts eight, the eighth is `zoom`, so nothing downstream
 /// would refuse it; the catalog is what withholds it, and adding a case here
 /// would produce a picker whose eighth entry is a **400 `invalid_params`** on
 /// every save. The gap between this list and the fork's is the product decision,

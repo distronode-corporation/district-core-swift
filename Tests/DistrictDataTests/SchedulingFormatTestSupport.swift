@@ -8,8 +8,8 @@ import XCTest
 /// ⛔ EVERY FIXTURE IS DECODED FROM JSON RATHER THAN CONSTRUCTED, AND THAT IS THE POINT
 /// RATHER THAN A CONSEQUENCE OF THE DTOs HAVING NO MEMBERWISE INIT. A formatter test that
 /// built its input in Swift would assert that the formatter agrees with the test's idea of
-/// the shape; starting at the bytes means a `CodingKeys` rename — `booker_name` to
-/// `bookerName`, say — fails the formatter test too, where the symptom ("Someone" in every
+/// the shape; starting at the bytes means a `CodingKeys` rename, `booker_name` to
+/// `bookerName`, say, fails the formatter test too, where the symptom ("Someone" in every
 /// row) is the one an operator would actually report.
 ///
 /// ⚠️ THE SNAKE_CASE KEYS BELOW ARE THE FORK'S AND ARE COPIED FROM THE DTO's OWN

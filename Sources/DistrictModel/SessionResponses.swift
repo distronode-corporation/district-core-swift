@@ -9,7 +9,7 @@ import Foundation
 /// `workspace/persona`, `workspace/tools`, `workspace/directory` and
 /// `workspace/routing-rules`). Sharing
 /// it is safe only because the contract gate pins each fixture against it
-/// separately — if one of those routes grows a field, that fixture fails and the
+/// separately, if one of those routes grows a field, that fixture fails and the
 /// others do not, which is exactly the signal wanted. A shared type verified
 /// against ONE fixture would be the opposite.
 ///
@@ -21,8 +21,8 @@ import Foundation
 ///
 /// ⛔ ON THE UNREGISTER PATH THE FLAG IS LOAD-BEARING RATHER THAN CEREMONIAL, and
 /// that is the one place a reader should not skim it. The server answers
-/// `{success:true}` even when there was no row to delete — deliberately, so the
-/// route is not an existence oracle over the device-id space — but a delete that
+/// `{success:true}` even when there was no row to delete, deliberately, so the
+/// route is not an existence oracle over the device-id space, but a delete that
 /// THREW answers 500, and that means the row may still be live and this handset
 /// may still receive another person's notifications after they sign in on it. So
 /// "the flag was true" is the whole difference between "push is off for this
@@ -40,7 +40,7 @@ public struct SuccessResponse: Codable, Sendable {
 /// is not yours, deliberately: device ids are client-generated and opaque, so
 /// answering 404 for a stranger's id and 200 for a real one would turn the route
 /// into a membership oracle over the id space. Zero is also the honest answer
-/// for the ordinary races — a row already revoked from another device, or a
+/// for the ordinary races, a row already revoked from another device, or a
 /// chain that rotated between the list read and the tap. All of them resolve to
 /// the same user-facing action: re-read the list and show what is there.
 ///

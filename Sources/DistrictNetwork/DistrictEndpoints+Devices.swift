@@ -4,7 +4,7 @@ import Foundation
 ///
 /// ⛔ TWO DIFFERENT PREFIXES FOR THINGS THAT BOTH SAY "devices", AND NEITHER IS
 /// INTERCHANGEABLE. SESSION management lives under `/api/auth/native/devices/…`
-/// — a PUBLIC prefix in `proxy.ts`, so the default-deny middleware never runs and
+/// a PUBLIC prefix in `proxy.ts`, so the default-deny middleware never runs and
 /// each route's own `requireAuth` is the entire access control. PUSH registration
 /// is a district resource at `/api/district/devices/…`, behind that middleware.
 /// `/api/auth/native/devices/register` and `/api/district/devices/revoke` both
@@ -13,7 +13,7 @@ import Foundation
 /// ⛔ ALL FIVE ARE ACCOUNT-SCOPED, NOT WORKSPACE-SCOPED, and none could be
 /// otherwise: a native session belongs to a USER and a device belongs to a PERSON
 /// across every workspace they hold. The scope comes from the verified session
-/// and there is no parameter that could widen it — an identity arriving as an
+/// and there is no parameter that could widen it, an identity arriving as an
 /// argument is an identity the caller chose.
 public extension DistrictEndpoints {
     /// Every live install on this account, newest first.
@@ -32,8 +32,8 @@ public extension DistrictEndpoints {
     /// oracle the server declined to build.
     ///
     /// ⚠️ SIGNING OUT THE CURRENT DEVICE IS A LOCAL EVENT TOO. The server has no
-    /// way to tell this process that its credential just died — it will simply 401
-    /// on the next request — so whatever calls this drives the local sign-out
+    /// way to tell this process that its credential just died, it will simply 401
+    /// on the next request, so whatever calls this drives the local sign-out
     /// itself.
     ///
     /// ⚠️ The server validates `deviceId` at 8...200 characters, mirroring the
@@ -54,7 +54,7 @@ public extension DistrictEndpoints {
     /// "all" that quietly excepted the caller would be a control nobody could
     /// reason about. Treat a successful response as this device's own sign-out.
     ///
-    /// ⚠️ NO PARAMETERS EXIST — the route parses nothing — so an EMPTY OBJECT is
+    /// ⚠️ NO PARAMETERS EXIST, the route parses nothing, so an EMPTY OBJECT is
     /// sent rather than a body a caller would have to guess at. (On Kotlin the
     /// `{}` was forced by OkHttp rejecting a body-less POST; here it is a
     /// deliberate parity choice, so the two clients put identical bytes on the
@@ -78,13 +78,13 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ `platform` IS SENT EXPLICITLY AS `"ios"`. The route's schema defaults it
     /// to `"android"`, so omitting it works and silently mislabels every row this
-    /// client writes — and the server's push sender selects the APNs payload from
+    /// client writes, and the server's push sender selects the APNs payload from
     /// exactly that column.
     ///
     /// ⚠️ AN IDEMPOTENT UPSERT KEYED ON THE INSTALLATION: re-sending the same
     /// token is free and a NEW one replaces the old. ⚠️ A device re-registered by
     /// a different account MOVES to that account rather than accumulating a second
-    /// row — one phone, one token, one owner — which is what stops a signed-out
+    /// row, one phone, one token, one owner, which is what stops a signed-out
     /// account's notifications arriving on a handset somebody else now holds.
     ///
     /// ⚠️ Rate limited at 20/min PER ACCOUNT. Nothing here may be called on a
@@ -127,7 +127,7 @@ public extension DistrictEndpoints {
     /// credential left to authenticate this with, and the row would sit registered
     /// until the push service eventually reported the token gone.
     ///
-    /// ⛔ NO BODY IS HONOURED — the route parses nothing — so `{}` goes, matching
+    /// ⛔ NO BODY IS HONOURED, the route parses nothing, so `{}` goes, matching
     /// ``revokeAllDevices()``.
     static func unregisterPushToken() -> ApiRequestDescriptor {
         ApiRequestDescriptor(

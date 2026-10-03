@@ -1,13 +1,13 @@
 import Foundation
 
-/// `GET /api/district/messages/search?workspaceId=&q=` — full-content message
+/// `GET /api/district/messages/search?workspaceId=&q=`, full-content message
 /// search for the unified Inbox.
 ///
 /// ⛔ THIS ROUTE HAS EXISTED ON THE SERVER SINCE BEFORE EITHER MOBILE CLIENT AND
 /// NOTHING HAS EVER CALLED IT, which is why there is no fixture behind this type.
 /// The shared contract corpus mirrors the Android client and that client has no
 /// search, so this DTO is modelled from the server's route source rather than
-/// pinned by the strict gate —
+/// pinned by the strict gate,
 /// the same footing as ``ContactCreateResponse``. It is the shape to re-check
 /// first if that route ever changes.
 ///
@@ -19,7 +19,7 @@ public struct MessageSearchResponse: Codable, Sendable {
     /// The matches, newest first, capped server-side at ``limit``.
     ///
     /// ⚠️ ONE MESSAGE PER ENTRY, NOT ONE THREAD. Several hits can share a
-    /// ``MessageSearchHit/threadKey`` — the same conversation matched twice — so a
+    /// ``MessageSearchHit/threadKey``, the same conversation matched twice, so a
     /// list keyed on the thread would collapse rows the server deliberately sent
     /// separately. Key on ``MessageSearchHit/messageId``.
     public let results: [MessageSearchHit]
@@ -29,7 +29,7 @@ public struct MessageSearchResponse: Codable, Sendable {
     ///
     /// ⛔ OPTIONAL BECAUSE THE SHORT-QUERY BRANCH OMITS THE KEY ALTOGETHER. A `q`
     /// under two characters returns `{"success":true,"results":[]}` and nothing
-    /// else — not `limit: null`, not `limit: 0`, absent. A non-optional `Int` here
+    /// else, not `limit: null`, not `limit: 0`, absent. A non-optional `Int` here
     /// decodes every ordinary response and then fails on the first person who
     /// types one letter into the search field, which is both the commonest input
     /// and the hardest failure to attribute.
@@ -45,7 +45,7 @@ public struct MessageSearchResponse: Codable, Sendable {
 /// ⛔ FIELD NAMES ARE THE SERVER'S, INCLUDING THE ONES THAT READ POORLY IN SWIFT.
 /// ``key`` is deprecated server-side and ``kind`` is a per-message property with a
 /// thread-shaped name; both are carried rather than renamed or dropped, for the
-/// reason ``ConversationSummary`` states at length — an unmodelled key is a
+/// reason ``ConversationSummary`` states at length, an unmodelled key is a
 /// dropped key, and a renamed one silently stops matching the wire.
 ///
 /// ⛔ IT CARRIES NO `canSms`/`canEmail`, WHICH IS THE ONE THING A CALLER MUST NOT
@@ -95,7 +95,7 @@ public struct MessageSearchHit: Codable, Sendable {
     /// `inbound` or `outbound`.
     public let direction: String
 
-    /// `sms`, `email` or `whatsapp` — ⚠️ nil on older rows, the same nullable
+    /// `sms`, `email` or `whatsapp`, ⚠️ nil on older rows, the same nullable
     /// column ``ConversationLastMessage/type`` carries.
     public let type: String?
 

@@ -9,7 +9,7 @@ import XCTest
 ///
 /// ⚠️ The type under test is `DistrictModel.ApiErrorEnvelope`; only the two
 /// members exercised here belong to DistrictNetwork. Decoding the SHAPE is the
-/// strict contract gate's job and is not repeated — what is asserted here is
+/// strict contract gate's job and is not repeated, what is asserted here is
 /// the lenient behaviour the gate deliberately does not have.
 final class ApiErrorEnvelopeTests: XCTestCase {
     /// The fields a row expects to find. `var` with defaults so a row states only
@@ -47,7 +47,7 @@ final class ApiErrorEnvelopeTests: XCTestCase {
             ),
             Row(
                 // ⛔ THE SHARED AUTH GUARD'S SHAPE. No `success` key at all, and it
-                // is returned verbatim by every district route on 401/403/404 — so
+                // is returned verbatim by every district route on 401/403/404, so
                 // this is the most common error body in the API, and the one a
                 // strict {success, error} DTO would throw on.
                 name: "the shared auth guard: bare {error}",
@@ -161,7 +161,7 @@ final class ApiErrorEnvelopeTests: XCTestCase {
             Row(
                 // ⚠️ AN EMPTY OBJECT IS AN ENVELOPE, unlike everything above: it
                 // decodes, it just carries nothing. The distinction is worth
-                // keeping — "the server sent an error object with no message" and
+                // keeping, "the server sent an error object with no message" and
                 // "the server sent no JSON at all" are different faults.
                 name: "an empty JSON object",
                 body: "{}",
@@ -193,8 +193,8 @@ final class ApiErrorEnvelopeTests: XCTestCase {
                 line: #line
             ),
             Row(
-                // The 503 body's own array is not on this type at all — see
-                // `WorkspaceListDegradedError` — so it is an unknown key here and
+                // The 503 body's own array is not on this type at all, see
+                // `WorkspaceListDegradedError`, so it is an unknown key here and
                 // must not stop the message arriving.
                 name: "degradedRegions is an unknown key on this type",
                 body: #"{"error":"Nope.","degradedRegions":["eu"]}"#,
@@ -214,7 +214,7 @@ final class ApiErrorEnvelopeTests: XCTestCase {
         let decoded = ApiErrorEnvelope.lenient(Data(CapturedErrorBodies.workspaceListDegraded.utf8))
 
         XCTAssertEqual(decoded?.code, ApiErrorCode.regionsDegraded)
-        // ⛔ NO `success` KEY AT ALL — the fact that makes a strict DTO throw.
+        // ⛔ NO `success` KEY AT ALL, the fact that makes a strict DTO throw.
         XCTAssertNil(decoded?.success)
         XCTAssertEqual(
             decoded?.message,

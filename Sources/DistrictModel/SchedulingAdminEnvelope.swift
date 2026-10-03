@@ -9,7 +9,7 @@ import Foundation
 /// Distronode, was authorised, cleared the op's role bar and validated, and the
 /// SCHEDULER is what refused. One generic type with a non-optional `data` cannot
 /// decode that body at all, and one with an optional `data` cannot tell "the op
-/// answered null" from "the op failed" — so the flag is its own decode.
+/// answered null" from "the op failed", so the flag is its own decode.
 ///
 /// ⚠️ `status` IS PARSED AND DELIBERATELY UNUSED. It is the scheduler's own HTTP
 /// status, carried for a log line; it must never reach the client's five-code
@@ -29,7 +29,7 @@ public struct SchedulingAdminEnvelopeHead: Codable, Sendable, Equatable {
 /// a caller that already branched on the head; it is not redundant to the wire.
 ///
 /// ⚠️ `Encodable` IS CONDITIONAL, because the runtime decode is parameterised on
-/// `Decodable` alone — nothing in the app ever encodes one of these. The
+/// `Decodable` alone, nothing in the app ever encodes one of these. The
 /// conformance exists so the gate can round-trip the payloads that ARE `Codable`.
 public struct SchedulingAdminSuccess<Payload: Decodable>: Decodable {
     public let ok: Bool
@@ -44,7 +44,7 @@ extension SchedulingAdminSuccess: Sendable where Payload: Sendable {}
 /// `invalid_params`.
 ///
 /// ⛔ FIELD NAMES, NEVER MESSAGES. `issueFields` flattens zod issues to paths and
-/// drops the text on purpose — an issue's message quotes the offending input
+/// drops the text on purpose, an issue's message quotes the offending input
 /// straight back out of the API. Anything rendering ``fields`` must treat the
 /// entries as identifiers to look up, not as prose to show.
 ///
@@ -62,14 +62,14 @@ public struct SchedulingAdminErrorBody: Codable, Sendable, Equatable {
 /// ⛔ IT IS NOT AN EMPTY BODY AND MODELLING IT AS ONE FAILS. The catalog's
 /// `NO_CONTENT` is `z.unknown().transform(() => ({ ok: true }))`, so a 204 or an
 /// empty 2xx from the scheduler is rewritten into a real object before it reaches
-/// this client — `{"ok":true,"data":{"ok":true}}` on the wire, an outer flag and
+/// this client, `{"ok":true,"data":{"ok":true}}` on the wire, an outer flag and
 /// an inner one that mean different things. `Void` is not `Decodable`, and an
 /// empty struct would decode a `{ok:false}` failure body just as happily, which is
 /// the mistake this type exists to make impossible.
 ///
 /// ⚠️ `ok` IS DECODED STRICTLY RATHER THAN DEFAULTED, and the reason is that it is
-/// the only thing here to get wrong. The value is constant by construction — the
-/// transform ignores its input — so the field is not information about the
+/// the only thing here to get wrong. The value is constant by construction, the
+/// transform ignores its input, so the field is not information about the
 /// request; it is a pin on the server's own shape, and a `?? true` would let that
 /// shape change without anything noticing.
 public struct SchedulingNoContent: Codable, Sendable, Equatable {

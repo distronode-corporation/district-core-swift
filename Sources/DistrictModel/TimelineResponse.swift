@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/timeline?workspaceId=&contactId=` (or `&phoneNumber=`) —
+/// `GET /api/district/timeline?workspaceId=&contactId=` (or `&phoneNumber=`),
 /// one thread's history, with SMS, email and CALLS interleaved.
 ///
 /// ⛔ THIS IS A CONTACT'S WHOLE TIMELINE, NOT A MESSAGE LIST, and the
@@ -10,7 +10,7 @@ import Foundation
 ///
 /// ⛔ THE DTO ARRIVED LATE ON PURPOSE, AND THE REASON IS WORTH KEEPING. When the
 /// repositories landed this was the one MVP read with no `Codable` type, because
-/// the route was mid-reshape — it was about to grow ``pageInfo`` — and a DTO
+/// the route was mid-reshape, it was about to grow ``pageInfo``, and a DTO
 /// pinned against the copy on disk then would have built a gate that failed the
 /// day the Android batch landed, presenting a change made on the Android side as
 /// an iOS bug in an iOS pipeline. That batch has landed, both fixtures carry the
@@ -44,7 +44,7 @@ public struct TimelineResponse: Codable, Sendable {
     ///
     /// ⛔ OPTIONAL RATHER THAN REQUIRED, AND THAT IS THE WHOLE COMPATIBILITY
     /// STORY IN ONE FIELD. A required `pageInfo` would turn a lagging origin into
-    /// a decode failure — an empty thread on screen — rather than into a thread
+    /// a decode failure, an empty thread on screen, rather than into a thread
     /// with no page behind it, which is exactly what such a server has.
     public let pageInfo: TimelinePageInfo?
 }
@@ -81,7 +81,7 @@ public struct TimelinePageInfo: Codable, Sendable {
 ///
 /// ⚠️ RAW STRINGS FOR ``type`` AND ``direction``, LIKE EVERY DTO IN THIS MODULE.
 /// Neither column is a database enum, and decoding into a Swift enum would fail
-/// closed on a value the server adds later — taking out the whole thread rather
+/// closed on a value the server adds later, taking out the whole thread rather
 /// than one label.
 ///
 /// ⚠️ ``direction`` INCLUDES `missed`, which is neither inbound nor outbound. A
@@ -91,7 +91,7 @@ public struct TimelinePageInfo: Codable, Sendable {
 ///
 /// ⛔ AND ON A CALL ROW ``direction`` IS AN OUTCOME RATHER THAN A DIRECTION. The
 /// server's timeline mapper ignores `Call.direction` entirely and labels every
-/// non-failed call `inbound`, reserving `missed` for failed/no-answer — so an
+/// non-failed call `inbound`, reserving `missed` for failed/no-answer, so an
 /// OUTBOUND call appears here as `inbound`. Do not build a "you called them"
 /// caption from it; `CallSummary.direction` on the calls feed is the field that
 /// means what it says.
@@ -117,7 +117,7 @@ public struct TimelineEvent: Codable, Sendable {
     /// no timezone formatting at all, so rendering it verbatim prints
     /// `2026-08-15T14:20:00.000Z` under every bubble.
     ///
-    /// ⚠️ THIS MODULE STILL OWNS NO DATE PARSING. The value is carried as the server's own string — it is also what a
+    /// ⚠️ THIS MODULE STILL OWNS NO DATE PARSING. The value is carried as the server's own string, it is also what a
     /// cursor is echoed back as, where re-formatting it would hand the server a
     /// timestamp it never emitted. The formatting belongs at the point of DISPLAY.
     public let timestamp: String

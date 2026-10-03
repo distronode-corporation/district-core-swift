@@ -20,7 +20,7 @@ import Foundation
 ///
 /// ⛔ EVERY PRICE FIELD IS OPTIONAL BECAUSE THE KEY IS GENUINELY ABSENT, NOT
 /// NULL. The Twilio implementation wraps its pricing lookup in a bare catch and
-/// leaves `monthlyPrice` undefined when the account has no Pricing API access —
+/// leaves `monthlyPrice` undefined when the account has no Pricing API access,
 /// and `JSON.stringify` DROPS an undefined value rather than writing null, so
 /// the field vanishes from the wire entirely. Typing it as required would throw
 /// on the first search from such an account, in production, with a decode
@@ -28,7 +28,7 @@ import Foundation
 /// `district-numbers-search.json` carries one row with pricing and one without,
 /// precisely so this stays covered.
 ///
-/// ⚠️ ``monthlyPrice`` IS A NUMBER AND CARRIES NO CURRENCY OF ITS OWN —
+/// ⚠️ ``monthlyPrice`` IS A NUMBER AND CARRIES NO CURRENCY OF ITS OWN,
 /// ``currency`` is a separate, equally optional field. A price with no currency
 /// beside it must not be rendered with a symbol the server never sent.
 public struct AvailableNumber: Codable, Sendable {
@@ -49,7 +49,7 @@ public struct AvailableNumber: Codable, Sendable {
     public let currency: String?
 }
 
-/// `GET /api/district/workspace/numbers/search` — the carrier's inventory.
+/// `GET /api/district/workspace/numbers/search`, the carrier's inventory.
 ///
 /// ⚠️ ``provider`` IS THE SERVER'S CHOICE, ECHOED BACK. A caller may name one,
 /// but the resolved credentials decide which carrier actually answered, so this
@@ -58,7 +58,7 @@ public struct AvailableNumber: Codable, Sendable {
 /// writes `credentials.provider` on every 200, and a body without it is drift
 /// rather than a search that named no carrier.
 ///
-/// ⛔ A WORKSPACE WITH NO CARRIER CONNECTED ANSWERS **400**, NOT AN EMPTY LIST —
+/// ⛔ A WORKSPACE WITH NO CARRIER CONNECTED ANSWERS **400**, NOT AN EMPTY LIST,
 /// `{success: false, error: "Messaging provider not configured for workspace"}`.
 /// That is a legitimate account state rather than a fault, and it must render as
 /// an empty state that explains itself. ⛔ It must NEVER be converted into an
@@ -80,7 +80,7 @@ public struct NumberSearchResponse: Codable, Sendable {
 /// ⛔ ``managed`` IS THE ONLY FIELD THAT IS NOT THE CARRIER'S OWN, AND IT DECIDES
 /// WHAT MAY BE OFFERED. `true` means the line is held on DISTRONODE's carrier
 /// account rather than the tenant's, so the tenant cannot release or reconfigure
-/// it — the row is theirs to USE, not to administer. The two halves of this list
+/// it, the row is theirs to USE, not to administer. The two halves of this list
 /// also come from different databases: `managed: false` rows are what the
 /// tenant's own carrier account reports, `managed: true` rows are hub records
 /// the carrier fetch deliberately never sees. Before the hub read existed, a
@@ -96,7 +96,7 @@ public struct ListedNumber: Codable, Sendable {
     public let phoneNumber: String
     /// ⚠️ Absent on a row the carrier never named.
     public let friendlyName: String?
-    /// ⚠️ Present and possibly EMPTY — the all-fallbacks managed row carries `[]`
+    /// ⚠️ Present and possibly EMPTY, the all-fallbacks managed row carries `[]`
     /// rather than omitting the key, which is a measured "we do not know what
     /// this line can do" rather than "it can do nothing".
     public let capabilities: [String]
@@ -118,7 +118,7 @@ public struct ListedNumber: Codable, Sendable {
     public let managed: Bool
 }
 
-/// `GET /api/district/workspace/provider/numbers` — every number the workspace
+/// `GET /api/district/workspace/provider/numbers`, every number the workspace
 /// already has, from every source.
 ///
 /// ⛔ ``partial`` IS THE DANGEROUS SHAPE OF THIS ROUTE AND IT MUST NEVER BE
@@ -127,18 +127,18 @@ public struct ListedNumber: Codable, Sendable {
 /// describing less inventory than the workspace owns. The route reserves its 502
 /// for "a carrier failed AND nothing resolved at all", because a failed lookup
 /// rendered as an empty list reads as "you own no numbers". ⛔ A screen must
-/// therefore render the rows AND name the carrier that is missing — a banner
+/// therefore render the rows AND name the carrier that is missing, a banner
 /// that REPLACED the list would throw away an answer already in hand, and a list
 /// with no banner would draw an incomplete inventory as a complete one.
 ///
-/// ⚠️ BOTH FLAGS ARE ABSENT — not false, not empty — ON A CLEAN LIST, which is
+/// ⚠️ BOTH FLAGS ARE ABSENT, not false, not empty, ON A CLEAN LIST, which is
 /// why both are Optional and why the partial fixture exists beside the clean
 /// one: with only one of them, the pair would be indistinguishable to a decoder.
 /// Use ``failedProviderNames`` rather than reading either field alone.
 ///
 /// ⚠️ A SECOND CONFIGURED CARRIER IS REQUIRED FOR THE PARTIAL STATE TO BE
 /// REACHABLE AT ALL. The route only fetches from providers the workspace has
-/// credentials for, so a single-carrier workspace has no partial state — it has
+/// credentials for, so a single-carrier workspace has no partial state, it has
 /// a 502 or a complete answer.
 public struct OwnedNumbersResponse: Codable, Sendable {
     public let success: Bool

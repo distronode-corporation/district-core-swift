@@ -8,9 +8,9 @@ import XCTest
 ///
 /// ⛔ THE NEGATIVE CASES ARE THE POINT OF THIS FILE, AND THEY ARE ABOUT WHICH
 /// SENTENCE A RINGING SCREEN SHOWS RATHER THAN ABOUT DECODING. Three statuses
-/// mean three different things to the person holding the phone — "the caller hung
+/// mean three different things to the person holding the phone, "the caller hung
 /// up" (404/409), "you are a viewer and this workspace will not let you take it"
-/// (403), and "something went wrong" (everything else) — and only the first two
+/// (403), and "something went wrong" (everything else), and only the first two
 /// are `.success` values a screen may word gently.
 ///
 /// ⚠️ NO TEST HERE SENDS A SECOND REQUEST, and none may be added. `calls/answer`
@@ -134,7 +134,7 @@ final class InboundCallRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ AN EDGE 403 IS HTML. `ApiErrorEnvelope.lenient` answers nil, so the
-    /// refusal carries no message and the screen owns the fallback — rather than
+    /// refusal carries no message and the screen owns the fallback, rather than
     /// putting a captive portal's markup on a ringing phone.
     func testANonJsonForbiddenBodyIsARefusalWithNoSentence() async {
         let transport = RepositoryTransport(json: "<html>403 Forbidden</html>", status: 403)
@@ -212,7 +212,7 @@ final class InboundCallRepositoryTests: XCTestCase {
     }
 
     /// ⛔ AN AFFIRMED ENVELOPE WITH A BLANK CREDENTIAL IS STILL NOT A CALL. `{}`
-    /// cannot reach here (every field is required), but `""` decodes perfectly —
+    /// cannot reach here (every field is required), but `""` decodes perfectly,
     /// and a blank url would surface at `engine.connect` as a media-plane error on
     /// a screen already showing a connected call.
     func testAnAffirmedEnvelopeWithABlankCredentialIsADecodeFailure() async {

@@ -1,13 +1,13 @@
 import Foundation
 
 /// The endpoints that still answer as bytes because their DTO does not exist
-/// yet — the tracked `UNTYPED_ENDPOINTS` list.
+/// yet, the tracked `UNTYPED_ENDPOINTS` list.
 ///
 /// ⛔ THIS IS A BURN-DOWN LIST AND IT MUST ONLY EVER SHRINK. Every route here is
 /// read through ``RawResponse`` until its contract fixture is implemented and its
 /// DTO ports. Moving an endpoint out of here means: add the DTO, implement its
 /// fixture in `ContractFixtureTests`, AND change the repository that calls it to
-/// decode typed — in one commit, so the strict gate, the client and this list
+/// decode typed, in one commit, so the strict gate, the client and this list
 /// agree at every commit.
 ///
 /// ⚠️ THE THIRD OF THOSE THREE IS THE ONE THAT IS EASY TO SKIP. DTOs can be
@@ -20,7 +20,7 @@ import Foundation
 /// `EndpointSurfaceTests` asserts that ``all`` ∪ ``TypedEndpoints/all`` ∪
 /// ``RedirectEndpoints/all`` is exactly ``EndpointID/allCases`` with no overlap,
 /// so an endpoint added without being classified fails the suite rather than
-/// quietly defaulting to "raw" — which is the shape that makes a burn-down list
+/// quietly defaulting to "raw", which is the shape that makes a burn-down list
 /// stop being true without anyone noticing.
 public enum UntypedEndpoints {
     public static let all: Set<EndpointID> = [
@@ -71,7 +71,7 @@ public enum UntypedEndpoints {
 /// the scheduling pair has the same property. The tempting edit on any new
 /// repository is a copied `affirm` line from a neighbouring one.
 public enum TypedEndpoints {
-    /// ⚠️ THIS SET PLUS THE PER-FAMILY SETS IN SIBLING FILES — a lint ceiling rather
+    /// ⚠️ THIS SET PLUS THE PER-FAMILY SETS IN SIBLING FILES, a lint ceiling rather
     /// than a taxonomy: one file would exceed `file_length`'s 500 lines and the
     /// commentary is the point of it. ⛔ A family declared elsewhere and not unioned in here
     /// fails `EndpointSurfaceTests`' partition assertion rather than defaulting to
@@ -152,7 +152,7 @@ public enum TypedEndpoints {
         .clearContactIntel,
         // ── Analytics and metered usage ──────────────────────────────────────
         // ⚠️ `usage` AND `usageHistory` ARE ONE ROUTE AND TWO ENTRIES, because the
-        // response TYPE changes with the `history` query parameter — an object
+        // response TYPE changes with the `history` query parameter, an object
         // there, an array here. Classifying them together would hide the fact that
         // a caller able to confuse them reads a single month as an empty history.
         .analytics,
@@ -182,7 +182,7 @@ public enum TypedEndpoints {
         .saveDraft,
         .generateDraft,
         // ── Scheduling ───────────────────────────────────────────────────────
-        // ⚠️ NEITHER ROUTE CARRIES A `success` ENVELOPE — status answers
+        // ⚠️ NEITHER ROUTE CARRIES A `success` ENVELOPE, status answers
         // `{eligible, canManage, tenant}` and enable answers `{ok, status,
         // publicHost, error}`. "Typed" here means the repository decodes a DTO,
         // and for these two it also means it must NOT reach for
@@ -305,7 +305,7 @@ public enum TypedEndpoints {
         // Stripe, so "typed" here means the repository decodes a DTO and, for
         // the second one, that it must NOT reach for `ResponseEnvelope.affirm`.
         //
-        // ⛔ AND `stripeBilling` HAS THREE BODIES BEHIND ONE ENDPOINT — healthy,
+        // ⛔ AND `stripeBilling` HAS THREE BODIES BEHIND ONE ENDPOINT, healthy,
         // `billingUnavailable: true`, and no-customer, the last two identical
         // but for one absent key. Three fixtures, one endpoint: the same
         // arithmetic messaging and HQ made, arriving a fourth time.
@@ -331,7 +331,7 @@ public enum TypedEndpoints {
         .ownedNumbers,
         // ── Meetings ─────────────────────────────────────────────────────────
         // ⛔ THE LIST IS A BARE ARRAY AND THE DETAIL IS A BARE OBJECT, so
-        // `meetings` stays on ``BareArrayEndpoints`` as well as here — the two
+        // `meetings` stays on ``BareArrayEndpoints`` as well as here, the two
         // lists answer different questions, and `meetingDetail` belongs to
         // neither envelope family. Typed here means `MeetingsRepository` decodes
         // `[MeetingSummary]` and `MeetingDetail`, which are NOT subsets of one

@@ -2,14 +2,14 @@ import ContractGateSupport
 import Foundation
 import XCTest
 
-/// The iOS half of the two-sided contract gate — the third consumer of the
+/// The iOS half of the two-sided contract gate, the third consumer of the
 /// fixtures the server generates and the Kotlin client already checks.
 ///
 /// ⛔ EVERY FIXTURE IN THE CORPUS IS WIRED IN FROM DAY ONE, not as DTOs land.
 /// A suite that only knew about the endpoints already ported could not tell a
 /// new endpoint from an endpoint nobody got to, and the burn-down would be
 /// invisible. Instead every file on disk must appear in exactly one of two
-/// lists — `ImplementedFixtures` or `ContractManifest.unimplemented` — and the
+/// lists, `ImplementedFixtures` or `ContractManifest.unimplemented`, and the
 /// suite prints a counted summary of both on every run.
 final class ContractFixtureTests: XCTestCase {
     // MARK: - The guard that stops this suite verifying nothing
@@ -24,7 +24,7 @@ final class ContractFixtureTests: XCTestCase {
     /// `*.json` or a partial checkout each leave the gate with nothing to read.
     func testContractsDirectoryIsPopulated() throws {
         let names = try ContractFixtures.allFixtureNames()
-        XCTAssertFalse(names.isEmpty, "unreachable — allFixtureNames() throws rather than returning []")
+        XCTAssertFalse(names.isEmpty, "unreachable: allFixtureNames() throws rather than returning []")
         print("contract fixtures: \(names.count) found in \(ContractFixtures.directory.path)")
     }
 
@@ -42,7 +42,7 @@ final class ContractFixtureTests: XCTestCase {
             \(ContractManifest.expectedFixtureCount) in ContractManifest.
               If fixtures were ADDED, bump ContractManifest.expectedFixtureCount and add
               each new name to ContractManifest.unimplemented in the same commit.
-              If this is a partial or stale checkout, fix the checkout — do not move
+              If this is a partial or stale checkout, fix the checkout: do not move
               the number to match it.
               on disk: \(names.joined(separator: ", "))
             """
@@ -82,8 +82,8 @@ final class ContractFixtureTests: XCTestCase {
     }
 
     /// ⛔ A SKIP-LIST ENTRY FOR A FIXTURE THAT DOES NOT EXIST IS A FAILURE, NOT A
-    /// HARMLESS LEFTOVER. It means the corpus moved under us — a rename, a
-    /// deletion, or this list drifting behind the generator — and a list that is
+    /// HARMLESS LEFTOVER. It means the corpus moved under us, a rename, a
+    /// deletion, or this list drifting behind the generator, and a list that is
     /// allowed to name ghosts stops being evidence of anything.
     func testSkipListHasNoStaleEntries() throws {
         let onDisk = try Set(ContractFixtures.allFixtureNames())
@@ -180,7 +180,7 @@ final class ContractFixtureTests: XCTestCase {
 
     /// ⛔ AN ENTRY MUST BE AN EXACT PATH, AND THERE IS NO PATTERN LANGUAGE TO
     /// WRITE A WIDER ONE WITH. The verifier matches by set membership, so a
-    /// `*` or a `[]` in an entry does not widen it — it simply never matches,
+    /// `*` or a `[]` in an entry does not widen it, it simply never matches,
     /// which would leave a fixture failing for a reason nobody would look for.
     /// This is the check that says so out loud.
     func testEveryAllowlistedPathIsAnExactPath() {

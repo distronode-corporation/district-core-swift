@@ -17,7 +17,7 @@ import Foundation
 /// ⚠️ TWO KEYS ONLY, AND IT IS NOT ``SchedulingTeam``. The user list embeds a
 /// name badge rather than the team, so a client that shared the type would model
 /// `slug`, `created_at`, `member_count` and `members` on an object that never
-/// carries them — invisible at runtime and a four-key report the moment the
+/// carries them, invisible at runtime and a four-key report the moment the
 /// fixture is gated.
 public struct SchedulingUserTeam: Codable, Sendable {
     public let id: String
@@ -28,7 +28,7 @@ public struct SchedulingUserTeam: Codable, Sendable {
 ///
 /// ⛔ `teams` IS `.nullish()` AND ARRIVES AS AN EXPLICIT `null`, NOT AS AN ABSENT
 /// KEY. It is a Go slice the fork marshals without `omitempty`, so a user in no
-/// team carries `"teams": null` — row 1 of `district-scheduling-users.json` is
+/// team carries `"teams": null`, row 1 of `district-scheduling-users.json` is
 /// that row, and its `$.data[1].teams` is one of this stream's three
 /// `allowedExplicitNulls` entries. ⚠️ Null and `[]` mean the same thing HERE
 /// (nobody's team membership is "unknown"), which is not true of every nullable
@@ -36,7 +36,7 @@ public struct SchedulingUserTeam: Codable, Sendable {
 ///
 /// ⛔ `archived` IS NON-OPTIONAL AND THE THREE FIELDS BESIDE IT ARE NOT. An
 /// active user carries `archived:false` and no `archived_at` and no
-/// `archived_by_name` — they are absent rather than null — so the Optionals are
+/// `archived_by_name`, they are absent rather than null, so the Optionals are
 /// "this user is not archived" and must not be read as "we do not know who
 /// archived them". `archived` is the field that decides.
 ///
@@ -49,7 +49,7 @@ public struct SchedulingUser: Codable, Sendable {
     public let email: String
     public let name: String
     /// An IANA zone. ⚠️ Absent on a user who has never opened the scheduler, in
-    /// which case the tenancy's default applies — which this response does not
+    /// which case the tenancy's default applies, which this response does not
     /// carry, so it cannot be substituted here.
     public let timezone: String?
     public let isAdmin: Bool
@@ -90,7 +90,7 @@ public struct SchedulingUser: Codable, Sendable {
 ///
 /// ⛔ THE OP IT BELONGS TO REFUSES 409 WHILE THE USER STILL HOSTS UPCOMING
 /// BOOKINGS, which is the whole reason ``SchedulingUpcomingBooking`` exists: the
-/// fork's archive is a two-step by design — reassign or cancel, then archive —
+/// fork's archive is a two-step by design, reassign or cancel, then archive,
 /// and a screen that offers "archive" without first offering the list has nothing
 /// to say when the 409 arrives. ⚠️ The fork's own refusal text never travels; the
 /// RPC answers a code and a number, so the sentence is ours to write.
@@ -111,7 +111,7 @@ public struct SchedulingUserArchived: Codable, Sendable {
 ///
 /// ⛔ EVERY FIELD IS REQUIRED, WHICH IS THE OPPOSITE OF ``SchedulingBooking`` AND
 /// IS NOT A CONTRADICTION. This is a purpose-built projection the fork assembles
-/// for exactly one question — "what is in the way?" — so it joins the event type
+/// for exactly one question, "what is in the way?", so it joins the event type
 /// and the attendee rather than reporting what a sparse booking index happens to
 /// hold. It is also not addressable: there is no `status`, no `location_value`
 /// and no host, because the host is the user being archived.
@@ -168,7 +168,7 @@ public struct SchedulingTeamMember: Codable, Sendable {
 ///
 /// ⛔ `members` IS `.nullish()` AND AN EMPTY TEAM ANSWERS EXPLICIT `null`. Same
 /// Go-slice-without-`omitempty` mechanism as ``SchedulingUser/teams``, and both
-/// of this stream's team fixtures demonstrate it — `$.data.items[1].members` on
+/// of this stream's team fixtures demonstrate it, `$.data.items[1].members` on
 /// the list and `$.data.members` on the single read, which are the same team seen
 /// twice. ⚠️ Unlike the user's `teams`, null here is NOT interchangeable with
 /// `[]`: six of the eight `teams.*` ops answer a team, and only the two that read

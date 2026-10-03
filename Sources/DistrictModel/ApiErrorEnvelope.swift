@@ -7,7 +7,7 @@ import Foundation
 /// ENVELOPES AND NOTHING NORMALISES THEM SERVER-SIDE:
 ///
 ///   - a route's own failure:  `{success:false, error, code}`
-///   - the shared auth guard:  `{error}` — returned verbatim by EVERY route on
+///   - the shared auth guard:  `{error}`, returned verbatim by EVERY route on
 ///     401/403/404, with no `success` key at all
 ///   - the newer helpers:      `{error, code}`
 ///
@@ -19,8 +19,8 @@ import Foundation
 /// ⚠️ THIS IS THE WIRE SHAPE, NOT THE APP'S ERROR TYPE. Normalising these onto
 /// `ApiError` happens in DistrictNetwork; this type is only what the bytes decode into.
 public struct ApiErrorEnvelope: Codable, Sendable {
-    /// Present only when the route builds its own envelope. Absent — not
-    /// `false` — on anything the shared auth guard produced.
+    /// Present only when the route builds its own envelope. Absent, not
+    /// `false`, on anything the shared auth guard produced.
     public let success: Bool?
     /// The human-readable reason. Present in all three shapes.
     ///
@@ -53,7 +53,7 @@ public enum ApiErrorCode {
     /// 503 from `GET /api/district/workspace/list` when a region is unreachable.
     /// See `WorkspaceListDegradedError`.
     public static let regionsDegraded = "REGIONS_DEGRADED"
-    /// 402 from the shared `requireActiveSubscription` guard — so it can arrive
+    /// 402 from the shared `requireActiveSubscription` guard, so it can arrive
     /// on any billable route, not only the dial. Its body carries a fourth key
     /// and therefore has its own type: see `SubscriptionInactiveError`.
     public static let subscriptionInactive = "subscription_inactive"
@@ -62,12 +62,12 @@ public enum ApiErrorCode {
     ///
     /// ⛔ NOT A BILLING FAILURE AND NOT A PERMISSION FAILURE, and it must not be
     /// worded as either. `subscription_inactive` means "pay and it resumes";
-    /// this one means "ask us and we turn it back on" — the dashboard has a
+    /// this one means "ask us and we turn it back on", the dashboard has a
     /// reactivation route, so the only correct copy points there.
     /// Rendered as a generic 403 it reads as an account the operator has lost.
     ///
-    /// ⚠️ ITS BODY IS A PLAIN `{success, error, code}` — no fourth key, unlike
-    /// the subscription refusal — so `ApiErrorEnvelope` models it exactly and it
+    /// ⚠️ ITS BODY IS A PLAIN `{success, error, code}`, no fourth key, unlike
+    /// the subscription refusal, so `ApiErrorEnvelope` models it exactly and it
     /// needs no type of its own. See `district-dial-dormant.json`.
     public static let workspaceDormant = "workspace_dormant"
     /// 400 from `POST /api/district/scheduling/handoff` when a `nonce` was sent but

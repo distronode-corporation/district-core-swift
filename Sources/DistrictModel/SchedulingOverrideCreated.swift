@@ -5,7 +5,7 @@ import Foundation
 //
 // ⛔ IN `DistrictModel` RATHER THAN BESIDE THE REPOSITORY, BECAUSE THE CONTRACT
 // GATE CAN ONLY SEE THIS MODULE. `ContractFixtureTests` depends on
-// `ContractGateSupport` and `DistrictModel` and nothing else, deliberately — a
+// `ContractGateSupport` and `DistrictModel` and nothing else, deliberately, a
 // fixture suite that could import the repository layer would drag the whole
 // dependency graph into a test about JSON. A wire type that is not here is a wire
 // type `StrictDecodeVerifier` cannot pin.
@@ -19,7 +19,7 @@ import Foundation
 /// DISTRICT'S. Every other DTO in this package mirrors a Distronode route and is
 /// camelCase; these pass THROUGH our RPC from a fork that is not ours, so the keys
 /// are spelled out rather than converted. ⛔ Do not reach for
-/// `.convertFromSnakeCase` on the shared decoder to "fix" it — ``ApiClient`` uses
+/// `.convertFromSnakeCase` on the shared decoder to "fix" it, ``ApiClient`` uses
 /// a plain `JSONDecoder` for every route in the client, and changing it would
 /// re-map the whole District surface to chase four fields.
 ///
@@ -35,7 +35,7 @@ public struct SchedulingAvailabilityOverride: Codable, Equatable, Sendable {
     /// ⚠️ NULLABLE, NOT ABSENT: an all-day block carries an explicit `null`.
     public let startTime: String?
     public let endTime: String?
-    /// ⚠️ OPTIONAL, unlike the two above — present only when this row was created
+    /// ⚠️ OPTIONAL, unlike the two above, present only when this row was created
     /// as part of a RANGE. It is what links a single day back to its group, and
     /// therefore what makes ``SchedulingAdminOp/availabilityOverridesDeleteGroup``
     /// addressable from a row the user tapped.
@@ -83,7 +83,7 @@ public struct SchedulingOverrideGroup: Codable, Equatable, Sendable {
 /// override answers a row; a date RANGE answers
 /// `{group_id, reason, start, end, days}` with no `id` in it at all. Modelled as
 /// one type with optional fields, a caller would have to guess which half is
-/// populated, and the guess would be `if let id` — the same test as below, made
+/// populated, and the guess would be `if let id`, the same test as below, made
 /// once per call site instead of once here.
 ///
 /// ⛔ DISAMBIGUATED ON THE PRESENCE OF `id`, NOT ON `group_id`, AND THE NEAR MISS
@@ -94,7 +94,7 @@ public struct SchedulingOverrideGroup: Codable, Equatable, Sendable {
 ///
 /// ⚠️ TRIED IN ROW ORDER, and the order is load-bearing rather than stylistic: a
 /// `try?` on the row first means a body carrying both keys decodes as the row,
-/// which is the correct reading — a summary has no `id` to offer.
+/// which is the correct reading, a summary has no `id` to offer.
 public enum SchedulingOverrideCreated: Codable, Equatable, Sendable {
     case single(SchedulingAvailabilityOverride)
     case range(SchedulingOverrideGroup)
@@ -112,7 +112,7 @@ public enum SchedulingOverrideCreated: Codable, Equatable, Sendable {
     /// CONTRACT FAULT NO DECODE-ONLY TEST CAN SEE. `StrictDecodeVerifier` decodes
     /// and then RE-ENCODES, comparing key sets; an `encode(to:)` that wrapped the
     /// arm in a discriminator, or emitted the other arm's keys, would pass every
-    /// runtime test in the package and fail the gate — which is precisely what the
+    /// runtime test in the package and fail the gate, which is precisely what the
     /// gate is for.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()

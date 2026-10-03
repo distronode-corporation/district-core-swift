@@ -11,12 +11,12 @@ import XCTest
 /// look like "the allowlist works" from a green pipeline: an entry that exempted
 /// the null assertion but not the re-encode key loss (every allowlisted fixture
 /// fails, which at least is loud), and an entry that exempted the whole OBJECT
-/// it sits in (nothing fails, ever again, at that path — which is silent and is
+/// it sits in (nothing fails, ever again, at that path, which is silent and is
 /// the one worth paying for a test). Both are pinned below, along with the
 /// property every shipped entry depends on: a listed path holding a real value
 /// is fine, because these are nullable columns and not required nulls.
 ///
-/// ⚠️ IN-MEMORY PAYLOADS, NOT COMMITTED FIXTURES — a broken fixture on disk would
+/// ⚠️ IN-MEMORY PAYLOADS, NOT COMMITTED FIXTURES, a broken fixture on disk would
 /// be picked up by the corpus enumeration and counted as part of the burn-down.
 final class AllowlistMechanicsTests: XCTestCase {
     // MARK: - The exemption itself
@@ -51,7 +51,7 @@ final class AllowlistMechanicsTests: XCTestCase {
 
     /// ⛔ THE SILENT FAILURE MODE. If the exemption were computed per OBJECT
     /// rather than per key, an entry for `note` would also hide a genuinely
-    /// unmodelled sibling — and unmodelled keys are the entire reason this gate
+    /// unmodelled sibling, and unmodelled keys are the entire reason this gate
     /// exists, since `JSONDecoder` cannot reject one.
     func testAnEntryDoesNotExcuseAnUnmodelledSiblingKey() {
         let json = """
@@ -72,7 +72,7 @@ final class AllowlistMechanicsTests: XCTestCase {
 
     /// ⛔ AND IT MUST NOT EXCUSE A DROPPED **VALUE**. The exemption is
     /// conditioned on the fixture's value actually being null, so an allowlist
-    /// entry cannot be used — or left lying around after a regeneration — to
+    /// entry cannot be used, or left lying around after a regeneration, to
     /// hide a field the DTO stopped modelling. Here the listed path carries a
     /// real string and the DTO has no property for it.
     func testAnEntryDoesNotExcuseADroppedKeyWhoseValueIsNotNull() {
@@ -114,7 +114,7 @@ final class AllowlistMechanicsTests: XCTestCase {
 
     /// ⚠️ THE PROPERTY EVERY SHIPPED ENTRY RELIES ON. Every one of them names a
     /// NULLABLE COLUMN, so whether a regenerated row happens to carry a value is
-    /// not a contract change — and a gate that demanded the null would fail on
+    /// not a contract change, and a gate that demanded the null would fail on
     /// the good news. A listed path holding a real value passes, and the value
     /// still round-trips.
     func testAnAllowlistedPathMayHoldARealValue() throws {
@@ -133,7 +133,7 @@ final class AllowlistMechanicsTests: XCTestCase {
     /// ⚠️ AND A DTO THAT RE-ENCODES THE NULL AS A NULL IS EQUALLY FINE. The
     /// exemption excuses a LOST key; it does not require one. This is the shape
     /// `district-workspace-config.json` takes, where the null sits inside an
-    /// opaque ``WireJSON`` blob that carries it through untouched — so the entry
+    /// opaque ``WireJSON`` blob that carries it through untouched, so the entry
     /// there buys the assertion exemption and nothing else.
     func testAnAllowlistedNullMayAlsoBeReEncodedAsANull() throws {
         let json = """
@@ -155,7 +155,7 @@ final class AllowlistMechanicsTests: XCTestCase {
     /// passes the set explicitly; the fixture entry point instead looks it up BY
     /// FIXTURE NAME. A table that was populated but never read would leave all
     /// allowlisted fixture failing, but a table read under the wrong key would
-    /// leave them failing too — and both would be reported as a DTO problem.
+    /// leave them failing too, and both would be reported as a DTO problem.
     func testTheFixtureNameIsWhatSelectsTheEntry() throws {
         let json = #"{"success":true,"draft":null}"#
         let decoded = try StrictDecodeVerifier.verify(
@@ -215,7 +215,7 @@ private struct NullableRow: Codable {
     let rows: [Row]
 }
 
-/// The same payload with `note` unmodelled — a DTO that drops the field.
+/// The same payload with `note` unmodelled, a DTO that drops the field.
 private struct IdOnlyRow: Codable {
     struct Row: Codable {
         let id: String

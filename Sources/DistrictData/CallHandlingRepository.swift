@@ -6,7 +6,7 @@ import Foundation
 ///
 /// ⛔ ITS OWN REPOSITORY RATHER THAN FOUR MORE METHODS ON ``WorkspaceRepository``,
 /// AND THE SEAM IS THE SCOPE RATHER THAN THE PATH PREFIX. Both routes sit under
-/// `/api/district/workspace/`, so grouping by URL would put them there — but
+/// `/api/district/workspace/`, so grouping by URL would put them there, but
 /// `availability` is not a workspace setting at all: it reads and writes the
 /// CALLER'S OWN membership row, and the PATCH takes no email and no user id to do
 /// it with. Filing it beside the wholesale-replace config writes is how someone
@@ -102,7 +102,7 @@ public struct CallHandlingRepository: Sendable {
     /// draw a live switch for someone the server will never ring.
     ///
     /// ⚠️ `reason` IS ALWAYS PRESENT ON THE WIRE and is an explicit `null` on the
-    /// ordinary path — see the ⛔ on ``AvailabilityResponse/reason``.
+    /// ordinary path, see the ⛔ on ``AvailabilityResponse/reason``.
     public func availability(workspaceId: String) async -> Result<AvailabilityResponse, ApiError> {
         let outcome = await client.send(
             DistrictEndpoints.availability(workspaceId: workspaceId),
@@ -119,7 +119,7 @@ public struct CallHandlingRepository: Sendable {
     ///
     /// ⛔ **409 IS NOT A VALIDATION FAILURE AND NOT A PERMISSION FAILURE.** It means
     /// there is no `WorkspaceMember` row to write, because the person holds their
-    /// role through the owner fallback — the read-side twin of
+    /// role through the owner fallback, the read-side twin of
     /// ``AvailabilityReason/noMemberRow``. The status reaches the caller intact so
     /// that sentence can be shown instead of a shrug; the route does not create a
     /// row and neither may this.

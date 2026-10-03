@@ -8,7 +8,7 @@ import XCTest
 /// ⛔ THE STRICT GATE CANNOT TELL THE TWO DEGRADED BODIES APART, WHICH IS WHY
 /// THIS FILE EXISTS. `district-billing-unavailable.json` and
 /// `district-billing-no-customer.json` differ by ONE key, and `StrictDecodeVerifier`
-/// compares shapes rather than values — so the fact that one means "Stripe is
+/// compares shapes rather than values, so the fact that one means "Stripe is
 /// down" and the other means "this account has no billing" is entirely
 /// value-level, and only assertions like these hold it. Conflating them is how a
 /// Stripe outage gets drawn as a free account.
@@ -17,7 +17,7 @@ final class BillingContractTests: XCTestCase {
 
     /// ⛔ SIX KEYS, NONE OF THEM FROM STRIPE. Every field is a column the Stripe
     /// webhooks wrote to our own database, which is what makes this screen render
-    /// during a Stripe outage — the property the route's header forbids anyone
+    /// during a Stripe outage, the property the route's header forbids anyone
     /// removing, and the reason this fixture and `district-billing.json` are two
     /// fixtures rather than one.
     func testTheWorkspacePlanCarriesTheTierInBothCasingsAndAMeteredMonth() throws {
@@ -37,7 +37,7 @@ final class BillingContractTests: XCTestCase {
         XCTAssertFalse(billing.overageCapExceeded)
         XCTAssertFalse(billing.callsAreBeingRefused, "within plan, and billing rather than blocking anyway")
         // ⛔ FRACTIONAL MINUTES REACH THE SCREEN THAT METERS THEM AGAINST AN
-        // ALLOWANCE, so `Double` is not fussiness — an `Int` here fails to decode
+        // ALLOWANCE, so `Double` is not fussiness, an `Int` here fails to decode
         // outright, and rounding would round a bill.
         let usage = try XCTUnwrap(billing.usage)
         XCTAssertEqual(usage.callMinutesInbound, 1204.25)
@@ -51,7 +51,7 @@ final class BillingContractTests: XCTestCase {
     /// ``WorkspaceBilling/callsAreBeingRefused`` exists to stop.
     ///
     /// ⛔ AND `usage: null` IS NOT ZERO. A column of zeros here would assert, in
-    /// the register of a bill, that nothing was used — beside a cap saying calls
+    /// the register of a bill, that nothing was used, beside a cap saying calls
     /// are refused. The two statements contradict each other and only one of them
     /// was measured. ⚠️ A null tier is not "Free" either: this route passes the
     /// column through untouched where `/api/settings` substitutes the word.
@@ -116,7 +116,7 @@ final class BillingContractTests: XCTestCase {
     /// ⛔ THE ROW WHERE FOUR OPTIONAL KEYS ARE ABSENT RATHER THAN NULL, and the
     /// row where the date means the opposite thing. `JSON.stringify` drops an
     /// undefined, so a legacy price that matched no tier sends no
-    /// `includedMinutes`, no `overageRate` and no `discount` at all — and
+    /// `includedMinutes`, no `overageRate` and no `discount` at all, and
     /// `cancel_at_period_end: true` makes `current_period_end` an END rather than
     /// a renewal, which under a "renews" heading tells a customer who cancelled
     /// that they are about to be billed again.
@@ -145,7 +145,7 @@ final class BillingContractTests: XCTestCase {
         XCTAssertEqual(legacy.currentPeriodEnd, 1_757_514_600, "⚠️ UNIX SECONDS")
     }
 
-    /// ⛔ THE MOST ORDINARY INVOICE THERE IS — this month's, before it is paid —
+    /// ⛔ THE MOST ORDINARY INVOICE THERE IS, this month's, before it is paid,
     /// IS THE ONE THAT WOULD THROW ON A CLIENT TYPING THE LINKS NON-NULL. Stripe
     /// omits both until an invoice is finalised. ⚠️ And a zero `tax` is a
     /// MEASURED zero summed out of `total_taxes`, not an absence, which is what
@@ -173,7 +173,7 @@ final class BillingContractTests: XCTestCase {
     }
 
     /// ⛔ DEGRADED MODE, NOT FREE TIER, AND THE FLAG IS THE ONLY THING THAT SAYS
-    /// SO. Nine of the fourteen healthy keys are ABSENT here — not null, absent —
+    /// SO. Nine of the fourteen healthy keys are ABSENT here, not null, absent,
     /// so a required field on any of them would fail to decode precisely when
     /// billing was already broken. ⚠️ The spending cap's nil on this path means
     /// "unknown", never "no cap": rendering it as "no spending cap set" states a
@@ -202,7 +202,7 @@ final class BillingContractTests: XCTestCase {
     /// the OPPOSITE thing: this account genuinely has no Stripe customer, which a
     /// screen may legitimately render as "no billing set up". No Stripe call was
     /// made to find that out. A client branching on "are the arrays empty" would
-    /// call an outage a free account — the conflation that routes a paying
+    /// call an outage a free account, the conflation that routes a paying
     /// customer to a checkout page.
     func testAnAccountWithNoStripeCustomerIsTheSameBodyWithoutTheFlagAndTheOppositeMeaning() throws {
         let billing = try StrictDecodeVerifier.verify(

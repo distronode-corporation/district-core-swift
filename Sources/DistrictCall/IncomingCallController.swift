@@ -2,7 +2,7 @@
 ///
 /// ⛔ ``answering`` IS A PHASE OF ITS OWN AND NOT A SPINNER OVER ``ringing``,
 /// BECAUSE THE TWO ACCEPT DIFFERENT INPUT. Answer and Decline are both live while
-/// ringing; once the answer round trip is out neither may be pressed again — a
+/// ringing; once the answer round trip is out neither may be pressed again, a
 /// second answer would write the server's rendezvous twice, and a decline would
 /// tear down a call that is mid-join whose credential has already been spent. It
 /// is also visible: the button has to stop looking pressable, and there is a real
@@ -12,7 +12,7 @@ public enum IncomingCallPhase: Sendable, Equatable {
     /// Nothing is ringing and nothing is live. The screen draws nothing.
     case idle
 
-    /// The phone is ringing. ⚠️ Bounded — see
+    /// The phone is ringing. ⚠️ Bounded, see
     /// ``IncomingCallController/ringTimeoutMilliseconds``.
     case ringing
 
@@ -101,7 +101,7 @@ public enum IncomingCallEvent: Sendable, Equatable {
     ///
     /// ⚠️ ONE EVENT FOR ALL THREE, DELIBERATELY. A car head unit, a watch or a
     /// headset answers through CallKit, and without that wire the OS connection
-    /// would go active while this app never joined the room — silence, on a call
+    /// would go active while this app never joined the room, silence, on a call
     /// the system says is connected.
     case answerPressed
 
@@ -135,9 +135,9 @@ public enum IncomingCallEvent: Sendable, Equatable {
 /// ⛔ THE DEVICE SURFACES ARE COMMANDS RATHER THAN CALLS FOR THE SAME REASON THE
 /// ENGINE'S ARE: CallKit cannot be imported here, cannot be built on Linux and
 /// cannot be exercised anywhere without a signed build on a real phone. Every
-/// ordering that matters — the ring notification going away at the PRESS rather
+/// ordering that matters, the ring notification going away at the PRESS rather
 /// than at the connect, the OS being told the call is active only AFTER media
-/// is up — is an assertion about this list.
+/// is up, is an assertion about this list.
 public enum IncomingCallCommand: Sendable, Equatable {
     /// Report a new incoming call to the OS and draw the notification.
     ///
@@ -161,7 +161,7 @@ public enum IncomingCallCommand: Sendable, Equatable {
     /// `POST /api/district/calls/{callId}/answer?workspaceId=`.
     ///
     /// ⛔ EMITTED EXACTLY ONCE PER CALL, AND ON NO OTHER PATH. ⛔ NOTHING IS SENT
-    /// ON A DECLINE OR A TIMEOUT — see ``IncomingCallController``.
+    /// ON A DECLINE OR A TIMEOUT, see ``IncomingCallController``.
     case requestAnswer(workspace: WorkspaceID, call: CallID)
 
     /// Tell the OS the call is connected.
@@ -186,8 +186,8 @@ public enum IncomingCallCommand: Sendable, Equatable {
 /// /api/district/actions/ring-app` blocks on a Redis rendezvous for about 25
 /// seconds and falls back to PSTN when it expires, so the server already has
 /// everything it needs from the ABSENCE of an answer. Reporting a decline would
-/// make a deliberate refusal distinguishable from a phone in a pocket — to the
-/// agent, and through it to the caller — and there is no version of that
+/// make a deliberate refusal distinguishable from a phone in a pocket, to the
+/// agent, and through it to the caller, and there is no version of that
 /// distinction the product wants. The two must be indistinguishable from outside,
 /// so they emit identical command lists and differ only in a local
 /// ``CallEndReason`` this device never transmits.
@@ -197,7 +197,7 @@ public enum IncomingCallCommand: Sendable, Equatable {
 /// would take the Answer button away while the server was still willing to accept
 /// one, which is the one ordering that turns a slow thumb into a missed call.
 ///
-/// ⛔ **ONE CALL AT A TIME, AND A SECOND PUSH WHILE ONE IS LIVE IS DROPPED** —
+/// ⛔ **ONE CALL AT A TIME, AND A SECOND PUSH WHILE ONE IS LIVE IS DROPPED**,
 /// not queued, not allowed to replace. One engine owns the device's audio focus,
 /// and a replacement would tear down a conversation the user is having in order to
 /// ring them about another. The dropped call still reaches the server's timeout
@@ -412,7 +412,7 @@ public struct IncomingCallController: Sendable, Equatable {
     /// The one exit.
     ///
     /// ⛔ THE DISCONNECT IS APPENDED ONLY WHEN A CONNECT WAS EVER ISSUED. See
-    /// ``IncomingCallState/engineAttached`` — it is what keeps a declined ring and
+    /// ``IncomingCallState/engineAttached``, it is what keeps a declined ring and
     /// a timed-out one emitting the same two commands, and what stops a failed
     /// join leaving a socket nobody closes.
     private static func end(

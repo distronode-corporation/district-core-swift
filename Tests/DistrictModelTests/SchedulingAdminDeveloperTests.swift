@@ -67,7 +67,7 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
 
     /// ⛔ THE CREATE BODY IS A DIFFERENT TYPE AND `key` IS REQUIRED ON IT. Modelled
     /// as an Optional on ``SchedulingAPIKey`` this would round-trip against the
-    /// LIST fixtures too, so the contract gate could not tell the two apart — the
+    /// LIST fixtures too, so the contract gate could not tell the two apart, the
     /// separation is what makes "is the secret here" a compile-time question.
     func testTheCreatedKeyRequiresItsPlaintext() throws {
         let created = try decode(
@@ -94,7 +94,7 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
     // MARK: - Connected apps
 
     /// ⛔ BOTH NULLS ON ONE ROW, AND THEY MEAN DIFFERENT THINGS. `last_used_at`
-    /// null is "never used"; `expires_at` null is "does NOT expire" — never
+    /// null is "never used"; `expires_at` null is "does NOT expire", never
     /// "expired". A screen that read the second as lapsed would tell a customer a
     /// working integration is dead.
     func testAnUnusedNonExpiringConnectionNullsBothTimestamps() throws {
@@ -133,7 +133,7 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
 
     /// ⛔ THE SEVEN EVENTS, SPELLED OUT A SECOND TIME RATHER THAN DERIVED FROM
     /// `allCases`. A test that read the enum back would assert the code equals
-    /// itself and would pass through any rename — and a rename here is a hard 400
+    /// itself and would pass through any rename, and a rename here is a hard 400
     /// (`unknown event: <name>`) at the fork, not an ignored key. This list is
     /// the fork's `validWebhookEvents`, which the server's `webhooks.create` schema
     /// and its developer-page formatter also copy by hand.
@@ -152,7 +152,7 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
         )
     }
 
-    /// ⚠️ SEVEN, COUNTED RATHER THAN ASSUMED — the same discipline
+    /// ⚠️ SEVEN, COUNTED RATHER THAN ASSUMED, the same discipline
     /// ``SchedulingAdminOp`` applies to its 75.
     func testTheWebhookEventVocabularyHasExactlySevenEntries() {
         XCTAssertEqual(SchedulingWebhookEvent.allCases.count, 7)
@@ -177,8 +177,8 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
         XCTAssertEqual(row.events, ["recording.completed"])
     }
 
-    /// ⚠️ `[]` IS A DIFFERENT ANSWER FROM NULL — a customer who deliberately
-    /// unticked everything — and both have to decode.
+    /// ⚠️ `[]` IS A DIFFERENT ANSWER FROM NULL, a customer who deliberately
+    /// unticked everything, and both have to decode.
     func testAWebhookTellsAnEmptyFieldListFromANullOne() throws {
         let row = try decode(
             SchedulingWebhook.self,
@@ -190,7 +190,7 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
     }
 
     /// ⛔ `events` IS `[String]` ON THE WAY IN, DELIBERATELY. The RESPONSE schema
-    /// carries no enum, so a row created before a rename — or by another client —
+    /// carries no enum, so a row created before a rename, or by another client,
     /// can hold a value this app's vocabulary does not have, and a throwing decode
     /// would take out the whole tab over one stale row.
     func testAWebhookDecodesAnEventNameTheVocabularyDoesNotKnow() throws {

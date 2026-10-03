@@ -5,8 +5,8 @@ import Foundation
 ///
 /// ⛔ BOTH ROUTES RETURN THE RAW PRISMA ROW, WHICH IS WHY ONE DTO SERVES BOTH
 /// AND WHY SO MANY FIELDS ARRIVE AS EXPLICIT NULLS. The list route was written
-/// to match `contacts/get` deliberately; the obvious alternative — reusing the
-/// server's `getPaginatedContacts` helper — returns a MAPPED shape that silently
+/// to match `contacts/get` deliberately; the obvious alternative, reusing the
+/// server's `getPaginatedContacts` helper, returns a MAPPED shape that silently
 /// drops ``dgiStatus``, ``dgiError`` and ``visualMemory`` and converts absent
 /// values to `undefined` instead of `null`. The detail screen needs `dgiStatus`,
 /// so the mapper would have forced two contact shapes with different
@@ -16,7 +16,7 @@ import Foundation
 /// ⚠️ EMAIL-FIRST: ``phoneNumber`` IS NULLABLE; a contact need not have a phone.
 /// The database enforces one contact per phone per workspace,
 /// but Postgres treats NULLs as distinct in a btree unique, so any number of
-/// phone-less contacts coexist — that is required, not tolerated. Never key a
+/// phone-less contacts coexist, that is required, not tolerated. Never key a
 /// list or a lookup on the number; use ``id``.
 public struct Contact: Codable, Sendable {
     public let id: String
@@ -36,19 +36,19 @@ public struct Contact: Codable, Sendable {
     /// struct for a column nothing validates. See ``WireJSON``.
     public let socialHandles: WireJSON?
     /// Firmographics. The server casts this to `{name?, domain?, industry?}`, so
-    /// those are the documented keys — but nothing enforces them, which is why
+    /// those are the documented keys, but nothing enforces them, which is why
     /// every field of ``ContactCompany`` is Optional.
     public let company: ContactCompany?
     /// The DGI enrichment dossier.
     ///
     /// ⛔ UNSTRUCTURED BY DESIGN AND IT MUST STAY OPAQUE. Its contents come from
     /// a model and change with the prompt, so a schema pinned here would break
-    /// on every prompt revision — and a typed model would DROP the dossier's
+    /// on every prompt revision, and a typed model would DROP the dossier's
     /// unmodelled keys, which are the entire payload of the feature.
     public let intelligence: WireJSON?
     /// ⚠️ OPAQUE EVEN THOUGH THE SCHEMA COMMENT SAYS "array of strings". The
     /// column is `Json?`, so nothing prevents a row holding an object or a
-    /// scalar — and a wrong TYPE is not rescued by a lenient parser the way an
+    /// scalar, and a wrong TYPE is not rescued by a lenient parser the way an
     /// unknown KEY is. Inspect it before trusting its shape.
     public let visualMemory: WireJSON?
     public let latestContextSummary: String?
@@ -56,14 +56,14 @@ public struct Contact: Codable, Sendable {
     ///
     /// ⛔ NULL AND `pending` ARE DIFFERENT THINGS. The column defaults to
     /// `pending`, but `contacts/clear-intel` resets it to NULL deliberately so
-    /// nothing re-crawls the contact — so null means "no dossier, and none
+    /// nothing re-crawls the contact, so null means "no dossier, and none
     /// queued". Render it as an offer to enrich, never as a spinner for a job
     /// that will never complete. The vocabulary is ``DgiStatus``; ⛔ there is no
     /// `processing`, which is the web console's optimistic local state and is
     /// what a poll loop waits forever for.
     public let dgiStatus: String?
     /// Why the last enrichment failed. ⚠️ Explicitly null on a contact that has
-    /// not failed, which is every row in both fixtures — hence the
+    /// not failed, which is every row in both fixtures, hence the
     /// `allowedExplicitNulls` entries.
     public let dgiError: String?
     public let budget: String?
@@ -99,7 +99,7 @@ public enum ContactNames {
 /// ⚠️ Every field Optional, for the same reason ``CallAnalysis``'s are: the
 /// column is `Json?` and nothing in the database enforces the shape, so a row
 /// written by an earlier pipeline may carry fewer keys. Drift in the other
-/// direction — a NEW key — is caught by the strict gate, while the shipped
+/// direction, a NEW key, is caught by the strict gate, while the shipped
 /// parser stays lenient.
 public struct ContactCompany: Codable, Sendable {
     public let name: String?
@@ -125,7 +125,7 @@ public struct ContactListResponse: Codable, Sendable {
     public let offset: Int
 }
 
-/// `GET /api/district/contacts/get?workspaceId=&contactId=` — the same row,
+/// `GET /api/district/contacts/get?workspaceId=&contactId=`, the same row,
 /// singly.
 ///
 /// ⚠️ THE ID IS A QUERY PARAMETER ON THIS ROUTE, not a path segment.
@@ -161,8 +161,8 @@ public struct ContactDetailResponse: Codable, Sendable {
 /// ⚠️ A **409** MEANS THE CONTACT ALREADY EXISTS, not that the request was
 /// malformed: the database enforces one contact per phone and per lowercased
 /// email per workspace, and the route's own sentence names which of the two
-/// collided. It never reaches this type — ``ApiClient/send(_:as:)`` maps a
-/// non-2xx to ``ApiError`` — but the wording matters where it lands.
+/// collided. It never reaches this type, ``ApiClient/send(_:as:)`` maps a
+/// non-2xx to ``ApiError``, but the wording matters where it lands.
 public struct ContactCreateResponse: Codable, Sendable {
     public let success: Bool
     /// The new contact's id.

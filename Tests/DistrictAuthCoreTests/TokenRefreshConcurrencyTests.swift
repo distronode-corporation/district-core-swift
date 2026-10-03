@@ -4,7 +4,7 @@ import XCTest
 
 /// ⛔ THE TESTS THAT MATTER MOST IN THIS MODULE. Every failure below is a
 /// SILENT one in production: two callers presenting the same refresh token does
-/// not fail the request, it succeeds — and the server revokes the entire token
+/// not fail the request, it succeeds, and the server revokes the entire token
 /// family as a suspected theft, signing the user out on every device with a
 /// `[auth] Native refresh replay detected` line nobody is watching.
 final class TokenRefreshConcurrencyTests: XCTestCase {
@@ -101,7 +101,7 @@ final class TokenRefreshConcurrencyTests: XCTestCase {
 
         // ⛔ TWO WRITES FOR TWO ROTATIONS, IN ORDER. A third write, or an
         // out-of-order pair, means a queued caller persisted a session that a
-        // later rotation had already superseded — the lost update that leaves
+        // later rotation had already superseded, the lost update that leaves
         // disk holding a spent token.
         let written = await store.writtenSessions
         XCTAssertEqual(written.map(\.refreshToken), ["refresh-2", "refresh-3"])

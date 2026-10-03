@@ -11,9 +11,9 @@ import Foundation
 //
 // ⛔ THERE IS NO RECORDING OF A MEETING TO PLAY, AND A ROOMS SCREEN BUILT ON
 // THESE TYPES MUST NOT PROMISE ONE. The `Meeting` model has no recording column
-// at all — its artefacts are ``MeetingDetail/summary`` and
+// at all, its artefacts are ``MeetingDetail/summary`` and
 // ``MeetingDetail/transcript``, both written by the voice agent's Companion when
-// the room closes — and neither meetings route has a recording sibling. The one
+// the room closes, and neither meetings route has a recording sibling. The one
 // recording surface on this whole API is `calls/{id}/recording`, which is a
 // telephone call, answers a **302** to a presigned object, and lives on
 // `RedirectEndpoints`. Offering a play control here would be offering a control
@@ -32,8 +32,8 @@ import Foundation
 ///
 /// ⛔ ``summaryPreview`` IS NULL FOR EVERY MEETING THAT HAS NOT ENDED, WHICH IS
 /// THE ORDINARY CASE RATHER THAN AN EDGE ONE. The Companion writes the minutes
-/// when the room closes, so a meeting in progress — including the one the user
-/// is sitting in — has no summary, no ``endedAt``, no ``title`` and
+/// when the room closes, so a meeting in progress, including the one the user
+/// is sitting in, has no summary, no ``endedAt``, no ``title`` and
 /// `durationSec: 0`. `district-meetings.json` carries one row of each shape, so
 /// a DTO that regressed either Optional to non-null is caught by the gate rather
 /// than on a phone.
@@ -43,7 +43,7 @@ import Foundation
 /// that rendered this as complete would be truncating the deliverable without
 /// saying so.
 ///
-/// ⚠️ THE TIMESTAMPS ARE ISO-8601 STRINGS, NOT INSTANTS — `NextResponse.json`
+/// ⚠️ THE TIMESTAMPS ARE ISO-8601 STRINGS, NOT INSTANTS, `NextResponse.json`
 /// serialises a Prisma `DateTime` through `JSON.stringify`. This module owns no
 /// date parsing, the same call ``CallSummary`` makes.
 public struct MeetingSummary: Codable, Sendable {
@@ -60,7 +60,7 @@ public struct MeetingSummary: Codable, Sendable {
     /// ⚠️ Null for everything still running.
     public let endedAt: String?
     public let createdAt: String
-    /// ⚠️ Zero while a meeting is in progress — it is stamped at the end, not
+    /// ⚠️ Zero while a meeting is in progress, it is stamped at the end, not
     /// accumulated, so a live meeting reports 0 rather than its elapsed time.
     public let durationSec: Int
     /// ⛔ Truncated to 220 characters, and null until the meeting ends. See the
@@ -73,11 +73,11 @@ public struct MeetingSummary: Codable, Sendable {
     public let participantCount: Int
 }
 
-/// `GET /api/district/meetings/[id]` — the WHOLE Prisma row, returned verbatim.
+/// `GET /api/district/meetings/[id]`, the WHOLE Prisma row, returned verbatim.
 ///
 /// ⛔ FOUR FIELDS HERE ARE NOT PUBLISHED BY THE LIST AT ALL: ``roomSid``,
 /// ``transcript``, ``actionItems`` and ``workspaceId``. That is why this client
-/// carries two models rather than treating the list as a subset — and the
+/// carries two models rather than treating the list as a subset, and the
 /// asymmetry runs both ways, since the list's `summaryPreview` and
 /// `participantCount` do not exist here. Both fixtures are committed.
 ///
@@ -97,7 +97,7 @@ public struct MeetingDetail: Codable, Sendable {
     public let id: String
     /// LiveKit's own `RM_…` session key.
     ///
-    /// ⚠️ NULLABLE BECAUSE THE ROW CAN EXIST BEFORE THE SID DOES — the Companion
+    /// ⚠️ NULLABLE BECAUSE THE ROW CAN EXIST BEFORE THE SID DOES, the Companion
     /// creates the record and LiveKit reports the sid separately. It is the
     /// canonical per-session key server-side and means nothing to a person, so
     /// it is not something to display.
@@ -112,7 +112,7 @@ public struct MeetingDetail: Codable, Sendable {
     /// ⚠️ See the type doc: the complete conversation, unredacted.
     public let transcript: String?
     /// ⚠️ AN UNSTRUCTURED `Json?` COLUMN whose element shape belongs to the voice
-    /// agent rather than to this repo — documented as `[{text, owner?}]` and
+    /// agent rather than to this repo, documented as `[{text, owner?}]` and
     /// enforced by nothing. Modelled as opaque ``WireJSON`` for the same reason
     /// `Contact.visualMemory` is: inventing a struct here would make this client
     /// fail to decode the first time the agent adds a key, and a lossy read of a

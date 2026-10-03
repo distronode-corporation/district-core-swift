@@ -6,8 +6,8 @@ import Foundation
 ///
 /// ⛔ ITS OWN REPOSITORY RATHER THAN A METHOD ON ``MeetingsRepository``, AND THAT
 /// TYPE'S OWN ⛔ IS WHY. It says outright that nothing on it may mint a room token:
-/// joining is a separate capability — a signed, short-lived credential whose guest
-/// invite is a transferable twelve-hour publish right — and it does not belong on
+/// joining is a separate capability, a signed, short-lived credential whose guest
+/// invite is a transferable twelve-hour publish right, and it does not belong on
 /// the type that reads the archive. The Kotlin client did fold the two together;
 /// this one deliberately does not, so that the surface which can hand out a
 /// capability is one file to review rather than a method on a reader. ⚠️ It also
@@ -15,7 +15,7 @@ import Foundation
 /// minutes, and this failing costs them the meeting.
 ///
 /// ⛔ NOTHING HERE MAY BE CALLED ON A REDRAW. Nothing is persisted, so the route is
-/// idempotent in the sense that matters for safety — but every call mints a FRESH
+/// idempotent in the sense that matters for safety, but every call mints a FRESH
 /// twelve-hour guest invite, so a screen calling it per render would be minting
 /// capabilities at the rate it redraws. One deliberate press, one call.
 ///
@@ -34,7 +34,7 @@ public struct RoomsRepository: Sendable {
     /// GUARD RATHER THAN A TYPING PREFERENCE. `POST /api/district/calls/token`
     /// serves two structurally opposite things behind one body: a `meet_`/`video_`
     /// prefix is a standalone ROOM, and anything else is read as a `Call.id` whose
-    /// caller is stamped `supervisor` — whereupon the voice agent unsubscribes their
+    /// caller is stamped `supervisor`, whereupon the voice agent unsubscribes their
     /// microphone and the AI greets a human it cannot hear. Only the first is
     /// reachable from this client, and it is reachable only through a type that
     /// cannot hold the billable prefix.
@@ -45,7 +45,7 @@ public struct RoomsRepository: Sendable {
     /// affirm, which presents as a room that connects and carries nothing.
     ///
     /// - Returns: `.failure` for everything else, already normalised by
-    ///   ``ApiErrorNormalizer`` — a 403 for a workspace this account cannot join
+    ///   ``ApiErrorNormalizer``, a 403 for a workspace this account cannot join
     ///   (the server parses the tenant back out of the NAME and runs
     ///   `requireWorkspaceRole` against it, so another tenant's room lands here), a
     ///   400 for a name the route's own regex refuses, offline, signed out.

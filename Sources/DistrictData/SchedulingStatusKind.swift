@@ -11,7 +11,7 @@ import Foundation
 ///
 /// ⚠️ THE CASES ARE CLOUDSCAPE'S `StatusIndicator` TYPES, WHICH IS WHY THERE ARE SIX AND
 /// NOT FOUR. The web's tables are built on that component and its vocabulary is what the
-/// ported functions were written against — `stopped` and `pending` are genuinely
+/// ported functions were written against, `stopped` and `pending` are genuinely
 /// different from `error` and `info` there (an archived host is stopped, not failed; a
 /// consent nobody answered is pending, not an error). Collapsing them would lose a
 /// distinction the copy beside them relies on.

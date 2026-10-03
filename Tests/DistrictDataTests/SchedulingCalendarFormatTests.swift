@@ -14,7 +14,7 @@ final class SchedulingCalendarFormatTests: XCTestCase {
         XCTAssertEqual(Calendar.providerLabel("apple"), "Apple Calendar")
     }
 
-    /// ⚠️ AN UNKNOWN PROVIDER IS ITS OWN RAW VALUE — a provider this build has not heard
+    /// ⚠️ AN UNKNOWN PROVIDER IS ITS OWN RAW VALUE, a provider this build has not heard
     /// of, not an error.
     func testAnUnknownProviderIsEchoed() {
         XCTAssertEqual(Calendar.providerLabel("fastmail"), "fastmail")

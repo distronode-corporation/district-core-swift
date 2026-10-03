@@ -41,8 +41,8 @@ public enum SupportWriteRepeat: Sendable {
 ///     one that landed. Ambiguous.
 ///   - `.transport` is no answer at all, which is the lost-response case. Ambiguous.
 ///   - `.decoding` is NOT ambiguous and is the one that reads as harmless. It is
-///     only ever produced from a **2xx** — `ApiErrorNormalizer` guards on
-///     `isSuccess`, and every site below is an envelope check downstream of one —
+///     only ever produced from a **2xx**, `ApiErrorNormalizer` guards on
+///     `isSuccess`, and every site below is an envelope check downstream of one,
 ///     so the server answered success and the comment IS in the thread. A repeat
 ///     posts a second one, guaranteed rather than possibly.
 ///
@@ -92,7 +92,7 @@ public extension SupportResubmit {
 /// split from `workspace/knowledge` and `workspace/messaging` on this same client.
 /// The route's own header gives the reason: these payloads are support
 /// correspondence rather than operational status. So a viewer must not be OFFERED
-/// the destination — a screen gated only at its controls would walk them into a
+/// the destination, a screen gated only at its controls would walk them into a
 /// 403 on the very first read.
 ///
 /// ⛔ FULL CONTENT IS CORRECT HERE, AND THE NEIGHBOURING RULE THAT SAYS OTHERWISE
@@ -112,7 +112,7 @@ public extension SupportResubmit {
 /// may come back after a failure.
 ///
 /// ⚠️ NO CACHE. A support thread is opened to find out whether somebody has
-/// answered yet, which is the one question a stale copy is worst at — and the
+/// answered yet, which is the one question a stale copy is worst at, and the
 /// detail route deliberately refreshes from Atlassian on read for that reason.
 public struct SupportRepository: Sendable {
     private let client: ApiClient
@@ -177,7 +177,7 @@ public struct SupportRepository: Sendable {
     /// ⛔ THE ONE WRITE HERE A CALLER MAY REPEAT, AND ONLY IF IT SENDS THE SAME
     /// ``idempotencyKey``. The server claims the key before it calls Atlassian and
     /// answers a re-used one with `deduplicated: true`, so a retry carrying the same
-    /// key collapses onto the first request — and a retry that mints a fresh one
+    /// key collapses onto the first request, and a retry that mints a fresh one
     /// puts a second ticket in a human's queue. Mint it once per composed draft.
     ///
     /// ⛔ ALL THREE 200 BRANCHES ARE SUCCESSES AND ``SupportRequestFiling`` IS WHAT
@@ -188,7 +188,7 @@ public struct SupportRepository: Sendable {
     /// ⛔ THE BODY IS EXACTLY FOUR KEYS AND MUST NOT GROW. This is backed by a real
     /// Atlassian service desk where a request type accepts only the fields its
     /// portal form exposes and an unknown field is a hard **400** rather than an
-    /// ignored key — which is what stopped every ticket the platform tried to file
+    /// ignored key, which is what stopped every ticket the platform tried to file
     /// (`The field 'labels' is not valid for this request type 'Problem'`). The
     /// mapping from `kind` to a request type id is the server's and stays there.
     ///
@@ -225,7 +225,7 @@ public struct SupportRepository: Sendable {
     /// entire job is to deliver a sentence to a human. The descriptor is what pins
     /// it; nothing here may assemble a body of its own.
     ///
-    /// ⛔ NOT IDEMPOTENT, AND NOTHING RETRIES IT — not here and not above. The reply
+    /// ⛔ NOT IDEMPOTENT, AND NOTHING RETRIES IT, not here and not above. The reply
     /// is posted as a PUBLIC Jira comment so it reaches the agent working the queue,
     /// which means a repeat is a second copy in the customer's own thread and a
     /// second notification. A caller that has to decide whether to re-arm its send
@@ -257,8 +257,8 @@ public struct SupportRepository: Sendable {
     ///
     /// ⛔ NOT IDEMPOTENT IN THE ONLY WAY THAT MATTERS TO A CUSTOMER. The transition
     /// itself converges, but the server posts a PUBLIC audit comment naming who
-    /// asked BETWEEN resolving that transition and applying it — deliberately, so
-    /// the attribution survives a transition that then fails — so a repeat that
+    /// asked BETWEEN resolving that transition and applying it, deliberately, so
+    /// the attribution survives a transition that then fails, so a repeat that
     /// still finds a transition leaves a second "Closed at the requester's request
     /// by …" in a thread they read. Pair it with ``SupportWriteRepeat/once``.
     ///

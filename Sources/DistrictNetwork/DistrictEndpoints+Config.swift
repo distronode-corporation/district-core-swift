@@ -6,20 +6,20 @@ import Foundation
 /// `workspace/directory` (PATCH), `workspace/routing-rules` (POST) and
 /// `workspace/tools` (PATCH) all REPLACE their stored value rather than merging
 /// it. A form that opened empty and saved through one of them would not "save
-/// nothing" — it would DELETE the transfer directory the voice agent routes live
+/// nothing", it would DELETE the transfer directory the voice agent routes live
 /// callers through, or the agent's tool allowlist. The web never had to think
 /// about this: its settings page is a server component that hydrates every form
 /// from the row during render. A phone has no such prop, so
 /// ``DistrictEndpoints/workspaceConfig(workspaceId:)`` IS that prop, fetched.
 ///
-/// ⛔ ALL FIVE CONFIG CALLS EXCLUDE `viewer` SERVER-SIDE, INCLUDING THE READ —
+/// ⛔ ALL FIVE CONFIG CALLS EXCLUDE `viewer` SERVER-SIDE, INCLUDING THE READ,
 /// unusual on this surface and not an oversight: the payload carries staff phone
 /// numbers and the operator's own prompt. The entry point must be HIDDEN for a
 /// viewer, not merely captioned.
 public extension DistrictEndpoints {
     /// The workspace settings row, redacted.
     ///
-    /// ⚠️ A PLAIN READ WITH NO SIDE EFFECTS AND NO VENDOR CALL, by design — it
+    /// ⚠️ A PLAIN READ WITH NO SIDE EFFECTS AND NO VENDOR CALL, by design, it
     /// cannot itself be the reason a client fails open into an empty form.
     ///
     /// ⚠️ `messagingConfig` arrives already narrowed by `redactWorkspaceSecrets`
@@ -37,19 +37,19 @@ public extension DistrictEndpoints {
     /// Save persona fields.
     ///
     /// ⛔ SEND ONLY WHAT THE OPERATOR CHANGED. The server merges per field
-    /// (`x !== undefined ? x : existing`), so an omitted key is PRESERVED — and a
+    /// (`x !== undefined ? x : existing`), so an omitted key is PRESERVED, and a
     /// client that posted its whole form state would overwrite the engine choice,
     /// the avatar settings and the tuning parameters with whatever it happened to
     /// hold. The nil-dropping in ``JSONValue/object(_:)`` is the mechanism by
     /// which "send only what changed" actually reaches the wire.
     ///
-    /// ⛔ ANSWERS `{success:true}` AND NOTHING MORE — the updated config is NOT
+    /// ⛔ ANSWERS `{success:true}` AND NOTHING MORE, the updated config is NOT
     /// echoed, so a caller needing fresh state must re-read.
     ///
     /// ⛔ ELEVEN FIELDS, SEVEN OF THEM FROM SERVER-PUBLISHED VOCABULARIES. This route
-    /// COERCES rather than rejects — an unrecognised `modelId` is rewritten to
+    /// COERCES rather than rejects, an unrecognised `modelId` is rewritten to
     /// `deepgram-pipeline`, an unrecognised `voice` is stored verbatim and then
-    /// replaced by the agent's own fallback, both with a 200 — so a free-text box on
+    /// replaced by the agent's own fallback, both with a 200, so a free-text box on
     /// a phone would leave a workspace speaking in a voice nobody chose.
     /// ``personaOptions(workspaceId:)`` publishes the same catalogues the web form
     /// derives its pickers from, so every value sent here comes from a list the
@@ -58,7 +58,7 @@ public extension DistrictEndpoints {
     /// ⛔ `responseLength` IS WRITTEN ONLY WHEN A VALID `modelId` ARRIVES IN THE
     /// SAME REQUEST, and that is the one coupling a caller cannot discover from a
     /// failure. The route stores it under `aiPersona.responseLength[modelId]`, so
-    /// with no accepted engine id there is no key to write under — and rather than
+    /// with no accepted engine id there is no key to write under, and rather than
     /// guessing at the stored one it writes nothing, answers 200, and the
     /// operator's choice vanishes. Send the two together or send neither.
     ///
@@ -105,7 +105,7 @@ public extension DistrictEndpoints {
                 // ⚠️ A `Double`, AND THE ROUTE CLAMPS IT TO 0...1 RATHER THAN
                 // REFUSING. It guards with `typeof temperature === "number"`, so an
                 // integer-valued `1` encoded as `1` is still a number and still
-                // accepted — unlike `appRingSeconds` next door, whose `.int()`
+                // accepted, unlike `appRingSeconds` next door, whose `.int()`
                 // refuses a decimal point.
                 ("temperature", temperature.map { JSONValue.number($0) }),
                 ("voiceStyle", .optional(voiceStyle)),
@@ -122,7 +122,7 @@ public extension DistrictEndpoints {
     /// ⛔ `allowedTools` IS WRITTEN WHOLESALE AND IS REQUIRED. Whatever list
     /// arrives becomes the stored one; a missing array is a 400 rather than a
     /// no-op. The caller's obligation is to send the list it LOADED with the
-    /// operator's toggles applied — INCLUDING any id this client's catalog does
+    /// operator's toggles applied, INCLUDING any id this client's catalog does
     /// not recognise, which is not hypothetical: `transfer_to_creator` was retired
     /// in 2026 and workspaces still store it.
     ///
@@ -142,7 +142,7 @@ public extension DistrictEndpoints {
     /// Replace the call transfer directory.
     ///
     /// ⛔ THE MOST DESTRUCTIVE CALL IN THIS CLIENT, AND ITS FAILURE MODE IS A 200.
-    /// The handler writes `callDirectory: (callDirectory || [])` — so an empty
+    /// The handler writes `callDirectory: (callDirectory || [])`, so an empty
     /// array, or a body that simply omits the key, WIPES every transfer target the
     /// voice agent can put a live caller through to, and answers `{success:true}`.
     /// There is no "save nothing" on this route.
@@ -151,7 +151,7 @@ public extension DistrictEndpoints {
     /// `.passthrough()` and names only `name` and `phoneNumber`; the column is
     /// `Json` and holds whatever anyone ever wrote. That is why this takes
     /// ``JSONValue`` rows straight out of a loaded config rather than a typed
-    /// model — a request rebuilt from one would strip the rest.
+    /// model, a request rebuilt from one would strip the rest.
     static func saveDirectory(workspaceId: String, callDirectory: [JSONValue]) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .saveDirectory,
@@ -169,7 +169,7 @@ public extension DistrictEndpoints {
     /// ⛔ **POST, NOT PATCH**, and also wholesale. One difference from
     /// ``saveDirectory(workspaceId:callDirectory:)`` is worth knowing: this route
     /// requires `Array.isArray(routingRules)` and answers **400 "Invalid
-    /// payload"** without it, so an omitted array is refused — but an EMPTY array
+    /// payload"** without it, so an omitted array is refused, but an EMPTY array
     /// is accepted and deletes every rule.
     ///
     /// ⚠️ CAN ANSWER **400 "Invalid voice identifier: X"** (or model) when the
@@ -190,7 +190,7 @@ public extension DistrictEndpoints {
 
     /// The knowledge documents the agent answers from, newest first.
     ///
-    /// ⚠️ THE KNOWLEDGE READS ADMIT `viewer` AND THE WRITES DO NOT — the OPPOSITE
+    /// ⚠️ THE KNOWLEDGE READS ADMIT `viewer` AND THE WRITES DO NOT, the OPPOSITE
     /// split from workspace config above, whose read excludes viewers too.
     /// Nothing on this surface is a staff phone number.
     static func knowledgeDocuments(workspaceId: String) -> ApiRequestDescriptor {
@@ -204,8 +204,8 @@ public extension DistrictEndpoints {
 
     /// Add one knowledge document.
     ///
-    /// ⛔ BILLABLE PER CALL — one embedding run over however many chunks the
-    /// content produced — rate limited at 20/min per WORKSPACE, and not
+    /// ⛔ BILLABLE PER CALL, one embedding run over however many chunks the
+    /// content produced, rate limited at 20/min per WORKSPACE, and not
     /// idempotent. Nothing in this client may retry it.
     static func createDocument(
         workspaceId: String,
@@ -231,7 +231,7 @@ public extension DistrictEndpoints {
     /// Delete one document; its chunks cascade.
     ///
     /// ⛔ **DELETE WITH QUERY PARAMETERS AND NO BODY**, and the id parameter is
-    /// spelled **`documentId`** — not `id`, not `docId`. The route reads
+    /// spelled **`documentId`**, not `id`, not `docId`. The route reads
     /// `searchParams.get("documentId")` and answers **400 "Missing documentId"**
     /// for anything else, which reads as a broken client rather than as a typo.
     ///

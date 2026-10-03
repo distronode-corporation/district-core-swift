@@ -21,7 +21,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ `params` IS SENT AS GIVEN, PATH KEYS INCLUDED, AND TRIMMING IT HERE
     /// BREAKS THE REQUEST. The catalog's `pathKeys` strip happens SERVER-side
-    /// inside `schedulerAdminRequest`, after `op.params` has validated the body —
+    /// inside `schedulerAdminRequest`, after `op.params` has validated the body,
     /// so a client that helpfully removed `slug` before sending would fail that
     /// schema for a missing required field and get a **400 `invalid_params`**
     /// naming the very key it was being clever about. The web dashboard's admin
@@ -29,8 +29,8 @@ public extension DistrictEndpoints {
     /// through untouched.
     ///
     /// ⛔ A FAILED OP IS A **200**. `failureResponse` answers
-    /// `{ok:false, failure, status}` at HTTP 200 on purpose — the request reached
-    /// us and the SCHEDULER is what refused — so this descriptor must never be
+    /// `{ok:false, failure, status}` at HTTP 200 on purpose, the request reached
+    /// us and the SCHEDULER is what refused, so this descriptor must never be
     /// sent through ``ApiClient/send(_:as:)``, whose decode would either fail or,
     /// worse, succeed against a lenient type and report an outage as data. See
     /// ``ApiClient/sendUnmapped(_:)`` and `SchedulingAdminRepository`.
@@ -53,7 +53,7 @@ public extension DistrictEndpoints {
                 ("workspaceId", .string(workspaceId)),
                 ("op", .string(op.rawValue)),
                 // ⚠️ NOT `.optional(...)`: an op that takes nothing sends `{}`,
-                // and `JSONValue.object(_:)` would DROP a nil pair — leaving the
+                // and `JSONValue.object(_:)` would DROP a nil pair, leaving the
                 // route to read `body.params` as undefined. It defaults that to
                 // `{}` itself, so the two agree today; sending the empty object
                 // makes the agreement a contract rather than a coincidence.
@@ -65,7 +65,7 @@ public extension DistrictEndpoints {
     /// Publish one of the three images the admin surface can set.
     ///
     /// ⛔ THE WORKSPACE IS A QUERY PARAMETER AND `target` IS A FORM FIELD, WHICH IS
-    /// A THIRD SHAPE AGAIN — ``uploadMedia`` puts the workspace in the fields and
+    /// A THIRD SHAPE AGAIN, ``uploadMedia`` puts the workspace in the fields and
     /// ``uploadDeskLogo`` sends no fields at all. The split is deliberate at the
     /// server: the workspace id has to be readable before `req.formData()` so the
     /// session check can run ahead of a multipart parse of a body up to
@@ -76,7 +76,7 @@ public extension DistrictEndpoints {
     /// which is why ``MultipartBody/filePartName`` is still correct and why a part
     /// named after the target would be "Missing file field".
     ///
-    /// ⚠️ JPEG, PNG, GIF AND WEBP ONLY — **NOT SVG**, which is the obvious thing to
+    /// ⚠️ JPEG, PNG, GIF AND WEBP ONLY, **NOT SVG**, which is the obvious thing to
     /// want for a logo and is a script-bearing document. The refusal is a **415**
     /// and this client cannot pre-compute it, because the fork sniffs the first 512
     /// bytes rather than trusting the declared type. The other refusals are a 413
@@ -106,7 +106,7 @@ public extension DistrictEndpoints {
     /// Resolve a playable URL for a scheduler recording.
     ///
     /// ⛔ THE SERVER ANSWERS **302, NOT JSON**, AND THIS CLIENT MUST NOT FOLLOW IT
-    /// — the same rule as ``callRecordingUrl(workspaceId:callId:)`` and for a
+    /// the same rule as ``callRecordingUrl(workspaceId:callId:)`` and for a
     /// sharper version of the same reason: these are video, and the fork has no 2xx
     /// path at all. Send it through ``ApiClient/redirectTarget(_:)``.
     ///

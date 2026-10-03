@@ -8,7 +8,7 @@ import XCTest
 /// ⛔ A SELF-CONSISTENCY TEST WOULD PASS WHILE BOTH SIDES WERE WRONG, WHICH IS
 /// THE WHOLE REASON THE VECTORS BELOW ARE HERE. The only thing that ever
 /// disagrees with this client is `sha256Hex` on the server, and it reports the
-/// disagreement as one opaque `invalid_grant` — indistinguishable from a
+/// disagreement as one opaque `invalid_grant`, indistinguishable from a
 /// replayed token, an expired one, or a wrong audience. Asserting
 /// `AppleNonce(raw: x).hashed == AppleNonce.sha256Hex(x)` would prove only that
 /// the type calls its own function. The three below are FIPS 180-2 / RFC 6234's
@@ -38,7 +38,7 @@ final class AppleNonceTests: XCTestCase {
     }
 
     /// ⚠️ UTF-8 BYTES, NOT UTF-16 AND NOT A LOSSY ASCII TRANSCODE. A raw nonce
-    /// this client mints is hex, so the distinction cannot bite in production —
+    /// this client mints is hex, so the distinction cannot bite in production,
     /// which is precisely why it needs a test: nothing else in the flow would
     /// ever notice if it changed.
     func testTheDigestHashesUtf8Bytes() {
@@ -52,7 +52,7 @@ final class AppleNonceTests: XCTestCase {
 
     /// ⛔ THE WHOLE NIBBLE TABLE. A hex encoder that gets the high and low
     /// nibbles the right way round for `0x00`-`0x0f` and wrong above it is a
-    /// classic, and a digest test alone can miss it — every byte of a digest is
+    /// classic, and a digest test alone can miss it, every byte of a digest is
     /// plausible, so a transposed pair just produces a different plausible
     /// string.
     func testEveryByteValueEncodesToItsOwnHexPair() {
@@ -101,7 +101,7 @@ final class AppleNonceTests: XCTestCase {
     // ── Generation ───────────────────────────────────────────────────────────
 
     /// ⚠️ 32 BYTES ASKED FOR, 64 CHARACTERS PRODUCED, AND THE COUNT IS ASSERTED
-    /// ON THE SOURCE rather than inferred from the string — a generator that
+    /// ON THE SOURCE rather than inferred from the string, a generator that
     /// asked for 16 and doubled them would produce a 64-character value too.
     func testGenerationAsksForThirtyTwoBytes() {
         let source = FixedBytes(Data(repeating: 0xAB, count: 64))
@@ -116,7 +116,7 @@ final class AppleNonceTests: XCTestCase {
 
     /// ⚠️ THE ALPHABET IS ASSERTED EVEN THOUGH THE SERVER DOES NOT CHECK IT. The
     /// value travels in a JSON body and in no URL, so nothing would break if it
-    /// were not hex — but "URL-safe, JSON-safe, nothing an intermediary
+    /// were not hex, but "URL-safe, JSON-safe, nothing an intermediary
     /// re-encodes" is the property the type claims, and an unasserted claim
     /// decays.
     func testAGeneratedNonceIsLowerCaseHexOnly() {

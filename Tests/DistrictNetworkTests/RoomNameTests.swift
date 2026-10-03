@@ -4,7 +4,7 @@ import XCTest
 
 /// ⛔ THE `video_` GUARD, ASSERTED RATHER THAN DOCUMENTED. `video_` is one
 /// character from `meet_` in the same server-side `startsWith` chain and silently
-/// starts a billable Tavus avatar whose default concurrency ceiling is 1 — so the
+/// starts a billable Tavus avatar whose default concurrency ceiling is 1, so the
 /// first accidental one is both a charge and an outage of the avatar feature for
 /// every other room.
 final class RoomNameTests: XCTestCase {
@@ -16,7 +16,7 @@ final class RoomNameTests: XCTestCase {
     /// ⛔ A BARE `Call.id` IS REFUSED TOO, and that closes the SUPERVISOR case.
     /// `calls/token` stamps `role: "supervisor"` for anything that is not a
     /// `meet_`/`video_` room, whereupon the voice agent unsubscribes the caller's
-    /// microphone — the AI then greets a human it cannot hear.
+    /// microphone, the AI then greets a human it cannot hear.
     func testACallIdCannotBeConstructed() {
         XCTAssertNil(RoomName("cln7x9q2h0000abcd"))
         XCTAssertNil(RoomName("call_123"))
@@ -45,7 +45,7 @@ final class RoomNameTests: XCTestCase {
     // MARK: - Minting a name
 
     /// ⛔ THE MINTED NAME CARRIES THE WORKSPACE, WHICH MEANS IT CARRIES A SECOND
-    /// UNDERSCORE — so it is deliberately NOT a value ``RoomName/init(_:)`` would
+    /// UNDERSCORE, so it is deliberately NOT a value ``RoomName/init(_:)`` would
     /// accept. See `testASuffixWithASeparatorIsRefused` above, which pins the other
     /// half of the same decision. The two initialisers answer different questions.
     func testAMintedNameJoinsTheWorkspaceAndTheNormalisedSuffix() {
@@ -117,7 +117,7 @@ final class RoomNameTests: XCTestCase {
     }
 
     /// ⚠️ `meet_<uuid>_standup` IS NOT A TITLE, and an empty line is not one either
-    /// — anything without the three-part shape comes back unchanged rather than
+    /// anything without the three-part shape comes back unchanged rather than
     /// blanking a row.
     func testTheDisplayNameIsTheHumanHalfAndNeverBlanks() {
         XCTAssertEqual(RoomName.displayName("meet_ws-1_standup"), "standup")
@@ -129,7 +129,7 @@ final class RoomNameTests: XCTestCase {
     }
 
     /// ⛔ THE IDENTITY IS A CONSTANT. The route REQUIRES the key (missing is a
-    /// 400) and IGNORES the value — it derives a hashed identity from the session,
+    /// 400) and IGNORES the value, it derives a hashed identity from the session,
     /// because accepting a client-supplied one was an impersonation hole and a
     /// random one per join produced duplicate tiles.
     func testTheRoomIdentityIsAConstantAndNamesThisPlatform() {
@@ -148,7 +148,7 @@ final class RoomNameTests: XCTestCase {
 
     /// ⛔ `platform` IS SENT AND IT SAYS `ios`. The route's schema defaults the
     /// field to `"android"`, so omitting it labels every iOS row as an Android one
-    /// — and the server's push sender selects the APNs payload from that column.
+    /// and the server's push sender selects the APNs payload from that column.
     func testThePushPlatformIsIos() {
         XCTAssertEqual(PushPlatform.ios, "ios")
     }

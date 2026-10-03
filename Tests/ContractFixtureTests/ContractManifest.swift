@@ -15,7 +15,7 @@ import Foundation
 ///
 /// ⚠️ IT WILL FAIL THE DAY A FIXTURE IS ADDED, AND THAT IS THE DESIGN. The fix
 /// is two lines here, and the failure is the only thing that makes a new
-/// endpoint's arrival visible to this client at all — nothing else on the iOS
+/// endpoint's arrival visible to this client at all, nothing else on the iOS
 /// side watches the generator.
 enum ContractManifest {
     /// Every `.json` file in the contract corpus.
@@ -25,7 +25,7 @@ enum ContractManifest {
     /// alone; only a file arriving on (or leaving) disk moves it. Keeping the two
     /// numbers separate is what lets each one fail for exactly one reason.
     ///
-    /// ⚠️ A LARGE JUMP IS HANDLED THE SAME WAY AS A SMALL ONE — a red count naming
+    /// ⚠️ A LARGE JUMP IS HANDLED THE SAME WAY AS A SMALL ONE, a red count naming
     /// every unexpected file. The size is what tempts someone to reach for a floor
     /// instead; a floor would go green against all of them and against a broken
     /// path.
@@ -62,8 +62,8 @@ enum ContractManifest {
     /// carries a `usage` key of its own; the metered-usage route is a different
     /// endpoint with a different body, and pairing them would gate a fixture
     /// against a DTO that does not model it.
-    /// ⚠️ The two surfaces do share the INNER type — `getUsage` feeds both and the
-    /// server asserts the payloads byte-identical — so `UsageMonth` is reused
+    /// ⚠️ The two surfaces do share the INNER type, `getUsage` feeds both and the
+    /// server asserts the payloads byte-identical, so `UsageMonth` is reused
     /// while the envelopes stay apart. See `ImplementedFixtures.billing`.
     static let unimplemented: Set<String> = [
         // ⛔ GATING AN ENTRY HERE BEFORE ITS TYPE EXISTS WOULD MEAN INVENTING THE TYPE
@@ -87,12 +87,12 @@ enum ContractManifest {
         // BODY. `-no-customer` and `-unavailable` are the same six keys with the
         // same three nulls, and the ONLY thing that tells "we could not ask
         // Stripe" apart from "this account has no billing" is an absent
-        // `billingUnavailable` key beside them — so the allowlist has to permit
+        // `billingUnavailable` key beside them, so the allowlist has to permit
         // the same three paths twice rather than once, and a reader who tidied
         // one of them away would be deleting the distinction. ⚠️ The healthy body
         // nulls two paths only, both on the UNPAID invoice: Stripe omits the
         // hosted URL and the PDF until an invoice is finalised, which makes the
-        // most ordinary row there is — this month's, before it is paid — the one
+        // most ordinary row there is, this month's, before it is paid, the one
         // that would throw on a client typing them non-null.
         "district-billing-no-customer.json",
         "district-billing-unavailable.json",
@@ -128,7 +128,7 @@ enum ContractManifest {
         // ⛔ THREE PATHS, ALL ON ROW 0, AND THEY ARE ONE FACT: a meeting that has
         // not ended. The Companion writes the minutes when the room closes, so
         // an in-progress meeting has no `summaryPreview`, no `endedAt` and no
-        // `title` — and that row is the one most likely to be at the TOP of a
+        // `title`, and that row is the one most likely to be at the TOP of a
         // live user's list, which is what makes it the ordinary case rather than
         // an edge one. ⚠️ Row 1 nulls nothing, which is why one fixture covers
         // both branches and why a DTO regressing either Optional fails here
@@ -137,7 +137,7 @@ enum ContractManifest {
         // row and this fixture's copy happens to have every column populated.
         "district-meetings.json",
         // ⛔ ONE PATH, AND IT IS THE ROUTE'S ORDINARY STATE RATHER THAN AN EDGE.
-        // `$.message.readAt` is null while nobody on the team has opened the message —
+        // `$.message.readAt` is null while nobody on the team has opened the message,
         // which is why a push was sent, so a resolver serving a notification sees this
         // more often than not. ⚠️ The route sends the key rather than omitting it
         // deliberately: it is what lets a shade drop a "Mark read" action that would do
@@ -159,7 +159,7 @@ enum ContractManifest {
         // ⚠️ ALL FIVE SCHEDULING TENANCY FIXTURES NEED AN ENTRY, WHICH IS UNUSUAL AND IS A
         // PROPERTY OF THE SURFACE RATHER THAN OF THE DTOs. Both routes serialise
         // a Prisma selection (or a `?? null` on it) rather than building a sparse
-        // object, so every column that has no value arrives as an explicit null —
+        // object, so every column that has no value arrives as an explicit null,
         // and the four status fixtures exist precisely to cover the states where
         // different columns are the empty ones.
         "district-scheduling-enable.json",
@@ -173,7 +173,7 @@ enum ContractManifest {
         // which is why `userSchema.teams` and `teamSchema.members` are `.nullish()`
         // where every optional array beside them is `.optional()`. ⛔ The two team
         // entries are the SAME team through `teams.list` and `teams.get` and must not
-        // be collapsed — either read has to be able to fail alone.
+        // be collapsed, either read has to be able to fail alone.
         // ⚠️ `district-scheduling-calendar-status.json` IS THE ENTRY A READER WILL
         // EXPECT AND IS DELIBERATELY ABSENT: its two `.nullish()` lists carry REAL
         // ARRAYS in the bytes, and an entry is permission for a null they demonstrate.
@@ -200,7 +200,7 @@ enum ContractManifest {
         // hit a hard cap and stopped paying is exactly the one with no metered
         // rows this month. `subscriptionTier` null is NOT "Free" (this route
         // passes the column through untouched where `/api/settings` substitutes
-        // a word), and `usage` null is NOT zero — a column of zeros beside a cap
+        // a word), and `usage` null is NOT zero, a column of zeros beside a cap
         // that says calls are being refused states something nothing measured.
         // ⚠️ `district-workspace-billing.json` needs no entry: the same six keys
         // are all populated there, which is what makes the pair worth having.
@@ -209,7 +209,7 @@ enum ContractManifest {
         "district-workspace-config.json",
         "district-workspace-list-partial.json",
         "district-workspace-list.json",
-        // ⛔ NINE OF THE TWELVE, AND THE OTHER THREE MUST NOT BE GIVEN AN ENTRY —
+        // ⛔ NINE OF THE TWELVE, AND THE OTHER THREE MUST NOT BE GIVEN AN ENTRY,
         // `-hosts`, `-test-email` and `-override-range` carry no null at all. Every
         // path is justified in `AllowedExplicitNulls+SchedulingA.swift`.
         "district-scheduling-event-type.json",

@@ -21,8 +21,8 @@ final class AnalyticsRepositoryTests: XCTestCase {
     // MARK: - Analytics
 
     /// ⛔ THE WINDOW MUST REACH THE WIRE AS ITS OWN VALUE. An unrecognised
-    /// `timeRange` is not an error server-side — the route silently serves 7d with a
-    /// 200 — so a wrong value here shows a week's figures under a 90-day heading with
+    /// `timeRange` is not an error server-side, the route silently serves 7d with a
+    /// 200, so a wrong value here shows a week's figures under a 90-day heading with
     /// nothing anywhere reporting a problem.
     func testTheAnalyticsWindowReachesTheWireAsItsOwnValue() async {
         let transport = RepositoryTransport(json: Self.analytics())
@@ -50,7 +50,7 @@ final class AnalyticsRepositoryTests: XCTestCase {
 
     /// ⛔ THE CASE THE TYPE ALONE CANNOT CATCH: every required key present and the
     /// flag false. Without the envelope guard this renders as zero calls, zero
-    /// conversions and a flat trend — a fabricated empty state an operator cannot
+    /// conversions and a flat trend, a fabricated empty state an operator cannot
     /// tell from a genuinely quiet week.
     func testAnalyticsThatDoesNotAffirmSuccessIsADecodeFailure() async {
         let body = Self.analytics().replacingOccurrences(of: #""success":true"#, with: #""success":false"#)
@@ -87,7 +87,7 @@ final class AnalyticsRepositoryTests: XCTestCase {
     ///
     /// ⚠️ THE REQUEST CARRIES NEITHER SWITCH. `history` and `months` are passed as
     /// explicit nils so the call site reads as the history read with the switch off,
-    /// and ``ApiURL`` drops them — `history=false` would be a different claim about
+    /// and ``ApiURL`` drops them, `history=false` would be a different claim about
     /// the route.
     func testAMonthWithNothingMeteredIsASuccessCarryingNil() async {
         let transport = RepositoryTransport(json: #"{"success":true,"usage":null}"#)

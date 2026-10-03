@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/workspace/list` — the workspaces this account may operate
+/// `GET /api/district/workspace/list`, the workspaces this account may operate
 /// on.
 ///
 /// ⛔ THIS ROUTE EXISTS FOR THE NATIVE CLIENTS. On the web the list never crosses
@@ -20,8 +20,8 @@ import Foundation
 /// and the browser disagree about which tenant is in view.
 ///
 /// ⛔ THE 503 IS A DIFFERENT TYPE, ON PURPOSE. When nothing resolved AND a region
-/// is down the route answers `REGIONS_DEGRADED` rather than an empty 200 —
-/// ``WorkspaceListDegradedError`` — because "we could not look" and "there is
+/// is down the route answers `REGIONS_DEGRADED` rather than an empty 200,
+/// ``WorkspaceListDegradedError``, because "we could not look" and "there is
 /// nothing" read to a paying customer as account loss when confused. This type
 /// is the 200, and it carries the PARTIAL case; see ``degradedRegions``.
 public struct WorkspaceListResponse: Codable, Sendable {
@@ -39,7 +39,7 @@ public struct WorkspaceListResponse: Codable, Sendable {
     /// active.
     ///
     /// ⚠️ WHEN ``workspaces`` IS EMPTY AND THIS IS NON-ZERO, the account exists
-    /// and its billing lapsed — a different screen from "no workspaces", and the
+    /// and its billing lapsed, a different screen from "no workspaces", and the
     /// only way to tell them apart. ⛔ Billing is READ-ONLY in this app (App
     /// Store Review Guideline 3.1.3(b)): report the state, offer no way to pay.
     public let inactiveCount: Int
@@ -47,7 +47,7 @@ public struct WorkspaceListResponse: Codable, Sendable {
     ///
     /// ⚠️ NOT GUARANTEED TO APPEAR IN ``workspaces``. The stored preference can
     /// name a workspace whose subscription has since lapsed, or one the user was
-    /// removed from — the server echoes it verbatim without cross-checking.
+    /// removed from, the server echoes it verbatim without cross-checking.
     /// Treat it as an id to LOOK UP, and fall back to index 0 when it is absent.
     /// Sending it blind earns a 403.
     public let defaultWorkspaceId: String?
@@ -61,7 +61,7 @@ public struct WorkspaceListResponse: Codable, Sendable {
     /// the answer is still incomplete.
     public let total: Int
     /// The page size the server actually applied, which is not necessarily the
-    /// one requested — the route clamps a missing, zero, negative or NaN limit
+    /// one requested, the route clamps a missing, zero, negative or NaN limit
     /// to the default and caps anything above the ceiling.
     public let limit: Int
     public let offset: Int
@@ -80,7 +80,7 @@ public struct WorkspaceEntry: Codable, Sendable {
     /// decoding straight into an enum would throw on an unmodelled role and take
     /// out the whole list. Parse through ``WorkspaceRole/fromWire(_:)``.
     public let role: String
-    /// Raw billing tier, straight off the column — nil when never set, and an
+    /// Raw billing tier, straight off the column, nil when never set, and an
     /// explicit null on the wire (which is why both list fixtures need an
     /// `allowedExplicitNulls` entry).
     ///
@@ -88,7 +88,7 @@ public struct WorkspaceEntry: Codable, Sendable {
     /// against a real database: the values are `VoicePro` and `VoiceStarter`,
     /// MIXED CASE. Nothing normalises this column on write and the route does
     /// not normalise on read, so `subscriptionTier == "voicepro"` silently never
-    /// matches. Lowercase before comparing — the server's own tier check in
+    /// matches. Lowercase before comparing, the server's own tier check in
     /// `/api/auth/me` does exactly that, which is why it works.
     ///
     /// ⚠️ NOT A DISPLAY STRING EITHER. `GET /api/settings` substitutes a

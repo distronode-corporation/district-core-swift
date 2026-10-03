@@ -53,12 +53,12 @@ public enum DialRefusal: Sendable, Equatable {
     /// the `.phonePad` keyboard, which offers `+` on every keypress.
     case strayPlus
 
-    /// An emergency number. ⛔ NOT AN ERROR THE OPERATOR SHOULD FIX — a hand-off.
+    /// An emergency number. ⛔ NOT AN ERROR THE OPERATOR SHOULD FIX, a hand-off.
     ///
     /// ⛔ IT IS TESTED FIRST, BEFORE ``missingCountryCode``, AND THE ORDER IS THE
     /// WHOLE FIX. Until this case existed, `911` fell through to
     /// `missingCountryCode`, whose copy reads "Start with a country code, for
-    /// example +1" — and following that instruction produces `+1911`, which was
+    /// example +1", and following that instruction produces `+1911`, which was
     /// then refused as ``tooShort``. The app walked somebody trying to call for
     /// help into a second dead end. A flat refusal would have been better; the
     /// remediation copy made it worse.
@@ -119,12 +119,12 @@ public enum DialEntry {
     /// ⚠️ SOURCE, SO THE LIST IS ARGUABLE RATHER THAN FOLKLORE: `112` and `911`
     /// are the two every handset must recognise under **3GPP TS 22.101 §10.1**,
     /// independent of SIM or network. The rest are the widely deployed national
-    /// codes — `000` (AU), `111` (NZ), `999` (UK, IE, HK), `110`/`118`/`119`
+    /// codes, `000` (AU), `111` (NZ), `999` (UK, IE, HK), `110`/`118`/`119`
     /// (JP, CN, and much of Europe), `113`/`115`/`117` (various EU).
     ///
     /// ⛔ IT IS DELIBERATELY INCOMPLETE AND THAT IS SAFE HERE, because the
     /// fallback is not a wrong call: no number under ``minimumDigits`` is
-    /// dialable at all, so an emergency code this set misses is still REFUSED —
+    /// dialable at all, so an emergency code this set misses is still REFUSED,
     /// it just gets the country-code sentence instead of the hand-off. Adding a
     /// code improves the message; omitting one never places a call.
     ///

@@ -31,7 +31,7 @@ final class RoomsRepositoryTests: XCTestCase {
     /// ⛔ THE URL IS THE SERVER'S CHOICE OF MEDIA NODE AND IS CARRIED VERBATIM. The
     /// room only exists on the deployment that created it, so a client that derived
     /// one from the workspace's region would join a bus that has never heard of the
-    /// room — and would do it silently.
+    /// room, and would do it silently.
     func testTheMediaUrlIsCarriedThroughUntouched() async throws {
         let transport = RepositoryTransport(json: RoomBodies.token(url: "wss://livekit-eu.distronode.com"))
         let room = try XCTUnwrap(RoomName(joining: "meet_ws-1_standup"))

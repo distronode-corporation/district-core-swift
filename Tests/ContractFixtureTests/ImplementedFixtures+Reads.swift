@@ -12,7 +12,7 @@ import Foundation
 /// one of the two lists, and the counted summary still counts all of them. This
 /// is not a second register and must never become one.
 ///
-/// ⚠️ `gate(_:_:)` HAD TO STOP BEING `private` FOR THIS TO COMPILE — a `private`
+/// ⚠️ `gate(_:_:)` HAD TO STOP BEING `private` FOR THIS TO COMPILE, a `private`
 /// helper is FILE-private, so an extension in another file cannot call it. That
 /// is the one visibility change the split cost.
 ///
@@ -26,13 +26,13 @@ extension ImplementedFixtures {
     /// workspace nulls two of its six keys; `/api/billing` has THREE because
     /// Stripe can be unreachable and an account can have no customer, and those
     /// two bodies are byte-identical apart from one ABSENT key. Five bodies, two
-    /// endpoints — the widest fixture-to-endpoint gap in the corpus.
+    /// endpoints, the widest fixture-to-endpoint gap in the corpus.
     ///
     /// ⛔ THE TWO DEGRADED BODIES ARE GATED SEPARATELY AGAINST THE SAME TYPE, AND
     /// THAT IS THE ASSERTION RATHER THAN A CONVENIENCE. The strict gate compares
     /// SHAPE, so it cannot tell them apart at all; what each gating proves is that
     /// ``StripeBilling`` decodes a body where nine of the fourteen healthy keys
-    /// are missing — which is the moment a required field would fail, i.e.
+    /// are missing, which is the moment a required field would fail, i.e.
     /// precisely when billing is already broken. The difference in MEANING is
     /// value-level and is asserted in `BillingContractTests`.
     ///
@@ -71,7 +71,7 @@ extension ImplementedFixtures {
     /// a clean list and present on the degraded one, so the clean fixture proves
     /// the Optionals do not invent the keys back on re-encode and the partial one
     /// proves they decode at all. With only one of them a decoder could not tell
-    /// the two states apart — and the state it would get wrong is a 200 carrying
+    /// the two states apart, and the state it would get wrong is a 200 carrying
     /// a SHORT list that draws exactly like a complete one.
     ///
     /// ⚠️ THE SEARCH FIXTURE'S SECOND ROW IS THE WHOLE REASON IT HAS TWO. Row 1
@@ -89,7 +89,7 @@ extension ImplementedFixtures {
     // MARK: - Meetings the Companion wrote up
 
     /// ⛔ TWO FIXTURES, TWO TYPES, AND THEY ARE NOT SUBSETS OF ONE ANOTHER IN
-    /// EITHER DIRECTION — which is exactly what gating both is for. The list
+    /// EITHER DIRECTION, which is exactly what gating both is for. The list
     /// RENAMES as it projects (`summary` becomes `summaryPreview` truncated to
     /// 220, `participants` becomes the integer `participantCount`), and the
     /// detail is the raw row and carries neither of those names while adding four
@@ -103,7 +103,7 @@ extension ImplementedFixtures {
     ///
     /// ⚠️ THIS GROUP IS NOT `ImplementedFixtures.meetings`, WHICH IS A NAMING
     /// ACCIDENT OF THE CORPUS RATHER THAN A DUPLICATE. That one holds the two ROOM
-    /// TOKEN bodies and some bare acknowledgements — joining a room — while these
+    /// TOKEN bodies and some bare acknowledgements, joining a room, while these
     /// two are the archive of meetings that already happened.
     static var meetingRecords: [ImplementedFixture] {
         [

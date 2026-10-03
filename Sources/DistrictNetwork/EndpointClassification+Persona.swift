@@ -16,7 +16,7 @@ public extension TypedEndpoints {
     /// that does not start, and there is nothing to degrade to.
     ///
     /// ⚠️ BOTH AFFIRM `success`. Unlike the scheduling pair next door, both bodies
-    /// carry the flag, so ``ResponseEnvelope/affirm(_:_:_:)`` applies — and it
+    /// carry the flag, so ``ResponseEnvelope/affirm(_:_:_:)`` applies, and it
     /// matters on the options read in particular, whose failure body is
     /// `{success:false,error}` with no catalogues at all.
     static let persona: Set<EndpointID> = [

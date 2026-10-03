@@ -5,13 +5,13 @@ import Foundation
 /// ⛔ BUILT BY HAND RATHER THAN THROUGH `URLComponents`, AND NOT FOR TASTE.
 /// `URLComponents.queryItems` percent-encodes with a permissive set that leaves
 /// `+` literal, so a value containing one arrives at the server as a SPACE after
-/// its own form decoding — and the values passed here include phone numbers
+/// its own form decoding, and the values passed here include phone numbers
 /// (`+15555550123` is the ordinary E.164 form this API's `phoneNumber` selector
 /// carries) and thread keys built from them. A timeline read for `+1555…` would
 /// silently address ` 1555…` and answer an empty thread, which reads as "no
 /// messages" rather than as an encoding bug.
 enum ApiURL {
-    /// - Returns: nil when the path could not be built — an empty segment, which
+    /// - Returns: nil when the path could not be built, an empty segment, which
     ///   would collapse to `//` and address a different route. ``ApiClient``
     ///   turns that into a transport failure rather than sending anything.
     static func build(base: URL, segments: [String], query: [ApiQueryItem]) -> URL? {
@@ -36,8 +36,8 @@ enum ApiURL {
         return URL(string: text)
     }
 
-    /// ⚠️ THE UNRESERVED SET AND NOTHING ELSE (RFC 3986 §2.3). Everything else —
-    /// `+`, `&`, `=`, `?`, `#`, space, non-ASCII — is percent-encoded, so a
+    /// ⚠️ THE UNRESERVED SET AND NOTHING ELSE (RFC 3986 §2.3). Everything else,
+    /// `+`, `&`, `=`, `?`, `#`, space, non-ASCII, is percent-encoded, so a
     /// value can neither open a new parameter nor be re-read as a space.
     ///
     /// ⚠️ WRITTEN OVER UTF-8 BYTES RATHER THAN THROUGH

@@ -7,7 +7,7 @@ import Foundation
 // ⛔ THESE ARE SPELLINGS OF ``SchedulingAdminRepository/perform(_:workspaceId:params:as:)``
 // AND NOT A SECOND CATALOG. The server owns the scheduler path, the HTTP verb and
 // the params schema; what these methods add is the one thing `perform` cannot know
-// and every caller would otherwise guess — WHICH RESPONSE TYPE GOES WITH WHICH OP.
+// and every caller would otherwise guess, WHICH RESPONSE TYPE GOES WITH WHICH OP.
 // Naming the wrong type at a call site is a runtime
 // ``SchedulingAdminError/decoding(_:)``, which is the cost `perform` pays for not
 // duplicating 75 schemas; these close that gap for the two namespaces S1b ports
@@ -18,7 +18,7 @@ import Foundation
 // and strips the path keys afterwards, so a client that removed one first gets a
 // 400 naming the field it was being tidy about. Every method below puts them back.
 // ⚠️ That is also why `slug` is a separate argument rather than a field on
-// ``SchedulingEventTypeChanges`` — it addresses the row, it is not a change to it.
+// ``SchedulingEventTypeChanges``, it addresses the row, it is not a change to it.
 //
 // ⚠️ A PATCH DROPS ITS nil PAIRS, WHICH IS "LEAVE ALONE" AND NOT "CLEAR".
 // ``JSONValue/object(_:)`` drops a nil by design; none of these schemas is
@@ -28,7 +28,7 @@ import Foundation
 public extension SchedulingAdminRepository {
     // MARK: - The event types themselves
 
-    /// `eventTypes.list` — every event type in the tenancy, archived ones included.
+    /// `eventTypes.list`, every event type in the tenancy, archived ones included.
     ///
     /// ⚠️ NOT FILTERED BY OWNER AND NOT FILTERED BY `is_active`. A member with the
     /// role for it sees the whole tenancy's list; ``SchedulingEventType/owned`` is
@@ -42,7 +42,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `eventTypes.get` — one event type by its public slug.
+    /// `eventTypes.get`, one event type by its public slug.
     func eventType(workspaceId: String, slug: String) async throws -> SchedulingEventType {
         try await perform(
             .eventTypesGet,
@@ -52,7 +52,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `eventTypes.create` — a new event type, which answers the created row.
+    /// `eventTypes.create`, a new event type, which answers the created row.
     func createEventType(
         workspaceId: String,
         draft: SchedulingEventTypeDraft
@@ -80,7 +80,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `eventTypes.patch` — a sparse update, which answers the whole updated row.
+    /// `eventTypes.patch`, a sparse update, which answers the whole updated row.
     ///
     /// ⚠️ ARCHIVING IS HERE (`changes.archived`), NOT IN ``deleteEventType(workspaceId:slug:)``.
     func patchEventType(
@@ -96,7 +96,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `eventTypes.delete` — removes the row.
+    /// `eventTypes.delete`, removes the row.
     ///
     /// ⛔ NOT THE SAME AS ARCHIVING, and the difference is the bookings. Patch
     /// `archived: true` to hide an event type while its history stays addressable.
@@ -111,7 +111,7 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Hosts
 
-    /// `eventTypes.hosts.get` — who can be booked on this event type.
+    /// `eventTypes.hosts.get`, who can be booked on this event type.
     func eventTypeHosts(workspaceId: String, slug: String) async throws -> [SchedulingHost] {
         try await perform(
             .eventTypesHostsGet,
@@ -121,10 +121,10 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `eventTypes.hosts.put` — REPLACES the host list, and answers the new one.
+    /// `eventTypes.hosts.put`, REPLACES the host list, and answers the new one.
     ///
     /// ⛔ A FULL REPLACEMENT. Sending one host removes the others, and the schema
-    /// refuses an empty array — see ``SchedulingHostAssignment``.
+    /// refuses an empty array, see ``SchedulingHostAssignment``.
     ///
     /// ⚠️ THE ANSWER IS THE LIST, NOT AN ECHO AND NOT A 204: the handler
     /// re-dispatches into the read, so the rows come back with the `name`, `email`
@@ -151,7 +151,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `eventTypes.testEmail` — sends one of the four templates to the CALLER.
+    /// `eventTypes.testEmail`, sends one of the four templates to the CALLER.
     ///
     /// ⛔ THERE IS NO RECIPIENT ARGUMENT AND THAT IS THE DESIGN. The fork addresses
     /// the calling member's own scheduler address; a recipient parameter would make
@@ -173,10 +173,10 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Booking questions
 
-    /// `eventTypes.questions.list` — the ADMIN list.
+    /// `eventTypes.questions.list`, the ADMIN list.
     ///
     /// ⚠️ IT HITS THE `/admin` SIBLING, which skips the `is_active` / `is_public`
-    /// filters the public endpoint applies — an event type being edited is usually
+    /// filters the public endpoint applies, an event type being edited is usually
     /// neither, so the public list would answer empty for exactly the row on screen.
     func eventTypeQuestions(workspaceId: String, slug: String) async throws -> [SchedulingQuestion] {
         try await perform(
@@ -187,7 +187,7 @@ public extension SchedulingAdminRepository {
         ).items
     }
 
-    /// `eventTypes.questions.create` — one new question on the booking form.
+    /// `eventTypes.questions.create`, one new question on the booking form.
     func createEventTypeQuestion(
         workspaceId: String,
         slug: String,
@@ -208,7 +208,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `eventTypes.questions.patch` — a sparse update of one question.
+    /// `eventTypes.questions.patch`, a sparse update of one question.
     ///
     /// ⚠️ TWO PATH KEYS, AND BOTH STAY IN THE BODY. The question is addressed by the
     /// event type's `slug` AND its own `id`.
@@ -234,7 +234,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `eventTypes.questions.delete` — removes one question.
+    /// `eventTypes.questions.delete`, removes one question.
     func deleteEventTypeQuestion(workspaceId: String, slug: String, id: String) async throws {
         _ = try await perform(
             .eventTypesQuestionsDelete,
@@ -246,7 +246,7 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Slots
 
-    /// `eventTypes.slots` — the bookable windows, as the booking page computes them.
+    /// `eventTypes.slots`, the bookable windows, as the booking page computes them.
     ///
     /// ⚠️ EVERY ARGUMENT AFTER THE SLUG IS OPTIONAL AND THE FORK PICKS ITS OWN
     /// DEFAULTS when they are dropped. ⛔ `tz` is the zone the windows are RETURNED

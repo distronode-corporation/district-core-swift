@@ -37,7 +37,7 @@ public struct SchedulingRecording: Codable, Equatable, Sendable {
     /// Whether an object actually exists to download. ⛔ A FILE IS NOT IMPLIED BY
     /// `status == "ready"` AND THIS IS THE FIELD THAT SAYS SO. A row whose object
     /// was reaped by retention keeps its status and loses its file, and the
-    /// download route answers 404 for it — so a Play button drawn off `status`
+    /// download route answers 404 for it, so a Play button drawn off `status`
     /// fails in the player rather than being absent from the row.
     public let hasFile: Bool?
     public let createdAt: String?
@@ -80,7 +80,7 @@ public struct SchedulingRecordingList: Codable, Equatable, Sendable {
 /// REPORTED. The op deletes per object and tallies; nothing about the HTTP status
 /// changes when some of them do not go. A screen that rendered "all deleted" off
 /// a successful call would tell a customer their recordings are gone while
-/// ``failed`` of them are still in the bucket — which, on a surface whose whole
+/// ``failed`` of them are still in the bucket, which, on a surface whose whole
 /// purpose is data removal, is the worst available wrong answer.
 public struct SchedulingRecordingsDeleted: Codable, Equatable, Sendable {
     public let deleted: Int
@@ -99,7 +99,7 @@ public struct SchedulingRecordingConsent: Codable, Equatable, Sendable {
     /// The LiveKit participant identity (`host-<userId>`, `guest-<name>`).
     /// ⚠️ Not an email and not a District user id: it is what the room knew.
     public let identity: String
-    /// ⚠️ Absent for a participant who never gave one — row 1 of the fixture.
+    /// ⚠️ Absent for a participant who never gave one, row 1 of the fixture.
     /// A screen falls back to ``identity``, which always exists.
     public let name: String?
     /// `granted`, `pending`, and whatever the fork adds. A `String` for

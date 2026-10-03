@@ -33,7 +33,7 @@ final class SchedulingAdminTeamRepositoryTests: XCTestCase {
     // MARK: - Scheduler users
 
     /// ⛔ THE `data` IS THE ARRAY ITSELF. There is no container to unwrap, which is
-    /// why the response type is `[SchedulingUser]` — and why a `SchedulingItems`
+    /// why the response type is `[SchedulingUser]`, and why a `SchedulingItems`
     /// here would fail at runtime with a missing-key error that reads like an
     /// outage.
     func testTheUserListDecodesABareArray() async throws {
@@ -94,7 +94,7 @@ final class SchedulingAdminTeamRepositoryTests: XCTestCase {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":{"items":[\#(Self.teamRow)]}}"#)
         let teams = try await repository(transport).teams(workspaceId: "ws_1")
         XCTAssertEqual(teams.count, 1)
-        // ⛔ NULL, NOT `[]`, ON AN EMPTY TEAM — and `member_count` is the field that
+        // ⛔ NULL, NOT `[]`, ON AN EMPTY TEAM, and `member_count` is the field that
         // agrees with it.
         XCTAssertNil(teams[0].members)
         XCTAssertEqual(teams[0].memberCount, 0)
@@ -164,7 +164,7 @@ final class SchedulingAdminTeamRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ A 200 `{ok:true}` RATHER THAN A 204, unlike almost every other delete in
-    /// this catalog — so it decodes as ``SchedulingNoContent`` by arriving in that
+    /// this catalog, so it decodes as ``SchedulingNoContent`` by arriving in that
     /// shape rather than by being rewritten into it.
     func testDeletingATeamAnswersABareFlag() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":{"ok":true}}"#)
@@ -209,7 +209,7 @@ final class SchedulingAdminTeamRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⛔ `userId`, CAMELCASE, ON THE PATCH — one op away from the add's `user_id`,
+    /// ⛔ `userId`, CAMELCASE, ON THE PATCH, one op away from the add's `user_id`,
     /// and both path keys stay in the body.
     func testPatchingAMembersPrioritySendsCamelCaseUserIdAndBothPathKeys() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":\#(Self.teamRow)}"#)

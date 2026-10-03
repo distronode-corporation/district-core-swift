@@ -1,13 +1,13 @@
 import Foundation
 
-/// `GET`/`PATCH /api/district/workspace/call-handling` — which of the agent and
+/// `GET`/`PATCH /api/district/workspace/call-handling`, which of the agent and
 /// the app answers a call, and how long the app is given to.
 ///
 /// ⛔ BOTH VERBS ANSWER THE SAME SHAPE, AND THE PATCH'S BODY IS THE NEW BASELINE.
 /// That makes this the FIRST write on the workspace-settings surface that does not
 /// need a re-read: `workspace/persona`, `workspace/tools`, `workspace/directory`
 /// and `workspace/routing-rules` all answer a bare `{"success": true}` and force
-/// one. So one DTO for two endpoints, deliberately — see the ⛔ at the foot of
+/// one. So one DTO for two endpoints, deliberately, see the ⛔ at the foot of
 /// `WorkspaceConfigResponses.swift` for why sharing is the honest call when the
 /// bodies really are identical, and the caveat that comes with it: the day the
 /// PATCH grows a key, split a type out rather than widening this one.
@@ -51,7 +51,7 @@ public enum CallHandling {
     public static let modes = [aiFirst, aiThenApp, appFirst]
 
     /// `DEFAULT_CALL_HANDLING`. ⚠️ What an unrecognised STORED value reads back as,
-    /// which the server does rather than the client — see the ⛔ on
+    /// which the server does rather than the client, see the ⛔ on
     /// ``CallHandlingResponse``.
     public static let `default` = aiFirst
 
@@ -80,7 +80,7 @@ public enum CallHandling {
     }
 }
 
-/// `GET`/`PATCH /api/district/workspace/availability` — whether the CALLER can be
+/// `GET`/`PATCH /api/district/workspace/availability`, whether the CALLER can be
 /// rung for this workspace's calls.
 ///
 /// ⛔ IT IS A FACT ABOUT THE CALLER'S OWN MEMBERSHIP ROW, NOT ABOUT THE WORKSPACE.
@@ -90,7 +90,7 @@ public enum CallHandling {
 ///
 /// ⛔ AND IT IS PER WORKSPACE, WHICH IS THE PART THAT SURPRISES PEOPLE. The same
 /// person can be available in one workspace and not in another, so any UI drawing
-/// this has to NAME the workspace it is talking about — a bare "Available for
+/// this has to NAME the workspace it is talking about, a bare "Available for
 /// calls" toggle is a claim about the whole account that this value does not make.
 public struct AvailabilityResponse: Codable, Sendable {
     public let success: Bool
@@ -115,7 +115,7 @@ public struct AvailabilityResponse: Codable, Sendable {
 /// MISTAKE THIS TYPE EXISTS TO PREVENT. `role` is a viewer, who has no business
 /// being rung and can do nothing about it. `no_member_row` is somebody who holds
 /// their role through the OWNER FALLBACK and therefore has no `WorkspaceMember` row
-/// at all — the ring fan-out reads that table, so they genuinely cannot be rung
+/// at all, the ring fan-out reads that table, so they genuinely cannot be rung
 /// today, and the write answers **409** rather than creating a row. One of those is
 /// a permission and the other is a gap in the data; an operator can act on the
 /// second by being added to the workspace properly.

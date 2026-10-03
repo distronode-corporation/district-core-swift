@@ -31,7 +31,7 @@ final class MeetingsRepositoryTests: XCTestCase {
     /// ⛔ A BARE ARRAY WITH NO ENVELOPE IS A SUCCESS, AND AN EMPTY ONE IS AN
     /// ANSWER. There is no flag to check and no guard could tell "nothing yet"
     /// from a broken read anyway, so a repository that wrapped this would reject
-    /// every healthy response — including the ordinary one from a workspace that
+    /// every healthy response, including the ordinary one from a workspace that
     /// has never held a meeting.
     func testAnEmptyArrayIsASuccessRatherThanAMissingEnvelope() async throws {
         let transport = RepositoryTransport(json: "[]")
@@ -50,7 +50,7 @@ final class MeetingsRepositoryTests: XCTestCase {
 
     /// ⛔ `video_` ROWS ARE FILTERED OUT AND THE FILTER IS DELIBERATE RATHER THAN
     /// DEFENSIVE. The Meeting table records whatever room the Companion was
-    /// dispatched into, including billable avatar sessions — a different product
+    /// dispatched into, including billable avatar sessions, a different product
     /// surface whose rows would appear here as meetings the user never held. A
     /// row that fails the filter belongs to something else; it is not corrupt
     /// data and it is not an error, so the rest of the list is still served.
@@ -126,7 +126,7 @@ final class MeetingsRepositoryTests: XCTestCase {
     /// ⛔ THE FILTER IS A PREFIX TEST AND NOT ``RoomName``, WHICH WOULD HIDE LIVE
     /// MEETINGS FROM THEIR OWN LIST. That type additionally restricts the suffix
     /// to `[a-zA-Z0-9-]` to match the web lobby, while the server's own regex
-    /// ends in `.+` and admits underscores — so a real room like
+    /// ends in `.+` and admits underscores, so a real room like
     /// `meet_ws-contract-test_standup` is a name this client must READ and would
     /// refuse to MINT. Validating a name we did not construct against the minting
     /// rule is the mistake this pins.

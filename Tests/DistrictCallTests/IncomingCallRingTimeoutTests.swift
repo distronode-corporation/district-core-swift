@@ -38,8 +38,8 @@ final class IncomingCallRingTimeoutTests: XCTestCase {
     }
 
     func testARingWithNoRecordedStartNeverExpires() {
-        // ⚠️ UNREACHABLE THROUGH ANY EVENT — the phase and the timestamp are set
-        // by the same transition — so this drives the state directly. Failing
+        // ⚠️ UNREACHABLE THROUGH ANY EVENT, the phase and the timestamp are set
+        // by the same transition, so this drives the state directly. Failing
         // OPEN here is the deliberate direction: a missing timestamp must leave
         // the Answer button live rather than cancel a call that is ringing.
         var state = IncomingCallController.inRinging().state

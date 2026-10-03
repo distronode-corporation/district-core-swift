@@ -9,7 +9,7 @@ import Foundation
 /// which is not the device's: a Toronto operator checking a booking from a hotel in
 /// Tokyo must still see the hour the customer was told. Formatting off
 /// `Date.formatted` would silently use the device zone and be wrong exactly when
-/// somebody is travelling — which is also when they are most likely to be reading a
+/// somebody is travelling, which is also when they are most likely to be reading a
 /// booking on a phone.
 ///
 /// ⚠️ `hour` IS 0...23 AND MIDNIGHT IS `0`, NEVER `24`. The TypeScript takes
@@ -80,13 +80,13 @@ public enum SchedulingClock {
         )
     }
 
-    /// `9:05` — UNPADDED hour, padded minute. The register, the bookings table and the
+    /// `9:05`, UNPADDED hour, padded minute. The register, the bookings table and the
     /// reschedule slot list.
     public static func clock(_ parts: SchedulingZonedParts) -> String {
         "\(parts.hour):\(paddedTwo(parts.minute))"
     }
 
-    /// `09:05` — PADDED hour and minute. The recordings table only; see the ⛔ on this
+    /// `09:05`, PADDED hour and minute. The recordings table only; see the ⛔ on this
     /// type.
     public static func paddedClock(_ parts: SchedulingZonedParts) -> String {
         "\(paddedTwo(parts.hour)):\(paddedTwo(parts.minute))"
@@ -94,7 +94,7 @@ public enum SchedulingClock {
 
     /// ⚠️ THE MONTH NAME FOR A 1-BASED MONTH, OR nil. A `month` outside 1...12 is a
     /// value no calendar produced, and the callers render the raw input rather than
-    /// indexing past the end of the table — which in Swift is a crash rather than the
+    /// indexing past the end of the table, which in Swift is a crash rather than the
     /// `undefined` the TypeScript would have shown.
     public static func monthName(_ month: Int) -> String? {
         guard month >= 1, month <= monthNames.count else { return nil }

@@ -11,7 +11,7 @@ import Foundation
 /// customer their account is gone.
 public enum WorkspaceListError: Error, Equatable, Sendable {
     /// At least one region could not be reached. ⚠️ The workspaces in the regions
-    /// that DID answer are not returned either — the route refuses to serve a
+    /// that DID answer are not returned either, the route refuses to serve a
     /// partial list, because a partial list is indistinguishable from a complete
     /// one once it reaches a screen.
     case regionsDegraded(message: String?, regions: [String])
@@ -21,7 +21,7 @@ public enum WorkspaceListError: Error, Equatable, Sendable {
 /// A successful workspace list, and how complete it is.
 ///
 /// ⛔ `degradedRegions` IS ALSO PRESENT ON A **200**, AND THAT IS THE HALF EVERY
-/// CLIENT MISSES. A partial list — some regions answered, others did not — is a
+/// CLIENT MISSES. A partial list, some regions answered, others did not, is a
 /// success carrying a non-empty array, and it is genuinely INCOMPLETE. A client
 /// that handled the array only on the 503 path would present a partial account as
 /// the whole one, which is the same lie as the empty-list case wearing a green
@@ -45,8 +45,8 @@ public struct WorkspaceListPage: Sendable {
         response.workspaces
     }
 
-    /// ⚠️ CAPTION THE LIST WHEN THIS IS TRUE. Not an error — the rows shown are
-    /// real — but they are not all of them.
+    /// ⚠️ CAPTION THE LIST WHEN THIS IS TRUE. Not an error, the rows shown are
+    /// real, but they are not all of them.
     public var isPartial: Bool {
         !degradedRegions.isEmpty
     }
@@ -54,7 +54,7 @@ public struct WorkspaceListPage: Sendable {
     /// ⛔ AN EMPTY LIST WITH A NON-ZERO `inactiveCount` IS A LAPSED ACCOUNT, NOT A
     /// NEW ONE, and it is the only way to tell them apart. The two need different
     /// screens: one says "your subscription is not active", the other offers
-    /// onboarding. ⛔ Neither may offer a way to PAY — billing is read-only in
+    /// onboarding. ⛔ Neither may offer a way to PAY, billing is read-only in
     /// this app (App Store Review Guideline 3.1.3(b)), so the lapsed screen names
     /// the website and stops there.
     public var isBlockedByBilling: Bool {
@@ -66,7 +66,7 @@ public struct WorkspaceListPage: Sendable {
     /// ⛔ THE STORED DEFAULT IS AN ID TO LOOK UP, NEVER ONE TO SEND BLIND. The
     /// server echoes `defaultWorkspaceId` verbatim without cross-checking it, so
     /// it can name a workspace whose subscription has since lapsed or one the
-    /// user was removed from — and sending that id on the next request earns a
+    /// user was removed from, and sending that id on the next request earns a
     /// 403 on a screen the user has not touched. Falling back to index 0 is what
     /// the browser does.
     ///
@@ -76,8 +76,8 @@ public struct WorkspaceListPage: Sendable {
     /// `if let`. SwiftFormat's `wrapMultilineStatementBraces` requires the opening
     /// brace of a multi-line condition to sit on its own line; SwiftLint's
     /// `opening_brace` requires it to stay on the same line. The pair is
-    /// unsatisfiable for a multi-line `if` — the same standoff the
-    /// `trailing_comma` note in `.swiftlint.yml` records — and a single-line
+    /// unsatisfiable for a multi-line `if`, the same standoff the
+    /// `trailing_comma` note in `.swiftlint.yml` records, and a single-line
     /// condition is the one shape neither rule objects to.
     ///
     /// ⚠️ MULTI-LINE `guard` IS NOT AFFECTED, which is why it is still used freely
@@ -89,7 +89,7 @@ public struct WorkspaceListPage: Sendable {
     ///
     /// ⚠️ Comparing a non-optional `id` against an optional `stored` is what makes
     /// the collapse safe: a nil default matches nothing, `first(where:)` returns
-    /// nil, and the fallback below runs — exactly the previous behaviour.
+    /// nil, and the fallback below runs, exactly the previous behaviour.
     public var defaultSelection: WorkspaceEntry? {
         let stored = response.defaultWorkspaceId
         if let match = response.workspaces.first(where: { $0.id == stored }) {
@@ -104,7 +104,7 @@ public struct WorkspaceRepository: Sendable {
     /// ⚠️ `internal` RATHER THAN `private` SINCE THE PERSONA BATCH, AND THE REASON IS
     /// SwiftLint's 500-LINE `file_length` CEILING RATHER THAN A DESIGN CHANGE. The
     /// persona methods live in `WorkspaceRepository+Persona.swift` because this file
-    /// had no room left, and `private` is FILE-private — an extension in another
+    /// had no room left, and `private` is FILE-private, an extension in another
     /// file cannot reach it. It stays out of the public surface either way, so the
     /// seam this type is (one ``ApiClient``, no transport visible to a screen) is
     /// unchanged.
@@ -196,7 +196,7 @@ public struct WorkspaceRepository: Sendable {
     /// Add one member.
     ///
     /// ⛔ AGENCY-ONLY SERVER-SIDE, WHICH IS NARROWER THAN `WorkspaceRole.canMutate`
-    /// — that property mirrors the wider `["agency","client"]` allow-list used
+    /// that property mirrors the wider `["agency","client"]` allow-list used
     /// everywhere else. Gate this on `.agency` explicitly.
     ///
     /// ⚠️ 409 `member_exists` is not a server fault; branch on
@@ -231,7 +231,7 @@ public struct WorkspaceRepository: Sendable {
     /// Remove one member.
     ///
     /// ⚠️ THE SUCCESS BODY HAS NO `member` KEY. `MemberMutationResponse.member` is
-    /// optional precisely so this decodes — it is the one response a client must
+    /// optional precisely so this decodes, it is the one response a client must
     /// not fail on, since the row really is gone.
     public func removeMember(workspaceId: String, email: String) async -> Result<MemberMutationResponse, ApiError> {
         await client.send(
@@ -261,7 +261,7 @@ public struct WorkspaceRepository: Sendable {
     /// settings page is a server component that reads the workspace row during
     /// render and threads it into each form, so every form opens pre-hydrated.
     /// Three of the saves below REPLACE their stored value wholesale, so a native
-    /// form that opened empty and saved would not save nothing — it would delete
+    /// form that opened empty and saved would not save nothing, it would delete
     /// the agent's tool allowlist, or every dynamic-persona rule the workspace
     /// has. A caller may only build one of those requests on a `.success` from
     /// here.
@@ -301,8 +301,8 @@ public struct WorkspaceRepository: Sendable {
     // ⛔ EVERY SAVE ON THIS SURFACE MAY ONLY EVER BE BUILT ON A SUCCESSFUL READ OF
     // ``config(workspaceId:)``, AND THIS LAYER CANNOT ENFORCE THAT, WHICH IS WHY
     // IT IS WRITTEN DOWN HERE. ⚠️ THE PERSONA SAVE MOVED OUT OF THIS FILE INTO
-    // `WorkspaceRepository+Persona.swift` WHEN IT GREW FROM FOUR FIELDS TO ELEVEN —
-    // SwiftLint's 500-line ceiling, nothing deeper — and the obligation stated here
+    // `WorkspaceRepository+Persona.swift` WHEN IT GREW FROM FOUR FIELDS TO ELEVEN,
+    // SwiftLint's 500-line ceiling, nothing deeper, and the obligation stated here
     // still covers it. `saveTools` and `saveRoutingRules` REPLACE their
     // stored value wholesale rather than merging it, so a form that opened empty
     // and saved would not save nothing: it would delete the agent's tool
@@ -361,7 +361,7 @@ public struct WorkspaceRepository: Sendable {
     ///
     /// ⛔ THE MOST DESTRUCTIVE CALL IN THIS CLIENT, AND ITS FAILURE MODE IS A 200.
     /// The handler writes `callDirectory: (callDirectory || [])`, so an empty array
-    /// — or a body that simply omits the key — WIPES every human the voice agent can
+    /// or a body that simply omits the key, WIPES every human the voice agent can
     /// put a live caller through to, and answers `{success:true}`. There is no "save
     /// nothing" on this route, and there is no undo.
     ///
@@ -375,13 +375,13 @@ public struct WorkspaceRepository: Sendable {
     /// route's per-entry zod schema is `.passthrough()` and names only `name`,
     /// `phoneNumber` and `type`, while the column is `Json` and holds whatever
     /// anyone ever wrote. A request rebuilt from a typed model would strip every
-    /// unmodelled key and answer 200 — a silent deletion inside a row rather than of
+    /// unmodelled key and answer 200, a silent deletion inside a row rather than of
     /// one. Start from the loaded object and overwrite the keys the form owns.
     ///
     /// ⛔ `type` IS THE ONE KEY WORTH NAMING HERE: `"app"` makes a transfer RING THE
     /// PHONE instead of dialling a PSTN number, and the route validates it as
     /// `"pstn" | "app"` so anything else is a 400. ⚠️ ABSENT MEANS `"pstn"` AND MUST
-    /// NOT BE NORMALISED TO IT ON WRITE — every entry stored today has no `type` key,
+    /// NOT BE NORMALISED TO IT ON WRITE, every entry stored today has no `type` key,
     /// every reader already treats an entry as a phone number, and writing the
     /// default in would rewrite every tenant's config to say what it already meant
     /// while making "did an operator CHOOSE pstn?" unanswerable.

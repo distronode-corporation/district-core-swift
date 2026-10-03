@@ -11,7 +11,7 @@ let testDialToken = "join-jwt"
 ///
 /// ⛔ THE ONLY HANDLE ON THE CARRIER LEG. It arrives with the credential and not
 /// before, which is why ``SoftphoneSession/inDialing()`` below has no `callId` and
-/// every phase after it does — the difference is exactly the window an operator
+/// every phase after it does, the difference is exactly the window an operator
 /// hangs up in when they mis-dial.
 let testDialCallId = "CA1"
 

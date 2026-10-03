@@ -3,7 +3,7 @@ import Foundation
 
 /// One dynamic-persona rule, as an editor holds it.
 ///
-/// ⛔ IT CARRIES THE ORIGINAL ROW, AND THAT IS THE WHOLE DESIGN — the same one
+/// ⛔ IT CARRIES THE ORIGINAL ROW, AND THAT IS THE WHOLE DESIGN, the same one
 /// ``RegulatoryDocumentUpload``'s neighbours make for the transfer directory, for
 /// the same reason and with a larger blast radius. `POST workspace/routing-rules`
 /// REPLACES the stored array wholesale, its per-rule zod schema is
@@ -11,7 +11,7 @@ import Foundation
 /// holding whatever anyone ever wrote. The committed fixture proves the point: two
 /// of its three rows are shaped `{id, match, action, target}`, which is not the
 /// shape the web's own rule builder edits at all. A row rebuilt from the six fields
-/// below would strip the rest and be answered **200** — a silent deletion INSIDE
+/// below would strip the rest and be answered **200**, a silent deletion INSIDE
 /// somebody's rule rather than of one.
 ///
 /// ⛔ SO ``rendered()`` OVERWRITES EXACTLY THE SIX KEYS THIS FORM OWNS AND TOUCHES
@@ -48,7 +48,7 @@ public struct RoutingRuleDraft: Identifiable, Sendable, Equatable {
     ///
     /// ⚠️ EVERY FIELD FALLS BACK TO `""` RATHER THAN TO A DEFAULT VALUE. A rule
     /// shaped `{id, match, action, target}` has none of the six keys, so it opens
-    /// entirely blank — which is the honest rendering of "this build cannot read
+    /// entirely blank, which is the honest rendering of "this build cannot read
     /// this rule", and ``isRecognised`` is what a screen asks before offering to
     /// edit it.
     public init(id: Int, row: WireJSON?) {
@@ -67,7 +67,7 @@ public struct RoutingRuleDraft: Identifiable, Sendable, Equatable {
     /// ⛔ THE DEFAULTS ARE THE WEB'S EXACTLY (`industry` / `contains` / `Puck`),
     /// because a rule created on one platform and opened on the other must not look
     /// like somebody changed it. ⚠️ `value` and `instruction` start empty, so a
-    /// freshly added rule matches nothing until it is filled in — see
+    /// freshly added rule matches nothing until it is filled in, see
     /// ``isIncomplete``.
     public static func added(id: Int) -> RoutingRuleDraft {
         var draft = RoutingRuleDraft(id: id, row: nil)
@@ -92,7 +92,7 @@ public struct RoutingRuleDraft: Identifiable, Sendable, Equatable {
     }
 
     /// ⚠️ A RULE WITH NOTHING TO MATCH ON IS FLAGGED, NOT REFUSED. It is legal, it
-    /// is stored, and it simply never fires — which is exactly what an operator
+    /// is stored, and it simply never fires, which is exactly what an operator
     /// opened the screen to find out. Deleting it on their behalf is not this
     /// type's decision.
     public var isIncomplete: Bool {

@@ -3,7 +3,7 @@ import Foundation
 // How a route ANSWERS, as opposed to whether this client has ported a DTO for it.
 //
 // ⛔ SPLIT OUT OF `EndpointClassification.swift` BECAUSE THAT FILE REACHED
-// SWIFTLINT'S 500-LINE CEILING AT 498 AND A NEW ENDPOINT FAMILY COULD NOT LAND —
+// SWIFTLINT'S 500-LINE CEILING AT 498 AND A NEW ENDPOINT FAMILY COULD NOT LAND,
 // the support surface needed five lines and had two. The cut is on a real seam
 // rather than at an arbitrary line: `UntypedEndpoints` and `TypedEndpoints` are the
 // two halves of one burn-down and have to be read together, while the two enums
@@ -27,7 +27,7 @@ import Foundation
 /// ``ApiClient/redirectTarget(_:)``.
 ///
 /// ⚠️ THE SECOND ONE IS VIDEO, NOT AUDIO, which is the same mistake costing two
-/// orders of magnitude more memory — the scheduler route exists at all because
+/// orders of magnitude more memory, the scheduler route exists at all because
 /// its own origin refuses to proxy the bytes for exactly that reason.
 ///
 /// ⛔ A REDIRECT IS NOT AUTOMATICALLY A MEMBER OF THIS LIST, AND THE COUNTER-CASE
@@ -54,7 +54,7 @@ public enum RedirectEndpoints {
 /// `meetings/{id}` is a bare OBJECT, itself unlike both).
 ///
 /// ⚠️ THE SUPPORT FAMILY IS NOT HERE AND MUST NOT BE ADDED. All five of its routes
-/// carry the ordinary `{success, …}` envelope, including the list — which is what
+/// carry the ordinary `{success, …}` envelope, including the list, which is what
 /// makes `ResponseEnvelope.affirm` reachable on the one read where "we could not
 /// look" rendered as "you have no support requests" is the expensive mistake.
 public enum BareArrayEndpoints {

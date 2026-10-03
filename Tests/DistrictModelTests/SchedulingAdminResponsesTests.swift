@@ -17,7 +17,7 @@ final class SchedulingAdminResponsesTests: XCTestCase {
     }
 
     /// ⚠️ STRICT RATHER THAN DEFAULTED. The value is constant by construction, so
-    /// the field is not information about the request — it is a pin on the
+    /// the field is not information about the request, it is a pin on the
     /// server's shape, and a `?? true` would let that shape change unobserved.
     func testNoContentRefusesABodyWithoutTheFlag() {
         XCTAssertThrowsError(try decode(SchedulingNoContent.self, #"{}"#))
@@ -94,7 +94,7 @@ final class SchedulingAdminResponsesTests: XCTestCase {
 
     /// ⛔ THE ENCODE ARM IS NOT DECORATION AND IT IS NOT TESTED BY ANY DECODE.
     /// `StrictDecodeVerifier` decodes a fixture and then RE-ENCODES it, comparing
-    /// key sets — so an `encode(to:)` that wrapped the arm in a discriminator, or
+    /// key sets, so an `encode(to:)` that wrapped the arm in a discriminator, or
     /// emitted the other arm's keys, would pass every decode test in this package
     /// and fail the contract gate, a suite away from the change that caused it. Both
     /// arms round-trip byte-identically here instead.

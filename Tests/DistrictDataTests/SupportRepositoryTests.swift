@@ -97,7 +97,7 @@ enum SupportBodies {
 ///
 /// ⛔ THE ASSERTIONS HERE ARE ABOUT OUTCOMES THAT LOOK ALIKE AND MEAN OPPOSITE
 /// THINGS. An empty request list and a failed read are the same picture and must
-/// never be the same value — that conflation is what told a web customer with three
+/// never be the same value, that conflation is what told a web customer with three
 /// open tickets that they had none. The three 200 branches of the create are all
 /// successes and one of them reads like an error. And a failed write's
 /// repeatability is a claim about whether a second public comment lands in somebody
@@ -144,7 +144,7 @@ final class SupportRepositoryTests: XCTestCase {
 
     /// ⛔ THE ENVELOPE CHECK IS THE WHOLE POINT ON THIS SURFACE. A required field
     /// rejects `{}` but not a well-formed `success: false`, which is what this
-    /// route's catch branch produces once the headers are written — and "we could
+    /// route's catch branch produces once the headers are written, and "we could
     /// not look" rendered as "you have no support requests" is the exact failure the
     /// web shipped: a customer with three open tickets was told they had none and
     /// stopped chasing.
@@ -415,8 +415,8 @@ final class SupportRepositoryTests: XCTestCase {
 
     // MARK: - Closing
 
-    /// ⛔ THE DESK'S OWN WORD IS ADOPTED. A desk workflow can be localised — its
-    /// transitions can read `完成` — so a client that printed
+    /// ⛔ THE DESK'S OWN WORD IS ADOPTED. A desk workflow can be localised, its
+    /// transitions can read `完成`, so a client that printed
     /// "Closed" would put English over a status Atlassian spells otherwise.
     ///
     /// ⛔ AND THE CLOSE CARRIES NO BODY. The handler never reads one.

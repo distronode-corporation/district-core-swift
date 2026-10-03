@@ -11,12 +11,12 @@ import XCTest
 /// three private helpers below are DUPLICATED from the event-type suites rather
 /// than lifted into a shared support file. `private` is file scope, so a copy here
 /// cannot collide with a third that another suite adds under the same obvious
-/// name — a live concern on a surface this wide.
+/// name, a live concern on a surface this wide.
 ///
 /// ⛔ EVERY PATCH IS ASSERTED IN BOTH POLARITIES, because `JSONValue.object(_:)`
 /// drops a nil pair: "leave alone" is spelled by ABSENCE, and a suite that only
 /// ever sent a populated patch would pass identically against a builder that sent
-/// explicit nulls — a different instruction to the server.
+/// explicit nulls, a different instruction to the server.
 final class SchedulingAdminAvailabilityRepoTests: XCTestCase {
     private func repository(_ transport: RepositoryTransport) -> SchedulingAdminRepository {
         SchedulingAdminRepository(client: .repositoryTest(transport), reportUnknownOp: { _ in })
@@ -42,7 +42,7 @@ final class SchedulingAdminAvailabilityRepoTests: XCTestCase {
 
     // MARK: - Weekly rules
 
-    /// ⛔ NO `eventTypeId` SENDS `"params":{}` — an unfiltered list. ⚠️ And a
+    /// ⛔ NO `eventTypeId` SENDS `"params":{}`, an unfiltered list. ⚠️ And a
     /// FILTERED list is not a superset of it: a rule with a null `event_type_id`
     /// governs every event type and does not come back under a filter, so the rules
     /// that actually apply to one event type are two calls unioned.
@@ -150,7 +150,7 @@ final class SchedulingAdminAvailabilityRepoTests: XCTestCase {
 
     // MARK: - Dated overrides
 
-    /// ⚠️ THE LIST TAKES NO PARAMS AT ALL — no date window, no event type. Any
+    /// ⚠️ THE LIST TAKES NO PARAMS AT ALL, no date window, no event type. Any
     /// narrowing is this side's job.
     func testOverridesListSendsAnEmptyParamsObject() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":{"items":[\#(Self.groupedOverride)]}}"#)
@@ -206,7 +206,7 @@ final class SchedulingAdminAvailabilityRepoTests: XCTestCase {
     }
 
     /// ⛔ THE TIMES ONLY MEAN ANYTHING UNDER `custom_hours`, and an all-day block
-    /// sends neither — which is why both polarities are here rather than one
+    /// sends neither, which is why both polarities are here rather than one
     /// fully-populated draft.
     func testCreateOverrideCarriesCustomHoursWhenTheyAreSet() async throws {
         let transport = RepositoryTransport(json: #"{"ok":true,"data":\#(Self.groupedOverride)}"#)

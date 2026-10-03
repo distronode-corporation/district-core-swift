@@ -9,7 +9,7 @@ import Foundation
 // number charges a setup fee AND opens a recurring monthly charge for a service
 // consumed inside the app, which is App Store Review Guideline 3.1.1 territory: it
 // has to be an in-app purchase or it is not offered at all. So there is no constant
-// here, no ``EndpointID`` case, and no descriptor — and because
+// here, no ``EndpointID`` case, and no descriptor, and because
 // ``ApiRequestDescriptor``'s initialiser is internal, the route is UNCONSTRUCTIBLE
 // from outside this module rather than merely undocumented. `EndpointSurfaceTests`
 // pins that, the same mechanism `calls/outbound` is held out by for an entirely
@@ -28,7 +28,7 @@ import Foundation
 // (POST, agency/client): they send an OTP and check one. An OTP entry flow is its own
 // screen with its own retry, expiry and attempt-ceiling states, so it is a feature
 // rather than two constants. ``DistrictPaths/workspaceVerify`` is the
-// CONFIGURATION — whether the Verify service exists at all. Named here so nobody has
+// CONFIGURATION, whether the Verify service exists at all. Named here so nobody has
 // to rediscover them.
 //
 // ⚠️ `workspace/channels`, `workspace/compliance`, `workspace/region-move` and
@@ -55,7 +55,7 @@ extension DistrictPaths {
     ///
     /// ⚠️ IT ADMITS `viewer`, and a MANAGED provider reports connectivity ONLY. The
     /// route short-circuits those before asking the carrier anything, because
-    /// `getAccountInfo` describes the AUTHENTICATING account — for a managed
+    /// `getAccountInfo` describes the AUTHENTICATING account, for a managed
     /// provider that is the platform's own shared account, so its name, prepaid
     /// balance and total number count are Distronode's figures plus every other
     /// managed tenant's, never this caller's.
@@ -67,7 +67,7 @@ extension DistrictPaths {
     ///
     /// ⛔ INFORMATIONAL, AND NOT THE COUNTRY GATE. The route's own header says it in
     /// terms: `purchasable` answers "can I buy one today" and `requirements` answers
-    /// "what would it take", and the first must never be inferred from the second —
+    /// "what would it take", and the first must never be inferred from the second,
     /// a country can publish perfectly readable rules and still not be sellable
     /// here, because the purchase path also has to attach the resulting bundle and
     /// the number has to be routable to a bridge that serves it.
@@ -81,7 +81,7 @@ extension DistrictPaths {
 
     /// ⛔ ONE PATH, TWO VERBS, AND THE WORKSPACE IS A QUERY PARAMETER ON BOTH. GET
     /// lists the workspace's regulatory filings; POST opens a new DRAFT, which is a
-    /// local row and nothing at the carrier — assembly happens once, at
+    /// local row and nothing at the carrier, assembly happens once, at
     /// ``numbersRegistrationSubmit``. The route reads `searchParams` before touching
     /// a body on either verb, so a `workspaceId` in the POST body would leave
     /// `requireWorkspaceRole` with null while the JSON reads perfectly correct.
@@ -105,11 +105,11 @@ extension DistrictPaths {
     /// and nothing else; `desk/logo` sends no fields at all and reads the workspace
     /// off the query; this one reads the workspace off the QUERY **and** sends two
     /// fields that are not the workspace (`bundleId`, `requirementName`). Copying
-    /// either neighbour's parts is a 400 from a request whose URL reads correctly —
+    /// either neighbour's parts is a 400 from a request whose URL reads correctly,
     /// the exact mistake `EndpointTable.ExpectedBody.multipart` was made per-row to
     /// catch.
     ///
-    /// ⛔ ONE PATH, TWO VERBS, AND **THE DELETE CARRIES A JSON BODY** — the only
+    /// ⛔ ONE PATH, TWO VERBS, AND **THE DELETE CARRIES A JSON BODY**, the only
     /// delete on this API that does. It reads `bundleId` and `documentId` off
     /// `req.json()`, and the workspace off the query. The "every DELETE here is
     /// query-only" convention therefore has exactly one documented exception; see
@@ -119,7 +119,7 @@ extension DistrictPaths {
     /// is cleared first because that is what stops the image being SHOWN. Here
     /// nothing displays the document and `storageKey` is the ONLY pointer to the
     /// bytes, so a failed object delete refuses the whole request (502) and KEEPS the
-    /// row — dropping it first would leave an identity document in a bucket under a
+    /// row, dropping it first would leave an identity document in a bucket under a
     /// name nobody can reconstruct.
     static var numbersRegistrationDocuments: [String] {
         numbersRegistrations + ["documents"]
@@ -149,7 +149,7 @@ extension DistrictPaths {
     ///
     /// ⛔ NOT A NO-OP WHEN IT LOOKS LIKE ONE, AND NOT SAFE TO SEND SPECULATIVELY. On
     /// Twilio the number-level voice URLs and a trunk binding are MUTUALLY
-    /// EXCLUSIVE, so the route restates the EU trunk binding every time — otherwise
+    /// EXCLUSIVE, so the route restates the EU trunk binding every time, otherwise
     /// a reconfigure UNBINDS an EU DID from the EU trunk and its calls are answered
     /// by the United States hub, contradicting what `/sovereign/data-residency`
     /// publishes, with a 200 either way. It fails CLOSED (**503**) rather than
@@ -168,8 +168,8 @@ extension DistrictPaths {
     /// ⛔ IRREVERSIBLE. The carrier takes the number back into the general pool, so
     /// it is generally NOT reclaimable, and every inbound call and message routed to
     /// it stops. Unlike a purchase there is no carrier balance that eventually stops
-    /// a runaway — a loop simply keeps working until the workspace has no numbers
-    /// left — so the only brake is 10/hour per workspace.
+    /// a runaway, a loop simply keeps working until the workspace has no numbers
+    /// left, so the only brake is 10/hour per workspace.
     ///
     /// ⚠️ IT CAN ANSWER **200 WITH `warnings`**, WHICH IS NOT A PARTIAL RELEASE. The
     /// number IS gone; a cleanup step after the irreversible part did not finish (a
@@ -188,7 +188,7 @@ extension DistrictPaths {
     /// A2P 10DLC brand and campaign registration.
     ///
     /// ⛔ **POST ONLY. THERE IS NO STATUS READ ANYWHERE**, so nothing in this client
-    /// can ask how a submission is going — which is why a screen must adopt the
+    /// can ask how a submission is going, which is why a screen must adopt the
     /// POST's own answer rather than re-reading it back.
     ///
     /// ⛔ A SUCCESSFUL SUBMISSION CREATES REAL, BILLABLE, CARRIER-VETTED OBJECTS: a
@@ -213,7 +213,7 @@ extension DistrictPaths {
     /// ⛔ **POST ONLY, NO STATUS READ**, like ``workspaceA2P``. Each accepted request
     /// files a real verification against the workspace's own carrier account, enters
     /// a slow MANUAL review queue, and flips the hub's `PhoneNumberIndex` row to
-    /// `pending_verification` — so a loop churns a live number's routing state. A
+    /// `pending_verification`, so a loop churns a live number's routing state. A
     /// stream of duplicates for one number is the pattern that gets an account's
     /// compliance standing questioned. 10/hour per workspace.
     ///
@@ -235,7 +235,7 @@ extension DistrictPaths {
     ///
     /// ⚠️ THIS IS A TWILIO-SIDE PBX ENDPOINT, NOT THE VOICE AGENT'S TRUNK. Twilio
     /// requires the domain to end in `sip.twilio.com`, so the provisioned name is
-    /// `<domain>.sip.twilio.com` — a different thing entirely from
+    /// `<domain>.sip.twilio.com`, a different thing entirely from
     /// `sip.distronode.com`, which is the District AI platform's own SIP endpoint.
     /// Nothing here touches that.
     ///
@@ -251,7 +251,7 @@ extension DistrictPaths {
     /// ⛔ THE VERIFY (OTP) SERVICE'S CONFIGURATION, NOT THE OTP FLOW. GET reports
     /// whether a Twilio Verify Service exists for this workspace; POST creates one or
     /// clears the pointer to it. `workspace/verify/start` and `workspace/verify/check`
-    /// are the flow itself and are absent — see the ⛔ at the head of this file.
+    /// are the flow itself and are absent, see the ⛔ at the head of this file.
     ///
     /// ⛔ ENABLE AND DISABLE ARE NOT SYMMETRICAL, AND THAT ASYMMETRY IS WHY THE ROUTE
     /// RATE LIMITS BOTH DIRECTIONS. Enabling creates a real, carrier-billable Verify
@@ -279,7 +279,7 @@ extension DistrictPaths {
     /// it costs money. The web validates numbers as an operator types; a phone must
     /// not.
     ///
-    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200** carrying `info.valid: false`, not a 404 —
+    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200** carrying `info.valid: false`, not a 404,
     /// the route translates Twilio's own 404 itself. The money is spent either way,
     /// which is the point worth knowing before treating "invalid" as a cheap answer.
     static var workspaceLookup: [String] {

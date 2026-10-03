@@ -9,7 +9,7 @@ import Foundation
 /// value it finds in the request BODY and compares the two, so the app must set
 /// the request property to ``hashed`` and send ``raw`` to our own server. A
 /// client that sends the raw value in both places is refused, and a client that
-/// sends the hash in both places is refused — the route's own header says it
+/// sends the hash in both places is refused, the route's own header says it
 /// accepts exactly ONE form on purpose, "so the contract is whatever the first
 /// client happened to do" never becomes true.
 ///
@@ -21,8 +21,8 @@ import Foundation
 /// reports the disagreement as one opaque `invalid_grant` that reads exactly
 /// like a replayed token.
 ///
-/// ⚠️ THE RAW VALUE IS ITSELF HEX, which is not required by anything — the
-/// server's schema is `z.string().min(16).max(256)` with no alphabet — but it
+/// ⚠️ THE RAW VALUE IS ITSELF HEX, which is not required by anything, the
+/// server's schema is `z.string().min(16).max(256)` with no alphabet, but it
 /// keeps the value URL-safe, JSON-safe and free of any character an intermediary
 /// might re-encode, and 32 bytes of it is 64 characters, comfortably inside that
 /// window.
@@ -64,7 +64,7 @@ public struct AppleNonce: Sendable, Equatable {
         AppleNonce(raw: hex(random.bytes(byteCount)))
     }
 
-    /// `SHA-256(utf8(value))` as lower-case hex — the server's `sha256Hex`.
+    /// `SHA-256(utf8(value))` as lower-case hex, the server's `sha256Hex`.
     ///
     /// ⚠️ UTF-8 BYTES, matching what the route hashes. Over the hex alphabet a
     /// raw nonce produces, UTF-8 and ASCII are identical, so the distinction

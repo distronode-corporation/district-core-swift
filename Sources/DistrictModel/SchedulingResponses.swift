@@ -83,7 +83,7 @@ public struct SchedulingTenant: Codable, Sendable {
     public let bookingUrl: String?
 }
 
-/// `GET /api/district/scheduling/status?workspaceId=` — what the Scheduling card
+/// `GET /api/district/scheduling/status?workspaceId=`, what the Scheduling card
 /// renders.
 ///
 /// ⛔ THERE IS NO `success` ENVELOPE ON THIS ROUTE, AND THAT IS NOT AN OVERSIGHT
@@ -94,15 +94,15 @@ public struct SchedulingTenant: Codable, Sendable {
 /// are what reject `{}`.
 ///
 /// ⛔ `tenant == nil` IS THE LEGACY STATE AND IT IS A STATE, NEVER AN ERROR. It
-/// means this workspace has no `SchedulingTenant` row — the ordinary condition of
-/// every workspace before anyone presses Enable — and rendering it as a failure
+/// means this workspace has no `SchedulingTenant` row, the ordinary condition of
+/// every workspace before anyone presses Enable, and rendering it as a failure
 /// would tell an operator something is broken when nothing is. It is also not the
 /// same question as ``eligible``: a workspace can be admitted and unprovisioned,
 /// or provisioned and later removed from the allowlist, so both answers are sent.
 ///
 /// ⚠️ READABLE BY `viewer` TOO. ``canManage`` is the server telling the client
 /// which buttons to draw (`agency` or `client`) rather than leaving it to
-/// re-derive that from a role string — and, like ``WorkspaceRole``, it is a UX
+/// re-derive that from a role string, and, like ``WorkspaceRole``, it is a UX
 /// affordance and not the boundary: the enable route enforces the role itself.
 public struct SchedulingStatusResponse: Codable, Sendable {
     /// Whether the FEATURE admits this workspace at all, which decides between
@@ -114,14 +114,14 @@ public struct SchedulingStatusResponse: Codable, Sendable {
     public let tenant: SchedulingTenant?
 }
 
-/// `POST /api/district/scheduling/enable` — the answer to pressing Enable.
+/// `POST /api/district/scheduling/enable`, the answer to pressing Enable.
 ///
 /// ⛔ IT ANSWERS **202**, AND THE 202 IS ABOUT THE STATE IT LEAVES RATHER THAN
 /// ABOUT QUEUEING. Provisioning is a multi-system operation that has already run
 /// by the time this body is written: the row may be `ready`, or `error` with a
 /// reason, and either way the client's next move is to re-read the status.
 /// ``ApiClient`` treats every 2xx as success, so nothing special is needed for
-/// it — which is worth stating because a client that only accepted 200 would
+/// it, which is worth stating because a client that only accepted 200 would
 /// report every successful enable as a failure.
 ///
 /// ⛔ `ok: false` IS A SUCCESSFUL DECODE CARRYING AN ERROR SENTENCE, NOT AN
@@ -133,14 +133,14 @@ public struct SchedulingStatusResponse: Codable, Sendable {
 /// workspace is not on the scheduling allowlist) and **429** (five enables in an
 /// hour, per workspace).
 ///
-/// ⚠️ NO `success` KEY HERE EITHER — the flag is spelled `ok`. Same rule as the
+/// ⚠️ NO `success` KEY HERE EITHER, the flag is spelled `ok`. Same rule as the
 /// status route: nothing may run this through ``ResponseEnvelope``.
 public struct SchedulingEnableResponse: Codable, Sendable {
     public let ok: Bool
     /// ⛔ A `String`, NOT ``SchedulingTenantStatus``, AND THE ASYMMETRY WITH
     /// ``SchedulingTenant/status`` IS DELIBERATE. This key forwards
     /// `ProvisionResult.status`, whose TypeScript type is
-    /// `SchedulingTenantStatus | "skipped"` — a wider union than the column's,
+    /// `SchedulingTenantStatus | "skipped"`, a wider union than the column's,
     /// because one provisioner type serves both provisioning and deprovisioning.
     /// The enable path cannot reach `"skipped"` today, but a throwing enum here
     /// would turn a future one into a decode failure on a body that is otherwise
@@ -150,7 +150,7 @@ public struct SchedulingEnableResponse: Codable, Sendable {
     /// status route, the advice for every outcome of this call anyway.
     public let status: String
     /// The allocated booking host, when there is one. ⚠️ Present on a FAILED
-    /// provision too, whenever the host had already been claimed — the host is
+    /// provision too, whenever the host had already been claimed, the host is
     /// allocated once and reused forever, so it survives a failure.
     public let publicHost: String?
     /// ⚠️ Null on success. The provisioner's classified message otherwise; never

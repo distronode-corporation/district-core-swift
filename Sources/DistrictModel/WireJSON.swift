@@ -4,14 +4,14 @@ import Foundation
 ///
 /// ⛔ IT EXISTS FOR THE SEVEN `Json?` COLUMNS ON THIS API WHOSE SHAPE NOTHING
 /// SERVER-SIDE ENFORCES, and modelling one of them as a struct is not a
-/// stricter choice — it is a wrong one. `Contact.intelligence` is a dossier
+/// stricter choice, it is a wrong one. `Contact.intelligence` is a dossier
 /// written by a model and its keys change with the prompt;
 /// `Contact.socialHandles` is cast to `Record<string, unknown>`;
 /// `Contact.visualMemory` is documented as "array of strings" and enforced as
 /// nothing; `Workspace.routingRules` holds two different row shapes in one
 /// array today. A typed model over any of them would DROP the keys it had not
 /// heard of, and both routes that write these values (`workspace/routing-rules`,
-/// `workspace/directory`) are WHOLESALE REPLACE with a zod `.passthrough()` —
+/// `workspace/directory`) are WHOLESALE REPLACE with a zod `.passthrough()`,
 /// so a value read through a lossy type and written back is a silent deletion,
 /// answered with a 200.
 ///
@@ -22,7 +22,7 @@ import Foundation
 /// DEBT, NOT AN OVERSIGHT. `DistrictNetwork.JSONValue` is the REQUEST-side type,
 /// and its `object(_:)` factory DROPS nils because an explicit null is a
 /// different instruction from an absent key on four of this API's routes. This
-/// one is the RESPONSE-side carrier and drops nothing — a `null` inside an
+/// one is the RESPONSE-side carrier and drops nothing, a `null` inside an
 /// opaque blob is part of the value and must round-trip as a null, which is
 /// what lets the strict contract gate compare an unmodelled blob at all. They
 /// can and should become one type, in this module, the day `DistrictNetwork`
@@ -88,7 +88,7 @@ extension WireJSON: Codable {
             // purpose: an object is the only remaining JSON shape, so letting
             // its decode throw is both the correct error and the only reachable
             // one. A hand-written `else { throw }` would be a line no input can
-            // reach — uncoverable, and a claim no test could ever check.
+            // reach, uncoverable, and a claim no test could ever check.
             self = try .object(container.decode([String: WireJSON].self))
         }
     }

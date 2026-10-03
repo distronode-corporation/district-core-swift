@@ -8,11 +8,11 @@ import XCTest
 /// ⛔ THE RULE IS THE CONSERVATIVE ONE AND THESE TESTS ARE WHERE IT IS PINNED: a
 /// repeat is offered only when the failure PROVES the write did not happen. On this
 /// surface the cost of getting it wrong is a second public comment in a customer's
-/// own thread — a duplicate reply, or a second "Closed at the requester's request
+/// own thread, a duplicate reply, or a second "Closed at the requester's request
 /// by …" note on a request that was already closed.
 final class SupportResubmitTests: XCTestCase {
-    /// ⛔ A 4xx IS THE SERVER HAVING REFUSED BEFORE IT DID ANY WORK — the role
-    /// guard, the Zod parse, a missing row, the rate limiter — so nothing was
+    /// ⛔ A 4xx IS THE SERVER HAVING REFUSED BEFORE IT DID ANY WORK, the role
+    /// guard, the Zod parse, a missing row, the rate limiter, so nothing was
     /// posted and a repeat is honest.
     func testAFourHundredRangeRefusalMayBeSentAgain() {
         for status in [400, 403, 404, 409, 429, 499] {
@@ -44,9 +44,9 @@ final class SupportResubmitTests: XCTestCase {
     }
 
     /// ⛔ A DECODE FAILURE IS THE ONE THAT READS AS HARMLESS AND IS NOT. It is only
-    /// ever produced from a **2xx** — `ApiErrorNormalizer` guards on `isSuccess`
+    /// ever produced from a **2xx**, `ApiErrorNormalizer` guards on `isSuccess`
     /// and every site in `SupportRepository` is an envelope check downstream of one
-    /// — so the server answered success and the comment IS in the thread. A repeat
+    /// so the server answered success and the comment IS in the thread. A repeat
     /// posts a second one, guaranteed rather than possibly.
     func testADecodeFailureRefusesTheRepeatBecauseTheWriteLanded() {
         XCTAssertEqual(SupportResubmit.after(.decoding("drift"), .once), .refused)

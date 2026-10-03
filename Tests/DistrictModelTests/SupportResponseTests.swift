@@ -13,8 +13,8 @@ final class SupportResponseTests: XCTestCase {
     // MARK: - The resolved bucket
 
     /// ⛔ CASE-INSENSITIVE, AND THAT IS NOT TIDINESS. The server unified two
-    /// vocabularies into `DONE` — the core issue API reports a lowercase key, the
-    /// servicedeskapi an uppercase one — and older production rows still hold
+    /// vocabularies into `DONE`, the core issue API reports a lowercase key, the
+    /// servicedeskapi an uppercase one, and older production rows still hold
     /// lowercase `done`. A literal `==` against either spelling is silently wrong
     /// for half the corpus, and the bug it produces is a dashboard offering
     /// "Close" on requests that are already closed, forever.

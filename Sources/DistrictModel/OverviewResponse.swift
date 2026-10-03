@@ -1,6 +1,6 @@
 import Foundation
 
-/// `GET /api/district/overview?workspaceId=` — the dashboard landing screen in
+/// `GET /api/district/overview?workspaceId=`, the dashboard landing screen in
 /// one round trip.
 ///
 /// ⛔ IT EXISTS FOR THIS CLIENT AND FOR NO OTHER. The web dashboard's overview
@@ -17,7 +17,7 @@ import Foundation
 ///
 /// ⚠️ ``workspaceId`` AND ``role`` ARE NON-OPTIONAL, WHICH DIVERGES FROM THE
 /// KOTLIN DTO. Both are written into an unconditional response literal on the
-/// route's only success path, after `requireWorkspaceRole` has resolved them —
+/// route's only success path, after `requireWorkspaceRole` has resolved them,
 /// the handler dereferences both with `!`. Kotlin defaults them to null as a
 /// kotlinx idiom rather than on evidence; requiring them here is what makes a
 /// 200 that omitted either one a loud contract failure instead of a screen with
@@ -43,7 +43,7 @@ public struct OverviewResponse: Codable, Sendable {
     /// ⛔ USE THIS RATHER THAN FORMATTING THE SECONDS LOCALLY. Two duration
     /// formats already ship in this product and they disagree on the same input:
     /// this tile omits a zero minutes component ("45s") while a call row always
-    /// emits one ("0m 45s" — see ``CallSummary/duration``). The server sends the
+    /// emits one ("0m 45s", see ``CallSummary/duration``). The server sends the
     /// tile's own label so this client cannot pick the wrong one of the two.
     public let avgDurationLabel: String
     /// The 8 most recent calls, byte-identical to a row of

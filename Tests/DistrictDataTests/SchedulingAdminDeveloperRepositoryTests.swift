@@ -8,7 +8,7 @@ import XCTest
 ///
 /// ⛔ THE BODY BYTES ARE ASSERTED ALONGSIDE THE RESULT. Three of these ops take an
 /// `id` that is ALSO a path segment at the far end, and the strip happens
-/// server-side — so "did the id travel" is a question about the encoded document
+/// server-side, so "did the id travel" is a question about the encoded document
 /// rather than about the arguments.
 final class SchedulingAdminDeveloperRepositoryTests: XCTestCase {
     private func repository(_ transport: RepositoryTransport) -> SchedulingAdminRepository {
@@ -111,7 +111,7 @@ final class SchedulingAdminDeveloperRepositoryTests: XCTestCase {
 
     /// ⛔ THE EVENT NAMES LEAVE AS THE ENUM'S RAW VALUES. A name the fork does not
     /// know is a hard 400 rather than an ignored key, so the request side is closed
-    /// — and this is the assertion that proves the enum's strings are what travels
+    /// and this is the assertion that proves the enum's strings are what travels
     /// rather than its case names.
     func testCreatingAWebhookSendsTheForksEventSpellings() async throws {
         let transport = RepositoryTransport(json: envelope(
@@ -135,8 +135,8 @@ final class SchedulingAdminDeveloperRepositoryTests: XCTestCase {
     }
 
     /// ⛔ OMITTING `fields` IS NOT THE SAME AS SENDING `[]`, AND THE WIRE IS WHERE
-    /// THE DIFFERENCE LIVES. nil means "the fork's default set" — which is not the
-    /// list the console offers — so a webhook created this way arrives missing
+    /// THE DIFFERENCE LIVES. nil means "the fork's default set", which is not the
+    /// list the console offers, so a webhook created this way arrives missing
     /// values the form never offered to remove.
     func testCreatingAWebhookWithoutFieldsOmitsTheKeyEntirely() async throws {
         let transport = RepositoryTransport(json: envelope(
@@ -240,7 +240,7 @@ final class SchedulingAdminDeveloperRepositoryTests: XCTestCase {
         )
     }
 
-    /// ⛔ A **400 `invalid_params`** CARRIES FIELD NAMES ONLY, never messages — a
+    /// ⛔ A **400 `invalid_params`** CARRIES FIELD NAMES ONLY, never messages, a
     /// zod issue's text quotes the offending input straight back out of the API.
     /// Pinned on the webhook create because its `url` is the field a customer is
     /// most likely to get refused on.

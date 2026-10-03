@@ -23,7 +23,7 @@ import Foundation
 // field the fork sends and the schema omits never reaches this client at all.
 // Adding a property here to "match the fork" would model a key that is stripped
 // one hop away, and the strict gate would fail on the added key rather than the
-// intent — which is the correct outcome and worth knowing before making the edit.
+// intent, which is the correct outcome and worth knowing before making the edit.
 
 /// The signed-in member, as the scheduler knows them (`me.get`, `me.patch`).
 ///
@@ -34,7 +34,7 @@ import Foundation
 ///
 /// ⛔ `is_admin` AND `is_owner` ARE THE FORK'S OWN FLAGS AND NEITHER IS THIS
 /// APP'S AUTHORISATION. Every op's real gate is `minRole` in the catalog, checked
-/// server-side against the District workspace role — see
+/// server-side against the District workspace role, see
 /// ``SchedulingAdminOp/minRole``. These two are worth rendering (an owner cannot
 /// be archived, and it explains why a control is missing) and must never be the
 /// reason a request is or is not sent.
@@ -42,7 +42,7 @@ import Foundation
 /// ⚠️ `timezone` IS THE WIRE FIELD AND `iana_timezone` IS THE COLUMN. The handler
 /// decodes `timezone`; sending the column name on a patch is silently ignored,
 /// which leaves every window this member publishes on whatever zone the SSO
-/// hand-off inserted. The same name is therefore used on the way out — see
+/// hand-off inserted. The same name is therefore used on the way out, see
 /// ``SchedulingMeUpdate``.
 public struct SchedulingMe: Codable, Equatable, Sendable {
     public let id: String
@@ -132,7 +132,7 @@ public struct SchedulingLocaleOption: Codable, Equatable, Sendable {
 /// have.
 ///
 /// ⚠️ `""` IS THE ORDINARY VALUE FOR AN UNSET LINK, NOT AN ERROR. `privacy_url`
-/// is a required `z.string()` and the fixture carries it empty — so emptiness is
+/// is a required `z.string()` and the fixture carries it empty, so emptiness is
 /// the "no link" test, and an Optional here would be a shape the server never
 /// sends.
 public struct SchedulingBranding: Codable, Equatable, Sendable {
@@ -192,7 +192,7 @@ public struct SchedulingStorageSettings: Codable, Equatable, Sendable {
     /// to upload to; a screen should say so rather than offering a retry.
     /// ⚠️ Optional: absent on a fork that predates the field.
     public let recordingsStorageReady: Bool?
-    /// Where this tenancy's objects are keyed. ⚠️ A PREFIX, not a bucket — the
+    /// Where this tenancy's objects are keyed. ⚠️ A PREFIX, not a bucket, the
     /// bucket is deliberately not published. Optional for the same reason as above.
     public let recordingsPrefix: String?
 
@@ -220,7 +220,7 @@ public struct SchedulingNotetakerSettings: Codable, Equatable, Sendable {
 /// ⛔ THE ALLOWLIST'S SHARPEST CASE, AND THE ABSENCES ARE THE CONTRACT. The fork
 /// also returns `endpoint`, `model`, `api_key_set`, `configured`, `active` and
 /// `base_prompt`; the catalog publishes two fields. The first three name an
-/// instance credential and the model this platform pays for — a tenant may turn
+/// instance credential and the model this platform pays for, a tenant may turn
 /// the summariser on and write instructions for it, and may not learn what it is.
 /// ⚠️ So a settings screen genuinely cannot show "which model", and that is the
 /// answer rather than a gap to fill.
@@ -231,7 +231,7 @@ public struct SchedulingNotetakerSettings: Codable, Equatable, Sendable {
 public struct SchedulingLLMSettings: Codable, Equatable, Sendable {
     public let enabled: Bool
     /// The tenant's own prompt addendum, capped at 4000 characters by the patch
-    /// schema. ⚠️ Free text written by a customer — never interpolate it into
+    /// schema. ⚠️ Free text written by a customer, never interpolate it into
     /// anything that executes, and never echo it into a log line.
     public let extraInstructions: String
 

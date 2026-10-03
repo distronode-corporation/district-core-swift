@@ -9,7 +9,7 @@ import Foundation
 /// columns in OUR OWN database and reaches no vendor; ``stripeBilling()``
 /// reaches Stripe and is therefore only as available as Stripe is. Folding them
 /// into one `Result` would mean a Stripe outage blanking the tier, the status
-/// and the overage cap — facts we hold locally and that a customer most needs
+/// and the overage cap, facts we hold locally and that a customer most needs
 /// exactly when something is wrong with their billing. A caller runs them in
 /// parallel and keeps two sub-states; this layer keeps each one honest on its
 /// own.
@@ -18,7 +18,7 @@ import Foundation
 /// BEFORE EDITING EITHER METHOD. Almost every district route answers
 /// `{success, …}` and ``ResponseEnvelope/affirm(_:_:_:)`` is what stops a `{}`
 /// body decoding into a confident empty answer. **`GET /api/billing` has no
-/// `success` key at all** — it returns the object bare — so affirming an
+/// `success` key at all**, it returns the object bare, so affirming an
 /// envelope there would reject every healthy response as contract drift, and
 /// `district-billing.json` pins that absence so the difference cannot be argued
 /// from memory.
@@ -43,13 +43,13 @@ public struct BillingRepository: Sendable {
     /// ⚠️ ENVELOPE FIRST, and it matters here as much as anywhere on this
     /// surface: a `{}` body would otherwise decode into a response whose
     /// `billing` is nil and whose `success` is the flag nobody checked. The
-    /// dangerous reading is the overage one — "within your plan" is the opposite
+    /// dangerous reading is the overage one, "within your plan" is the opposite
     /// of the fact this screen exists to surface.
     ///
     /// ⛔ A 200 THAT AFFIRMS SUCCESS AND CARRIES NO `billing` OBJECT IS
     /// MALFORMED, NOT AN EMPTY PLAN, and is reported as a decode failure.
-    /// Absence of a plan is representable — the server sends
-    /// `subscriptionStatus: "none"` beside a null tier — so a missing object can
+    /// Absence of a plan is representable, the server sends
+    /// `subscriptionStatus: "none"` beside a null tier, so a missing object can
     /// only mean drift. The same distinction ``CallsRepository/detail(workspaceId:callId:)``
     /// draws, and the opposite call from ``AnalyticsRepository``'s usage read,
     /// where the null genuinely IS the payload.
@@ -71,7 +71,7 @@ public struct BillingRepository: Sendable {
     /// Subscriptions and invoices, from Stripe.
     ///
     /// ⛔ NO ENVELOPE CHECK, AND ITS ABSENCE IS THE POINT. This route does not
-    /// send `success` — not `false`, ABSENT — so ``ResponseEnvelope/affirm(_:_:_:)``
+    /// send `success`, not `false`, ABSENT, so ``ResponseEnvelope/affirm(_:_:_:)``
     /// would reject a perfectly good response every single time, and the screen
     /// would show contract-drift copy to every user with a working subscription.
     /// The strictness that guard provides elsewhere is supplied here by three

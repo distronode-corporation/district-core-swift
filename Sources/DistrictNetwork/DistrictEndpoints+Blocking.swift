@@ -3,9 +3,9 @@ import Foundation
 /// Blocking a caller, and reading back who is blocked.
 ///
 /// ⛔ THESE TWO EXIST FOR APP STORE REVIEW GUIDELINE 1.2, WHICH IS A SHIP GATE
-/// RATHER THAN A FEATURE REQUEST. District AI carries user-generated content — a
+/// RATHER THAN A FEATURE REQUEST. District AI carries user-generated content, a
 /// caller writes the messages in an inbox thread and speaks the words in a
-/// transcript — so the binary must offer a way to BLOCK the person producing it
+/// transcript, so the binary must offer a way to BLOCK the person producing it
 /// and a way to REPORT what they produced. The report half rides the existing
 /// support transport (`DistrictEndpoints+Support.swift`); this file is the block
 /// half.
@@ -13,7 +13,7 @@ import Foundation
 /// ⛔ THE CALLER IS THE "USER" AND THE CONTACT ROW IS THE IDENTITY. There is no
 /// account to block: a caller is a phone number that the server upserts into a
 /// `Contact` when it first rings. So a block is a column on that row, which is why
-/// the write accepts a `contactId` OR a raw `phoneNumber` — a thread whose
+/// the write accepts a `contactId` OR a raw `phoneNumber`, a thread whose
 /// counterpart never resolved to a contact has only the second, and refusing it
 /// would leave exactly the threads a reviewer is most likely to try unblockable.
 ///
@@ -33,7 +33,7 @@ public extension DistrictEndpoints {
     /// `update` replaces every column) and none of them may be retried.
     ///
     /// ⛔ EXACTLY ONE OF `contactId` AND `phoneNumber` SHOULD BE SENT, AND THIS
-    /// FUNCTION DOES NOT ENFORCE IT — ``ContactsRepository`` does, before the
+    /// FUNCTION DOES NOT ENFORCE IT, ``ContactsRepository`` does, before the
     /// request is built. The reason the enforcement is upstream rather than here is
     /// that a descriptor with no caller cannot report a refusal; it can only build
     /// a body the server will reject.
@@ -73,7 +73,7 @@ public extension DistrictEndpoints {
     /// ⛔ THE SET IS NOT ON THE CONTACT ROW AND MUST NOT BE PUT THERE. Both contact
     /// reads return the raw Prisma row, and `district-contacts.json` /
     /// `district-contact.json` pin those bodies byte for byte through
-    /// `StrictDecodeVerifier` — so a `blocked` field added to ``Contact`` would red
+    /// `StrictDecodeVerifier`, so a `blocked` field added to ``Contact`` would red
     /// the contract gate on a fixture this client may not regenerate (the corpus is
     /// owned by the Android side). A separate read is the only shape
     /// that does not make a UI badge into a two-repo change.

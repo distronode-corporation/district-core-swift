@@ -9,7 +9,7 @@ import Foundation
 /// deriving it twice is how the two units get mixed up. Do not "normalise"
 /// these to seconds.
 public struct NativeTokens: Sendable, Equatable {
-    /// Compact JWS, 10-minute TTL. ⛔ HELD IN MEMORY ONLY — see ``TokenStore``.
+    /// Compact JWS, 10-minute TTL. ⛔ HELD IN MEMORY ONLY, see ``TokenStore``.
     public let accessToken: String
     /// Epoch MILLISECONDS.
     public let accessTokenExpiresAt: Int64
@@ -46,7 +46,7 @@ public struct NativeTokens: Sendable, Equatable {
 /// against the two `NextResponse.json({...})` calls rather than assumed: the
 /// exchange route and the refresh route build the identical object literal.
 /// A future divergence would surface as a contract-gate failure on whichever
-/// fixture changed, which is the signal wanted — see the note below.
+/// fixture changed, which is the signal wanted, see the note below.
 ///
 /// ⛔ THESE DTOs ARE NOT YET UNDER THE CONTRACT GATE, AND THAT IS A KNOWN,
 /// TRACKED HOLE RATHER THAN AN OVERSIGHT. There are no fixtures for the
@@ -60,7 +60,7 @@ public struct NativeTokens: Sendable, Equatable {
 /// OPPOSITE OF WHAT THE KOTLIN CLIENT DOES, AND BOTH ARE RIGHT. `NativeAuthApi`
 /// hand-parses four keys and ignores this one, because it is a lenient runtime
 /// parser. This type is a `Codable` destined for the strict gate,
-/// which decodes, RE-ENCODES and compares key sets — so an undeclared server key
+/// which decodes, RE-ENCODES and compares key sets, so an undeclared server key
 /// disappears at re-encode and fails the comparison. Dropping `tokenType` here
 /// would make the fixture unpinnable the day it exists.
 public struct NativeTokenResponse: Codable, Sendable, Equatable {

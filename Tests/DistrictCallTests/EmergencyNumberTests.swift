@@ -2,7 +2,7 @@
 import XCTest
 
 /// ⛔ THE ORDERING IS THE SUBJECT OF THIS FILE, NOT THE REFUSAL. Without the
-/// emergency check running first, `911` is still refused — as
+/// emergency check running first, `911` is still refused, as
 /// ``DialRefusal/missingCountryCode``, whose copy reads "Start with a country code,
 /// for example +1". Following that produces `+1911`, refused again as
 /// ``DialRefusal/tooShort``. So a test asserting only "911 cannot be dialled"

@@ -102,7 +102,7 @@ final class SchedulingSettingsDeveloperFormatTests: XCTestCase {
     }
 
     /// ⚠️ AN ABSENT READINESS FLAG IS TREATED AS READY, because the comparison is against
-    /// `false` explicitly — an older payload should not claim the region is broken.
+    /// `false` explicitly, an older payload should not claim the region is broken.
     func testAnAbsentReadinessFlagReadsAsReady() throws {
         let unknown = try SchedulingFixture.storage(enabled: true, ready: nil)
         XCTAssertTrue(Settings.recordingDescription(unknown).hasPrefix("Meetings held"))
@@ -257,8 +257,8 @@ final class SchedulingSettingsDeveloperFormatTests: XCTestCase {
     /// ⚠️ THE ABSENT MARKER IS PER COLUMN AND THE DEFAULT IS AN EM DASH. `Never` and
     /// `Not tried yet` are the callers' and are not interchangeable.
     func testTheAbsentMarkerDefaultsToAnEmDashAndIsOverridable() {
-        XCTAssertEqual(Developer.stamp(nil, timezone: "UTC"), "—")
-        XCTAssertEqual(Developer.stamp("", timezone: "UTC"), "—")
+        XCTAssertEqual(Developer.stamp(nil, timezone: "UTC"), "\u{2014}")
+        XCTAssertEqual(Developer.stamp("", timezone: "UTC"), "\u{2014}")
         XCTAssertEqual(Developer.stamp(nil, timezone: "UTC", absent: "Never"), "Never")
         XCTAssertEqual(Developer.stamp(nil, timezone: "UTC", absent: "Not tried yet"), "Not tried yet")
     }

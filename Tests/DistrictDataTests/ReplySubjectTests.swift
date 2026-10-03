@@ -8,7 +8,7 @@ import XCTest
 ///
 /// ⛔ WHAT THIS IS DEFENDING: `messages/send` reads
 /// `(typeof subject === "string" && subject.trim()) || "Message from District"`, and
-/// this client sent nothing — so every email reply the product had ever sent was
+/// this client sent nothing, so every email reply the product had ever sent was
 /// titled "Message from District" and threaded with none of them in the customer's
 /// mail client. The server accepts that send happily, so nothing downstream can catch
 /// it and these are the tests that hold the line.
@@ -40,7 +40,7 @@ final class ReplySubjectTests: XCTestCase {
         XCTAssertEqual(ReplySubject.reply(to: events), "Re: Roof survey")
     }
 
-    /// ⚠️ CASE-INSENSITIVELY, because the prefix arrives from whatever wrote it — a
+    /// ⚠️ CASE-INSENSITIVELY, because the prefix arrives from whatever wrote it, a
     /// customer's mail client, not this app.
     func testThePrefixTestIgnoresCase() throws {
         let events = try Self.events([
@@ -62,7 +62,7 @@ final class ReplySubjectTests: XCTestCase {
     }
 
     /// ⛔ AND NOTHING IS INVENTED. A thread of SMS and calls has no subject to answer,
-    /// and a manufactured line would be this client asserting a topic nobody chose —
+    /// and a manufactured line would be this client asserting a topic nobody chose,
     /// the smaller version of the bug it is here to fix. nil means the operator writes
     /// it, and the composer refuses to send until they do.
     func testAThreadThatHasNeverCarriedASubjectDerivesNone() throws {

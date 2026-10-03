@@ -28,11 +28,11 @@ struct EndpointExpectation {
 
 enum ExpectedBody: Equatable {
     case none
-    /// The exact bytes, with keys sorted — see ``JSONWire/encode(_:)``.
+    /// The exact bytes, with keys sorted, see ``JSONWire/encode(_:)``.
     case json(String)
     /// ⛔ THE FIELDS AND FILENAME ARE CARRIED PER ROW, AND THEY DID NOT USED TO BE.
     /// While `messages/media` was the only multipart route, the suite asserted one
-    /// hard-coded `["workspaceId": "ws_1"]` for every multipart body — which was
+    /// hard-coded `["workspaceId": "ws_1"]` for every multipart body, which was
     /// true of the only row that existed and would have been a false green for the
     /// second. `desk/logo` sends NO form fields at all, because it reads the
     /// workspace off the query string instead, and that is precisely the difference
@@ -53,7 +53,7 @@ enum ExpectedBody: Equatable {
 /// shipping untested.
 ///
 /// ⚠️ SPLIT ACROSS FILES AND INTO SMALL GROUPS because SwiftLint caps a file at
-/// 500 lines and a function body at 60 — and the cap is doing something useful
+/// 500 lines and a function body at 60, and the cap is doing something useful
 /// here rather than being worked around: the groups match the sections
 /// `HttpDistrictApi.kt` is itself split into.
 enum EndpointTable {
@@ -74,7 +74,7 @@ enum EndpointTable {
 
     /// ⚠️ Force-unwrapped in TEST code only, and the guard it proves is asserted
     /// separately in `RoomNameTests`: `meet_` is the one prefix ``RoomName``
-    /// accepts, so this cannot be nil unless that guard changed — in which case
+    /// accepts, so this cannot be nil unless that guard changed, in which case
     /// the crash is the signal.
     static let meetingRoom = RoomName("meet_standup")!
 

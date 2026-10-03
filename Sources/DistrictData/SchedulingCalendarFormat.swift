@@ -26,7 +26,7 @@ public enum SchedulingCalendarFormat {
     ///
     /// ⛔ THREE DIFFERENT ANSWERS AND THE DIFFERENCE MATTERS. A nil `calendars` means the
     /// per-connection read FAILED or has not run, so the honest answer is the
-    /// connection-level boolean ("Checked" / "Not checked") — a coarse but true summary.
+    /// connection-level boolean ("Checked" / "Not checked"), a coarse but true summary.
     /// An empty selection means the read SUCCEEDED and nothing is selected, which is
     /// "None" and is a real and different state. Collapsing the two would report "None"
     /// for a connection whose calendars simply had not loaded, which is the opposite of

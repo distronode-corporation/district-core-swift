@@ -4,7 +4,7 @@ import Foundation
 // the slots it offers, and the acknowledgement of a test email.
 //
 // ⛔ SPLIT FROM `SchedulingAdminEventTypes.swift` FOR THE 500-LINE `file_length`
-// CEILING, which `swiftlint --strict` promotes to an error — the same reason
+// CEILING, which `swiftlint --strict` promotes to an error, the same reason
 // `AllowedExplicitNulls+Union.swift` and `ImplementedFixtures+SchedulingAdmin.swift`
 // exist. It is not a boundary in the domain: everything here is addressed by the
 // event type's `slug`.
@@ -13,7 +13,7 @@ import Foundation
 ///
 /// ⛔ `user_id` IS THE SCHEDULER'S USER ID AND NOT A DISTRICT MEMBER ID. The two
 /// namespaces are joined inside the fork, which is why nothing on this row can be
-/// looked up against a District workspace directory — and why
+/// looked up against a District workspace directory, and why
 /// ``SchedulingHostAssignment`` takes the same opaque string back rather than
 /// offering a member picker keyed on District ids.
 ///
@@ -30,12 +30,12 @@ public struct SchedulingHost: Codable, Equatable, Sendable {
     public let name: String
     public let email: String
     public let avatarUrl: String?
-    /// `required`, `rotation` or `optional` — the three values
+    /// `required`, `rotation` or `optional`, the three values
     /// `eventTypes.hosts.put` accepts.
     public let role: String
     /// ⚠️ MEANINGFUL ONLY UNDER ONE OF THE THREE `rr_strategy` VALUES the catalog
     /// permits (`even`, `soonest`, `priority`), and the row does not say which one
-    /// the event type is on — read it beside ``SchedulingEventType/rrStrategy``
+    /// the event type is on, read it beside ``SchedulingEventType/rrStrategy``
     /// rather than as a ranking that always applies.
     public let priority: Int
     public let archived: Bool
@@ -89,7 +89,7 @@ public struct SchedulingQuestion: Codable, Equatable, Sendable {
 ///
 /// ⚠️ `start` AND `end` ARE INSTANTS, NOT THE `HH:MM` WALL CLOCK the availability
 /// rules and overrides use. Three types in this family carry a `start`/`end` pair
-/// and all three mean something different — instants here, wall-clock times on
+/// and all three mean something different, instants here, wall-clock times on
 /// ``SchedulingAvailabilityRule``, and DATES on ``SchedulingOverrideGroup``.
 ///
 /// ⛔ `host_ids` IS NULL ON A `fixed` EVENT TYPE, where there is one host and the
@@ -153,7 +153,7 @@ public struct SchedulingSlots: Codable, Equatable, Sendable {
 /// that says "sent to you" is overstating an outcome nothing here observed.
 ///
 /// ⚠️ `to` IS THE CALLING MEMBER'S OWN SCHEDULER ADDRESS, chosen by the fork and
-/// not by the caller — there is no recipient parameter, deliberately, because one
+/// not by the caller, there is no recipient parameter, deliberately, because one
 /// would make this op a mail relay addressable by anybody holding a viewer's key.
 public struct SchedulingTestEmailResult: Codable, Equatable, Sendable {
     public let sent: Bool

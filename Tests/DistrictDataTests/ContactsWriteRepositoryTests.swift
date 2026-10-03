@@ -9,12 +9,12 @@ import XCTest
 /// ⚠️ A SEPARATE FILE FROM `RepositoryTests`, WHICH HOLDS THE CONTACT READS, for
 /// the reason that file's own header gives about the inbox: SwiftLint's ceilings
 /// are 500 lines per file and 400 per type, and the writes are thirteen cases with
-/// their reasoning attached. The split is by SURFACE, not by kind — the pager and
+/// their reasoning attached. The split is by SURFACE, not by kind, the pager and
 /// the detail read stay next door.
 ///
 /// ⛔ THREE OF THESE ROUTES ARE NOT ORDINARY WRITES. `enrich` spends money and is
 /// not idempotent, `clear-intel` destroys data that costs money to rebuild, and
-/// `delete` removes a customer record — so the assertions below are about what
+/// `delete` removes a customer record, so the assertions below are about what
 /// this client SENDS and what it folds into success, not only about decoding.
 final class ContactsWriteRepositoryTests: XCTestCase {
     func testCreatingAContactPostsToCreateAndAnswersTheNewId() async {

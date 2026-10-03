@@ -7,7 +7,7 @@ import XCTest
 ///
 /// ⛔ SPLIT OUT OF `EndpointSurfaceTests` WHEN THAT FILE REACHED SwiftLint's 500-LINE
 /// CEILING, and the cut is on a real seam rather than at an arbitrary line: these two
-/// tests answer one question — can a descriptor in one family reach the other — while
+/// tests answer one question, can a descriptor in one family reach the other, while
 /// the file they came from answers "what must this client be unable to ask for at all".
 ///
 /// ⛔ THE CONFUSION THEY GUARD IS NOT HYPOTHETICAL. `district/support/*` is this tenant
@@ -15,7 +15,7 @@ import XCTest
 /// raising something with THEM. The two families use the same nouns, are one path
 /// segment apart. A third shares the word and is worse:
 /// `/api/desk/threads/{handle}` is the page a tenant's CUSTOMER opens from an email,
-/// authenticated by a capability token — sending this client's bearer there would send
+/// authenticated by a capability token, sending this client's bearer there would send
 /// it on behalf of a person who is not our user.
 ///
 /// ⚠️ THE REPLY FIELD IS THE SAME CONFUSION IN A SECOND PLACE and is asserted next door:
@@ -62,7 +62,7 @@ final class EndpointFamilyGuardTests: XCTestCase {
     /// THE PUBLIC CUSTOMER THREAD. Three families share the word: this one
     /// (`/api/district/desk/*`, the tenant's own customers' tickets, bearer-authenticated),
     /// `/api/district/support/*` (the mirror image, the tenant's tickets with
-    /// Distronode), and `/api/desk/threads/{handle}` — the page a tenant's CUSTOMER
+    /// Distronode), and `/api/desk/threads/{handle}`, the page a tenant's CUSTOMER
     /// opens from a notification email, which authenticates with a capability token
     /// and an HttpOnly cookie. A descriptor for the third would send this client's
     /// bearer to a route that does not want one, on behalf of a person who is not our

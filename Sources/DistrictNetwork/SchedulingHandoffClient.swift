@@ -132,7 +132,7 @@ public struct SchedulingHandoffClient: Sendable {
     /// ⛔ HTTPS ONLY, AND THE API'S OWN HOST ONLY.
     ///
     /// ⚠️ `SFSafariViewController` accepts only `http`/`https` and TRAPS on anything
-    /// else, so an unexpected scheme would be a crash rather than a refusal — the
+    /// else, so an unexpected scheme would be a crash rather than a refusal, the
     /// same trap `SchedulingSSOClient` documents. And a hand-off that is not TLS puts
     /// a single-use sign-in code on the wire in clear.
     private func verified(_ handoff: SchedulingHandoff) -> Result<SchedulingHandoff, ApiError> {

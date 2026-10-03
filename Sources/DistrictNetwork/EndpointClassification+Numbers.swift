@@ -18,8 +18,8 @@ public extension TypedEndpoints {
     /// the two together.
     ///
     /// ⛔ TWO OF THEM MUST NOT AFFIRM AN ENVELOPE, AND ONLY ONE OF THE TWO IS OBVIOUS.
-    /// ``providerStatus`` sends **no `success` flag at all** — like the scheduling
-    /// pair, `stripeBilling` and `meetings` — so
+    /// ``providerStatus`` sends **no `success` flag at all**, like the scheduling
+    /// pair, `stripeBilling` and `meetings`, so
     /// `ResponseEnvelope.affirm` there would look for a key that does not exist and fail
     /// every response. ⚠️ And ``configureNumber`` sends one on SUCCESS but writes its
     /// failures as a bare `{error: …}` with no `success: false`, so the affirm on that
@@ -91,13 +91,13 @@ public extension TypedEndpoints {
         .sipTrunks,
         .createSipTrunk,
         // ⚠️ BOTH VERBS LAND ON ONE TYPE, ``VerifyServiceResponse``, because the GET and
-        // both POST branches answer the same three keys — with `verifyServiceSid` an
+        // both POST branches answer the same three keys, with `verifyServiceSid` an
         // explicit null on the read and an ABSENT key on the disable reply. Two
         // endpoints, one type, and the shapes agree only because both are Optional.
         .verifyService,
         .setVerifyServiceEnabled,
         // ⛔ BILLABLE PER CALL, ON A GET, ADMITTING `viewer`. Being on this list means a
-        // repository decodes it, not that it is cheap — the same distinction
+        // repository decodes it, not that it is cheap, the same distinction
         // `testMessagingCredentials` carries, and here the cost is the carrier's rather
         // than a third party's.
         .lookupNumber,

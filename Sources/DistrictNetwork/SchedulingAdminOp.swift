@@ -6,7 +6,7 @@ import Foundation
 /// ⛔ AN ALLOWLIST, NOT A PROXY, AND THE RAW VALUE IS THE WHOLE ADDRESS. The route
 /// takes an `op` NAME and never a path, so a caller cannot reach a scheduler route
 /// the server's catalog does not name. The server's op catalog (`admin-ops`)
-/// records what that excludes and why — `/v1/settings/{google,email,zoom,livekit,
+/// records what that excludes and why, `/v1/settings/{google,email,zoom,livekit,
 /// stripe,tracking}` hold INSTANCE credentials shared by every tenancy,
 /// `/v1/platform/*` can create and delete any tenancy at all, and
 /// `PATCH /v1/users/{id}/role` plus `POST /v1/users/{id}/transfer-ownership` would
@@ -18,13 +18,13 @@ import Foundation
 /// names are their camelCase transliteration. A key renamed on the server is a
 /// **400 `unknown_op`** here, not a compile error, so `SchedulingAdminOpTests`
 /// embeds all 75 strings a second time rather than deriving them from
-/// `allCases` — a test that re-reads the enum would assert that the code equals
+/// `allCases`, a test that re-reads the enum would assert that the code equals
 /// itself and would pass through any rename.
 ///
 /// ⚠️ SEVENTY-FIVE, COUNTED FROM `ADMIN_OPS` RATHER THAN ASSUMED. The split is
 /// 35 `viewer` / 40 `client` and 29 reads / 46 writes; both are asserted, and
 /// neither is derivable from the other (the `me.*` and `calendar.*` namespaces
-/// are `viewer` even when they write — see ``minRole``).
+/// are `viewer` even when they write, see ``minRole``).
 ///
 /// ⛔ THIS IS A NAME, NOT A REQUEST. Nothing here carries the scheduler path, the
 /// HTTP verb or the params schema: all three live on the server, which is what

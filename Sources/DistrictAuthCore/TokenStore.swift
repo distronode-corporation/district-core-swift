@@ -8,7 +8,7 @@ import Foundation
 /// yields a usable credential. ``TokenRefreshCoordinator`` holds it in memory
 /// and re-mints it after a process restart.
 ///
-/// ⛔ THE `pendingRefreshToken` MARKER IS NOT AN OPTIMISATION — IT PREVENTS A
+/// ⛔ THE `pendingRefreshToken` MARKER IS NOT AN OPTIMISATION, IT PREVENTS A
 /// FALSE SECURITY ALARM. The server's rotation is mandatory and a replayed
 /// refresh token revokes the whole family. If the process dies between sending a
 /// refresh and persisting its response, the disk still holds a token the server
@@ -16,7 +16,7 @@ import Foundation
 /// theft: the server revokes the family and logs
 /// `[auth] Native refresh replay detected`. Recording which token is in flight
 /// BEFORE sending it lets the client recognise that state on the next launch and
-/// go straight to a clean re-login instead — same user-visible outcome, but no
+/// go straight to a clean re-login instead, same user-visible outcome, but no
 /// bogus replay alarm and no revocation of a family that was never compromised.
 ///
 /// ⛔ EVERY MEMBER THROWS, AND `read` THROWING IS THE ONE THAT MATTERS. The
@@ -24,14 +24,14 @@ import Foundation
 /// `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` (AfterFirstUnlock rather
 /// than WhenUnlocked so a push-triggered background wake can read the
 /// session on a locked phone). Before first unlock, a read on a locked device
-/// fails TRANSIENTLY. Modelling that as "no session" — the obvious shape, and
-/// what a non-throwing optional would force — signs the user out for having
+/// fails TRANSIENTLY. Modelling that as "no session", the obvious shape, and
+/// what a non-throwing optional would force, signs the user out for having
 /// locked their phone. The coordinator maps a thrown read to
 /// ``RetryReason/storeUnavailable`` and keeps the session.
 ///
 /// ⛔ THERE ARE NOW TWO PENDING SLOTS AND THEY ARE NOT SYMMETRIC, WHICH IS THE
 /// ONE THING TO CARRY AWAY FROM THIS TYPE. ``pendingRefreshToken()`` describes
-/// THIS session — a refresh in flight whose outcome is unknown — so it dies with
+/// THIS session, a refresh in flight whose outcome is unknown, so it dies with
 /// the session and ``clear()`` takes it. ``pendingRevokeToken()`` describes a
 /// server-side ROW that OUTLIVES the session, so ``clear()`` must spare it. They
 /// look like the same mechanism written twice and they are not; see the ⛔ on
@@ -50,7 +50,7 @@ public protocol TokenStore: Sendable {
     ///
     /// ⛔ AND DELIBERATELY **NOT** THE REVOKE OUTBOX. The outbox names a
     /// credential the SERVER IS STILL HONOURING, and the sign-out that wrote it
-    /// calls this method microseconds later — so a `clear()` that took the
+    /// calls this method microseconds later, so a `clear()` that took the
     /// outbox with it would erase the only record of the very token the outbox
     /// exists to chase, which is precisely the stranding it was added to
     /// prevent. The two slots LOOK symmetric and are not: the refresh marker
@@ -65,7 +65,7 @@ public protocol TokenStore: Sendable {
     /// Record that `refreshToken` is about to be sent.
     ///
     /// ⛔ MUST BE DURABLE BEFORE RETURNING. If this write is buffered, it is
-    /// exactly as lost as the response it exists to detect — and the coordinator
+    /// exactly as lost as the response it exists to detect, and the coordinator
     /// treats a THROWN marker write as a reason to abort the refresh entirely
     /// rather than send one unprotected.
     func markRefreshPending(_ refreshToken: String) async throws
@@ -91,15 +91,15 @@ public protocol TokenStore: Sendable {
     /// when its database write threw, and the route's own header spells out the
     /// client's obligation: KEEP the credential and try again, because the
     /// server may honour that refresh token for the rest of its 60-day life.
-    /// But the user asked to sign out NOW, so the local wipe cannot wait — a
+    /// But the user asked to sign out NOW, so the local wipe cannot wait, a
     /// device that still looks signed in is the worse of the two failures, and
     /// it is the one the user can see. Keeping the token HERE satisfies both:
     /// the session is gone from the user's point of view, and the credential is
     /// still tracked well enough to be killed on a later launch.
     ///
     /// ⚠️ SCOPED TO ONE ROW SERVER-SIDE, SO A STALE ENTRY IS HARMLESS.
-    /// `revokeNativeSession` matches on the presented token's hash alone — not
-    /// on its family and not on the user — so draining an entry written before a
+    /// `revokeNativeSession` matches on the presented token's hash alone, not
+    /// on its family and not on the user, so draining an entry written before a
     /// re-login cannot touch the new session.
     func pendingRevokeToken() async throws -> String?
 
@@ -112,13 +112,13 @@ public protocol TokenStore: Sendable {
     func markRevokePending(_ refreshToken: String) async throws
 
     /// Clear the outbox once the server has accepted the token (or was never
-    /// holding it — the route answers 200 for both and declines to say which).
+    /// holding it, the route answers 200 for both and declines to say which).
     func clearRevokePending() async throws
 }
 
 /// What actually goes to disk.
 ///
-/// Note the absence of an access token — see the ⛔ on ``TokenStore``.
+/// Note the absence of an access token, see the ⛔ on ``TokenStore``.
 public struct PersistedSession: Sendable, Equatable {
     public let refreshToken: String
     /// Epoch MILLISECONDS.
@@ -147,7 +147,7 @@ public struct PersistedSession: Sendable, Equatable {
 /// revokes the entire family as theft).
 ///
 /// ⚠️ NO FAILURE-INJECTION KNOBS, ON PURPOSE. A test that needs `write` to throw
-/// declares its own conforming type — one that always fails is three lines. A
+/// declares its own conforming type, one that always fails is three lines. A
 /// shared fake with a `failNextWrite` flag becomes a second implementation of
 /// the coordinator's own state machine and drifts from it.
 public actor InMemoryTokenStore: TokenStore {

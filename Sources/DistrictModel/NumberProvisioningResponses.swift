@@ -5,15 +5,15 @@ import Foundation
 // inside the app, which is App Store Review Guideline 3.1.1: an in-app purchase or
 // nothing. There is no request type, no response type, no ``EndpointID`` case and no
 // path constant, so the route is unconstructible from outside `DistrictNetwork`
-// rather than merely unmodelled — `EndpointSurfaceTests` pins that.
+// rather than merely unmodelled, `EndpointSurfaceTests` pins that.
 // ⛔ 3.1.1 COVERS STEERING TOO, so nothing here carries a URL to the web marketplace.
 // The next reader will want to finish the set in good faith; this is the reason not
 // to.
 //
 // ⚠️ THE READ PAIR IS IN `NumberResponses.swift` and stays there: ``AvailableNumber``,
 // ``NumberSearchResponse``, ``ListedNumber`` and ``OwnedNumbersResponse`` are pinned
-// by three shared contract fixtures. Nothing here has a fixture — the shared corpus
-// mirrors the Android client and that client has no provisioning surface — so
+// by three shared contract fixtures. Nothing here has a fixture, the shared corpus
+// mirrors the Android client and that client has no provisioning surface, so
 // ⛔ `ContractManifest.expectedFixtureCount` MUST NOT MOVE. What pins these shapes is
 // the route source, quoted per type below, and `NumberProvisioningRepositoryTests`.
 //
@@ -29,7 +29,7 @@ import Foundation
 /// PROPERTY RATHER THAN A GAP. `getAccountInfo` and `listOwnedNumbers` describe the
 /// AUTHENTICATING carrier account; for a managed provider that is the platform's own
 /// shared account, so its name, prepaid balance and total number count are
-/// Distronode's figures plus every other managed tenant's — never this caller's. The
+/// Distronode's figures plus every other managed tenant's, never this caller's. The
 /// route short-circuits managed providers to `{connected: true, managed: true}`
 /// before asking the carrier anything. ⚠️ It did NOT always: this route had no managed
 /// short-circuit at all, unlike `provider/numbers`, which is what made the platform's
@@ -38,14 +38,14 @@ import Foundation
 /// bonus.
 ///
 /// ⛔ `connected: false` WITH AN ``error`` IS A **200**, NOT AN HTTP FAILURE. A carrier
-/// that refuses its credentials is per-carrier content here — the response's own
+/// that refuses its credentials is per-carrier content here, the response's own
 /// top-level `connected` can still be true because another carrier answered. A screen
 /// must render this per row rather than as a page-level failure.
 ///
 /// ⚠️ EVERY FIELD BUT ``connected`` IS ABSENT RATHER THAN NULL ON SOME BRANCH, because
 /// the route builds a different object literal per case and `JSON.stringify` drops an
-/// undefined value entirely. ⚠️ ``balance`` IS A **STRING** on the wire — Twilio's own
-/// spelling — and must not be modelled as a number.
+/// undefined value entirely. ⚠️ ``balance`` IS A **STRING** on the wire, Twilio's own
+/// spelling, and must not be modelled as a number.
 public struct ProviderStatusEntry: Codable, Sendable {
     /// ⚠️ The only field present on every branch.
     public let connected: Bool
@@ -60,7 +60,7 @@ public struct ProviderStatusEntry: Codable, Sendable {
     public let balance: String?
     public let currency: String?
     /// ⚠️ The count on the CARRIER ACCOUNT, which for a BYOK workspace is theirs and
-    /// for a managed one would be everybody's — hence absent there.
+    /// for a managed one would be everybody's, hence absent there.
     public let numberCount: Int?
     /// ⚠️ Present exactly when ``connected`` is false. The route sends the literal
     /// "Invalid credentials" rather than the carrier's own text.
@@ -71,8 +71,8 @@ public struct ProviderStatusEntry: Codable, Sendable {
 ///
 /// ⛔ **NO `success` FLAG AT ALL, AND TWO DIFFERENT KEY SETS ONE LETTER APART.** A
 /// workspace whose credentials do not resolve answers `{connected: false, provider:
-/// null}` — SINGULAR `provider`, always null. Everything else answers `{connected,
-/// providers: {…}}` — PLURAL, a map keyed by carrier id. They are mutually exclusive
+/// null}`, SINGULAR `provider`, always null. Everything else answers `{connected,
+/// providers: {…}}`, PLURAL, a map keyed by carrier id. They are mutually exclusive
 /// branches of one route, so a decoder that modelled only the plural would read a
 /// perfectly ordinary disconnected workspace as contract drift, and one that modelled
 /// only the singular would read a healthy workspace the same way.
@@ -167,7 +167,7 @@ public struct RegulatoryRequirement: Codable, Sendable {
 public struct CountryRequirements: Codable, Sendable {
     public let isoCountry: String
     /// ⚠️ Twilio's vocabulary, which spells the toll-free case with a SPACE
-    /// (`toll free`) — a different vocabulary from the marketplace search's
+    /// (`toll free`), a different vocabulary from the marketplace search's
     /// `tollFree`.
     public let numberType: String
     public let endUserType: String
@@ -188,13 +188,13 @@ public struct CountryRequirements: Codable, Sendable {
 /// routable to a bridge that serves it.
 ///
 /// ⛔ A NULL ``requirements`` IS NOT A FAILED LOOKUP. It means the country publishes no
-/// regulation for that number type, i.e. NO REGISTRATION IS REQUIRED — a real and
+/// regulation for that number type, i.e. NO REGISTRATION IS REQUIRED, a real and
 /// common answer. A failed lookup throws and arrives as a 500, so the two stay
 /// distinguishable; collapsing them tells a customer to file paperwork that does not
 /// exist, or that none is needed when we simply could not ask.
 ///
-/// ⚠️ ``country`` AND ``numberType`` ARE ECHOED AS THE SERVER RESOLVED THEM — country
-/// uppercased, number type defaulted to `local` — so a screen should label its answer
+/// ⚠️ ``country`` AND ``numberType`` ARE ECHOED AS THE SERVER RESOLVED THEM, country
+/// uppercased, number type defaulted to `local`, so a screen should label its answer
 /// from these rather than from what it asked for.
 public struct NumberRequirementsResponse: Codable, Sendable {
     public let success: Bool
@@ -225,8 +225,8 @@ public struct NumberRequirementsResponse: Codable, Sendable {
 /// document can be stored and unsubmitted again after being both.
 ///
 /// ⛔ AND THIS IS **NOT** THE SHAPE THE UPLOAD ANSWERS. The POST answers
-/// ``RegistrationDocumentResponse``'s narrower row — `createdAt` instead of
-/// `updatedAt`, and neither boolean — so a list row cannot be built from an upload's
+/// ``RegistrationDocumentResponse``'s narrower row, `createdAt` instead of
+/// `updatedAt`, and neither boolean, so a list row cannot be built from an upload's
 /// reply. Re-read the list.
 public struct RegistrationDocument: Codable, Sendable {
     public let id: String
@@ -258,7 +258,7 @@ public struct RegistrationDocument: Codable, Sendable {
 /// ⛔ ``rejectionReasons`` IS ALREADY HUMAN-READABLE AND IS THE ONLY PLACE A REFUSAL'S
 /// DETAIL SURVIVES. The submit's 422 carries `failures` and `reasons` that
 /// ``ApiError`` does not keep, and the route stores the carrier's structured failures
-/// verbatim on the row — so re-reading the list after a refusal is how a screen shows
+/// verbatim on the row, so re-reading the list after a refusal is how a screen shows
 /// the customer what to fix. ⚠️ Empty unless the filing was actually refused.
 ///
 /// ⚠️ A STATUS MAY BE STALE AND THE RESPONSE CANNOT SAY SO. The list refreshes
@@ -315,7 +315,7 @@ public struct NumberRegistrationsResponse: Codable, Sendable {
     public let platformCountries: [String]
 }
 
-/// `POST /api/district/workspace/numbers/registrations` — the created draft.
+/// `POST /api/district/workspace/numbers/registrations`, the created draft.
 ///
 /// ⚠️ ANSWERS **201**, and echoes the whole row, so the created filing can be adopted
 /// without a re-read.
@@ -333,7 +333,7 @@ public struct NumberRegistrationCreatedResponse: Codable, Sendable {
 ///
 /// ⛔ NARROWER THAN ``RegistrationDocument`` AND WITH A DIFFERENT TIMESTAMP, WHICH IS
 /// WHY IT IS ITS OWN TYPE. The upload answers `{id, requirementName, mimeType,
-/// sizeBytes, createdAt}` — `createdAt`, not `updatedAt` — and carries neither
+/// sizeBytes, createdAt}`, `createdAt`, not `updatedAt`, and carries neither
 /// `stored` nor `submitted`. Reusing the list's type here would fail to decode a
 /// perfectly good reply, and building a list row from this one would invent two
 /// booleans. Re-read the list after an upload.
@@ -358,7 +358,7 @@ public struct RegistrationDocumentResponse: Codable, Sendable {
 /// `DELETE /api/district/workspace/numbers/registrations/documents`.
 ///
 /// ⚠️ IT ECHOES THE ID IT REMOVED, which is what lets a caller drop the right row
-/// without re-reading — and is worth using rather than the id that was sent, since
+/// without re-reading, and is worth using rather than the id that was sent, since
 /// the two agreeing is the server's confirmation rather than an assumption.
 public struct RegistrationDocumentRemovalResponse: Codable, Sendable {
     public let success: Bool
@@ -397,7 +397,7 @@ public struct NumberRegistrationSubmitResponse: Codable, Sendable {
 /// `POST /api/district/workspace/numbers/release`.
 ///
 /// ⛔ A **200 CARRYING `warnings` IS NOT A PARTIAL RELEASE, AND SWALLOWING THE ARRAY IS
-/// THE EXPENSIVE MISTAKE.** The carrier has taken the number back — that part is done
+/// THE EXPENSIVE MISTAKE.** The carrier has taken the number back, that part is done
 /// and cannot be undone. What failed is a cleanup step AFTER it: the inbound trunk
 /// still lists the number, or its `ManagedBillingItem` could not be moved to
 /// `canceled`, which means THE WORKSPACE KEEPS BEING CHARGED FOR A NUMBER IT NO LONGER
@@ -409,8 +409,8 @@ public struct NumberRegistrationSubmitResponse: Codable, Sendable {
 /// happen twice would send them into the ownership guard's 403, since the row it needs
 /// has just been deleted.
 ///
-/// ⚠️ THE KEY IS **ABSENT**, NOT AN EMPTY ARRAY, ON A CLEAN RELEASE — the route spreads
-/// it conditionally — which is why it is Optional and why ``warningLines`` exists.
+/// ⚠️ THE KEY IS **ABSENT**, NOT AN EMPTY ARRAY, ON A CLEAN RELEASE, the route spreads
+/// it conditionally, which is why it is Optional and why ``warningLines`` exists.
 public struct NumberReleaseResponse: Codable, Sendable {
     public let success: Bool
     /// ⛔ ABSENT on a clean release. Present means the number is gone AND something
@@ -420,7 +420,7 @@ public struct NumberReleaseResponse: Codable, Sendable {
     /// The cleanup steps that did not finish, or empty when everything did.
     ///
     /// ⚠️ Computed, so it adds no key on re-encode, and it collapses absent and empty
-    /// to one answer — which is safe here in a way it is not for
+    /// to one answer, which is safe here in a way it is not for
     /// ``OwnedNumbersResponse``, because there the flag and the names are two halves of
     /// one fact and here there is only the one.
     public var warningLines: [String] {

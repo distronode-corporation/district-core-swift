@@ -6,13 +6,13 @@ import Foundation
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `ImplementedFixtures+MessageThread.swift` was.
 // SwiftLint's `file_length` warning is an ERROR under `--strict`, so one line added
-// inline reds the LINT job rather than the gate — a failure a long way from the
+// inline reds the LINT job rather than the gate, a failure a long way from the
 // change that caused it.
 
 extension ImplementedFixtures {
     // MARK: - The scheduling admin envelope
 
-    /// ⛔ THIS GROUP GATES THE TRANSPORT ONLY — the wrapper every op's answer
+    /// ⛔ THIS GROUP GATES THE TRANSPORT ONLY, the wrapper every op's answer
     /// arrives in and the three refusal shapes. The row DTOs those wrappers carry
     /// are gated in the `+SchedulingA`, `+SchedulingB` and `+SchedulingC` groups.
     /// Gating a payload fixture against a type that does not exist is how a DTO
@@ -21,7 +21,7 @@ extension ImplementedFixtures {
     ///
     /// ⛔ THE FAILURE FIXTURE IS A **200** AND THAT IS THE WHOLE REASON IT EXISTS.
     /// `{ok:false, failure:"rejected", status:403}` is what the route answers when
-    /// the SCHEDULER refuses — HTTP 200, because the request reached Distronode,
+    /// the SCHEDULER refuses, HTTP 200, because the request reached Distronode,
     /// was authorised, cleared the op's role bar and validated. A client that read
     /// `res.ok` alone reports every scheduler outage as a success, which is the one
     /// mistake this corpus can pin and no route-level test would.
@@ -37,7 +37,7 @@ extension ImplementedFixtures {
     /// either refusal grows a key, that one fails on its own.
     ///
     /// ⛔ `district-scheduling-no-content.json` IS `{"ok":true,"data":{"ok":true}}`
-    /// — AN OUTER FLAG AND AN INNER ONE — AND MODELLING THE SIXTEEN NO-BODY OPS AS
+    /// AN OUTER FLAG AND AN INNER ONE, AND MODELLING THE SIXTEEN NO-BODY OPS AS
     /// AN EMPTY BODY FAILS AGAINST IT. The catalog's `NO_CONTENT` rewrites a 204
     /// into an object before it leaves the route. This is also the only fixture
     /// here that exercises ``SchedulingAdminSuccess``'s `ok` field: the gate
@@ -46,7 +46,7 @@ extension ImplementedFixtures {
     ///
     /// ⚠️ NONE OF THE FOUR CARRIES AN EXPLICIT NULL, so ``AllowedExplicitNulls``
     /// and ``ContractManifest/expectedAllowedNullPaths`` do not move. Checked
-    /// against the fixture bytes, not inferred from the types — every optional
+    /// against the fixture bytes, not inferred from the types, every optional
     /// here is ABSENT on the bodies that do not have it.
     static var schedulingAdmin: [ImplementedFixture] {
         [

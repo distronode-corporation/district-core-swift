@@ -7,14 +7,14 @@ import XCTest
 /// The overview, workspace, calls and contacts repositories.
 ///
 /// ⚠️ THE INBOX LIVES IN `InboxRepositoryTests` AND `ThreadPageReaderTests`, not
-/// because it is different in kind but because it is half the surface — the
-/// composer alone is seven methods, three of which spend money — and SwiftLint's
+/// because it is different in kind but because it is half the surface, the
+/// composer alone is seven methods, three of which spend money, and SwiftLint's
 /// file-length ceiling is 500 lines, which this file is already within 22 of.
 final class RepositoryTests: XCTestCase {
     // MARK: - Overview
 
     /// ⛔ AN EMPTY `{}` MUST NOT READ AS FOUR CONFIDENT ZEROS. Typing the response
-    /// is most of that defence now — `OverviewResponse` requires six keys — but
+    /// is most of that defence now, `OverviewResponse` requires six keys, but
     /// the envelope guard is what catches the body that carries all six and says
     /// `success: false`.
     func testAnEmptyOverviewBodyIsADecodeFailure() async {
@@ -131,7 +131,7 @@ final class RepositoryTests: XCTestCase {
 
     /// ⛔ THE STORED DEFAULT IS AN ID TO LOOK UP, NOT ONE TO SEND BLIND. The server
     /// echoes it without cross-checking, so it can name a workspace whose
-    /// subscription has lapsed — and sending that id earns a 403 on a screen the
+    /// subscription has lapsed, and sending that id earns a 403 on a screen the
     /// user never touched.
     func testTheDefaultSelectionPrefersTheStoredChoiceWhenItIsStillInTheList() async {
         let transport = RepositoryTransport(json: Bodies.workspaceList(
@@ -195,7 +195,7 @@ final class RepositoryTests: XCTestCase {
         )
     }
 
-    /// ⚠️ NOTHING WAS SENT AT ALL — no credential — so there is no body to
+    /// ⚠️ NOTHING WAS SENT AT ALL, no credential, so there is no body to
     /// classify and the failure is carried through as-is.
     func testAWorkspaceListWithNoCredentialFailsWithoutClassifyingABody() async {
         let transport = RepositoryTransport(json: Bodies.workspaceList())
@@ -254,7 +254,7 @@ final class RepositoryTests: XCTestCase {
     }
 
     /// ⚠️ THE REMOVAL RESPONSE HAS NO `member` KEY, and it is the one response a
-    /// client must not fail to decode — the row really is gone.
+    /// client must not fail to decode, the row really is gone.
     func testARemovalWithNoEchoedMemberStillDecodes() async {
         let transport = RepositoryTransport(json: #"{"success":true}"#)
 
@@ -299,7 +299,7 @@ final class RepositoryTests: XCTestCase {
 
     // MARK: - Calls
 
-    /// ⛔ NO ENVELOPE ON THE CALL LOG — it is `NextResponse.json(calls)`, decoded
+    /// ⛔ NO ENVELOPE ON THE CALL LOG, it is `NextResponse.json(calls)`, decoded
     /// as `[CallSummary]`. A `success` guard, or a DTO expecting an object, would
     /// reject every response the server sends.
     func testTheCallLogIsABareArrayAndPagesWithoutATotal() async {
@@ -381,7 +381,7 @@ final class RepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE ENVELOPE MATTERS MOST HERE, because `""` is the legitimate value for
-    /// a call with no transcript — a structurally wrong 200 would otherwise render
+    /// a call with no transcript, a structurally wrong 200 would otherwise render
     /// as "nothing was said".
     func testAnAbsentTranscriptIsTheEmptyStringButAWrongEnvelopeIsAFailure() async {
         let ok = RepositoryTransport(json: #"{"success":true,"transcript":""}"#)
@@ -406,7 +406,7 @@ final class RepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE RECORDING URL COMES FROM THE `Location` HEADER OF A 302 THAT IS NOT
-    /// FOLLOWED, and it is perishable — resolve it at playback, never cache it.
+    /// FOLLOWED, and it is perishable, resolve it at playback, never cache it.
     func testTheRecordingUrlIsTheRedirectTarget() async {
         let transport = RepositoryTransport(redirectTo: "https://storage.example.com/rec.mp3?sig=abc")
 
@@ -419,7 +419,7 @@ final class RepositoryTests: XCTestCase {
     // MARK: - Contacts
 
     /// ⚠️ CONTACTS REPORTS A REAL `total`, so the end is KNOWN and a full final
-    /// page costs no extra request — unlike the call log.
+    /// page costs no extra request, unlike the call log.
     func testContactsPagingUsesTheReportedTotal() async {
         let transport = RepositoryTransport(json: Bodies.contactPage(ids: ["c_1", "c_2"], total: 2, limit: 2))
         let pager = ContactsRepository(client: .repositoryTest(transport)).pager(workspaceId: "ws_1")

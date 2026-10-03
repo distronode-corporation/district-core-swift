@@ -6,8 +6,8 @@ import XCTest
 /// Carrying a response-side blob back onto the request side.
 ///
 /// ⛔ THE ONE ASSERTION THAT MATTERS IS THE NULL. ``JSONValue/object(_:)`` DROPS nil pairs
-/// by design — an explicit null is a different instruction from an absent key on four of
-/// this API's routes — and ``JSONValue/carrying(_:)`` must not go anywhere near it, because
+/// by design, an explicit null is a different instruction from an absent key on four of
+/// this API's routes, and ``JSONValue/carrying(_:)`` must not go anywhere near it, because
 /// a `null` inside an opaque blob is part of the VALUE. Both `workspace/directory` and
 /// `workspace/routing-rules` replace their stored array wholesale and answer 200 either
 /// way, so a dropped key here is a silent deletion inside somebody's stored row.

@@ -29,7 +29,7 @@ public struct SchedulingHoursRange: Equatable, Sendable {
 /// ⛔ A SPAN IS ONE ROW AND ITS `days` IS A COUNT OF ROWS, NOT A CALENDAR LENGTH. The
 /// fork stores a multi-day absence as one override row PER DAY sharing a `group_id`, so
 /// a fortnight off is fourteen rows; folding them is what stops the table being unusable.
-/// ⚠️ `days` therefore counts what came back — a group with a gap in it reports the
+/// ⚠️ `days` therefore counts what came back, a group with a gap in it reports the
 /// number of stored days and not the distance between its ends, which is the truth about
 /// the data and is what the source computes.
 public struct SchedulingOverrideRow: Equatable, Sendable {
@@ -122,7 +122,7 @@ public enum SchedulingHoursFormat {
     ///
     /// ⚠️ THE RANGE CHECK IS ON THE **WIRE** VALUE, BEFORE THE MODULO. A guard placed
     /// after ``displayDay(_:)`` could never fire, because the modulo has already folded
-    /// every integer into 0...6 — so a corrupt `day_of_week` of `9` would silently land
+    /// every integer into 0...6, so a corrupt `day_of_week` of `9` would silently land
     /// on a real day. The source checks in the same place, and the comment is here
     /// because the dead-guard version looks more careful and is not.
     public static func weekFromRules(_ rules: [SchedulingAvailabilityRule]) -> [[SchedulingHoursRange]] {
@@ -140,7 +140,7 @@ public enum SchedulingHoursFormat {
     ///
     /// ⛔ FORMATTED FROM THE STRING AND NEVER THROUGH A `Date`. A bare `YYYY-MM-DD` has
     /// no zone, so parsing it into an instant and formatting it back lands a day early
-    /// for anybody west of UTC — which is the single most common date bug on a surface
+    /// for anybody west of UTC, which is the single most common date bug on a surface
     /// like this one. ⚠️ Anything that is not three dash-separated numeric groups, or
     /// whose month is outside 1...12, comes back UNCHANGED: it is still the truth, and
     /// rewriting it would hide a corrupt row.
@@ -169,7 +169,7 @@ public enum SchedulingHoursFormat {
         let from = formatOverrideDate(start)
         // ⚠️ THE YEAR IS STRIPPED ONLY IF IT IS THERE. `formatOverrideDate` returns the
         // input unchanged for a malformed date, and that value has no `, YYYY` tail to
-        // remove — so this must not assume the shape it just asked for.
+        // remove, so this must not assume the shape it just asked for.
         let trimmed = from.hasSuffix(", \(start.prefix(4))")
             ? String(from.dropLast(6))
             : from
@@ -184,7 +184,7 @@ public enum SchedulingHoursFormat {
     public static func overrideHours(_ row: SchedulingOverrideRow) -> String {
         // ⚠️ THE TWO OPTIONALS ARE COALESCED BEFORE THE TEST rather than unwrapped inside
         // it. An absent time and an empty one mean the same thing here, and the combined
-        // condition is what keeps this a single-line `if` — `swiftformat` wraps a
+        // condition is what keeps this a single-line `if`, `swiftformat` wraps a
         // multi-line one's brace onto its own line and `swiftlint` then rejects that, so
         // the two tools can only both pass if the condition stays short.
         let start = row.startTime ?? ""
@@ -212,7 +212,7 @@ public enum SchedulingHoursFormat {
     /// ⛔ A SPAN TAKES ITS REASON AND HOURS FROM THE **FIRST** ROW SEEN FOR ITS GROUP,
     /// and later rows only widen the ends and increment the count. That is the source's
     /// behaviour rather than a chosen one, and it matters because the fork does not
-    /// promise the rows arrive in date order — so the reason shown is the reason of
+    /// promise the rows arrive in date order, so the reason shown is the reason of
     /// whichever day came back first, which for a group the fork wrote in one statement
     /// is the same on every row anyway.
     ///
@@ -280,7 +280,7 @@ public enum SchedulingHoursFormat {
         // ⛔ DECORATED WITH ITS POSITION BECAUSE `sorted(by:)` IS NOT STABLE AND
         // `Array.prototype.sort` IS. Two overrides starting on the same date are ordered
         // by the fork's own row order on the web, and Swift's introsort is free to swap
-        // them — so a screen and a browser side by side would list the same two days in
+        // them, so a screen and a browser side by side would list the same two days in
         // different orders, intermittently, which is the worst kind of difference to be
         // asked about. The index tiebreak makes the port match by construction.
         return rows

@@ -4,7 +4,7 @@ import Foundation
 ///
 /// ⛔ THE APP MUST NEVER CONSTRUCT A `video_` ROOM NAME, AND THIS TYPE IS WHY IT
 /// CANNOT. `video_` is one character from `meet_` in the same `startsWith` chain
-/// on the server, and it silently starts a **billable Tavus avatar** — default
+/// on the server, and it silently starts a **billable Tavus avatar**, default
 /// concurrency ceiling 1, never exercised in production, so the first time it
 /// happens it is both a charge and an outage of the avatar feature for every
 /// other room. A comment asking nobody to type it is not a control;
@@ -14,7 +14,7 @@ import Foundation
 /// SUPERVISOR CASE. `POST /api/district/calls/token` serves two structurally
 /// opposite things behind one body: a `meet_`/`video_` prefix means a standalone
 /// ROOM (the route stamps `participant`), anything else is read as a `Call.id`
-/// and the caller is stamped `supervisor` — whereupon the voice agent
+/// and the caller is stamped `supervisor`, whereupon the voice agent
 /// unsubscribes their microphone. Only the room case is reachable from this
 /// client, and an id-shaped string is refused here rather than answered with a
 /// token that silently mutes the operator.
@@ -22,7 +22,7 @@ import Foundation
 /// ⚠️ A ROOM NAME IS NOT AN AUTHORIZATION CLAIM AND MUST NOT BE TREATED AS ONE.
 /// The server parses the workspace id back out of it and runs
 /// `requireWorkspaceRole` against THAT, so naming another tenant's room answers
-/// 403 rather than granting anything. It is also not a secret — suffixes are
+/// 403 rather than granting anything. It is also not a secret, suffixes are
 /// human-typed and low entropy, which is exactly why an unauthenticated guest
 /// needs a signed invite instead of a name.
 public struct RoomName: Sendable, Equatable {
@@ -37,7 +37,7 @@ public struct RoomName: Sendable, Equatable {
     /// that the guard EXISTS rather than a test of a comment.
     public static let billableAvatarPrefix = "video_"
 
-    /// - Returns: nil for anything that is not a `meet_` room — a `video_`
+    /// - Returns: nil for anything that is not a `meet_` room, a `video_`
     ///   avatar room, a bare `Call.id`, an empty suffix, or a name carrying a
     ///   path separator.
     public init?(_ value: String) {
@@ -127,7 +127,7 @@ public struct RoomName: Sendable, Equatable {
     ///
     /// ⚠️ SPLITS FROM THE LEFT ON EXACTLY TWO SEPARATORS, because the tail may
     /// legitimately contain further underscores when the name came from somewhere
-    /// other than ``init(workspaceId:suffix:)`` — the server accepts `.+` there.
+    /// other than ``init(workspaceId:suffix:)``, the server accepts `.+` there.
     /// ⚠️ RETURNS THE WHOLE NAME UNCHANGED when it does not have the shape, so a
     /// display never silently blanks; `meet_<uuid>_standup` is not a title, and
     /// neither is an empty line.
@@ -156,7 +156,7 @@ public struct RoomName: Sendable, Equatable {
 /// ⛔ A CONSTANT, DELIBERATELY. The route REQUIRES the key (a missing value is a
 /// 400) and IGNORES the value: it derives a hashed participant identity from the
 /// SESSION, because accepting a client-supplied identity was an impersonation
-/// hole, and a random one per join produced duplicate tiles — LiveKit evicts only
+/// hole, and a random one per join produced duplicate tiles, LiveKit evicts only
 /// on a REPEATED identity. Sending a device id or an email would put a value on
 /// the wire that is neither used nor needed.
 public enum RoomIdentity {

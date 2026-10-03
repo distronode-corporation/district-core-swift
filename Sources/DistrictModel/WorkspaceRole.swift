@@ -3,7 +3,7 @@ import Foundation
 /// A workspace membership role, parsed from the wire.
 ///
 /// ⛔ THIS IS A UX AFFORDANCE, NOT A SECURITY BOUNDARY. Authorisation happens on
-/// the server, in `requireWorkspaceRole`, on every request — reads admit all
+/// the server, in `requireWorkspaceRole`, on every request, reads admit all
 /// three roles, mutations admit `["agency","client"]` only. Nothing here
 /// protects data: hiding a button stops the app OFFERING an action that would
 /// come back 403, which is a better experience than a failure dialog, and that
@@ -14,7 +14,7 @@ import Foundation
 /// PURPOSE. Server-side the column is `role String @default("client")` with no
 /// Prisma enum and no TypeScript union anywhere, so a fourth value is a
 /// schema-level possibility rather than a hypothesis. A `Codable` enum would
-/// throw on an unmodelled value and take out the entire response it arrived in —
+/// throw on an unmodelled value and take out the entire response it arrived in,
 /// the whole member list, for one unrecognised row. Parsing through
 /// ``WorkspaceRole/fromWire(_:)`` contains the blast radius to "this membership
 /// has no privileges".
@@ -32,7 +32,7 @@ public enum WorkspaceRole: String, Sendable, CaseIterable {
     ///
     /// Mirrors the `["agency","client"]` allow-list those routes pass to
     /// `requireWorkspaceRole`. ⚠️ TOO COARSE FOR MEMBERSHIP. Every mutation on
-    /// `workspace/members` is **agency-only**, a narrower list than this — gate
+    /// `workspace/members` is **agency-only**, a narrower list than this, gate
     /// those controls on `.agency` specifically rather than on this property.
     public var canMutate: Bool {
         self != .viewer
@@ -52,7 +52,7 @@ public enum WorkspaceRole: String, Sendable, CaseIterable {
     /// ⛔ FAILS CLOSED BY RETURNING nil, AND EVERY CONSUMER MUST TREAT nil AS
     /// "NO PRIVILEGES" rather than falling back to a default. The tempting
     /// default is `.client`, because that is what the SERVER falls back to for a
-    /// member with no explicit row — but the server reaches that conclusion
+    /// member with no explicit row, but the server reaches that conclusion
     /// having confirmed the membership exists. Here, nil means the opposite: the
     /// role could not be established. Assuming `.client` would show mutation
     /// controls to a viewer whose role string arrived misspelled, and every one
@@ -72,7 +72,7 @@ public enum WorkspaceRole: String, Sendable, CaseIterable {
     /// Whether to offer mutating controls for a role that may not have parsed.
     ///
     /// ⚠️ TAKES AN OPTIONAL DELIBERATELY. `role?.canMutate == true` is correct
-    /// but invites being rewritten as `!= false`, which is `true` for nil — the
+    /// but invites being rewritten as `!= false`, which is `true` for nil, the
     /// exact inversion this helper exists to make unwritable.
     public static func allowsMutation(_ role: WorkspaceRole?) -> Bool {
         role?.canMutate == true

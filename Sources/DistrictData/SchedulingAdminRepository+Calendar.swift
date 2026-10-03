@@ -8,22 +8,22 @@ import Foundation
 /// catalog's decision rather than a gap in it: these are the CALLER'S OWN calendar
 /// connections, so a viewer linking their own Google account changes nothing about
 /// the tenancy. Four of the seven are `NO_CONTENT` ops, which answer
-/// `{"ok":true,"data":{"ok":true}}` rather than an empty body — see
+/// `{"ok":true,"data":{"ok":true}}` rather than an empty body, see
 /// ``SchedulingNoContent``.
 ///
 /// ⛔ `provider` IS REQUIRED BY EVERY CONNECTION OP AND THE `{id}` IN THE PATH IS
 /// DECORATIVE. The fork recreates a connection id on every token refresh, so
 /// identity is `provider` + `account`, and a client that sent only the id would
 /// address a connection that no longer answers to it. The id is still sent, and is
-/// still in the body — see the path-keys note on `+Bookings.swift`.
+/// still in the body, see the path-keys note on `+Bookings.swift`.
 ///
 /// ⚠️ THE SAME VALUE HAS TWO SPELLINGS ACROSS ONE ENDPOINT PAIR: the GET and the
 /// DELETE take it as `account`, the PUT and the destination write take it as
-/// `account_email`. That is the server's schema, not a typo to tidy — the
+/// `account_email`. That is the server's schema, not a typo to tidy, the
 /// parameter is named `accountEmail` on both sides here so the caller does not
 /// have to know, and the wire key is what differs.
 public extension SchedulingAdminRepository {
-    /// `calendar.status` — what the instance offers and what this caller has
+    /// `calendar.status`, what the instance offers and what this caller has
     /// connected.
     func calendarStatus(workspaceId: String) async throws -> SchedulingCalendarStatus {
         try await perform(
@@ -34,13 +34,13 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `calendar.caldav.connect` — link a CalDAV account.
+    /// `calendar.caldav.connect`, link a CalDAV account.
     ///
     /// ⛔ THE WIRE FIELD IS `app_password`, NOT `password`, and the distinction is
     /// the point: Fastmail, iCloud and Zimbra all require an application-specific
     /// credential here rather than the account password.
     /// ⚠️ `serverUrl` IS REFUSED BY THE CATALOG unless it is an `https://` address
-    /// with a hostname — an SSRF guard shared with the browser form — so a
+    /// with a hostname, an SSRF guard shared with the browser form, so a
     /// malformed one is an `invalidParams` naming the field rather than a request
     /// the scheduler ever sees.
     func connectCaldav(
@@ -63,7 +63,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `calendar.connections.calendars.get` — the calendars inside one connected
+    /// `calendar.connections.calendars.get`, the calendars inside one connected
     /// account.
     ///
     /// ⚠️ THE CONTAINER KEY IS `calendars`, NOT `items`. Unwrapped here so callers
@@ -87,7 +87,7 @@ public extension SchedulingAdminRepository {
         ).calendars
     }
 
-    /// `calendar.connections.calendars.put` — replace the whole selection for one
+    /// `calendar.connections.calendars.put`, replace the whole selection for one
     /// account.
     ///
     /// ⛔ A REPLACE, NOT A PATCH, AND A CALENDAR LEFT OUT IS A CALENDAR TURNED
@@ -114,7 +114,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `calendar.connections.destination` — make this connection the one new
+    /// `calendar.connections.destination`, make this connection the one new
     /// bookings are written to.
     ///
     /// ⚠️ EXACTLY ONE CONNECTION HOLDS IT, so this is a move rather than a toggle:
@@ -139,7 +139,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `calendar.connections.delete` — unlink an account.
+    /// `calendar.connections.delete`, unlink an account.
     ///
     /// ⛔ THIS CAN REMOVE THE DESTINATION CONNECTION, and the catalog does not
     /// refuse it. A tenancy left with no destination writes new bookings nowhere,
@@ -162,12 +162,12 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `zoom.status` — whether the instance has Zoom credentials, and whether this
+    /// `zoom.status`, whether the instance has Zoom credentials, and whether this
     /// caller has linked an account.
     ///
     /// ⛔ THE ONLY ZOOM OP THERE IS. `GET|PATCH /v1/settings/zoom` hold the
     /// INSTANCE's credentials, shared by every tenancy on the deployment, and are
-    /// deliberately absent from the catalog — so nothing on this client can change
+    /// deliberately absent from the catalog, so nothing on this client can change
     /// Zoom's configuration even in principle.
     func zoomStatus(workspaceId: String) async throws -> SchedulingZoomStatus {
         try await perform(

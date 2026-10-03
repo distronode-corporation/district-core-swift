@@ -58,7 +58,7 @@ final class SchedulingAdminRecordingsRepositoryTests: XCTestCase {
     }
 
     /// ⛔ THE TALLY IS HANDED BACK WHOLE BECAUSE `failed` IS THE ONLY PLACE A
-    /// PARTIAL FAILURE IS REPORTED — the HTTP status is a 200 either way. A method
+    /// PARTIAL FAILURE IS REPORTED, the HTTP status is a 200 either way. A method
     /// that collapsed this to `deleted` would discard the number at the layer least
     /// able to notice it was gone.
     func testDeletingEverythingReportsBothHalvesOfTheTally() async throws {

@@ -14,7 +14,7 @@ final class SchedulingAdminEventTypeDetailsTests: XCTestCase {
     // MARK: - Hosts
 
     /// ⚠️ `avatar_url` IS ABSENT, NEVER NULL, on this row. Both polarities are
-    /// decoded here so the Optional is proven rather than assumed — and the absent
+    /// decoded here so the Optional is proven rather than assumed, and the absent
     /// spelling is what lets this fixture family need no entry in the
     /// explicit-null register for its host list.
     func testAHostDecodesWithAndWithoutAnAvatar() throws {
@@ -136,7 +136,7 @@ final class SchedulingAdminEventTypeDetailsTests: XCTestCase {
 
     /// ⚠️ `taken` IS `nullish` IN THE CATALOG, so it can arrive as an explicit null
     /// as well as absent. Both decode to nil and the difference is not recoverable
-    /// — stated as a test rather than left for someone to discover while debugging
+    /// stated as a test rather than left for someone to discover while debugging
     /// an empty diary.
     func testAnExplicitlyNullTakenListIsAlsoNil() throws {
         let nulled = try decode(SchedulingSlots.self, #"{"slots":[],"taken":null}"#)

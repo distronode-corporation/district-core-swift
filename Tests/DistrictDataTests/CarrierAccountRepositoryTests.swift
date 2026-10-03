@@ -9,7 +9,7 @@ import XCTest
 ///
 /// ⛔ TWO OF THESE FLOWS HAVE **NO STATUS READ ANYWHERE**, which is what these tests are
 /// really about. A2P and toll-free verification answer the only report either will ever
-/// produce, so the assertions below are that every field of that answer survives — there
+/// produce, so the assertions below are that every field of that answer survives, there
 /// is no second request that could recover a dropped one.
 ///
 /// ⛔ AND FOUR OF THE FIVE WRITES SPEND MONEY NO RETRY UNDOES: a carrier brand fee, a
@@ -22,7 +22,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
     /// ⛔ A LEGACY ROW WITH BOTH SIDS NULL DESCRIBES A BILLING ITEM WITH NO TWILIO
     /// RESOURCES BEHIND IT, and that is worth surfacing rather than hiding. The list parses
     /// its rows out of a packed `productRef` string, so a row written before real
-    /// provisioning was wired up carries neither sid — which is why both are Optional.
+    /// provisioning was wired up carries neither sid, which is why both are Optional.
     func testTheTrunkListDecodesBothProvisionedAndLegacyRows() async throws {
         let transport = RepositoryTransport(json: NumberProvisioningBodies.sipTrunksMixed)
 
@@ -43,7 +43,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
 
     /// ⛔ AN EMPTY LIST IS A REAL ANSWER AND A FAILED READ IS NOT ONE. Most workspaces have
     /// no SIP trunk at all, so "we could not look" drawn as "you have none" would invite a
-    /// duplicate provision — and a duplicate is a second $25/month with no route to cancel
+    /// duplicate provision, and a duplicate is a second $25/month with no route to cancel
     /// either of them.
     func testAnEmptyTrunkListStaysDistinctFromAFailedRead() async throws {
         let empty = RepositoryTransport(json: NumberProvisioningBodies.sipTrunksEmpty)
@@ -65,7 +65,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
         XCTAssertEqual(result.failureOnly, .decoding("SipTrunksResponse did not affirm success=true"))
     }
 
-    /// ⚠️ `domain` IS THE LABEL ONLY — the route appends `.sip.twilio.com` — and the echoed
+    /// ⚠️ `domain` IS THE LABEL ONLY, the route appends `.sip.twilio.com`, and the echoed
     /// trunk carries the fully-qualified name plus real sids, so it can be adopted without
     /// a re-read.
     func testCreatingATrunkSendsTheLabelAndAdoptsTheQualifiedDomainBack() async throws {
@@ -247,7 +247,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
     // MARK: - Toll-free verification
 
     /// ⚠️ THE SUBMISSION CHANGED A LIVE NUMBER'S ROUTING STATE (the hub row moves to
-    /// `pending_verification`), and `tfvSid` is the handle an operator quotes to support —
+    /// `pending_verification`), and `tfvSid` is the handle an operator quotes to support,
     /// so both reported values have to survive, there being no status read to re-ask.
     ///
     /// ⛔ `optInImageUrls` IS ALWAYS SENT, EVEN EMPTY, so the refusal is the route's own
@@ -282,7 +282,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
     /// ⛔ AN EMPTY OPT-IN LIST IS STILL SENT, AND THE **400** THAT COMES BACK IS THE ROUTE'S
     /// OWN ACTIONABLE SENTENCE. Twilio's reviewers open every URL by hand and reject the
     /// filing days later with error 30509 if one does not load, so refusing up front beats
-    /// losing days — and a client that pre-empted the refusal with its own wording would
+    /// losing days, and a client that pre-empted the refusal with its own wording would
     /// replace the remedy with a shrug.
     func testAnEmptyOptInListIsStillSentSoTheRoutesOwnRefusalIsShown() async {
         let transport = RepositoryTransport(json: NumberProvisioningBodies.tfvOptInMissing, status: 400)
@@ -326,7 +326,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
 
     /// ⛔ ONE CALL, ONE REQUEST, AND THE `+` IS PERCENT-ENCODED. A literal `+` in a query
     /// value arrives at the server as a SPACE after form decoding, so the lookup would be
-    /// performed for a different number — a spent carrier call answering `valid: false`,
+    /// performed for a different number, a spent carrier call answering `valid: false`,
     /// which reads as a bad number rather than as an encoding bug.
     func testALookupSpendsExactlyOneRequestAndEncodesTheE164Number() async throws {
         let transport = RepositoryTransport(json: NumberProvisioningBodies.lookupValid)
@@ -383,7 +383,7 @@ final class CarrierAccountRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ `JSONEncoder` ESCAPES `/` AS `\/` ON LINUX AND NOT ON DARWIN, and both are valid
-    /// JSON that decodes identically — so a byte-exact assertion on a body containing a URL
+    /// JSON that decodes identically, so a byte-exact assertion on a body containing a URL
     /// passes on this runner and fails the day anything runs on a Mac. The escape is
     /// normalised away rather than the URL removed, because the opt-in evidence URL is
     /// precisely the field worth pinning. `EndpointTableTests` carries the same helper.

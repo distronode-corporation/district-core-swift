@@ -1,7 +1,7 @@
 import Foundation
 
 public extension TypedEndpoints {
-    /// District Desk — the tenant's OWN customers' tickets.
+    /// District Desk, the tenant's OWN customers' tickets.
     ///
     /// ⛔ NOT THE SUPPORT DESK, WHICH IS THE MIRROR IMAGE AND A SEPARATE FAMILY. These
     /// are the tickets a tenant's customers raised with the TENANT;
@@ -20,7 +20,7 @@ public extension TypedEndpoints {
     /// on disk, so it moves only when files do.
     ///
     /// ⚠️ NINE ENTRIES FOR SEVEN PATHS. `desk/settings` is GET + PATCH and `desk/logo`
-    /// is POST + DELETE — the same "a path is not an endpoint" arithmetic the messaging
+    /// is POST + DELETE, the same "a path is not an endpoint" arithmetic the messaging
     /// family made, running in the other direction.
     ///
     /// ⚠️ ITS OWN FILE RATHER THAN NINE MORE LINES IN `EndpointClassification.swift`,

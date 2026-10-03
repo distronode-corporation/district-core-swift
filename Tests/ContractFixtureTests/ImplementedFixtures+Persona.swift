@@ -6,7 +6,7 @@ import Foundation
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `ImplementedFixtures+MessageThread.swift` and
 // `+SchedulingAdmin.swift` were. SwiftLint's `file_length` warning is an ERROR under
-// `--strict`, so one line added inline reds the LINT job rather than the gate — a
+// `--strict`, so one line added inline reds the LINT job rather than the gate, a
 // failure a long way from the change that caused it.
 
 extension ImplementedFixtures {
@@ -14,7 +14,7 @@ extension ImplementedFixtures {
 
     /// ⛔ TWO FIXTURES GATED TOGETHER WITH THEIR TYPES, WHICH IS THE ONLY WAY A NAME
     /// IS SUPPOSED TO LEAVE `ContractManifest.unimplemented`. Gating either one
-    /// earlier would have meant inventing the type to gate it against — the "a DTO
+    /// earlier would have meant inventing the type to gate it against, the "a DTO
     /// that nothing decodes is a fixture test, not a client" failure the ⚠️ at the
     /// top of ``UntypedEndpoints`` describes. They are gated alongside
     /// `PersonaOptionsResponse`, `PersonaPreviewTokenResponse`, both descriptors,
@@ -24,7 +24,7 @@ extension ImplementedFixtures {
     ///
     /// ⛔ THE OPTIONS FIXTURE IS THE LARGEST BODY IN THIS CORPUS AND THE GATE IS WHAT
     /// MAKES ITS SIZE SAFE. Seven engines, two language lists, THIRTY-SIX engine ×
-    /// language voice catalogues, eight voice styles and four defaults — nearly three
+    /// language voice catalogues, eight voice styles and four defaults, nearly three
     /// thousand lines, in which one unmodelled key would be invisible to any
     /// hand-written assertion. `StrictDecodeVerifier` re-encodes and compares key sets
     /// per path, so a field the server adds fails HERE rather than being silently
@@ -38,8 +38,8 @@ extension ImplementedFixtures {
     ///
     /// ⛔ THE PREVIEW TOKEN'S `e2ee` IS PRESENT ON THIS FIXTURE AND OPTIONAL IN THE
     /// DTO, AND THE ASYMMETRY IS DELIBERATE RATHER THAN A SECOND BODY SHAPE. A
-    /// `preview_*` room is always encrypted — browser-to-agent, no SIP leg, no avatar
-    /// — so the Optional is a refusal to crash on drift, not a documented branch. It
+    /// `preview_*` room is always encrypted, browser-to-agent, no SIP leg, no avatar
+    /// so the Optional is a refusal to crash on drift, not a documented branch. It
     /// shares ``E2EEInfo`` with `district-room-token.json`, which carries the
     /// never-base64-decode rule in full; the two fixtures gate the same type against
     /// two routes, so the day either grows a key exactly one of them fails.

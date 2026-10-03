@@ -102,8 +102,8 @@ public enum SchedulingSettingsFormat {
     }
 
     /// ⚠️ THE TWO GROUPS AND THEIR SEVEN SWITCHES, IN THE WEB'S ORDER. The split is by
-    /// WHOSE meeting it is — one set fires when you are booked into somebody else's, the
-    /// other when somebody books yours — which is why the headings are not "Email" and
+    /// WHOSE meeting it is, one set fires when you are booked into somebody else's, the
+    /// other when somebody books yours, which is why the headings are not "Email" and
     /// "Push".
     public static let notificationGroups: [SchedulingNotificationGroup] = [
         SchedulingNotificationGroup(

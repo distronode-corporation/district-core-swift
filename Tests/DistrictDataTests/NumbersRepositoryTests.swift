@@ -80,7 +80,7 @@ final class NumbersRepositoryTests: XCTestCase {
 
     /// ⚠️ ENVELOPE FIRST. Every field of the response has a shape that survives a
     /// thin body, and the answer a caller would act on from a half-decoded search
-    /// is "no numbers available" — the exact answer that sends someone off to try
+    /// is "no numbers available", the exact answer that sends someone off to try
     /// a different area code.
     func testASearchBodyThatDoesNotAffirmSuccessIsADecodeFailure() async {
         let transport = RepositoryTransport(json: #"{"success":false,"provider":"twilio","numbers":[]}"#)
@@ -178,7 +178,7 @@ private enum NumberBodies {
     """#
 
     /// ⚠️ NEITHER FLAG IS PRESENT, which is what a clean list looks like on the
-    /// wire — absent, not false and not an empty array.
+    /// wire, absent, not false and not an empty array.
     static let ownedClean = #"""
     {"success":true,"numbers":[{"phoneNumber":"+14165550100","capabilities":["voice"],
      "type":"local","status":"active","provider":"twilio","managed":false}]}

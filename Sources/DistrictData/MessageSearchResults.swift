@@ -11,13 +11,13 @@ import Foundation
 ///
 /// ⚠️ A FILE OF ITS OWN RATHER THAN BESIDE ``ConversationList``, WHICH IS A SIZE
 /// DECISION AND NOT A KIND ONE. `InboxRepository.swift` sits close to SwiftLint's
-/// 500-line `file_length` ceiling — an error under `--strict` — and this type plus
+/// 500-line `file_length` ceiling, an error under `--strict`, and this type plus
 /// its sibling method would leave it almost no headroom. `InboxRepositoryTests`
 /// is split from `RepositoryTests` for the same reason.
 public struct MessageSearchResults: Sendable {
     /// ⚠️ NO EXPLICIT INITIALISER, LIKE ``ConversationList``. A public struct's
     /// synthesised memberwise initialiser is INTERNAL, so only this module can build
-    /// one — which is correct here, because the only honest producer is
+    /// one, which is correct here, because the only honest producer is
     /// ``InboxRepository/search(workspaceId:query:)``. ``ReplyTarget`` documents the
     /// opposite call and why it needed one.
     public let response: MessageSearchResponse
@@ -34,7 +34,7 @@ public struct MessageSearchResults: Sendable {
 
     /// ⚠️ CAPTION THE LIST WHEN THIS IS TRUE. The server stopped at its cap, so
     /// older matches exist that this response does not contain. There is nothing to
-    /// fetch — the route takes no offset — so this is a truthfulness signal rather
+    /// fetch, the route takes no offset, so this is a truthfulness signal rather
     /// than a pager, exactly like ``ConversationList/isPartial``.
     ///
     /// ⚠️ FALSE WHEN `limit` IS ABSENT, WHICH IS NOT A GUESS. The key is missing

@@ -40,7 +40,7 @@ final class CallMediaStateTests: XCTestCase {
 
         // ⚠️ FLOORED. The SDK can report a leave for a join this client never
         // saw, and a negative count would make "is the room empty" answer false
-        // for ever — so an outbound call would never notice the callee hanging
+        // for ever, so an outbound call would never notice the callee hanging
         // up.
         media.apply(.participantLeft(CallParticipant(identity: "b")))
         media.apply(.participantLeft(CallParticipant(identity: "ghost")))
@@ -86,7 +86,7 @@ final class CallMediaStateTests: XCTestCase {
 
     func testTheTerminalEventsChangeNothingHere() {
         // ⛔ ENDING A CALL IS A DECISION ABOUT THE PHASE and belongs to whichever
-        // machine owns it — the two end for different reasons and emit different
+        // machine owns it, the two end for different reasons and emit different
         // commands. Reaching it here would let a media helper end a call.
         var media = CallMediaState()
         media.apply(.participantJoined(CallParticipant(identity: "a")))

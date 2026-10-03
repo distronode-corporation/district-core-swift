@@ -13,10 +13,10 @@ import Foundation
 ///   3. **re-encode** the DTO,
 ///   4. compare the re-encoded key set against the raw fixture's, recursively.
 ///
-/// A server key the DTO does not model survives steps 1–2 (the decoder ignores
+/// A server key the DTO does not model survives steps 1-2 (the decoder ignores
 /// it) and vanishes at step 3, so step 4 is what catches it. The same walk also
-/// catches an **asymmetric custom `Codable`** — an `encode(to:)` that does not
-/// mirror its `init(from:)` — which no decode-only test can see.
+/// catches an **asymmetric custom `Codable`**, an `encode(to:)` that does not
+/// mirror its `init(from:)`, which no decode-only test can see.
 ///
 /// ⛔ STRICT HERE, LENIENT IN THE FIELD. The runtime DTOs do no unknown-key
 /// rejection: a new server field must red CI, and must degrade to "ignored" on
@@ -56,7 +56,7 @@ public enum StrictDecodeVerifier {
     ///
     /// ⚠️ THE SELF-TEST ENTRY POINT. `StrictDecodeVerifierTests` drives
     /// deliberately-broken payloads through this so the gate is proven able to
-    /// FAIL — a gate that has only ever been seen passing is not evidence of
+    /// FAIL, a gate that has only ever been seen passing is not evidence of
     /// anything. `allowingExplicitNulls` is a parameter rather than a lookup so
     /// the allowlist mechanism can be exercised in both directions against
     /// payloads small enough to read, rather than only through the real entries,
@@ -229,8 +229,8 @@ public enum StrictDecodeVerifier {
             )
         }
         // ⚠️ ELEMENT-WISE, NOT SET-WISE. Rows of the same collection can and do
-        // carry different key sets — `district-room-token.json` versus its
-        // viewer twin is exactly that shape at the top level — so comparing a
+        // carry different key sets, `district-room-token.json` versus its
+        // viewer twin is exactly that shape at the top level, so comparing a
         // union of the elements' keys would let a DTO drop a key present in one
         // row as long as some other row happened to carry it.
         for (offset, element) in raw.enumerated() {
@@ -248,7 +248,7 @@ public enum StrictDecodeVerifier {
     /// What the recursive walk needs to carry but never changes.
     ///
     /// ⚠️ A STRUCT RATHER THAN THREE MORE PARAMETERS, because every one of the
-    /// three compare functions would otherwise take six — over SwiftLint's
+    /// three compare functions would otherwise take six, over SwiftLint's
     /// `function_parameter_count` ceiling, and past the point where a caller can
     /// see at a glance which argument is which.
     private struct ComparisonContext {
@@ -277,13 +277,13 @@ public enum StrictDecodeVerifier {
         guard let decoding = error as? DecodingError else { return String(describing: error) }
         switch decoding {
         case let .keyNotFound(key, context):
-            return "missing key `\(key.stringValue)` at \(pathText(context)) — \(context.debugDescription)"
+            return "missing key `\(key.stringValue)` at \(pathText(context)): \(context.debugDescription)"
         case let .typeMismatch(expected, context):
-            return "expected \(expected) at \(pathText(context)) — \(context.debugDescription)"
+            return "expected \(expected) at \(pathText(context)): \(context.debugDescription)"
         case let .valueNotFound(expected, context):
-            return "null where \(expected) was required at \(pathText(context)) — \(context.debugDescription)"
+            return "null where \(expected) was required at \(pathText(context)): \(context.debugDescription)"
         case let .dataCorrupted(context):
-            return "corrupted at \(pathText(context)) — \(context.debugDescription)"
+            return "corrupted at \(pathText(context)): \(context.debugDescription)"
         @unknown default:
             return String(describing: decoding)
         }

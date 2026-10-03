@@ -8,7 +8,7 @@ import Foundation
 // AND THEY DO NOT NARROW IT. `perform` stays public and stays the boundary: the
 // server owns the catalog, and nothing here re-implements a path, a verb or a
 // params schema. What a named method buys is the ONE thing `perform` genuinely
-// cannot check — that the op and the response type agree — which is a runtime
+// cannot check, that the op and the response type agree, which is a runtime
 // ``SchedulingAdminError/decoding(_:)`` at the generic call site and a compile
 // error here.
 //
@@ -21,7 +21,7 @@ import Foundation
 public extension SchedulingAdminRepository {
     // MARK: - The caller's own scheduler account
 
-    /// `me.get` — the signed-in member, as the scheduler knows them.
+    /// `me.get`, the signed-in member, as the scheduler knows them.
     ///
     /// ⚠️ `viewer`-LEVEL AND SELF-SCOPED. It answers for whoever holds the
     /// session, so there is no id to pass and no way to ask about somebody else.
@@ -29,7 +29,7 @@ public extension SchedulingAdminRepository {
         try await perform(.meGet, workspaceId: workspaceId, params: .object([]), as: SchedulingMe.self)
     }
 
-    /// `me.patch` — change some of the caller's own preferences.
+    /// `me.patch`, change some of the caller's own preferences.
     ///
     /// ⚠️ SPARSE, AND SPENDING THE **MEMBER** BUDGET RATHER THAN THE WORKSPACE'S.
     /// `me.*` writes come out of the 30-per-member-per-hour bucket, not the
@@ -39,7 +39,7 @@ public extension SchedulingAdminRepository {
         try await perform(.mePatch, workspaceId: workspaceId, params: update.params, as: SchedulingMe.self)
     }
 
-    /// `me.avatar.delete` — remove the caller's own picture.
+    /// `me.avatar.delete`, remove the caller's own picture.
     ///
     /// ⚠️ ANSWERS NOTHING, so the branding/avatar URL a screen is holding is stale
     /// the moment this returns. Re-read ``me(workspaceId:)``.
@@ -54,7 +54,7 @@ public extension SchedulingAdminRepository {
 
     // MARK: - Branding
 
-    /// `settings.branding.get` — the public booking page's look.
+    /// `settings.branding.get`, the public booking page's look.
     func branding(workspaceId: String) async throws -> SchedulingBranding {
         try await perform(
             .settingsBrandingGet,
@@ -64,11 +64,11 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `settings.branding.patch` — REPLACE the branding, every field at once.
+    /// `settings.branding.patch`, REPLACE the branding, every field at once.
     ///
     /// ⛔ NOT A SPARSE PATCH, WHICH IS WHY THE ARGUMENT IS A STRUCT WITH NO
     /// OPTIONALS. The fork decodes into non-pointer fields, so an omitted
-    /// `privacy_url` CLEARS it — the catalog makes all seven required precisely so
+    /// `privacy_url` CLEARS it, the catalog makes all seven required precisely so
     /// that cannot happen by accident, and a caller has to send back what the GET
     /// returned. See ``SchedulingBrandingUpdate``.
     func updateBranding(
@@ -119,7 +119,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `settings.storage.patch` — the one field it accepts.
+    /// `settings.storage.patch`, the one field it accepts.
     ///
     /// ⚠️ TURNING THIS ON DOES NOT MAKE RECORDING WORK. Read
     /// ``SchedulingStorageSettings/recordingsStorageReady`` back: an instance with
@@ -147,7 +147,7 @@ public extension SchedulingAdminRepository {
     /// `settings.notetaker.patch`.
     ///
     /// ⛔ ONE FIELD, AND THE SCHEMA IS `z.strictObject`. Anything else in the body
-    /// — `stt_api_key` above all — is a **400 naming the field**, which is the
+    /// `stt_api_key` above all, is a **400 naming the field**, which is the
     /// intended behaviour: silently accepting a credential a customer believes
     /// they set is the worse of the two failures.
     func setNotetakerEnabled(workspaceId: String, _ enabled: Bool) async throws -> SchedulingNotetakerSettings {
@@ -169,7 +169,7 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    /// `settings.llm.patch` — both fields optional, `z.strictObject` again.
+    /// `settings.llm.patch`, both fields optional, `z.strictObject` again.
     ///
     /// ⚠️ PASSING NEITHER SENDS `{}`, WHICH IS A VALID NO-OP AND NOT AN ERROR. The
     /// schema marks both fields optional, so the request is accepted and changes
@@ -177,7 +177,7 @@ public extension SchedulingAdminRepository {
     /// should decide not to send it rather than relying on the server to ignore it.
     ///
     /// - Parameter extraInstructions: capped at 4000 characters server-side.
-    ///   ⚠️ `""` CLEARS IT and nil LEAVES IT ALONE — the difference is an absent
+    ///   ⚠️ `""` CLEARS IT and nil LEAVES IT ALONE, the difference is an absent
     ///   key, which ``JSONValue/object(_:)`` produces by dropping the nil.
     func updateLLMSettings(
         workspaceId: String,
@@ -200,14 +200,14 @@ public extension SchedulingAdminRepository {
 ///
 /// ⛔ A STRUCT RATHER THAN TWELVE PARAMETERS, AND NOT ONLY FOR SwiftLint'S
 /// `function_parameter_count`. Twelve same-typed optionals at a call site is a
-/// shape where two arguments can be transposed silently — `notifyHostCancel` and
-/// `notifyCancellation` are one word apart and mean mail to two different people —
+/// shape where two arguments can be transposed silently, `notifyHostCancel` and
+/// `notifyCancellation` are one word apart and mean mail to two different people,
 /// and the compiler cannot object. Labelled properties make the transposition
 /// visible at the place it would be written.
 ///
 /// ⚠️ EVERY nil IS AN OMITTED KEY, NOT A CLEARED FIELD. ``JSONValue/object(_:)``
 /// drops nil pairs, and the fork's `me.patch` handler leaves an absent field
-/// alone — so a screen may send only what the user touched.
+/// alone, so a screen may send only what the user touched.
 public struct SchedulingMeUpdate: Equatable, Sendable {
     public var name: String?
     /// ⛔ THE WIRE FIELD IS `timezone` AND THE COLUMN IS `iana_timezone`. Sending

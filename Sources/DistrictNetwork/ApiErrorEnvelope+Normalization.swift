@@ -54,7 +54,7 @@ public extension ApiErrorEnvelope {
     /// string. `REGIONS_DEGRADED` is not a sentence and must never reach a screen.
     ///
     /// ⚠️ BLANK MEANS ABSENT (Kotlin `isBlank()` parity), but a non-blank value
-    /// is returned VERBATIM — including any surrounding whitespace. Trimming here
+    /// is returned VERBATIM, including any surrounding whitespace. Trimming here
     /// would make this client's copy differ from the Kotlin client's for the same
     /// bytes, and the two get compared in support threads.
     ///

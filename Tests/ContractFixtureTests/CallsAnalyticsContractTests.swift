@@ -8,7 +8,7 @@ import XCTest
 /// ⚠️ THE STRICT GATE AND THESE TESTS DO DIFFERENT JOBS AND BOTH ARE NEEDED.
 /// `StrictDecodeVerifier` proves the DTO's key set matches the server's exactly;
 /// it deliberately does not compare values. What it therefore cannot notice is a
-/// fixture being REGENERATED against thinner data — every key still present,
+/// fixture being REGENERATED against thinner data, every key still present,
 /// every awkward branch gone. These tests pin the branches each fixture is
 /// supposed to cover, so a regeneration that stopped exercising one fails here.
 final class CallsAnalyticsContractTests: XCTestCase {
@@ -27,8 +27,8 @@ final class CallsAnalyticsContractTests: XCTestCase {
         XCTAssertTrue(response.hasTranscript)
 
         // ⚠️ DECODED RATHER THAN CONSTRUCTED. The DTOs publish no memberwise
-        // initialiser — they are wire shapes, and a synthesised `internal` init
-        // is not reachable from this module anyway — so a synthetic branch is
+        // initialiser, they are wire shapes, and a synthesised `internal` init
+        // is not reachable from this module anyway, so a synthetic branch is
         // exercised the way the app would reach it.
         let empty = try decode(CallTranscriptResponse.self, from: #"{"success":true,"transcript":"   "}"#)
         XCTAssertFalse(empty.hasTranscript, "whitespace is not content")
@@ -93,7 +93,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
         // ⚠️ The room name embeds the call id, which is why nothing here mints one.
         XCTAssertTrue(response.roomName.hasSuffix(response.callId))
         XCTAssertFalse(response.token.isEmpty)
-        // ⛔ The TRUNK's deployment, used verbatim — not derived from the region.
+        // ⛔ The TRUNK's deployment, used verbatim, not derived from the region.
         XCTAssertTrue(response.url.hasPrefix("wss://"))
     }
 
@@ -116,7 +116,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
         XCTAssertFalse(lapsed.success)
         XCTAssertEqual(lapsed.code, ApiErrorCode.subscriptionInactive)
         // ⛔ DIAGNOSTIC ONLY. Which Stripe states count as delinquent is the
-        // server's decision, so nothing may branch on this — it is asserted here
+        // server's decision, so nothing may branch on this, it is asserted here
         // solely to prove the key is modelled, which is why this body needs its
         // own type instead of ApiErrorEnvelope.
         XCTAssertEqual(lapsed.status, "past_due")
@@ -154,7 +154,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
     /// ⛔ EVERY NUMBER IS THE SERVER'S AND NONE OF THEM MAY BE RE-DERIVED. The
     /// two traps pinned here are the ones that produce plausible wrong answers
     /// rather than obvious ones: `conversionRate` is already a percentage, and
-    /// `avgDuration` averages COMPLETED calls while `calls` counts all of them —
+    /// `avgDuration` averages COMPLETED calls while `calls` counts all of them,
     /// so a bucket with traffic and a zero average is correct, not corrupt.
     func testAnalyticsCarriesServerDerivedTotalsAndAFullTrendSeries() throws {
         let response = try StrictDecodeVerifier.verify(
@@ -194,7 +194,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
 
     /// ⛔ nil `pct` MEANS "New", NOT 0%. The fixture that pins it
     /// (`district-analytics-new-workspace.json`) carries an explicit null and so
-    /// cannot enter the strict gate without an allowlist decision — which is
+    /// cannot enter the strict gate without an allowlist decision, which is
     /// exactly why the branch is asserted on the type here rather than left to a
     /// fixture nobody can gate.
     func testCallVolumeDeltaSeparatesTheArrowFromThePercentage() throws {
@@ -207,7 +207,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
         XCTAssertFalse(response.callVolumeDelta.isNew)
 
         // A first-ever week: `up` with no baseline to be a percentage of. Both
-        // no-baseline rows are decoded from the exact bytes the route emits —
+        // no-baseline rows are decoded from the exact bytes the route emits,
         // `pct` as an explicit null, which is the shape the strict gate cannot
         // accept and the runtime parser must.
         let brandNew = try decode(
@@ -228,7 +228,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
 
     // ⚠️ THE `range` WINDOW IS NOT ASSERTED HERE. `AnalyticsRange` is a REQUEST
     // concern and lives in `DistrictNetwork`, where `RoomNameTests` already pins
-    // its three wire values — the contract this response side depends on is the
+    // its three wire values, the contract this response side depends on is the
     // BUCKETING those values imply (daily for 7d/30d, weekly for 90d), which is
     // why `EngagementPoint` documents it and nothing here assumes a series
     // length.
@@ -236,7 +236,7 @@ final class CallsAnalyticsContractTests: XCTestCase {
 
 /// Decode a literal body into a DTO.
 ///
-/// ⚠️ FOR SYNTHETIC BRANCHES ONLY — anything that models a real response goes
+/// ⚠️ FOR SYNTHETIC BRANCHES ONLY, anything that models a real response goes
 /// through `StrictDecodeVerifier` so the key set is checked too. This exists for
 /// the shapes a committed fixture cannot carry, notably an explicit `null` the
 /// no-nulls invariant would reject.

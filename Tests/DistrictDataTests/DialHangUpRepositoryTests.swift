@@ -9,13 +9,13 @@ import XCTest
 /// ⛔ THE DEFECT THESE EXIST FOR IS A BILL RATHER THAN AN ERROR. Ending a call
 /// locally is `Room.disconnect()`, which drops this device from the room and says
 /// nothing to the SIP participant, so the carrier leg goes on and goes on being
-/// billed — a call ended in under a second can bill roughly 90 seconds at the
+/// billed, a call ended in under a second can bill roughly 90 seconds at the
 /// carrier, with nothing failing anywhere.
 ///
 /// ⛔ ITS OWN FILE RATHER THAN MORE CASES IN `DialRepositoryTests.swift`, WHICH
 /// OPENS BY DECLARING "NO TEST HERE SENDS A SECOND REQUEST, AND NONE MAY BE ADDED".
-/// That rule is the dial's and is load bearing there — a second request rings a
-/// second telephone — and this route's rule is the exact opposite: it is idempotent
+/// That rule is the dial's and is load bearing there, a second request rings a
+/// second telephone, and this route's rule is the exact opposite: it is idempotent
 /// and is deliberately sent on endings that may have sent it already. Putting both
 /// under one header would leave the file's own invariant reading as false.
 final class DialHangUpRepositoryTests: XCTestCase {
@@ -67,7 +67,7 @@ final class DialHangUpRepositoryTests: XCTestCase {
 
     /// ⛔ `ended:false` IS A SUCCESS AND MUST NEVER READ AS A FAILED HANG-UP. It is
     /// the ordinary answer whenever the callee hung up first, and it is what a
-    /// second send of this idempotent route returns — which is a path the client
+    /// second send of this idempotent route returns, which is a path the client
     /// deliberately takes.
     func testEndedFalseIsAlreadyEndedRatherThanAFailure() async {
         let transport = RepositoryTransport(json: #"{"success":true,"ended":false}"#)
@@ -78,8 +78,8 @@ final class DialHangUpRepositoryTests: XCTestCase {
         XCTAssertNil(result.failureOnly)
     }
 
-    /// ⚠️ 404 IS INDISTINGUISHABLE FROM ANOTHER TENANT'S ID by design — the route
-    /// reads by id and checks ownership afterwards — so it says "we cannot end
+    /// ⚠️ 404 IS INDISTINGUISHABLE FROM ANOTHER TENANT'S ID by design, the route
+    /// reads by id and checks ownership afterwards, so it says "we cannot end
     /// this", never "that id was malformed".
     func testAMissingCallIsAnAnswerRatherThanAnError() async {
         let transport = RepositoryTransport(json: #"{"error":"Call not found"}"#, status: 404)

@@ -74,7 +74,7 @@ public enum SchedulingDeveloperFormat {
     ///
     /// ⛔ TWELVE-HOUR, WHICH IS INHERITED RATHER THAN CHOSEN AND IS THE ONE PLACE ON THIS
     /// SURFACE THAT IS. The web's `stamp` calls `formatInUserTimezone`, whose defaults set
-    /// `hour12: true` and which `stamp` does not override — so `Sep 12, 2026, 10:05 AM` is
+    /// `hour12: true` and which `stamp` does not override, so `Sep 12, 2026, 10:05 AM` is
     /// what a browser renders in these four columns while every other scheduling table
     /// renders a 24-hour clock. Measured from the source rather than assumed, and
     /// reproduced so the two clients agree.
@@ -86,7 +86,7 @@ public enum SchedulingDeveloperFormat {
     public static func stamp(
         _ value: String?,
         timezone: String,
-        absent: String = "—"
+        absent: String = "\u{2014}"
     ) -> String {
         guard let value, !value.isEmpty else { return absent }
         guard let date = WireInstant.parse(value) else { return "Unknown Date" }

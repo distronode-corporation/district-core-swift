@@ -90,7 +90,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
 
     /// ⛔ A REFUSAL FROM THE SCHEDULER IS A **200** ON THIS ROUTE TOO. It is not in
     /// the op catalog, yet it answers the catalog's envelope on purpose so both
-    /// surfaces share one failure vocabulary — and a client reading the status
+    /// surfaces share one failure vocabulary, and a client reading the status
     /// alone would report a rejected image as a successful upload.
     func testASchedulerRefusalIsATwoHundredCarryingOkFalse() async {
         let transport = RepositoryTransport(json: #"{"ok":false,"failure":"instance_unavailable","status":502}"#)
@@ -107,7 +107,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
     /// ⛔ `{ok:false}` WITH NO `failure` STRING IS STILL A REFUSAL AND MUST NOT
     /// DECODE AS A SUCCESS. The key is `.optional()` on the head, so a body that
     /// carried only the flag would satisfy a type whose every other field is
-    /// optional — which is the "reports an outage as an empty success" failure the
+    /// optional, which is the "reports an outage as an empty success" failure the
     /// envelope split exists to prevent. It lands on
     /// ``SchedulingAdminFailureCode/unknown``, the honest generic, rather than on a
     /// specific code this client cannot have inferred.
@@ -128,7 +128,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
     /// ``SchedulingAdminError/unknown`` DELIBERATELY. The five-code vocabulary has
     /// no "wrong file type" arm, and inventing a sixth here would make this client
     /// disagree with the browser about one refusal. ⚠️ The mitigation is on the way
-    /// IN — offer only the four accepted types — which is what makes the gap
+    /// IN, offer only the four accepted types, which is what makes the gap
     /// acceptable rather than merely tolerated.
     func testTheUploadsOwnRefusalsMapThroughTheSharedStatusVocabulary() async {
         let cases: [UploadRefusal] = [
@@ -152,8 +152,8 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
         }
     }
 
-    /// ⚠️ A NON-2xx WITH A BODY THAT IS NOT JSON AT ALL — a captive portal, an edge
-    /// error page — still has to map from the STATUS. The code defaults to "" and
+    /// ⚠️ A NON-2xx WITH A BODY THAT IS NOT JSON AT ALL, a captive portal, an edge
+    /// error page, still has to map from the STATUS. The code defaults to "" and
     /// the status decides.
     func testANonJsonRefusalStillMapsFromItsStatus() async {
         let transport = RepositoryTransport([
@@ -170,7 +170,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
     }
 
     /// ⛔ A **2xx THAT IS NEITHER ENVELOPE SHAPE** IS A CONTRACT WE CANNOT READ AND
-    /// IS NOT A RETRY — the same arm the RPC route takes.
+    /// IS NOT A RETRY, the same arm the RPC route takes.
     func testATwoHundredThatIsNotAnEnvelopeIsUnknownRatherThanADecodeError() async {
         let transport = RepositoryTransport(json: #"["not an envelope"]"#)
         do {
@@ -204,7 +204,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
 
     /// ⚠️ A REQUEST THAT NEVER PRODUCED A RESPONSE ARRIVES AS
     /// ``SchedulingAdminError/transport(_:)``, which carries the cause rather than
-    /// swallowing it — "offline" and "TLS rejected" need different diagnostics.
+    /// swallowing it, "offline" and "TLS rejected" need different diagnostics.
     func testATransportFailureCarriesItsCause() async {
         let transport = ThrowingTransport()
         do {
@@ -239,7 +239,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
 
     /// ⛔ `agency` AND `client` ONLY, WHICH IS STRICTER THAN THE OP THAT LISTS
     /// THESE. A viewer may see that a recording exists and may not take a copy of a
-    /// customer conversation away — so a row drawn from the list must not assume
+    /// customer conversation away, so a row drawn from the list must not assume
     /// this will answer.
     func testAViewerIsRefusedTheDownloadEvenThoughTheListAnswered() async {
         let transport = RepositoryTransport(json: #"{"error":"forbidden"}"#, status: 403)
@@ -272,7 +272,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
 
     /// ⛔ FOUR TYPES, AND **SVG IS NOT ONE OF THEM**. An SVG logo is the obvious
     /// thing to want and an SVG is a script-bearing document; the route answers 415
-    /// for it, which this client cannot word usefully — see the ⚠️ on `upload`.
+    /// for it, which this client cannot word usefully, see the ⚠️ on `upload`.
     func testTheAcceptedTypesAreTheForksFourAndExcludeSvg() {
         XCTAssertEqual(
             SchedulingUploadFile.acceptedMimeTypes,
@@ -286,7 +286,7 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
 /// One row of the upload's refusal table.
 ///
 /// ⚠️ A STRUCT RATHER THAN A THREE-MEMBER TUPLE, which SwiftLint's `large_tuple`
-/// refuses at two — and reasonably here, because `status` and `code` are both
+/// refuses at two, and reasonably here, because `status` and `code` are both
 /// stringly adjacent and a transposition in a tuple literal is invisible.
 private struct UploadRefusal {
     let status: Int

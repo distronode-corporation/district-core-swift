@@ -7,7 +7,7 @@ import XCTest
 // ⛔ THESE MIRROR `DistrictAuthCore`'s REAL TYPES FIELD FOR FIELD AND CASE FOR
 // CASE, AND THAT IS THE WHOLE VALUE OF THEM. `DistrictNetworkTests` cannot
 // import `DistrictAuthCore` (its target does not depend on it) and NOTHING on
-// the Linux tier compiles `App/`, where the real conformances are declared — the
+// the Linux tier compiles `App/`, where the real conformances are declared, the
 // app target reaches a compiler only on a macOS build. So
 // the conformances are rehearsed here against copies: if
 // `extension NativeTokenResponse: NativeAuthTokenWire {}` or
@@ -15,7 +15,7 @@ import XCTest
 // file stops compiling first.
 //
 // ⚠️ KEEP THEM IN STEP WITH THE ORIGINALS. A mirror that drifts still compiles
-// and proves nothing — see `NativeTokens.swift` and `RefreshClient.swift`.
+// and proves nothing, see `NativeTokens.swift` and `RefreshClient.swift`.
 
 /// Mirrors `DistrictAuthCore.NativeTokens`.
 struct MirrorTokens: Sendable, Equatable {
@@ -48,7 +48,7 @@ struct MirrorTokenResponse: Codable, Sendable, Equatable {
 /// `Sendable` and `tokens`, so there is no adapter to write and none to rot.
 extension MirrorTokenResponse: NativeAuthTokenWire {}
 
-/// Mirrors `DistrictAuthCore.RefreshResult` — the five cases, in its spelling.
+/// Mirrors `DistrictAuthCore.RefreshResult`, the five cases, in its spelling.
 enum MirrorRefreshResult: Sendable, Equatable {
     case success(MirrorTokens)
     case rejected
@@ -72,7 +72,7 @@ protocol MirrorRefreshClient: Sendable {
 /// generic client is the witness once `Refresh` is pinned.
 extension NativeAuthClient: MirrorRefreshClient where Refresh == MirrorRefreshResult {}
 
-/// Mirrors `DistrictAuthCore.RevokeDeferral` — four cases, in its spelling.
+/// Mirrors `DistrictAuthCore.RevokeDeferral`, four cases, in its spelling.
 ///
 /// ⚠️ `unexpected(status:)` KEEPS ITS ARGUMENT LABEL. The label is part of the
 /// requirement's name, so a mirror that dropped it would compile here and the
@@ -84,7 +84,7 @@ enum MirrorRevokeDeferral: Sendable, Equatable {
     case unexpected(status: Int)
 }
 
-/// Mirrors `DistrictAuthCore.RevokeOutcome` — TWO cases, deliberately. A
+/// Mirrors `DistrictAuthCore.RevokeOutcome`, TWO cases, deliberately. A
 /// sign-out has no "rejected": the local wipe is unconditional, so the only
 /// question is whether the credential still needs chasing.
 enum MirrorRevokeOutcome: Sendable, Equatable {
@@ -158,7 +158,7 @@ final class NativeAuthSeamTests: XCTestCase {
     /// `SignOutCoordinator`.
     ///
     /// ⚠️ THE 503 ROW IS THE ONE WORTH REHEARSING HERE rather than a 200,
-    /// because it is the case that carries a PAYLOAD across the seam — a bare
+    /// because it is the case that carries a PAYLOAD across the seam, a bare
     /// `accepted` would prove the static-var half and say nothing about
     /// `deferred(_:)`.
     func testTheClientSatisfiesTheRevokeClientSeamThroughAnExistential() async throws {

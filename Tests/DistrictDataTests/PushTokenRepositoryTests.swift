@@ -16,7 +16,7 @@ import XCTest
 ///
 /// ⛔ THE `platform` KEY IS ASSERTED ON THE BYTES, NOT INFERRED. The route's
 /// schema DEFAULTS it to `"android"`, so an omitted key is accepted and silently
-/// mislabels every row this client writes — and the server's push sender chooses the
+/// mislabels every row this client writes, and the server's push sender chooses the
 /// APNs payload from exactly that column. The failure is invisible from here: the
 /// registration succeeds and no push ever arrives.
 final class PushTokenRepositoryTests: XCTestCase {
@@ -104,8 +104,8 @@ final class PushTokenRepositoryTests: XCTestCase {
         XCTAssertNil(memory.lastRegisteredToken())
     }
 
-    /// ⚠️ A 401 IS THE SHAPE A REGISTER SENT TOO EARLY TAKES — before a sign-in
-    /// there is no bearer — which is exactly why `PushRegistrar` triggers on the
+    /// ⚠️ A 401 IS THE SHAPE A REGISTER SENT TOO EARLY TAKES, before a sign-in
+    /// there is no bearer, which is exactly why `PushRegistrar` triggers on the
     /// session gate reaching signed-in rather than at launch. It is carried
     /// through as a failure and remembers nothing.
     func testAnUnauthorizedRegisterFailsAndRemembersNothing() async {
@@ -121,7 +121,7 @@ final class PushTokenRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ A REQUEST THAT NEVER LEFT THE DEVICE IS NOT A REFUSAL. Push is a
-    /// courtesy channel, so this is reported and dropped rather than surfaced —
+    /// courtesy channel, so this is reported and dropped rather than surfaced,
     /// but it must not be recorded as a registration.
     func testATransportFailureOnRegisterRemembersNothing() async {
         let memory = RecordingPushTokenMemory()
@@ -308,7 +308,7 @@ final class PushTokenRepositoryTests: XCTestCase {
     /// ⛔ THE PATH FOR A SESSION THE SERVER ENDED. Nothing local ran, so nothing
     /// unregistered; without this the next account to sign in on the handset would
     /// find its own token remembered, skip the register, and never claim the
-    /// installation row — which is the server's UPSERT KEY, so the previous
+    /// installation row, which is the server's UPSERT KEY, so the previous
     /// account would keep receiving this device's notifications.
     ///
     /// ⛔ BOTH SLOTS, AND THE VOIP ONE IS THE EXPENSIVE ONE TO GET WRONG. A VoIP

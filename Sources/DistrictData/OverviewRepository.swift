@@ -16,7 +16,7 @@ public struct OverviewRepository: Sendable {
     ///
     /// ⛔ THE ENVELOPE GUARD IS THE WHOLE REASON THIS IS A REPOSITORY AND NOT A
     /// BARE CALL, AND TYPING THE RESPONSE DID NOT RETIRE IT. `OverviewResponse`
-    /// requires six keys, so an empty `{}` no longer decodes — but a body that
+    /// requires six keys, so an empty `{}` no longer decodes, but a body that
     /// carries all six and says `success: false` still would, and it would render
     /// as FOUR CONFIDENT ZEROS: a workspace that took a hundred calls this week
     /// reported as one that took none, with nothing anywhere reporting a problem.
@@ -28,8 +28,8 @@ public struct OverviewRepository: Sendable {
     /// look populated.
     ///
     /// - Parameter workspaceId: ⚠️ PASS IT. Nil is legal and makes the SERVER
-    ///   choose — it falls back to the first workspace of its own membership
-    ///   listing — and this client holds no selection cookie, so on a
+    ///   choose, it falls back to the first workspace of its own membership
+    ///   listing, and this client holds no selection cookie, so on a
     ///   multi-workspace account the server's fallback silently reports on the
     ///   wrong one. ``OverviewResponse/workspaceId`` echoes what actually
     ///   answered, which is what catches a local selection that has drifted.

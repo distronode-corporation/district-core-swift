@@ -16,8 +16,8 @@ import Foundation
 /// One person on a booking.
 ///
 /// ⛔ BOTH FIELDS ARE OPTIONAL AND THE SERVER SCHEMA IS WHY, not caution. The
-/// catalog's attendee object marks `name` and `email` `.optional()` — an
-/// attendee row from a booking page that asked for neither carries neither — so
+/// catalog's attendee object marks `name` and `email` `.optional()`, an
+/// attendee row from a booking page that asked for neither carries neither, so
 /// a non-optional here would throw on a legitimate booking rather than render a
 /// row with a blank.
 public struct SchedulingBookingAttendee: Codable, Sendable {
@@ -37,7 +37,7 @@ public struct SchedulingBookingAttendee: Codable, Sendable {
 ///
 /// ⛔ ONLY FIVE FIELDS ARE GUARANTEED, WHICH IS THE OPPOSITE OF HOW A BOOKING
 /// READS. `id`, `start_at`, `end_at` and `status` are the whole of what the
-/// schema requires; everything else — including the EVENT TYPE and the HOST — is
+/// schema requires; everything else, including the EVENT TYPE and the HOST, is
 /// `.optional()`. Row 1 of `district-scheduling-bookings.json` is that shape on
 /// purpose: a cancelled booking with four keys and nothing else, which is what a
 /// list built from a sparse index answers. A screen must be able to draw it.
@@ -99,9 +99,9 @@ public struct SchedulingBookingCounts: Codable, Sendable {
 /// One page of `bookings.list`.
 ///
 /// ⛔ READ THE ECHO, NOT YOUR REQUEST. `limit` and `offset` come back because the
-/// far end CLAMPS `limit` silently — the catalog refuses anything over 200 before
+/// far end CLAMPS `limit` silently, the catalog refuses anything over 200 before
 /// the request leaves us, but the scheduler may still return fewer than it was
-/// asked for — so a pager that advanced by the value it sent would skip rows.
+/// asked for, so a pager that advanced by the value it sent would skip rows.
 /// ⚠️ All four are `.optional()` in the schema and every one of them is absent on
 /// some real answer, so a pager has to survive their absence rather than assume
 /// the echo is always there.
@@ -121,8 +121,8 @@ public struct SchedulingBookingPage: Codable, Sendable {
 /// was not asked" by the ROW's presence rather than by the value.
 ///
 /// ⚠️ `type` IS THE QUESTION'S INPUT KIND (`select`, `text`, …) AND NOT THE
-/// ANSWER'S. Whatever the kind, `value` arrives as a string — a multi-select
-/// answer is pre-joined by the fork — so nothing here should branch on `type` to
+/// ANSWER'S. Whatever the kind, `value` arrives as a string, a multi-select
+/// answer is pre-joined by the fork, so nothing here should branch on `type` to
 /// decide how to DECODE. It decides how to LABEL.
 public struct SchedulingBookingAnswer: Codable, Sendable {
     public let questionId: String
@@ -145,7 +145,7 @@ public struct SchedulingBookingAnswer: Codable, Sendable {
 /// for a booking that has not happened yet, which is most bookings. A client that
 /// typed `content` non-null would throw on every future booking it opened.
 ///
-/// ⚠️ `status` IS THE GENERATION'S STATE, NOT THE BOOKING'S — `ready` when the
+/// ⚠️ `status` IS THE GENERATION'S STATE, NOT THE BOOKING'S, `ready` when the
 /// notes are final, `pending` while the notetaker is still working. It is the
 /// field that says whether `content` is worth showing yet, and it is NOT the same
 /// vocabulary as ``SchedulingBooking/status``.
@@ -167,7 +167,7 @@ public struct SchedulingBookingNotes: Codable, Sendable {
 ///
 /// ⛔ A THIRD SHAPE, AND IT IS NOT ``SchedulingBookingNotes`` WITH A NIL
 /// `updated_at`. The regenerate response has no `updated_at` KEY in its schema at
-/// all, so sharing the type would model a key the op never sends — harmless at
+/// all, so sharing the type would model a key the op never sends, harmless at
 /// runtime and a dropped/added-key report the moment anyone gates the fixture,
 /// which is exactly what the two separate fixtures here are for.
 ///
@@ -185,7 +185,7 @@ public struct SchedulingBookingNotesRegenerated: Codable, Sendable {
 ///
 /// ⚠️ SAME DISCRIMINATED SHAPE AS THE NOTES: `exists:false` and nothing else.
 /// ⛔ This is raw customer speech, so it belongs to the same class of data as the
-/// call recordings — the repository deliberately keeps it out of error text (see
+/// call recordings, the repository deliberately keeps it out of error text (see
 /// the ⛔ on `SchedulingAdminRepository.decode`), and anything logging a failure
 /// around this type must do the same.
 public struct SchedulingBookingTranscript: Codable, Sendable {

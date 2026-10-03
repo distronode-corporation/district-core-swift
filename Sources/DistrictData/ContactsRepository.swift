@@ -6,7 +6,7 @@ import Foundation
 public struct ContactsRepository: Sendable {
     /// ⚠️ INTERNAL RATHER THAN `private`, FOR THE REASON ``NumbersRepository/client``
     /// GIVES. `private` is FILE scope in Swift, so the extension in
-    /// `ContactsRepository+Blocking.swift` could not reach it — and the alternative
+    /// `ContactsRepository+Blocking.swift` could not reach it, and the alternative
     /// was a second repository type over the same contact rows, which
     /// `AppContainer`'s own ⚠️ warns is how a second `ApiClient`, and therefore a
     /// second `TokenRefreshCoordinator`, gets written by accident. Still
@@ -25,13 +25,13 @@ public struct ContactsRepository: Sendable {
     ///
     /// ⛔ DEDUPLICATION MATTERS MORE HERE THAN ANYWHERE ELSE. `bulk-create`
     /// inserts an entire import in one statement, so a window's worth of rows can
-    /// shift between two page loads — and the ordering is `createdAt desc` with
+    /// shift between two page loads, and the ordering is `createdAt desc` with
     /// `id` as a tie-break precisely because hundreds of rows share one
     /// `createdAt`.
     ///
     /// ⚠️ THE SERVER ECHOES the limit and offset it actually applied (it clamps
     /// a limit above 100, and replaces a non-positive one with its default). They
-    /// are not read here, because the pager advances by rows RECEIVED — which is
+    /// are not read here, because the pager advances by rows RECEIVED, which is
     /// the same number by construction and stays right if the clamp ever changes.
     public func pager(workspaceId: String) -> OffsetPager<Contact> {
         let client = client
@@ -52,7 +52,7 @@ public struct ContactsRepository: Sendable {
 
     /// One contact.
     ///
-    /// ⚠️ THE ID IS A QUERY PARAMETER ON THIS ROUTE, not a path segment — see
+    /// ⚠️ THE ID IS A QUERY PARAMETER ON THIS ROUTE, not a path segment, see
     /// ``DistrictEndpoints/contact(workspaceId:contactId:)``.
     ///
     /// ⚠️ POLL THIS AFTER AN ENRICHMENT. `contacts/enrich` answers 200 with
@@ -81,7 +81,7 @@ public struct ContactsRepository: Sendable {
 
     // ⚠️ EVERY ONE OF THESE EXCLUDES `viewer` SERVER-SIDE. Gate the controls on
     // ``WorkspaceRole/allowsMutation(_:)`` so a viewer is never offered an action
-    // that can only 403 — the gate is an affordance, and the server stays the
+    // that can only 403, the gate is an affordance, and the server stays the
     // authority.
 
     /// Create a contact, answering its new id.
@@ -92,13 +92,13 @@ public struct ContactsRepository: Sendable {
     ///
     /// ⚠️ A BLANK STRING IS NORMALISED TO AN ABSENT KEY. The route reads
     /// `typeof phoneNumber === "string" && phoneNumber.trim()`, so `""` is
-    /// already "no phone" to it — but `normalizeAddress("")` and a blank phone
+    /// already "no phone" to it, but `normalizeAddress("")` and a blank phone
     /// take different branches, and sending the empty strings a text field
     /// produces would make the client's own validation and the server's disagree
     /// about what was asked for. Normalising once, here, keeps them the same
     /// question.
     ///
-    /// ⚠️ A **409** IS A DUPLICATE, NOT A SERVER FAULT — one contact per phone
+    /// ⚠️ A **409** IS A DUPLICATE, NOT A SERVER FAULT, one contact per phone
     /// and per lowercased email per workspace. Surface the route's sentence.
     public func create(
         workspaceId: String,
@@ -182,7 +182,7 @@ public struct ContactsRepository: Sendable {
     /// ⛔ A **404 IS A SUCCESS HERE**, and it is the one place on this surface
     /// where a failure status is folded into the happy path. The route answers
     /// 404 when its `deleteMany` matched no row, which for a delete means the
-    /// contact is already gone — the outcome the caller asked for. Reporting it
+    /// contact is already gone, the outcome the caller asked for. Reporting it
     /// as a failure shows the operator an error they cannot act on beside a row
     /// that has, in fact, disappeared.
     ///
@@ -216,7 +216,7 @@ public struct ContactsRepository: Sendable {
     /// ⛔ A **403 IS USUALLY THE WORKSPACE OPT-IN, NOT THE CALLER'S ROLE**, and
     /// the body of that 403 is the product rather than boilerplate: it names the
     /// settings page that turns the feature on. This method passes the error
-    /// through UNTOUCHED so that sentence survives to the screen — replacing it
+    /// through UNTOUCHED so that sentence survives to the screen, replacing it
     /// with "you do not have permission" sends the operator hunting through their
     /// own account for a switch that lives on the workspace.
     ///
@@ -236,7 +236,7 @@ public struct ContactsRepository: Sendable {
     /// calling.
     ///
     /// ⛔ AFTERWARDS `dgiStatus` IS **NULL** AND NOTHING IS QUEUED. Re-read the
-    /// contact rather than optimistically stamping "pending" locally — that
+    /// contact rather than optimistically stamping "pending" locally, that
     /// pending would never resolve, because there is no job.
     ///
     /// ⚠️ UNLIKE ``delete(workspaceId:contactId:)``, A 404 IS NOT FOLDED INTO
@@ -254,7 +254,7 @@ public struct ContactsRepository: Sendable {
     /// A trimmed value, or nil when there is nothing left of it.
     ///
     /// ⚠️ NIL RATHER THAN `""`, because ``JSONValue/object(_:)`` drops a nil pair
-    /// and keeps an empty string — and on `contacts/create` an empty phone takes
+    /// and keeps an empty string, and on `contacts/create` an empty phone takes
     /// a different branch from an absent one.
     private static func present(_ value: String?) -> String? {
         guard let value else { return nil }

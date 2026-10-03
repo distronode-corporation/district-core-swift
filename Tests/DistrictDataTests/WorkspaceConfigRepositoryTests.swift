@@ -11,8 +11,8 @@ import XCTest
 /// JSON. Three of this surface's saves REPLACE their stored value wholesale, so the
 /// only thing standing between a bad read and a deleted tool allowlist is that this
 /// method refuses to answer `.success` with anything a form could mistake for a
-/// baseline. That makes the two drift cases below — a 200 whose `config` is null,
-/// and a 200 that does not affirm `success` — the most load-bearing tests in the
+/// baseline. That makes the two drift cases below, a 200 whose `config` is null,
+/// and a 200 that does not affirm `success`, the most load-bearing tests in the
 /// file, even though neither is a shape the healthy route emits.
 ///
 /// ⚠️ THE FIXTURE CORPUS PINS THE WIRE SHAPE AND THIS DOES NOT.
@@ -74,7 +74,7 @@ final class WorkspaceConfigRepositoryTests: XCTestCase {
 
     /// ⛔ NO `config` KEY IS CONTRACT DRIFT AND MUST NOT BECOME AN EMPTY FORM. The
     /// route always emits it on the success path, so nil is a shape change rather
-    /// than a state — and answering `.success` with nothing in hand would hand a
+    /// than a state, and answering `.success` with nothing in hand would hand a
     /// mutation form exactly the blank baseline this read exists to prevent.
     func testASuccessCarryingNoConfigIsReportedAsDriftRatherThanAnEmptyForm() async {
         let transport = RepositoryTransport(json: #"{"success":true,"config":null}"#)
@@ -136,7 +136,7 @@ final class WorkspaceConfigRepositoryTests: XCTestCase {
     """#
 
     /// ⚠️ EVERY OPTIONAL NULL AT ONCE, which is the shape a workspace nobody has
-    /// configured genuinely has — the route nulls a missing optional rather than
+    /// configured genuinely has, the route nulls a missing optional rather than
     /// dropping its key.
     private static let sparse = #"""
     {"success":true,"config":{

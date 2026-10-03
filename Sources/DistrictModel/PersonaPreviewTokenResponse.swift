@@ -1,6 +1,6 @@
 import Foundation
 
-/// `POST /api/district/workspace/persona/preview-token` — the credential for one
+/// `POST /api/district/workspace/persona/preview-token`, the credential for one
 /// persona audition.
 ///
 /// ⛔ A REAL, BILLED CALL AND NOT A DRY RUN. The token invites the voice agent into
@@ -11,8 +11,8 @@ import Foundation
 ///
 /// ⛔ ``url`` IS THE SERVER'S CHOICE OF MEDIA NODE AND IS USED VERBATIM, for the
 /// reason ``RoomTokenResponse/url`` states at length: the room exists only on the
-/// deployment that created it, and a URL derived from the workspace's region — or
-/// from a constant — joins a bus that has never heard of the room. Here it is
+/// deployment that created it, and a URL derived from the workspace's region, or
+/// from a constant, joins a bus that has never heard of the room. Here it is
 /// derived from the WORKSPACE's region server-side, precisely so an EU customer is
 /// not auditioning their agent through the US node.
 ///
@@ -34,7 +34,7 @@ public struct PersonaPreviewTokenResponse: Codable, Sendable, Equatable {
     /// ⛔ `preview_<workspaceId>_<uuid>`, MINTED SERVER-SIDE AND NEVER REBUILT. The
     /// agent branches on the `preview_` prefix to read the persona out of the token
     /// metadata instead of the stored row, so a name a client invented would be
-    /// answered by the SAVED persona — the opposite of what the screen promises.
+    /// answered by the SAVED persona, the opposite of what the screen promises.
     public let roomName: String
     /// The room's shared encryption passphrase.
     ///
@@ -42,7 +42,7 @@ public struct PersonaPreviewTokenResponse: Codable, Sendable, Equatable {
     /// the base64 TEXT of 32 random bytes and it is tempting to read "base64" as an
     /// instruction: every LiveKit SDK UTF-8-encodes this string and runs PBKDF2
     /// over those ASCII bytes, so decoding to raw bytes selects a different
-    /// derivation and a different AES key. The failure mode is not an error — both
+    /// derivation and a different AES key. The failure mode is not an error, both
     /// sides join, both publish, and every track is undecryptable noise. The voice
     /// agent is bound by the same rule (`district-voice-agent/src/e2ee.py`). The
     /// type is shared with ``RoomTokenResponse``, which carries the argument in
@@ -52,7 +52,7 @@ public struct PersonaPreviewTokenResponse: Codable, Sendable, Equatable {
     /// Optional is a refusal to crash rather than a documented second shape: a
     /// `preview_*` room is always encrypted (browser-to-agent, no SIP leg, no
     /// avatar). ⚠️ So an ABSENT key here is not "join unencrypted" the way it is on
-    /// `calls/token` — it is the server failing to derive one, and a client that
+    /// `calls/token`, it is the server failing to derive one, and a client that
     /// joined anyway would be the only unencrypted participant in a room everyone
     /// else encrypted, hearing and publishing noise.
     public let e2ee: E2EEInfo?

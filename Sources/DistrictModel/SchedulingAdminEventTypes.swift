@@ -12,13 +12,13 @@ import Foundation
 // CONVERTED. These rows pass THROUGH our RPC from a scheduler fork that is not
 // ours; every other DTO in this package mirrors a Distronode route and is
 // camelCase. ⛔ Reaching for `.convertFromSnakeCase` on the shared decoder to
-// "fix" it would re-map the whole District surface to chase this one family —
+// "fix" it would re-map the whole District surface to chase this one family,
 // ``ApiClient`` uses a plain `JSONDecoder` for every route in the client.
 
 // ⛔ ``SchedulingItems`` IS **NOT** DECLARED HERE. The catalog's
 // `items = (schema) => z.object({ items: z.array(schema) })` wrapper is shared
 // across namespaces, and it is declared once in `SchedulingAdminDeveloper.swift`.
-// A second copy beside the event types would not be a tidier home for it — two
+// A second copy beside the event types would not be a tidier home for it, two
 // types of one name in one module do not compile, and the near-miss (a
 // `SchedulingEventTypeList` sitting beside a `SchedulingItems`) would give this
 // one family a private envelope that drifts from the one every other list uses.
@@ -31,7 +31,7 @@ import Foundation
 /// ⛔ THIRTY-THREE FIELDS, AND THE TWO THAT ARE MISSING ARE MISSING ON PURPOSE.
 /// The fork returns `price_cents` and `currency`; `admin-ops.ts` strips both from
 /// the response schema and REFUSES them on the way in, because a dashboard that
-/// rendered them would be advertising paid bookings — a feature this platform
+/// rendered them would be advertising paid bookings, a feature this platform
 /// does not sell to a tenant and cannot settle money for. Adding either here
 /// would not make them arrive; it would make this type disagree with the
 /// allowlist that governs what does.
@@ -40,13 +40,13 @@ import Foundation
 /// INTERCHANGEABLE. `id`, `slug`, `name` and `duration_minutes` are always
 /// present. A second group (`slot_interval_minutes`, the four `buffer`/`notice`/
 /// `max` numbers, the three flags, `created_at`, `routing_mode`, `rr_strategy`,
-/// `archived`, `owned` and the two `owner_*` fields) is OPTIONAL on the wire —
+/// `archived`, `owned` and the two `owner_*` fields) is OPTIONAL on the wire,
 /// the key is absent, not null, because the fork marshals them with `omitempty`
 /// or the handler does not join the owner at all. The third group (`description`,
 /// `location_value`, the five `msg_*`, the four `subj_*` and `reminders`) arrives
 /// as an EXPLICIT NULL: those are nullable columns and Go marshals a nil without
 /// `omitempty`. Swift spells all three `Optional`, which is why the contract gate
-/// carries per-path null permission rather than a per-type waiver — see
+/// carries per-path null permission rather than a per-type waiver, see
 /// `AllowedExplicitNulls+SchedulingA.swift`.
 ///
 /// ⚠️ `location_value` IS POLYMORPHIC AND THE TYPE CANNOT SAY SO. The same column
@@ -64,7 +64,7 @@ public struct SchedulingEventType: Codable, Equatable, Sendable {
     public let slotIntervalMinutes: Int?
     /// ⚠️ A RAW STRING, NOT ``SchedulingLocationType``. The fork's own CHECK
     /// constraint is wider than the catalog's allowlist (it accepts `zoom`), so a
-    /// row can legitimately carry a value this build does not offer — and a
+    /// row can legitimately carry a value this build does not offer, and a
     /// non-optional enum here would fail the whole read rather than the one field.
     public let locationType: String?
     /// ⚠️ NULLABLE, and polymorphic. See the type doc.
@@ -97,7 +97,7 @@ public struct SchedulingEventType: Codable, Equatable, Sendable {
     ///
     /// ⚠️ NULL RATHER THAN `[]` WHEN UNSET: the fork declares it `[]int` with no
     /// `omitempty`, so a nil slice marshals as `null`. ⛔ And null is NOT the same
-    /// as an empty array here — an empty array is "the operator turned every
+    /// as an empty array here, an empty array is "the operator turned every
     /// reminder off", which the patch op can set and the read must not conflate
     /// with "never configured".
     public let reminders: [Int]?

@@ -4,17 +4,17 @@ import Foundation
 // ENVELOPES IN THIS FILE. `GET /api/district/workspace/usage` answers
 // `{success, usage: UsageMonth|null}` for the current month and
 // `{success, usage: UsageMonth[]}` when asked for `history=true`. No single
-// Codable field can be both, and the type that tried — an opaque carrier on the
-// key, branched on at the call site — would only move the decision somewhere with
+// Codable field can be both, and the type that tried, an opaque carrier on the
+// key, branched on at the call site, would only move the decision somewhere with
 // no compiler help. The Kotlin client splits them the same way, for the same
 // reason; see `UsageResponse.kt`.
 
-/// `GET /api/district/workspace/usage?workspaceId=` — this month's metered usage.
+/// `GET /api/district/workspace/usage?workspaceId=`, this month's metered usage.
 ///
 /// ⛔ ``usage`` IS NULL WHEN THE MONTH HAS NO METERING ROWS AT ALL, AND NULL IS NOT
 /// ZERO. `getUsage` returns `null` the moment its `groupBy` comes back empty, so a
 /// screen that rendered it as a column of zeros would state, with the authority of
-/// a billing figure, that a workspace sent no messages and placed no calls — a
+/// a billing figure, that a workspace sent no messages and placed no calls, a
 /// claim nothing ever measured. "No usage has been recorded yet" is checkable; a
 /// fabricated zero beside a billing label is what becomes a support ticket.
 ///
@@ -32,7 +32,7 @@ public struct UsageResponse: Codable, Sendable {
 /// ⚠️ AN EMPTY ARRAY IS "NOTHING HAS EVER BEEN METERED", NOT A FAILURE AND NOT A
 /// SHORT PAGE. `getUsageHistory` walks back one month at a time and appends only
 /// the months that had rows, so a workspace nobody has metered answers `[]` on a
-/// 200 — the list equivalent of the null above.
+/// 200, the list equivalent of the null above.
 ///
 /// ⚠️ SHORTER THAN ASKED FOR IS ORDINARY for the same reason, and the server also
 /// clamps `months` to 1...24 and falls back to 6 for a non-numeric value. Nothing
@@ -57,7 +57,7 @@ public struct UsageHistoryResponse: Codable, Sendable {
 ///
 /// ⛔ AND THEY ARE `Double`, NOT `Int`. `ProviderUsage.amount` is summed as a float
 /// server-side, so call minutes genuinely arrive fractional (`1204.25` in the
-/// committed fixture). An `Int` here fails to decode that outright — and the
+/// committed fixture). An `Int` here fails to decode that outright, and the
 /// obvious "fix", rounding, would round a bill.
 ///
 /// ⚠️ ``month`` IS THE ONLY REQUIRED KEY, and it is required rather than defaulted
@@ -66,7 +66,7 @@ public struct UsageHistoryResponse: Codable, Sendable {
 /// sparse.
 public struct UsageMonth: Codable, Sendable {
     /// `YYYY-MM`, built from UTC month boundaries. ⛔ A CALENDAR KEY, NOT AN INSTANT
-    /// — parsing it into a date and formatting it back is how a month silently
+    /// parsing it into a date and formatting it back is how a month silently
     /// shifts by one for a reader west of UTC.
     public let month: String
     /// The carrier or vendor the rows were metered against (`twilio`, `tavus`).

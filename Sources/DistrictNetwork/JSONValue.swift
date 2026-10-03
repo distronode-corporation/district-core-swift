@@ -5,7 +5,7 @@ import Foundation
 /// ⛔ THIS EXISTS BECAUSE THE REQUEST BODIES ON THIS SURFACE ARE NOT DTOs YET AND
 /// THE WIRE RULE IS STRICTER THAN `Encodable`'S DEFAULT. Kotlin encodes every
 /// body through `Json { explicitNulls = false }`, so a null field is **omitted**
-/// rather than sent as an explicit null — and that is load-bearing on at least
+/// rather than sent as an explicit null, and that is load-bearing on at least
 /// four routes:
 ///
 ///   - `contacts/update` treats an explicit null as "clear this column" and an
@@ -147,7 +147,7 @@ extension JSONValue: Codable {
 public enum JSONWire {
     /// ⚠️ `sortedKeys` SO THE BYTES ARE DETERMINISTIC. Swift's dictionary order
     /// is seeded per process, so without this the same body encodes differently
-    /// on every run — which makes a byte-exact assertion in the endpoint table
+    /// on every run, which makes a byte-exact assertion in the endpoint table
     /// flaky rather than wrong, i.e. the worst kind of test.
     public static func encode(_ value: JSONValue) throws -> Data {
         let encoder = JSONEncoder()

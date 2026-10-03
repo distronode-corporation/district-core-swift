@@ -6,7 +6,7 @@ import Foundation
 /// ⛔ THREE STATES, AND AN `Optional<String>` CANNOT EXPRESS THEM. The route
 /// distinguishes ABSENT ("leave it alone"), a string ("store this") and an explicit
 /// NULL ("clear it, and fall back to the workspace name"), and ``JSONValue/object(_:)``
-/// drops a nil pair by design — so a nil `String?` here would silently mean "leave it
+/// drops a nil pair by design, so a nil `String?` here would silently mean "leave it
 /// alone" at the one call site whose whole purpose is to clear the value.
 ///
 /// ⛔ THIS IS THE FIRST AND ONLY USER OF `JSONValue`'S EXPLICIT-NULL ESCAPE HATCH.
@@ -16,7 +16,7 @@ import Foundation
 ///
 /// ⚠️ AN EMPTY STRING WOULD ALSO CLEAR IT, and relying on that would be a mistake to
 /// inherit. The route's schema is `.string().trim().max(80).transform(v => v || null)`,
-/// so `"  "` reaches the column as null today — but that is a coincidence of the
+/// so `"  "` reaches the column as null today, but that is a coincidence of the
 /// transform rather than the contract, and ``clear`` says what is meant.
 public enum DeskBrandName: Sendable, Equatable {
     /// Store this name. ⚠️ Trimmed and bounded at 80 server-side; over-length is a 400.
@@ -79,7 +79,7 @@ public struct DeskTicketDraft: Sendable, Equatable {
 /// INCLUDING THE MULTIPART UPLOAD AND THE THREE THAT ALSO HAVE BODIES. All nine
 /// routes read `new URL(req.url).searchParams.get("workspaceId")` and hand it to
 /// `requireWorkspaceRole` before anything else runs. Putting it in the body instead
-/// — which is what `scheduling/enable` does, one file over — leaves the guard with
+/// which is what `scheduling/enable` does, one file over, leaves the guard with
 /// null and the request is refused before the handler is reached, while the body
 /// looks entirely correct.
 ///
@@ -89,7 +89,7 @@ public struct DeskTicketDraft: Sendable, Equatable {
 /// correspondence about them, and a viewer seat exists to watch operations, which is
 /// different in kind. The server's own comment says that if a viewer ever needs to
 /// know a queue exists, the answer is a count endpoint rather than widening these.
-/// So the ENTRY POINT must be hidden for a viewer, not merely captioned — the same
+/// So the ENTRY POINT must be hidden for a viewer, not merely captioned, the same
 /// call ``workspaceConfig(workspaceId:)`` makes.
 ///
 /// ⚠️ NOTHING HERE IS BILLABLE AND NOTHING HERE IS IRREVERSIBLE, which is worth
@@ -121,7 +121,7 @@ public extension DistrictEndpoints {
     /// Change one or more desk settings.
     ///
     /// ⛔ SEND ONLY WHAT CHANGED. This is a PATCH and the route merges per field, so an
-    /// omitted key is PRESERVED — and a client that posted its whole form state would
+    /// omitted key is PRESERVED, and a client that posted its whole form state would
     /// make this screen the writer of values it may have read before another tab
     /// changed them. That is the `blank_form_overwrites_config` shape: a form saved
     /// after a failed load writing blanks over live configuration. The nil-dropping in
@@ -139,7 +139,7 @@ public extension DistrictEndpoints {
     /// workspace member point their own customers' page at any image on the internet,
     /// with our domain's reputation attached.
     ///
-    /// ⚠️ IT ECHOES THE WHOLE STORED ROW, so this write needs no re-read — and the echo
+    /// ⚠️ IT ECHOES THE WHOLE STORED ROW, so this write needs no re-read, and the echo
     /// is what must be adopted, never the values that were sent.
     static func saveDeskSettings(
         workspaceId: String,
@@ -228,7 +228,7 @@ public extension DistrictEndpoints {
     ///
     /// ⚠️ THE `status` FILTER IS OPTIONAL AND A SCREEN SHOWING COUNTS SHOULD NOT USE
     /// IT. Every filter chip on the web carries a count, so filtering server-side would
-    /// mean four requests to draw one row of chips — and the counts could then disagree
+    /// mean four requests to draw one row of chips, and the counts could then disagree
     /// with each other between responses. Read the queue whole and filter locally; the
     /// parameter exists for a caller that genuinely wants one slice.
     ///
@@ -252,7 +252,7 @@ public extension DistrictEndpoints {
                 ApiQueryItem("workspaceId", workspaceId),
                 // ⚠️ A nil is DROPPED rather than sent empty. `status=` present-and-empty
                 // is not in the route's vocabulary, so it would fall through to "no
-                // filter" — the same answer by accident rather than by contract.
+                // filter", the same answer by accident rather than by contract.
                 ApiQueryItem("status", status),
             ]
         )
@@ -310,7 +310,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ THE FIELD IS `message`. The route's schema is `z.object({ message })`, so a
     /// body spelled `body` parses to nothing and every reply 400s with "A message is
-    /// required" — while the adjacent SUPPORT desk's reply takes exactly `body`. Two
+    /// required", while the adjacent SUPPORT desk's reply takes exactly `body`. Two
     /// surfaces one word apart, and the failure is a plausible-looking request that
     /// never lands.
     ///
@@ -318,15 +318,15 @@ public extension DistrictEndpoints {
     /// IS WHY THIS IS PINNED BY A TEST RATHER THAN BY THIS COMMENT. It contains the
     /// word `body` twice and NEITHER is the request field: one is the local holding
     /// the parsed request, the other passes `body: parsed.data.message` into the
-    /// internal `replyToDeskTicket` call — an INTERNAL parameter name, on the far side
+    /// internal `replyToDeskTicket` call, an INTERNAL parameter name, on the far side
     /// of the schema. A reader grepping it for "body" finds both, in plausible
     /// positions, and concludes the opposite of the truth. `EndpointTable+Desk` asserts the serialised bytes and
     /// `EndpointSurfaceTests` asserts them again, so an edit that "harmonises" the two
     /// desks fails a test instead of shipping a silent 400.
     ///
     /// ⛔ THE AUTHOR TYPE IS FIXED TO `team` SERVER-SIDE AND IS NOT A PARAMETER. It
-    /// decides three things at once — the status transition, whether the customer is
-    /// emailed, and how the message is attributed in the thread — so accepting it from
+    /// decides three things at once, the status transition, whether the customer is
+    /// emailed, and how the message is attributed in the thread, so accepting it from
     /// the wire would let a caller post a message attributed to their own customer and
     /// suppress the notification while doing it.
     ///
@@ -361,7 +361,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ THE ROUTE VALIDATES WITH `z.enum(DESK_TICKET_STATUSES)`, SO AN UNRECOGNISED
     /// VALUE IS A **400** RATHER THAN A STORED ONE. The column behind it is plain
-    /// `TEXT` — chosen so adding a state never needs a migration on four databases —
+    /// `TEXT`, chosen so adding a state never needs a migration on four databases,
     /// which makes that enum the only thing standing between a typo and a permanent,
     /// unfilterable status on a customer's ticket. ⚠️ The closed vocabulary is
     /// enforced one tier up, at ``DeskRepository``, exactly as

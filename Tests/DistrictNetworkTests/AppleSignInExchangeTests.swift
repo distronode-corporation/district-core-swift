@@ -14,7 +14,7 @@ import XCTest
 /// token, so nothing downstream would say which it was.
 final class AppleSignInExchangeTests: XCTestCase {
     /// One row of the status map. ⚠️ A STRUCT RATHER THAN A TUPLE, which SwiftLint
-    /// caps at two members — and it earns the type by carrying its own source line,
+    /// caps at two members, and it earns the type by carrying its own source line,
     /// so a failing row names itself instead of naming the loop.
     private struct Row {
         let status: Int
@@ -51,7 +51,7 @@ final class AppleSignInExchangeTests: XCTestCase {
         )
 
         /// ⚠️ A THREE-SEGMENT PLACEHOLDER, NOT A REAL TOKEN. Nothing on this tier
-        /// parses it — the server does, against Apple's JWKS — so a value that
+        /// parses it, the server does, against Apple's JWKS, so a value that
         /// merely looks like a JWS is the honest fixture.
         static let request = AppleNativeSignInRequest(
             identityToken: "header.payload.signature",
@@ -67,10 +67,10 @@ final class AppleSignInExchangeTests: XCTestCase {
 
     // ── The status map ───────────────────────────────────────────────────────
 
-    /// ⛔ STATUS BY STATUS, READ OFF THE ROUTE. Every refusal it can make — a
+    /// ⛔ STATUS BY STATUS, READ OFF THE ROUTE. Every refusal it can make, a
     /// signature that does not verify, a wrong audience, an expired token, a
     /// nonce mismatch, an unresolvable subject, an address whose verification
-    /// was withdrawn — is the SAME opaque 400, and all of them mean "start the
+    /// was withdrawn, is the SAME opaque 400, and all of them mean "start the
     /// sign-in over".
     ///
     /// ⚠️ A 200 THIS BUILD CANNOT PARSE IS AMBIGUOUS, NOT A REFUSAL: the server

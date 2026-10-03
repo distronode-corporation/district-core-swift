@@ -6,7 +6,7 @@ import Foundation
 /// ONLY THING IN THIS FILE THAT IS EASY TO GET WRONG. `workspace/call-handling`
 /// is a WORKSPACE setting: every member sees the same value and a mutator
 /// changes it for all of them. `workspace/availability` is a fact about the
-/// CALLER'S OWN membership row — the PATCH takes no email and no user id, so
+/// CALLER'S OWN membership row, the PATCH takes no email and no user id, so
 /// there is no way to express "set someone else's availability" and no UI may
 /// imply otherwise.
 ///
@@ -31,7 +31,7 @@ public extension DistrictEndpoints {
     /// for. ⛔ Do not re-normalise on top of that: a client that clamped again
     /// would be a second opinion about a value the server has already settled.
     ///
-    /// ⚠️ IT ADMITS `viewer` WHILE THE PATCH DOES NOT — the opposite split from
+    /// ⚠️ IT ADMITS `viewer` WHILE THE PATCH DOES NOT, the opposite split from
     /// `workspace/config`, whose read excludes them because it carries staff
     /// transfer numbers. Nothing here is a phone number, so the screen shows a
     /// viewer the real setting read-only rather than being hidden.
@@ -53,7 +53,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ AN UNKNOWN MODE OR AN OUT-OF-RANGE RING IS A **400**, NOT A COERCED
     /// VALUE. The read normalises what is STORED; the write validates what
-    /// ARRIVES, and those are deliberately not the same rule — a stored value
+    /// ARRIVES, and those are deliberately not the same rule, a stored value
     /// predating the vocabulary must still be displayable, while a client sending
     /// one must be told it is wrong. Send ``CallHandling`` and
     /// ``CallHandling/clampRing(_:)`` rather than free values.
@@ -91,7 +91,7 @@ public extension DistrictEndpoints {
     /// ``AvailabilityReason``.
     ///
     /// ⚠️ A VIEWER GETS `false` WITH `reason: "role"` AND NO DATABASE READ. It is
-    /// a real answer rather than a refusal, so this route never 403s for a role —
+    /// a real answer rather than a refusal, so this route never 403s for a role,
     /// which means a screen must render the reason instead of assuming a 200
     /// carries a toggleable value.
     static func availability(workspaceId: String) -> ApiRequestDescriptor {

@@ -7,7 +7,7 @@ import XCTest
 /// ⛔ THE DEFECT GUARDED: ending a direct softphone call with `Room.disconnect()`
 /// and nothing else removes this device from the room and leaves the SIP
 /// participant in it. The telephone at the far end goes on ringing or talking to an
-/// empty room, and the carrier goes on billing — a call ended in under a second can
+/// empty room, and the carrier goes on billing, a call ended in under a second can
 /// bill roughly 90 seconds. Nothing throws, nothing logs, and every screen says the
 /// call is over.
 ///
@@ -118,7 +118,7 @@ final class SoftphoneServerLegTests: XCTestCase {
     /// ``SoftphoneCommand/reportCallEnded`` DOES NOT APPLY HERE. That one is split
     /// on whether CallKit performed the ending itself; the SERVER performed none of
     /// them. `remoteHungUp` is the one case where the leg may genuinely be down
-    /// already, and the route answers `{ended: false}` for that at no cost —
+    /// already, and the route answers `{ended: false}` for that at no cost,
     /// whereas `failed` and `remoteEnded` mean OUR socket died, which says nothing
     /// at all about the telephone.
     func testEveryEndingWithAKnownIdAsksTheServerToEndTheLeg() {
@@ -138,7 +138,7 @@ final class SoftphoneServerLegTests: XCTestCase {
     }
 
     /// ⛔ LAST IN THE LIST, ALWAYS. The two commands before it are local and
-    /// instant — the OS is told, the socket is closed — and this one is a network
+    /// instant, the OS is told, the socket is closed, and this one is a network
     /// round trip that the App tier performs from the same ordered list. Emitting it
     /// first would let an implementation that awaited it hold the system's call UI
     /// open for the length of a timeout on a call the operator has finished with.

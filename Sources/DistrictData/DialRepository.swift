@@ -25,7 +25,7 @@ import Foundation
 /// ⛔ NOTHING HERE CARRIES THE 402's `status` FIELD, AND THAT IS THE POINT OF
 /// LEAVING IT OUT. ``SubscriptionInactiveError/status`` is modelled because a
 /// committed fixture proves the key exists, and its own doc forbids branching on
-/// it — which Stripe states count as delinquent is the server's decision. Lifting
+/// it, which Stripe states count as delinquent is the server's decision. Lifting
 /// it into an outcome a screen can see is how a client ends up deciding for
 /// itself, so the repository never decodes that type.
 ///
@@ -85,10 +85,10 @@ public enum DialOutcome: Sendable {
 /// gate-pinned wire DTOs and conforming one to make an assertion terser would be
 /// the tail wagging the dog; this enum carries no payload at all.
 public enum HangUpOutcome: Sendable, Equatable {
-    /// 200 `{"ended": true}` — this request tore the room down.
+    /// 200 `{"ended": true}`, this request tore the room down.
     case ended
 
-    /// 200 `{"ended": false}` — the call was already gone.
+    /// 200 `{"ended": false}`, the call was already gone.
     ///
     /// ⛔ NOT A FAILURE, AND THE COMMON CASE ON TWO OF THE FOUR PATHS THAT SEND
     /// THIS. A callee who hangs up first, and a media failure that is reported
@@ -106,7 +106,7 @@ public enum HangUpOutcome: Sendable, Equatable {
     /// ⛔ UNREACHABLE FROM THIS CLIENT TODAY AND MODELLED ANYWAY. The only caller
     /// is ``SoftphoneSession``, whose id can only have come from
     /// ``DialResponse/callId``, so a 409 here would mean the server had reclassified
-    /// a call this app placed — a contract fact worth seeing in a log rather than
+    /// a call this app placed, a contract fact worth seeing in a log rather than
     /// folding into a generic failure.
     case notDirectCall
 }
@@ -125,10 +125,10 @@ public enum HangUpOutcome: Sendable, Equatable {
 /// that is already happening.
 ///
 /// ⛔ NO RETRY MAY BE ADDED TO ``dial(workspaceId:to:)``, at this layer or above
-/// it. Every other write on this surface is safe to re-send — a duplicate member
+/// it. Every other write on this surface is safe to re-send, a duplicate member
 /// add is a 409, a duplicate draft save overwrites, and ``hangUp(workspaceId:
 /// callId:)`` next door is idempotent BY DESIGN and is deliberately sent on paths
-/// that may have sent it already — and this one places a second call,
+/// that may have sent it already, and this one places a second call,
 /// bills for it, and rings the callee again. ⚠️ The property is a property of
 /// the DIAL, not of the type: the file holds a second write with the opposite
 /// rule. ``ApiClient`` does not retry either,
@@ -141,7 +141,7 @@ public enum HangUpOutcome: Sendable, Equatable {
 /// THIS FILE MAKES. `POST /api/district/calls/dial` answers an opted-out number
 /// with `{success:false, error}` at 403 and nothing machine-readable. The Kotlin
 /// client concluded that it is therefore indistinguishable from the role refusal
-/// the same route can emit, and folded both into its catch-all — correctly, for
+/// the same route can emit, and folded both into its catch-all, correctly, for
 /// that client: `ApiResult.HttpFailure` keeps `status`, `message` and `code` and
 /// DROPS the `success` key, so the distinction is not visible from where its
 /// decision is made.
@@ -154,8 +154,8 @@ public enum HangUpOutcome: Sendable, Equatable {
 /// `success`, and no `code`.**
 ///
 /// ⛔ ALL THREE TERMS ARE LOAD-BEARING AND DROPPING ANY ONE MISCLASSIFIES A REAL
-/// BODY. Without the status check the route's own catch branch — a 500 carrying
-/// `{success:false, error}` — becomes a compliance refusal, and so do its three
+/// BODY. Without the status check the route's own catch branch, a 500 carrying
+/// `{success:false, error}`, becomes a compliance refusal, and so do its three
 /// 400s ("Invalid phone number", "No phone number configured", the Sinch
 /// constraint). Without the `success` check the role refusal does. Without the
 /// `code` check the dormancy 403 does, since it is the DNC shape plus a code.
@@ -186,8 +186,8 @@ public struct DialRepository: Sendable {
     /// reaches for the same method for the same reason.
     ///
     /// - Returns: `.failure` for everything that is not one of the three known
-    ///   refusals — offline, signed out, the role 403, the rate limit, a 400 for
-    ///   an unusable number or a Sinch-only workspace, a 5xx, contract drift —
+    ///   refusals, offline, signed out, the role 403, the rate limit, a 400 for
+    ///   an unusable number or a Sinch-only workspace, a 5xx, contract drift,
     ///   already normalised by ``ApiErrorNormalizer``.
     public func dial(workspaceId: String, to: String) async -> Result<DialOutcome, ApiError> {
         let outcome = await client.sendUnmapped(DistrictEndpoints.dial(workspaceId: workspaceId, to: to))
@@ -215,8 +215,8 @@ public struct DialRepository: Sendable {
     /// REASON. 404 and 409 are answers rather than errors, and the 200's `ended`
     /// key is a fact ``ApiError`` could never carry.
     ///
-    /// - Returns: `.failure` only for things that are genuinely faults — offline,
-    ///   signed out, the role 403, a 5xx, contract drift — already normalised by
+    /// - Returns: `.failure` only for things that are genuinely faults, offline,
+    ///   signed out, the role 403, a 5xx, contract drift, already normalised by
     ///   ``ApiErrorNormalizer``.
     public func hangUp(workspaceId: String, callId: String) async -> Result<HangUpOutcome, ApiError> {
         let outcome = await client.sendUnmapped(
@@ -233,7 +233,7 @@ public struct DialRepository: Sendable {
             return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
         }
         // ⛔ ENVELOPE-CHECKED LIKE EVERY OTHER WRITE. Both fields are required, so
-        // `{}` never decodes — but a route falling into its error branch after the
+        // `{}` never decodes, but a route falling into its error branch after the
         // headers are written answers a well-formed `{success: false}` with a 200,
         // and reading `ended` off that body would report a carrier leg as ended
         // when the server had just told us it could not do it.
@@ -273,8 +273,8 @@ public struct DialRepository: Sendable {
         // other route's `success:false` on a 200 means "we could not look"; this
         // one may mean "the call is already ringing and the credential is not
         // usable", which is the one case where reporting a refusal for a call
-        // that WAS placed is possible. It is still the right answer — joining a
-        // room on an unaffirmed envelope shows a working call over a failure —
+        // that WAS placed is possible. It is still the right answer, joining a
+        // room on an unaffirmed envelope shows a working call over a failure,
         // but the dialer's copy has to say the attempt may have gone out.
         return ResponseEnvelope.affirm("DialResponse", decoded.success, decoded).map(DialOutcome.placed)
     }

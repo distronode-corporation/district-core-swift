@@ -23,8 +23,8 @@ import Foundation
 ///     oldestId}}`.
 ///
 /// Both of those decode typed today; what the fallback exists for is a document
-/// the DTO refuses — a row missing a field the DTO requires, an `Int` where a
-/// `String` is expected — because rendering such a thread defensively is a better
+/// the DTO refuses, a row missing a field the DTO requires, an `Int` where a
+/// `String` is expected, because rendering such a thread defensively is a better
 /// answer than showing "no messages yet" to a customer who has a history.
 ///
 /// ⚠️ THE FALLBACK IS NOT LOOSER THAN THE DTO IN WHAT IT PRODUCES, ONLY IN WHAT
@@ -35,7 +35,7 @@ import Foundation
 ///
 /// ⚠️ RAW STRINGS FOR ``type`` AND ``direction``, LIKE EVERY DTO IN
 /// `DistrictModel`. Neither column is a database enum, and decoding into a Swift
-/// enum would fail closed on a value the server adds later — taking out the whole
+/// enum would fail closed on a value the server adds later, taking out the whole
 /// thread rather than one label.
 public struct ThreadEvent: Sendable, Equatable, Identifiable {
     /// The `Message.id` or `Call.id` this entry came from.
@@ -63,13 +63,13 @@ public struct ThreadEvent: Sendable, Equatable, Identifiable {
     /// "AI call completed." when it has none).
     public let body: String
     public let status: String
-    /// Email rows only. Absent — not null — on every other kind.
+    /// Email rows only. Absent, not null, on every other kind.
     public let subject: String?
     /// MMS attachments. ⚠️ The key is OMITTED when there are none, so an empty
     /// array here means "none", never "the server did not say".
     ///
     /// ⛔ THESE ARE ANONYMOUS CAPABILITY URLs (`/api/media/<uuid>`) and must be
-    /// loaded WITHOUT this client's bearer token — see ``UploadedMedia/url``.
+    /// loaded WITHOUT this client's bearer token, see ``UploadedMedia/url``.
     public let mediaUrls: [String]
     /// Call rows only, in seconds.
     public let durationSeconds: Int?
@@ -90,7 +90,7 @@ public struct ThreadEvent: Sendable, Equatable, Identifiable {
 
     /// True when the workspace sent this, rather than the customer.
     ///
-    /// ⚠️ FALSE FOR A CALL ROW WHATEVER THE CALL'S REAL DIRECTION — see the ⚠️ on
+    /// ⚠️ FALSE FOR A CALL ROW WHATEVER THE CALL'S REAL DIRECTION, see the ⚠️ on
     /// ``direction``.
     public var isOutbound: Bool {
         direction == ThreadEventDirection.outbound
@@ -137,7 +137,7 @@ public struct ThreadPage: Sendable, Equatable {
     ///
     /// ⛔ COUNTED, NOT SWALLOWED, AND NOT FATAL EITHER. Dropping the whole thread
     /// over one unreadable row is the mistake `CallSummary.from` documents in the
-    /// other direction — a customer with a hundred messages should not lose all of
+    /// other direction, a customer with a hundred messages should not lose all of
     /// them to one. But a silent drop is a thread that is quietly missing
     /// somebody's reply, so the count travels with the page and the UI says the
     /// history is incomplete. Non-zero here is contract drift worth a bug report,
@@ -212,7 +212,7 @@ enum ThreadPageReader {
     ///
     /// ⛔ NO DEFAULTING BEYOND WHAT THE FALLBACK DOES, AND THE ABSENCES ARE NOT
     /// THE SAME THING. The fallback maps an ABSENT `type` to `sms`; here `type`
-    /// is required, so a row that omits it never reaches this function at all —
+    /// is required, so a row that omits it never reaches this function at all,
     /// the whole document fails typed decode and the fallback handles it. What
     /// this must not do is additionally rewrite an EMPTY `type` to `sms`, because
     /// the fallback does not, and the two paths have to agree value for value on
@@ -258,7 +258,7 @@ enum ThreadPageReader {
     static func readShapeGuarded(_ document: JSONValue) -> Result<ThreadPage, ApiError> {
         // ⛔ A MISSING `timeline` KEY IS A MALFORMED RESPONSE, NOT AN EMPTY
         // THREAD. The route builds the key unconditionally on its success path
-        // (`{success: true, timeline: events}`), and an empty thread is `[]` —
+        // (`{success: true, timeline: events}`), and an empty thread is `[]`,
         // so absence means the body is not the one this route sends, and
         // rendering it as "no messages yet" would show an empty conversation for
         // a customer who has one.
@@ -324,8 +324,8 @@ enum ThreadPageReader {
     /// The cursor for the window before this one.
     ///
     /// ⛔ BOTH HALVES OR NOTHING, WHICH IS WHY ``ThreadCursor`` CANNOT HOLD ONE.
-    /// `beforeId` without `before` is a **400** from the route — an id alone
-    /// cannot say which timestamp it breaks a tie at — so a half-populated
+    /// `beforeId` without `before` is a **400** from the route, an id alone
+    /// cannot say which timestamp it breaks a tie at, so a half-populated
     /// `pageInfo` (both are nullable, and both are null on an empty page) must
     /// produce no cursor rather than half of one.
     private static func cursor(from pageInfo: JSONValue?) -> ThreadCursor? {

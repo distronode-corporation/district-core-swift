@@ -10,7 +10,7 @@
 /// ``CallCommand`` alone, the only thing an ending could ask for would be a media
 /// disconnect and nothing on the outbound path would report an end to CallKit.
 /// The OS would go on believing a call was live after the callee hung up, after
-/// a refused dial and after a media failure — and because the provider is configured
+/// a refused dial and after a media failure, and because the provider is configured
 /// `maximumCallGroups = 1`, a call the OS still believes in silently refuses
 /// every later one in BOTH directions for the life of the process, and
 /// `provider(_:didDeactivate:)` never fires so the audio session is never
@@ -25,7 +25,7 @@
 ///
 ///   * `hungUpLocally` is the ONLY reason ``SoftphoneEvent/hangUpPressed``
 ///     produces, and every producer of that event has already put a
-///     `CXEndCallAction` through CallKit — the in-app button asks for one before
+///     `CXEndCallAction` through CallKit, the in-app button asks for one before
 ///     it feeds the reducer, the lock screen / CarPlay / headset IS one, and a
 ///     provider reset has torn its calls down without asking. The OS knows, so
 ///     the list carries no report.
@@ -68,7 +68,7 @@ public enum SoftphoneCommand: Sendable, Equatable {
     /// ⛔ EMITTED AT MOST ONCE PER SESSION, GUARDED BY
     /// ``SoftphoneState/serverHangUpRequested`` RATHER THAN BY THE TERMINAL PHASE.
     /// The phase alone is not enough, because one of the two exits that can emit
-    /// this fires while the session is ALREADY ended — see `SoftphoneServerLeg.swift`.
+    /// this fires while the session is ALREADY ended, see `SoftphoneServerLeg.swift`.
     ///
     /// ⚠️ BEST EFFORT AT THE FAR END: a failure is logged, never shown, and never
     /// blocks the local teardown. It is emitted LAST for that reason.

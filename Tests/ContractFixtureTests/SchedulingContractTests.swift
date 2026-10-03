@@ -6,9 +6,9 @@ import XCTest
 /// Per-fixture assertions for the four scheduling states and the enable body.
 ///
 /// ⛔ THE STRICT GATE CANNOT TELL THESE FOUR FIXTURES APART, WHICH IS EXACTLY WHY
-/// THIS FILE EXISTS. All four status bodies have an identical key set — the route
+/// THIS FILE EXISTS. All four status bodies have an identical key set, the route
 /// serialises the whole Prisma selection and derives `bookingUrl` with a
-/// `?? null`, so nothing is ever omitted — and `StrictDecodeVerifier` deliberately
+/// `?? null`, so nothing is ever omitted, and `StrictDecodeVerifier` deliberately
 /// compares shapes and not values. What distinguishes a provisioning tenancy from
 /// a failed one is entirely which columns are null, and every one of those facts
 /// is value-level.
@@ -82,7 +82,7 @@ final class SchedulingContractTests: XCTestCase {
     /// time it worked, and has NO `bookingUrl`. Every ingredient for a link is
     /// present and the server withheld it, so this is the row that catches a client
     /// rebuilding the URL from `publicHost`. ⚠️ `lastReadyAt` survives the failure
-    /// because the server does not clear it — "ready on Saturday, broken since" is
+    /// because the server does not clear it, "ready on Saturday, broken since" is
     /// the fact the card needs, and a DTO that treated the two as mutually
     /// exclusive would lose it.
     ///
@@ -109,7 +109,7 @@ final class SchedulingContractTests: XCTestCase {
 
     // MARK: - Enable
 
-    /// The 202's success branch. ⚠️ `error: null` is SENT rather than omitted —
+    /// The 202's success branch. ⚠️ `error: null` is SENT rather than omitted,
     /// the route writes `result.ok ? null : (result.message ?? null)`, so the key
     /// exists on both branches, which is why it needs an allowlist entry.
     func testASuccessfulEnableCarriesTheHostAndANullError() throws {
@@ -126,8 +126,8 @@ final class SchedulingContractTests: XCTestCase {
     }
 
     /// ⛔ `ok: false` IS A WELL-FORMED 202 CARRYING A SENTENCE, NOT A FAILURE
-    /// SHAPE, and no committed fixture holds it — the corpus records the happy
-    /// branch only — so it is decoded from literal bytes here. The sentence is the
+    /// SHAPE, and no committed fixture holds it, the corpus records the happy
+    /// branch only, so it is decoded from literal bytes here. The sentence is the
     /// whole product of this branch: the provision ran, refused, and said why.
     func testARefusedEnableStillDecodesAndKeepsItsSentence() throws {
         let response = try decode(
@@ -145,10 +145,10 @@ final class SchedulingContractTests: XCTestCase {
     }
 
     /// ⛔ THE `disabled` BRANCH OF ENABLE, WHICH READS AS A SUCCESS AND IS A
-    /// REFUSAL. `provisionSchedulingTenant` leaves a `disabled` row alone —
+    /// REFUSAL. `provisionSchedulingTenant` leaves a `disabled` row alone,
     /// somebody switched this off, or the workspace is being deleted, and
     /// re-provisioning would resurrect booking pages against an explicit decision
-    /// — so pressing Enable on one answers `ok: false, status: "disabled"` rather
+    /// so pressing Enable on one answers `ok: false, status: "disabled"` rather
     /// than doing anything. No fixture carries it either.
     func testEnablingADisabledTenancyRefusesRatherThanReprovisioning() throws {
         let response = try decode(

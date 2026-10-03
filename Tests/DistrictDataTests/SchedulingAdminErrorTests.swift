@@ -5,7 +5,7 @@ import XCTest
 
 final class SchedulingAdminErrorTests: XCTestCase {
     /// ⛔ THE FIVE-CODE COLLAPSE IS ASSERTED FOR EVERY ARM, because it is the one
-    /// thing this client and the browser have to agree on — a person shown two
+    /// thing this client and the browser have to agree on, a person shown two
     /// different explanations of one refusal depending on which device they picked
     /// it up on reports a bug against whichever they saw second.
     func testEveryErrorCollapsesOntoTheRightCode() {
@@ -39,7 +39,7 @@ final class SchedulingAdminErrorTests: XCTestCase {
     /// ARM IS STILL SPELLED OUT, WHICH IS WHY IT IS TESTED HERE DIRECTLY RATHER
     /// THAN THROUGH `perform`. `sendUnmapped` skips the status mapping entirely, so
     /// the only failures it can produce are an unbuildable path, a missing
-    /// credential and a dead socket — a transport reason or a synthetic 401.
+    /// credential and a dead socket, a transport reason or a synthetic 401.
     /// Collapsing the third case into one of the others, or reaching for a
     /// `default`, would mean a future change to `ApiClient` could route a decode
     /// failure here and have it silently reported as something it is not; the

@@ -12,7 +12,7 @@ extension StrictDecodeVerifier {
         // ⛔ THREE PATHS, ALL ON ROW 0, AND THEY ARE ONE FACT RATHER THAN THREE:
         // this meeting has not ended. The voice agent's Companion writes the
         // minutes when the room closes, so an in-progress meeting has no
-        // `summaryPreview`, no `endedAt` and no `title` — and it is the row most
+        // `summaryPreview`, no `endedAt` and no `title`, and it is the row most
         // likely to be at the TOP of a live user's list, i.e. the ordinary case
         // and not an edge one. ⚠️ Row 1 nulls nothing, so this single fixture
         // covers both branches and a DTO that regressed any of the three
@@ -27,7 +27,7 @@ extension StrictDecodeVerifier {
         // ⚠️ `district-meeting-detail.json` GETS NO ENTRY AND MUST NOT BE GIVEN
         // ONE. It is the whole row returned verbatim and its committed copy is a
         // COMPLETED meeting with every column populated, so there is no null to
-        // permit — and an entry would silence one on a row a regeneration adds.
+        // permit, and an entry would silence one on a row a regeneration adds.
         "district-meetings.json": [
             "$[0].endedAt",
             "$[0].summaryPreview",

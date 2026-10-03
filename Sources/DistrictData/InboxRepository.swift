@@ -17,7 +17,7 @@ public struct ConversationList: Sendable {
     /// ⛔ KEY A LIST ON ``ConversationSummary/threadKey``, NEVER ON `key` OR ON
     /// the counterpart address. One customer's phone and their email are two
     /// different strings that fold into one thread, so an address key produces
-    /// duplicate identifiers — which on a SwiftUI `List` bound to `Identifiable`
+    /// duplicate identifiers, which on a SwiftUI `List` bound to `Identifiable`
     /// is a runtime failure, not a cosmetic one.
     public var conversations: [ConversationSummary] {
         response.conversations
@@ -61,20 +61,20 @@ public struct InboxRepository: Sendable {
 
     /// One thread's history: SMS, email AND calls, interleaved, oldest first.
     ///
-    /// ⛔ READ OUT OF ``JSONValue`` RATHER THAN A DTO, ON PURPOSE — see the ⛔ on
+    /// ⛔ READ OUT OF ``JSONValue`` RATHER THAN A DTO, ON PURPOSE, see the ⛔ on
     /// ``ThreadEvent``. This is the one MVP surface whose wire shape is mid-change
     /// on the server side, and ``ThreadPageReader`` handles both versions.
     ///
     /// ⛔ EXPAND-ONLY PAGING, AND THE CURSOR IS A PAIR OR NOTHING. `beforeId`
-    /// without `before` is a **400** from the route — an id alone cannot say which
-    /// timestamp it breaks a tie at — so the cursor is modelled as one value that
+    /// without `before` is a **400** from the route, an id alone cannot say which
+    /// timestamp it breaks a tie at, so the cursor is modelled as one value that
     /// cannot hold half of itself. See ``ThreadCursor``.
     ///
     /// ⚠️ THE CURSOR VALUES ARE THE SERVER'S OWN, echoed back from a previous
     /// response's `pageInfo`. Never a timestamp this client formatted: the server
     /// compares it against what it emitted. ⛔ And on the deployed route there is
     /// no `pageInfo` at all, so ``ThreadPage/hasMore`` is false and no cursor is
-    /// ever produced — which is why "load older" must be driven by that flag
+    /// ever produced, which is why "load older" must be driven by that flag
     /// rather than offered unconditionally.
     public func timeline(
         workspaceId: String,
@@ -104,8 +104,8 @@ public struct InboxRepository: Sendable {
     /// is a failure wearing an absence's clothes.
     ///
     /// ⛔ THE TWO-CHARACTER FLOOR IS THE SERVER'S AND IS NOT ENFORCED HERE. A
-    /// shorter `q` is answered `{success, results: []}` with no `limit` key —
-    /// well-formed, cheap, and honest — so refusing it locally would be this layer
+    /// shorter `q` is answered `{success, results: []}` with no `limit` key,
+    /// well-formed, cheap, and honest, so refusing it locally would be this layer
     /// inventing a validation rule. What must NOT happen is a request per keystroke
     /// to be told nothing, and that is a debounce, which belongs to the caller that
     /// owns the text field rather than to a `Sendable` struct with no state.
@@ -148,7 +148,7 @@ public struct InboxRepository: Sendable {
             .flatMap { ResponseEnvelope.affirm("UnreadCountResponse", $0.success, $0) }
     }
 
-    // MARK: - Drafts (persistence — cheap, idempotent, author-scoped)
+    // MARK: - Drafts (persistence, cheap, idempotent, author-scoped)
 
     /// One thread's saved draft, or nil when there is none.
     ///
@@ -174,7 +174,7 @@ public struct InboxRepository: Sendable {
     /// per visible conversation.
     ///
     /// ⚠️ AUTHOR-SCOPED, unlike read state. A colleague's unfinished thought is
-    /// not in this list and must not be — the server keys the row by
+    /// not in this list and must not be, the server keys the row by
     /// `authorEmail` and this client never sends one.
     public func drafts(workspaceId: String) async -> Result<[MessageDraft], ApiError> {
         let outcome = await client.send(
@@ -240,7 +240,7 @@ public struct InboxRepository: Sendable {
     /// ``saveDraft(workspaceId:threadKey:body:subject:mediaUrls:)``.** Every call
     /// is one Vertex generation, capped at 20/min per workspace with no
     /// entitlement check in front of it. ⛔ It must never be fired from a timer, a
-    /// retry helper, an autosave debounce or a view's appearance — only from an
+    /// retry helper, an autosave debounce or a view's appearance, only from an
     /// explicit press. `ApiClient` retries nothing, which is the other half of
     /// that guarantee.
     ///
@@ -275,11 +275,11 @@ public struct InboxRepository: Sendable {
     /// ⛔ THE RECIPIENT IS AN ADDRESS, NEVER A THREAD IDENTITY. The route hands
     /// `to` straight to the carrier or to Postmark; it does not resolve a Contact
     /// id. Sending `contact:<id>` dispatches an SMS to a cuid, which fails at the
-    /// provider as a raw 500 — and since the server folds every contact-resolved
+    /// provider as a raw 500, and since the server folds every contact-resolved
     /// counterpart into that form, that is MOST threads.
     /// ``ConversationSummary/replyTarget`` is what resolves the pair correctly.
     ///
-    /// ⚠️ THE SERVER'S REFUSALS REACH THE CALLER VERBATIM — unverified sender,
+    /// ⚠️ THE SERVER'S REFUSALS REACH THE CALLER VERBATIM, unverified sender,
     /// exhausted A2P registration, the per-workspace cap. "Could not send" throws
     /// all of that away, and each of those needs a different action from the
     /// operator.
@@ -314,7 +314,7 @@ public struct InboxRepository: Sendable {
     /// error dialog on every tap.
     ///
     /// ⚠️ THE RESULT IS A COUNT AND ZERO IS A SUCCESS: a thread another agent
-    /// already opened marks nothing. Both outcomes resolve to the same action —
+    /// already opened marks nothing. Both outcomes resolve to the same action,
     /// redraw from the list.
     public func markRead(workspaceId: String, selector: ThreadSelector) async -> Result<Int, ApiError> {
         let outcome = await client.send(
@@ -412,7 +412,7 @@ public enum MediaUploadLimits {
 /// when it did not; sending both, or neither, is not a case the server defines.
 ///
 /// ⚠️ THE ADDRESS PARAMETER IS STILL SPELLED `phoneNumber` ON THE WIRE and now
-/// carries an email too. That name is historical and renaming it would 400 — see
+/// carries an email too. That name is historical and renaming it would 400, see
 /// ``DistrictEndpoints/timeline(workspaceId:contactId:address:before:beforeId:)``.
 public enum ThreadSelector: Sendable, Equatable {
     case contact(String)
@@ -433,7 +433,7 @@ public enum ThreadSelector: Sendable, Equatable {
 ///
 /// ⛔ IT CANNOT HOLD AN ID WITHOUT A TIMESTAMP, AND THAT IS THE WHOLE TYPE.
 /// `beforeId` alone is a 400 from the route; the alternatives the server rejected
-/// — guess a timestamp, or ignore the parameter — both end with the client
+/// guess a timestamp, or ignore the parameter, both end with the client
 /// walking backwards through the same window forever.
 ///
 /// ⚠️ OMITTING THE CURSOR ENTIRELY IS THE NEWEST WINDOW, byte for byte the

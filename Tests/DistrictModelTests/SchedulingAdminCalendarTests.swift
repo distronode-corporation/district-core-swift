@@ -6,8 +6,8 @@ import XCTest
 ///
 /// ⛔ THE NULL BRANCH OF `calendar.status` LIVES HERE AND NOT IN THE ALLOWLIST,
 /// AND THAT IS THE POINT OF THE FILE. `providers` and `unconfigured_providers`
-/// are `.nullish()` on the server — Go slices the fork marshals without
-/// `omitempty` — but the committed fixture carries REAL ARRAYS for both, and an
+/// are `.nullish()` on the server, Go slices the fork marshals without
+/// `omitempty`, but the committed fixture carries REAL ARRAYS for both, and an
 /// `allowedExplicitNulls` entry is permission for a null the bytes demonstrate.
 /// Granting one for a null nobody has seen would widen the single escape the
 /// gate's no-nulls invariant has, so the branch is proved from inline bytes
@@ -46,9 +46,9 @@ final class SchedulingAdminCalendarTests: XCTestCase {
     }
 
     /// ⛔ THE SHAPE THAT BREAKS THE CALENDAR PAGE WHEN MISSED. Both lists arrive
-    /// as EXPLICIT NULLS on a fully configured instance — `unconfigured_providers`
+    /// as EXPLICIT NULLS on a fully configured instance, `unconfigured_providers`
     /// is nil exactly when Google and Microsoft are both set up, i.e. on every
-    /// production tenant — and typing either `.optional()` rather than nullable
+    /// production tenant, and typing either `.optional()` rather than nullable
     /// makes the whole calendar page read "could not be read" for every customer.
     func testBothProviderListsDecodeFromAnExplicitNull() throws {
         let status = try decode(
@@ -118,7 +118,7 @@ final class SchedulingAdminCalendarTests: XCTestCase {
         XCTAssertEqual(selection.isDestination, true)
     }
 
-    /// ⛔ TWO KEYS IS A LEGAL CALENDAR, AND ALMOST EVERY GOOGLE ACCOUNT HAS ONE — a
+    /// ⛔ TWO KEYS IS A LEGAL CALENDAR, AND ALMOST EVERY GOOGLE ACCOUNT HAS ONE, a
     /// read-only subscription such as a holidays feed. ⚠️ Absent is not `false`:
     /// they render the same and they say different things, so nothing should
     /// substitute one for the other.

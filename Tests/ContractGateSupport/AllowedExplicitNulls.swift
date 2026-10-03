@@ -5,7 +5,7 @@ import Foundation
 /// ⛔ EVERY ENTRY IS AN EXACT PATH, INCLUDING THE ARRAY INDEX, AND THAT IS THE
 /// DESIGN RATHER THAN AN ACCIDENT OF NOT HAVING WILDCARDS. `$.recentCalls[*]`
 /// would be one line instead of four and would also silence a null on a row
-/// nobody looked at — including a row a future regeneration ADDS. An exact path
+/// nobody looked at, including a row a future regeneration ADDS. An exact path
 /// silences one value in one file, and a fixture whose rows shift lands its null
 /// on a path that is not listed, which reds the gate rather than passing quietly.
 /// The verifier's path matching is plain set membership for the same reason: a
@@ -20,7 +20,7 @@ import Foundation
 /// assertion, and the re-encode key-set comparison (Swift writes a nil Optional
 /// as an ABSENT key, so the fixture's key would otherwise read as lost). It buys
 /// nothing else. A dropped key whose value is NOT null still fails at that same
-/// path, and every sibling key is untouched — both proven in
+/// path, and every sibling key is untouched, both proven in
 /// `StrictDecodeVerifierTests`.
 ///
 /// ⚠️ AND AN ENTRY IS PERMISSION, NOT A REQUIREMENT. A listed path holding a real
@@ -47,7 +47,7 @@ public extension StrictDecodeVerifier {
         //
         // ⛔ ONE MAPPING (`toCallSummaries`) FEEDS ALL THREE FIXTURES, so these
         // three lists describe the same seven nullable columns three times. If a
-        // column stops being nulled, all three fail together — which is the
+        // column stops being nulled, all three fail together, which is the
         // signal that the surfaces have NOT drifted.
         //
         //   analysis        `Call.analysis`, a Json? column. Written by the
@@ -62,7 +62,7 @@ public extension StrictDecodeVerifier {
         //   sentiment       `Call.sentiment`. Analysis again.
         //   transferStatus  `Call.transferStatus` / `.transferReason`, the
         //   transferReason  warm-transfer outcome. Null on every call that was
-        //                   never transferred — including the answered one, row
+        //                   never transferred, including the answered one, row
         //                   0, which is why these two appear there and the other
         //                   five do not.
         "district-calls.json": [
@@ -98,7 +98,7 @@ public extension StrictDecodeVerifier {
             "$.recentCalls[1].phoneIntel.lineType", "$.recentCalls[4].phoneIntel.lineType",
             "$.recentCalls[1].phoneIntel.carrier", "$.recentCalls[4].phoneIntel.carrier",
         ],
-        // The ANSWERED row, singly — so only the transfer pair is null here.
+        // The ANSWERED row, singly, so only the transfer pair is null here.
         "district-call-detail.json": [
             "$.call.transferReason",
             "$.call.transferStatus",
@@ -109,7 +109,7 @@ public extension StrictDecodeVerifier {
         // ⛔ BOTH CONTACT ROUTES RETURN THE RAW PRISMA ROW, which is precisely
         // why so many keys arrive as explicit nulls: nothing maps them, so every
         // nullable column is present and null. Row 1 of the list fixture is the
-        // deliberately sparse contact — the email-first case that exists to
+        // deliberately sparse contact, the email-first case that exists to
         // prove a phone-less contact decodes.
         //
         //   dgiError               `Contact.dgiError`. Null on every contact
@@ -155,7 +155,7 @@ public extension StrictDecodeVerifier {
         // nullable because the field is OPTIONAL on token exchange, so a client
         // that sent no name has one; `lastUsedAt` is nullable because the server
         // stamps it only when a refresh token ROTATES, so it is null for every
-        // session's first ten minutes — i.e. exactly the row a user sees on the
+        // session's first ten minutes, i.e. exactly the row a user sees on the
         // screen right after signing in. Both keys are SENT as null rather than
         // omitted, because the route serialises the Prisma selection whole.
         //
@@ -174,7 +174,7 @@ public extension StrictDecodeVerifier {
         // FACT: the counterpart matched no `Contact`, so there is no id, no
         // name, no email and no phone to report. The server sends the keys with
         // nulls rather than omitting them, and the thread is still perfectly
-        // usable — `canSms` is true and `counterpart` is the number. That is why
+        // usable, `canSms` is true and `counterpart` is the number. That is why
         // `ConversationSummary.displayName` falls back to the counterpart rather
         // than to a placeholder.
         "district-conversations.json": [
@@ -188,7 +188,7 @@ public extension StrictDecodeVerifier {
         "district-drafts-list.json": [
             "$.drafts[1].subject",
         ],
-        // ⛔ `draft: null` IS THE ORDINARY ANSWER TO A READ, NOT AN ERROR — the
+        // ⛔ `draft: null` IS THE ORDINARY ANSWER TO A READ, NOT AN ERROR, the
         // server chose null over 404 so the composer's common open path is not
         // logged as a fault. This one entry is the whole fixture.
         "district-draft-null.json": [
@@ -211,7 +211,7 @@ public extension StrictDecodeVerifier {
         // ⛔ `usage` NULL MEANS "NOTHING METERED THIS MONTH", NOT "ZERO OF
         // EVERYTHING". `getUsage` returns null the moment its `groupBy` comes back
         // with no rows, and the route forwards it rather than substituting an empty
-        // object — so this one path IS the whole fixture. A screen that rendered it
+        // object, so this one path IS the whole fixture. A screen that rendered it
         // as a column of zeros would state a billing fact nobody measured. See
         // ``UsageResponse``.
         // ⚠️ The sibling fixtures need no entry: `district-usage.json` carries every
@@ -326,14 +326,14 @@ public extension StrictDecodeVerifier {
         // ── Scheduling ──────────────────────────────────────────────────────
         //
         // ⛔ FOUR STATUS FIXTURES BECAUSE THE NULLS MOVE, NOT BECAUSE THE SHAPE
-        // DOES. The key set is identical in all four — the route serialises the
-        // whole Prisma selection and derives `bookingUrl` with a `?? null` — so
+        // DOES. The key set is identical in all four, the route serialises the
+        // whole Prisma selection and derives `bookingUrl` with a `?? null`, so
         // what tells the states apart is WHICH columns are empty, and a single
         // fixture would gate the DTO against exactly one of them.
         //
         //   tenant       No `SchedulingTenant` row at all: the LEGACY state, i.e.
         //                every workspace before anyone presses Enable. ⛔ Not an
-        //                error and not an empty tenancy — the whole object is
+        //                error and not an empty tenancy, the whole object is
         //                null, and this one path IS the whole fixture.
         //   lastReadyAt  `SchedulingTenant.lastReadyAt`, stamped only when a
         //                provision is observed complete. Null on a tenancy that
@@ -341,7 +341,7 @@ public extension StrictDecodeVerifier {
         //                ⚠️ NOT cleared by a later failure, which is why the error
         //                fixture carries a real timestamp here.
         //   lastError    `SchedulingTenant.lastError`. Null on every tenancy whose
-        //                provisioning has not FAILED — so on both the provisioning
+        //                provisioning has not FAILED, so on both the provisioning
         //                and the ready rows, and populated only on the error one.
         //   bookingUrl   Derived server-side as `status === "ready" ? … : null`,
         //                so it is null on every state except ready. ⛔ It is null
@@ -366,7 +366,7 @@ public extension StrictDecodeVerifier {
         // ⛔ `error` NULL IS THE SUCCESSFUL PROVISION, and the key is SENT rather
         // than omitted: the route writes `result.ok ? null : (result.message ??
         // null)`, so both branches always produce the key. ⚠️ `publicHost` needs
-        // no entry here and would be a mistake to add — the host is allocated
+        // no entry here and would be a mistake to add, the host is allocated
         // before the platform call and reused forever, so the ready body carries a
         // real one, and permission for a null there would silence the one case
         // that means the allocation itself failed.
@@ -378,7 +378,7 @@ public extension StrictDecodeVerifier {
         //
         // `Workspace.subscriptionTier` is null until a plan is set. ⚠️ The
         // non-null values are MIXED CASE (`VoicePro`), which is the trap this
-        // field is better known for — see `WorkspaceEntry.subscriptionTier`.
+        // field is better known for, see `WorkspaceEntry.subscriptionTier`.
         // ⚠️ The two fixtures null DIFFERENT ROWS because the partial one is
         // missing the degraded region's workspace, so the indices are not
         // interchangeable.
@@ -389,7 +389,7 @@ public extension StrictDecodeVerifier {
             "$.workspaces[1].subscriptionTier",
         ],
         // A routing rule's `target` is null for an action that has nowhere to
-        // send — row 1 answers from the knowledge base rather than transferring.
+        // send, row 1 answers from the knowledge base rather than transferring.
         // ⚠️ INSIDE AN OPAQUE `WireJSON` BLOB, so this entry exempts the null
         // ASSERTION only: the carrier re-encodes the null as a null, and the key
         // is never lost. Both halves are exercised by this one fixture.
@@ -399,7 +399,7 @@ public extension StrictDecodeVerifier {
         // ⛔ THE KEY SET IS IDENTICAL WHETHER THE WORKSPACE IS CONFIGURED OR
         // BRAND NEW: the route NULLS a missing optional rather than dropping the
         // key. That is what makes this fixture the sparse twin of the one above
-        // rather than a shorter version of it — seven columns nobody has set.
+        // rather than a shorter version of it, seven columns nobody has set.
         "district-workspace-config-sparse.json": [
             "$.config.aiPersona",
             "$.config.campaignSettings",
@@ -415,7 +415,7 @@ public extension StrictDecodeVerifier {
         // ⛔ THE TWO DEGRADED BODIES HOLD THE SAME THREE PATHS AND THAT IS THE
         // WHOLE MECHANISM RATHER THAN A COPY-PASTE. `GET /api/billing` has three
         // shapes: a healthy one, a Stripe outage (`billingUnavailable: true`),
-        // and an account with no Stripe customer — and the last two are
+        // and an account with no Stripe customer, and the last two are
         // byte-identical apart from that one key, which is ABSENT on the third
         // rather than false. So the same three nulls have to be permitted twice,
         // once per fixture, and collapsing the pair would delete the only thing
@@ -443,7 +443,7 @@ public extension StrictDecodeVerifier {
         // ⛔ TWO PATHS ON THE HEALTHY BODY, BOTH ON THE UNPAID INVOICE, AND IT IS
         // THE MOST ORDINARY ROW THERE IS. Stripe omits `hosted_invoice_url` and
         // `invoice_pdf` until an invoice is FINALISED, so this month's invoice
-        // before it is paid carries both as nulls — a client that typed them
+        // before it is paid carries both as nulls, a client that typed them
         // non-null would throw on the row every customer sees every month. ⚠️ Row
         // 0, the paid one, carries real strings for both, which is what makes
         // one fixture cover the branch in each direction. ⛔ And neither may be
@@ -456,7 +456,7 @@ public extension StrictDecodeVerifier {
         // ⛔ TWO PATHS, ONE STATE, AND NEITHER NULL MAY BE READ AS A VALUE. This
         // is `workspace/billing` for a workspace that hit a hard cap and stopped
         // paying, which is exactly the workspace with no metered rows this month
-        // — the two co-occur, which is why one fixture carries both.
+        // the two co-occur, which is why one fixture carries both.
         //
         //   subscriptionTier  `Workspace.subscriptionTier`, passed through
         //                     untouched. ⛔ NULL IS NOT "Free": `GET
@@ -470,8 +470,8 @@ public extension StrictDecodeVerifier {
         //                     refused; the two statements contradict each other
         //                     and only one of them was measured.
         //
-        // ⚠️ The sibling `district-workspace-billing.json` needs no entry at all —
-        // same six keys, every one populated — which is what makes the pair a
+        // ⚠️ The sibling `district-workspace-billing.json` needs no entry at all,
+        // same six keys, every one populated, which is what makes the pair a
         // test of the Optionals rather than of the decoder.
         "district-workspace-billing-null-usage.json": [
             "$.billing.subscriptionTier",

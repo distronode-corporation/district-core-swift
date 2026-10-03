@@ -71,7 +71,7 @@ final class NativeAuthClientTests: XCTestCase {
 
     // ── The two status maps ──────────────────────────────────────────────────
 
-    /// ⛔ THE EXCHANGE MAP, STATUS BY STATUS. A 400 here is `rejected` — the
+    /// ⛔ THE EXCHANGE MAP, STATUS BY STATUS. A 400 here is `rejected`, the
     /// token route answers one opaque `invalid_grant` for expired, replayed,
     /// PKCE-mismatched and redirect-mismatched codes alike, and all four mean
     /// "start the login over".
@@ -106,7 +106,7 @@ final class NativeAuthClientTests: XCTestCase {
     /// ⛔ THE REFRESH MAP, STATUS BY STATUS, AND IT IS THE SECURITY-RELEVANT ONE.
     /// It is `RefreshResult`'s own table: 401 is the only dead credential, and
     /// **429 and 400 are both `rateLimited`** because the route rate-limits and
-    /// validates its body BEFORE `rotateNativeSession` — so in both cases the
+    /// validates its body BEFORE `rotateNativeSession`, so in both cases the
     /// token is provably unspent. Mapping either onto `rejected` signs a user out
     /// while their credential is still valid.
     func testTheRefreshStatusMap() async {
@@ -172,7 +172,7 @@ final class NativeAuthClientTests: XCTestCase {
 
     /// ⛔ THE STATUS IS THE CONTRACT, NOT THE BODY. A 200 this build cannot parse
     /// is STILL `accepted`, because the route's only successful body is
-    /// `{"success":true}` and nothing branches on it — treating an unreadable
+    /// `{"success":true}` and nothing branches on it, treating an unreadable
     /// 200 as a failure would leave an outbox entry chasing a token the server
     /// has already forgotten. ⚠️ This is the exact opposite of the refresh path,
     /// where an unreadable 200 hides a rotation that really happened.
@@ -193,7 +193,7 @@ final class NativeAuthClientTests: XCTestCase {
     /// ⛔ A TRANSPORT FAILURE IS `notSent` AND KEEPS THE CREDENTIAL. ⚠️ Note that
     /// `isProvablyUnsent` is NOT consulted: it exists so a refresh can tell an
     /// unspent token from a possibly-spent one, and a revoke has no such
-    /// distinction — every failure to get an answer means "try again later". So
+    /// distinction, every failure to get an answer means "try again later". So
     /// a `.timedOut`, which the refresh path calls ambiguous, is the same answer
     /// here as a DNS failure.
     func testEveryTransportFailureIsNotSent() async {
@@ -214,7 +214,7 @@ final class NativeAuthClientTests: XCTestCase {
         }
     }
 
-    /// ⚠️ ONE KEY, MATCHING `RevokeSchema`, and never in the URL — a query
+    /// ⚠️ ONE KEY, MATCHING `RevokeSchema`, and never in the URL, a query
     /// parameter would reach logs, proxies and anything that ever opened it.
     func testTheRevokeBodyCarriesTheTokenAndNothingElse() async throws {
         let transport = TestTransport(json: #"{"success":true}"#)
@@ -229,7 +229,7 @@ final class NativeAuthClientTests: XCTestCase {
     }
 
     /// ⛔ NO BEARER, AND EXACTLY ONE REQUEST. The refresh token IS the credential
-    /// this route authenticates with, and the client does NOT retry — the retry
+    /// this route authenticates with, and the client does NOT retry, the retry
     /// is the revoke outbox, on a later launch.
     func testRevokePostsOnceWithNoBearer() async {
         let transport = TestTransport(status: 503)
@@ -252,7 +252,7 @@ final class NativeAuthClientTests: XCTestCase {
     /// ⛔ "NEVER LEFT THE DEVICE" IS NOT "MIGHT HAVE ROTATED THE TOKEN", AND
     /// COLLAPSING THEM BURNS SESSIONS. Opening the app offline marks the token
     /// pending, fails to send it, and the next launch reads marker == stored
-    /// token as an interrupted refresh — one offline app-open costing a re-login.
+    /// token as an interrupted refresh, one offline app-open costing a re-login.
     ///
     /// ⚠️ AND AN UNCLASSIFIED ERROR IS AMBIGUOUS, NEVER UNSENT: an error type
     /// that does not answer the question at all falls through to
@@ -338,7 +338,7 @@ final class NativeAuthClientTests: XCTestCase {
         XCTAssertNil(body["deviceName"])
     }
 
-    /// ⚠️ ONE KEY, AND THE REFRESH TOKEN NEVER TRAVELS IN THE URL — a query
+    /// ⚠️ ONE KEY, AND THE REFRESH TOKEN NEVER TRAVELS IN THE URL, a query
     /// parameter would reach logs, proxies and the browser history of anything
     /// that ever opened it.
     func testTheRefreshBodyCarriesTheTokenAndNothingElse() async throws {
@@ -408,7 +408,7 @@ final class NativeAuthClientTests: XCTestCase {
     }
 
     /// ⚠️ A BASE URL WITH A TRAILING SLASH MUST NOT DOUBLE UP. The production
-    /// constant carries none, but a configured value could — and
+    /// constant carries none, but a configured value could, and
     /// `//api/auth/native/token` addresses a different path.
     func testATrailingSlashOnTheBaseUrlIsAbsorbed() async {
         let transport = TestTransport(json: Fixture.tokenBody)

@@ -7,7 +7,7 @@ import Foundation
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `+MessageThread.swift`, `+SchedulingAdmin.swift` and
 // `+SchedulingB.swift` were. SwiftLint's `file_length` warning is an ERROR under
-// `--strict`, so one line added inline reds the LINT job rather than the gate — a
+// `--strict`, so one line added inline reds the LINT job rather than the gate, a
 // failure a long way from the change that caused it.
 
 extension ImplementedFixtures {
@@ -17,7 +17,7 @@ extension ImplementedFixtures {
     /// THE ODD ONE IS THE REASON TO READ THIS LIST RATHER THAN SKIM IT.
     /// `district-scheduling-upload.json` is the MULTIPART route's answer: it is not
     /// in the op catalog, it has no `op` name, and it arrives from
-    /// `/api/district/scheduling/admin/upload` — yet it wears
+    /// `/api/district/scheduling/admin/upload`, yet it wears
     /// ``SchedulingAdminSuccess`` because that route deliberately answers the
     /// catalog's envelope, `{ok:false, failure, status}` at HTTP **200** included,
     /// so both surfaces have one failure vocabulary. Gating it here is what pins
@@ -37,8 +37,8 @@ extension ImplementedFixtures {
     ///
     /// ⛔ THE TWO "CREATED" BODIES ARE SEPARATE TYPES FROM THEIR LIST ROWS, NOT
     /// OPTIONAL FIELDS ON THEM, AND THE GATE IS WHAT MAKES THAT SAFE RATHER THAN
-    /// MERELY TIDY. `district-scheduling-api-key-created.json` carries `key` — the
-    /// plaintext credential, shown once — and `-webhook-created.json` carries
+    /// MERELY TIDY. `district-scheduling-api-key-created.json` carries `key`, the
+    /// plaintext credential, shown once, and `-webhook-created.json` carries
     /// `secret`. Modelled as Optionals on ``SchedulingAPIKey`` and
     /// ``SchedulingWebhook``, both would ROUND-TRIP CLEANLY against the list
     /// fixtures too (a nil Optional writes an absent key), so the gate would not
@@ -48,8 +48,8 @@ extension ImplementedFixtures {
     /// ⚠️ FOUR EXPLICIT NULLS ACROSS THREE OF THE FIFTEEN, so
     /// ``ContractManifest/expectedAllowedNullPaths`` moves by four and
     /// `AllowedExplicitNulls+SchedulingC.swift` says which columns and why. ⛔ The
-    /// twelve others carry NONE — checked against the fixture bytes rather than
-    /// inferred from the types — and that includes the three whose rows look most
+    /// twelve others carry NONE, checked against the fixture bytes rather than
+    /// inferred from the types, and that includes the three whose rows look most
     /// like candidates: the failed recording missing six of eight keys, the guest
     /// with no consent timestamp, and the delivery that got no answer are all
     /// ABSENT keys, which a nil Optional already round-trips.
@@ -70,7 +70,7 @@ extension ImplementedFixtures {
     /// storage drops all three `backups_*`. Every one of those names an INSTANCE
     /// credential or a resource shared with other tenancies. ⚠️ So a DTO grown
     /// "to match the fork" would model keys that cannot arrive, and this gate would
-    /// report them as ADDED on re-encode — which is the right failure, in the right
+    /// report them as ADDED on re-encode, which is the right failure, in the right
     /// place, for the right reason.
     private static var settingsFixtures: [ImplementedFixture] {
         [
@@ -79,7 +79,7 @@ extension ImplementedFixtures {
             gate("district-scheduling-storage.json", SchedulingAdminSuccess<SchedulingStorageSettings>.self),
             gate("district-scheduling-notetaker.json", SchedulingAdminSuccess<SchedulingNotetakerSettings>.self),
             gate("district-scheduling-llm.json", SchedulingAdminSuccess<SchedulingLLMSettings>.self),
-            // ⚠️ NOT AN OP. The multipart route's answer — see the ⛔ on
+            // ⚠️ NOT AN OP. The multipart route's answer, see the ⛔ on
             // ``schedulingC``. It is filed beside branding because `logo` and
             // `banner` are the two targets a branding screen sends.
             gate("district-scheduling-upload.json", SchedulingAdminSuccess<SchedulingUploadResult>.self),

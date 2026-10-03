@@ -6,7 +6,7 @@ import XCTest
 ///
 /// ⛔ BODY-LEVEL RATHER THAN URL-LEVEL, WHICH IS WHY IT IS NOT JUST MORE ROWS IN
 /// `EndpointTable`. That table asserts one canonical body per endpoint; the property
-/// under test here is the DROPPING — `savePersona` grew from four fields to eleven,
+/// under test here is the DROPPING, `savePersona` grew from four fields to eleven,
 /// and on a route that merges per field (`x !== undefined ? x : existing`) the
 /// difference between an absent key and a sent one is the difference between
 /// preserving the operator's engine choice and overwriting it with whatever this
@@ -26,7 +26,7 @@ final class PersonaEndpointTests: XCTestCase {
     /// available and a save that touched one names one; every other key is ABSENT,
     /// so the server preserves the stored value. A body carrying eleven keys would
     /// overwrite the engine, the voice, the tuning and the answer length with this
-    /// client's idea of them — answered 200.
+    /// client's idea of them, answered 200.
     func testASaveThatChangedOneFieldSendsOneFieldAndTheWorkspace() throws {
         let descriptor = DistrictEndpoints.savePersona(workspaceId: "ws_1", greeting: "Hello there")
         XCTAssertEqual(try body(descriptor), #"{"greeting":"Hello there","workspaceId":"ws_1"}"#)
@@ -58,7 +58,7 @@ final class PersonaEndpointTests: XCTestCase {
     }
 
     /// ⚠️ A JSON NUMBER, NOT A STRING. The route guards with
-    /// `typeof temperature === "number"` and IGNORES anything else — so a quoted value
+    /// `typeof temperature === "number"` and IGNORES anything else, so a quoted value
     /// would leave the stored creativity exactly as it was and still answer 200.
     /// ⚠️ 0.5 rather than 0.7 because this compares bytes; see the same note in
     /// `EndpointTable+Persona.swift`.
@@ -76,7 +76,7 @@ final class PersonaEndpointTests: XCTestCase {
     }
 
     /// ⛔ ALL ELEVEN ARE EXPRESSIBLE, AND THE FOUR AVATAR FIELDS ARE NOT. There is no
-    /// `videoEnabled`, `replicaId`, `videoModelId` or `videoVoice` parameter to pass —
+    /// `videoEnabled`, `replicaId`, `videoModelId` or `videoVoice` parameter to pass,
     /// the absence is structural rather than a convention, which is what App Store
     /// Review Guideline 3.1.3(b) and the billable Tavus stream both ask for.
     func testTheWholeEditableSurfaceIsElevenKeysAndCarriesNoAvatarField() throws {
@@ -130,7 +130,7 @@ final class PersonaEndpointTests: XCTestCase {
 
     /// ⛔ THE FORM CARRIES EXACTLY THE TEN KEYS THE SERVER'S SANITISER READS. A key it
     /// does not read is inert TODAY, which is how a form field becomes an agent input
-    /// later without anyone deciding — and `dgiEnabled` in particular is absent
+    /// later without anyone deciding, and `dgiEnabled` in particular is absent
     /// because a preview does not enrich anybody.
     func testTheFormCarriesTheSanitisersTenKeysAndNoOthers() {
         let descriptor = DistrictEndpoints.previewToken(

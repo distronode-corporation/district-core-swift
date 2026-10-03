@@ -8,13 +8,13 @@ import Foundation
 /// Analytics is raw SQL over the `Call` table; usage and usage history are metering
 /// `groupBy`s on a different route, in two different response shapes. They fail for
 /// different reasons, so folding them into one `Result` would let either failure
-/// blank an answer the caller already holds — an operator who can see this month's
+/// blank an answer the caller already holds, an operator who can see this month's
 /// SMS count losing it because a call aggregate timed out. The caller runs them
 /// concurrently and keeps three sub-states; this layer's job is to keep each one
 /// honest on its own.
 ///
 /// ⚠️ NO CACHING AND NO PAGER. Analytics is a fixed-size aggregate per window and
-/// usage is one row per month, so neither pages — and a stale cache behind a figure
+/// usage is one row per month, so neither pages, and a stale cache behind a figure
 /// an operator is reading as current is worse than a second request.
 public struct AnalyticsRepository: Sendable {
     /// The span the web console asks for.
@@ -34,7 +34,7 @@ public struct AnalyticsRepository: Sendable {
     ///
     /// ⛔ THE ENVELOPE GUARD MATTERS MORE HERE THAN ALMOST ANYWHERE ELSE ON THIS
     /// SURFACE. ``AnalyticsResponse`` requires every key, so `{}` no longer decodes
-    /// — but a well-formed body that says `success: false` still does, and it
+    /// but a well-formed body that says `success: false` still does, and it
     /// renders as ZERO CALLS, ZERO CONVERSIONS and a flat trend. That is not an
     /// empty state, it is a fabricated one, and an operator has nothing on the
     /// screen to tell it from a genuinely quiet week.
@@ -58,8 +58,8 @@ public struct AnalyticsRepository: Sendable {
     /// ⛔ THE NIL IS CARRIED THROUGH INSIDE A SUCCESS, NOT CONVERTED INTO A FAILURE
     /// AND NOT INTO AN EMPTY OBJECT. `.success(nil)` means "we asked, and there is
     /// genuinely nothing recorded for this month"; a `.failure` means "we could not
-    /// find out". The screen says different things about them — a sentence against a
-    /// retry — and collapsing them in either direction is the mistake this signature
+    /// find out". The screen says different things about them, a sentence against a
+    /// retry, and collapsing them in either direction is the mistake this signature
     /// exists to prevent, because the collapsed form asserts a billing fact nobody
     /// measured.
     ///
@@ -80,7 +80,7 @@ public struct AnalyticsRepository: Sendable {
     ///
     /// ⚠️ A SHORT LIST IS NOT AN ERROR AND AN EMPTY ONE IS NOT A FAILURE. The server
     /// skips months with no rows and clamps the request to 1...24, so the answer can
-    /// be shorter than asked for — or empty for a workspace that has never been
+    /// be shorter than asked for, or empty for a workspace that has never been
     /// metered, which means exactly what it says.
     public func usageHistory(
         workspaceId: String,

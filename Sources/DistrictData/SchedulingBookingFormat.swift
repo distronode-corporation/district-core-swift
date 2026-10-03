@@ -31,7 +31,7 @@ public struct SchedulingBookingQuery: Equatable, Sendable {
     public var from: String
     public var to: String
     /// ⚠️ A SLUG, NOT AN ID. `bookings.list` filters event types by slug, and an unknown
-    /// one is an empty 200 rather than a 404 — so an empty page is never evidence the
+    /// one is an empty 200 rather than a 404, so an empty page is never evidence the
     /// filter was understood. See the ⚠️ on the repository's `bookings` method.
     public var eventTypeSlug: String
     public var host: String
@@ -91,7 +91,7 @@ public enum SchedulingBookingFormat {
     /// Turn the filter row into the read's parameters.
     ///
     /// ⛔ AN EMPTY FILTER IS OMITTED AND NEVER SENT AS `""`. The catalog validates these,
-    /// and an empty `event_type` is not "any event type" to the fork — it is a slug that
+    /// and an empty `event_type` is not "any event type" to the fork, it is a slug that
     /// matches nothing, which comes back as an empty 200 that reads exactly like a
     /// workspace with no bookings. ⚠️ And an unknown slug answers the same empty 200, so
     /// an empty page is never evidence the filter was understood.
@@ -183,7 +183,7 @@ public enum SchedulingBookingFormat {
     /// ⛔ ON `endAt` AND NOT ON `startAt`, which is the difference between "this meeting
     /// is running" and "this meeting is over". A booking that started ten minutes ago is
     /// still cancellable; one that ended ten minutes ago is not. ⚠️ Nothing in this READ
-    /// stage calls it — it is what the write stage's Cancel and Reschedule controls gate
+    /// stage calls it, it is what the write stage's Cancel and Reschedule controls gate
     /// on, and it is ported here because it is a property of the row rather than of the
     /// form.
     public static func isActionable(_ booking: SchedulingBooking, now: Date = Date()) -> Bool {

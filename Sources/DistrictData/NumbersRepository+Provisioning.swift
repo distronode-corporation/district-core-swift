@@ -10,7 +10,7 @@ import Foundation
 /// and it is copied to the call site rather than guessed.
 ///
 /// ⚠️ IT IS NOT "IS THIS SCARY". Uploading a document sounds consequential and is
-/// ``idempotent`` — the route replaces the row for that requirement rather than adding a
+/// ``idempotent``, the route replaces the row for that requirement rather than adding a
 /// second one. Releasing a number sounds like tidying up and is ``once``.
 public enum NumberWriteRepeat: Sendable {
     /// Safe to send again: the server converges on the same state.
@@ -31,20 +31,20 @@ public enum NumberWriteRepeat: Sendable {
 /// WRITE DID NOT HAPPEN, never when it merely might not have. The three ``ApiError``
 /// cases are not equally informative and that asymmetry is the whole decision:
 ///
-///   - `.http` in 400...499 is the server having REFUSED before it did any work — the
+///   - `.http` in 400...499 is the server having REFUSED before it did any work, the
 ///     role guard, the ownership check against the hub index, the rate limiter, a
 ///     missing row, a malformed body. Nothing was spent. A repeat is honest.
 ///   - `.http` at 500 and above is the server having THROWN, which on this family it
 ///     can do after the carrier call has already landed. Ambiguous.
 ///   - `.transport` is no answer at all, which is the lost-response case. Ambiguous.
 ///   - `.decoding` is NOT ambiguous and is the one that reads as harmless. It is only
-///     ever produced from a **2xx** — `ApiErrorNormalizer` guards on `isSuccess` — so
+///     ever produced from a **2xx**, `ApiErrorNormalizer` guards on `isSuccess`, so
 ///     the server answered success and the write DID happen. A repeat spends it again,
 ///     guaranteed rather than possibly.
 ///
 /// ⚠️ THE 4xx BRANCH IS SAFE HERE FOR A REASON WORTH STATING, BECAUSE IT IS NOT SAFE
 /// EVERYWHERE. On `numbers/release` a **403** after a successful release is the
-/// EXPECTED answer — the ownership row the guard needs has just been deleted — so a
+/// EXPECTED answer, the ownership row the guard needs has just been deleted, so a
 /// re-armed control that is pressed again gets the same 403 and spends nothing. What
 /// makes that acceptable is that the second failure is also free; it is emphatically
 /// not evidence that the first attempt failed, and a screen must not word it that way.
@@ -93,8 +93,8 @@ public extension NumbersRepository {
     /// Which carriers this workspace has credentials for.
     ///
     /// ⛔ NO `ResponseEnvelope.affirm` HERE, AND THAT IS NOT AN OVERSIGHT. This route
-    /// sends no `success` flag at all — the fourth on this surface after the scheduling
-    /// pair, `stripeBilling` and `meetings` — so affirming one would look for a key that
+    /// sends no `success` flag at all, the fourth on this surface after the scheduling
+    /// pair, `stripeBilling` and `meetings`, so affirming one would look for a key that
     /// does not exist and fail every response. The required non-optional `connected` is
     /// what rejects a `{}` body.
     ///
@@ -119,7 +119,7 @@ public extension NumbersRepository {
     /// ⛔ A NULL `requirements` IS NOT A FAILED LOOKUP AND MUST NOT BE CONVERTED INTO
     /// ONE. It means the country publishes no regulation for that number type, i.e. no
     /// registration is required, which is a real and common answer. A failed lookup
-    /// throws server-side and arrives as a 500, so the two stay distinguishable — and
+    /// throws server-side and arrives as a 500, so the two stay distinguishable, and
     /// collapsing them either way is wrong: upward tells a customer to file paperwork
     /// that does not exist, downward tells them none is needed when nobody could ask.
     ///
@@ -129,7 +129,7 @@ public extension NumbersRepository {
     ///
     /// ⚠️ ENVELOPE FIRST. Every field of this body would survive a thin document except
     /// the four required ones, and a half-decoded read would report `purchasable: false`
-    /// with no requirements — which reads as "we cannot serve your market" about a
+    /// with no requirements, which reads as "we cannot serve your market" about a
     /// country nobody looked at.
     func numberRequirements(
         workspaceId: String,
@@ -221,8 +221,8 @@ public extension NumbersRepository {
     /// and nothing is deleted).
     ///
     /// ⛔ THE REPLY IS NOT A LIST ROW. It answers `{id, requirementName, mimeType,
-    /// sizeBytes, createdAt}` — `createdAt`, not `updatedAt`, and neither `stored` nor
-    /// `submitted` — so a caller cannot splice it into a
+    /// sizeBytes, createdAt}`, `createdAt`, not `updatedAt`, and neither `stored` nor
+    /// `submitted`, so a caller cannot splice it into a
     /// ``NumberRegistration/documents`` array. Re-read the list. See
     /// ``UploadedRegistrationDocument``.
     ///
@@ -261,8 +261,8 @@ public extension NumbersRepository {
     /// **404**, which is the outcome the caller asked for rather than a new problem.
     ///
     /// ⛔ A **502 CHANGED NOTHING AND THE ROW IS STILL THERE**, deliberately. This route
-    /// deletes the OBJECT first and the row second — the opposite of the desk logo's
-    /// order — because `storageKey` is the only pointer to the bytes and dropping the
+    /// deletes the OBJECT first and the row second, the opposite of the desk logo's
+    /// order, because `storageKey` is the only pointer to the bytes and dropping the
     /// row first would abandon an identity document in a bucket under a name nobody can
     /// reconstruct. So a failed removal is retryable and must not be drawn as done.
     func deleteRegistrationDocument(
@@ -288,7 +288,7 @@ public extension NumbersRepository {
     /// the workspace's own account and submits a REGULATED APPLICATION IN THE CUSTOMER'S
     /// NAME. 5/hour per workspace against its siblings' 60. ⚠️ The route's persist-as-you-go
     /// ordering means an OPERATOR's second tap re-uses the EndUser and every uploaded
-    /// document rather than filing a second copy of a passport — which makes a deliberate
+    /// document rather than filing a second copy of a passport, which makes a deliberate
     /// retry cheap and is not a licence for this client to retry on its own.
     ///
     /// ⛔ A **422 IS "YOUR PAPERWORK IS WRONG" AND THE FILING STAYS A DRAFT**; a **502 IS
@@ -301,7 +301,7 @@ public extension NumbersRepository {
     /// and the normaliser keeps only the sentence. It is recoverable rather than lost:
     /// the route stores the carrier's structured failures verbatim on the row, so
     /// ``numberRegistrations(workspaceId:)`` returns them as
-    /// ``NumberRegistration/rejectionReasons``. **Re-read the list after a refusal** —
+    /// ``NumberRegistration/rejectionReasons``. **Re-read the list after a refusal**,
     /// showing only the sentence tells a customer their filing was refused without
     /// saying which part.
     ///
@@ -330,7 +330,7 @@ public extension NumbersRepository {
     ///
     /// ⛔ IT IS NOT THE HARMLESS ONE IT SOUNDS LIKE. On Twilio the number-level voice
     /// URLs and a trunk binding are MUTUALLY EXCLUSIVE, so the route restates the EU
-    /// trunk binding on every call — and a reconfigure that omitted it would UNBIND an
+    /// trunk binding on every call, and a reconfigure that omitted it would UNBIND an
     /// EU DID from the EU trunk, leaving the number ringing while being answered by the
     /// United States hub, contradicting what `/sovereign/data-residency` publishes, with
     /// a 200 either way. The route fails CLOSED (**503**) rather than degrade when the
@@ -343,7 +343,7 @@ public extension NumbersRepository {
     /// retry.
     ///
     /// ⛔ THE ERRORS CARRY `{error: …}` WITH NO `success: false`, so there is nothing to
-    /// affirm on the failure path — and the SUCCESS is a bare `{success: true}`, which
+    /// affirm on the failure path, and the SUCCESS is a bare `{success: true}`, which
     /// ``SuccessResponse`` decodes and this method does affirm.
     func configureNumber(workspaceId: String, phoneNumber: String) async -> Result<SuccessResponse, ApiError> {
         let descriptor = DistrictEndpoints.configureNumber(workspaceId: workspaceId, phoneNumber: phoneNumber)
@@ -358,12 +358,12 @@ public extension NumbersRepository {
     /// ⛔ ``NumberWriteRepeat/once``, IRREVERSIBLE, AND IT NEEDS AN EXPLICIT
     /// CONFIRMATION. The number returns to the carrier's general pool, so it is
     /// generally NOT reclaimable, and every inbound call and message routed to it stops
-    /// — the tenant's callers reach nothing. ⚠️ Unlike a purchase there is no carrier
+    /// the tenant's callers reach nothing. ⚠️ Unlike a purchase there is no carrier
     /// balance that eventually stops a runaway: a loop keeps working until the workspace
     /// has no numbers left, and the only brake is 10/hour per workspace.
     ///
     /// ⛔ A **200 MAY CARRY `warnings`, AND THAT IS NOT A PARTIAL RELEASE.** The number
-    /// is gone; a cleanup step after the irreversible part did not finish — the inbound
+    /// is gone; a cleanup step after the irreversible part did not finish, the inbound
     /// trunk still lists it, or its monthly charge could not be ended, which means the
     /// workspace KEEPS BEING CHARGED for a number it no longer has. The flag is carried
     /// through inside the success rather than promoted to a failure, for the reason
@@ -372,13 +372,13 @@ public extension NumbersRepository {
     ///
     /// ⛔ A **502 MEANS NOTHING WAS CHANGED**: the route refuses to run any cleanup after
     /// a carrier refusal, because every step below it assumes the number is gone. That
-    /// is also why a retry after a SUCCESS answers **403** — the ownership row the guard
-    /// needs has just been deleted — which is the expected answer and must not be worded
+    /// is also why a retry after a SUCCESS answers **403**, the ownership row the guard
+    /// needs has just been deleted, which is the expected answer and must not be worded
     /// as "the release failed".
     ///
     /// ⛔ AND A MANAGED NUMBER IS NOT THE TENANT'S TO RELEASE. `managed: true` on
     /// ``ListedNumber`` means the line is held on Distronode's carrier account, so no
-    /// release control may be offered for one — the row is theirs to USE, not to
+    /// release control may be offered for one, the row is theirs to USE, not to
     /// administer.
     func releaseNumber(workspaceId: String, phoneNumber: String) async -> Result<NumberReleaseResponse, ApiError> {
         let descriptor = DistrictEndpoints.releaseNumber(workspaceId: workspaceId, phoneNumber: phoneNumber)

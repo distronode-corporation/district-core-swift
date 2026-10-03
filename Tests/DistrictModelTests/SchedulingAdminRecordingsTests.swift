@@ -15,7 +15,7 @@ final class SchedulingAdminRecordingsTests: XCTestCase {
     }
 
     /// ⛔ ONLY `id` AND `status` ARE GUARANTEED. A capture that FAILED has no room,
-    /// no duration, no file and no booker, because none of them was ever written —
+    /// no duration, no file and no booker, because none of them was ever written,
     /// so a DTO that required `booking_id` would throw on the one row an operator
     /// most needs to see, and the failure would read as "recordings are broken".
     func testAFailedRecordingDecodesFromTwoKeys() throws {
@@ -50,7 +50,7 @@ final class SchedulingAdminRecordingsTests: XCTestCase {
 
     /// ⛔ A FILE IS NOT IMPLIED BY `status == "ready"`. A row whose object was
     /// reaped by retention keeps its status and loses its file, and the download
-    /// route answers 404 for it — so a Play button drawn off the status alone fails
+    /// route answers 404 for it, so a Play button drawn off the status alone fails
     /// inside the player rather than being absent from the row.
     func testAReadyRecordingCanReportNoFile() throws {
         let row = try decode(SchedulingRecording.self, #"{"id":"rec_3","status":"ready","has_file":false}"#)
@@ -79,7 +79,7 @@ final class SchedulingAdminRecordingsTests: XCTestCase {
         ))
     }
 
-    /// ⚠️ AN EMPTY LIST IS A VALID ANSWER AND NOT AN ABSENCE — a tenancy that has
+    /// ⚠️ AN EMPTY LIST IS A VALID ANSWER AND NOT AN ABSENCE, a tenancy that has
     /// never recorded anything.
     func testAnEmptyRecordingListDecodes() throws {
         XCTAssertTrue(try decode(SchedulingRecordingList.self, #"{"recordings":[]}"#).recordings.isEmpty)
@@ -95,8 +95,8 @@ final class SchedulingAdminRecordingsTests: XCTestCase {
         XCTAssertThrowsError(try decode(SchedulingRecordingsDeleted.self, #"{"deleted":4}"#))
     }
 
-    /// ⛔ `pending` IS A REAL, COMMON STATE — the guest left before the prompt
-    /// resolved — AND IS NEVER "GRANTED BY DEFAULT". An absent `decided_at` beside
+    /// ⛔ `pending` IS A REAL, COMMON STATE, the guest left before the prompt
+    /// resolved, AND IS NEVER "GRANTED BY DEFAULT". An absent `decided_at` beside
     /// it is the pair that makes the row readable: a decision with no timestamp has
     /// not been made.
     func testAPendingConsentCarriesNeitherANameNorATimestamp() throws {

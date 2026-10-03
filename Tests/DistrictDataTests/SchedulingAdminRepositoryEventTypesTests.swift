@@ -16,7 +16,7 @@ import XCTest
 /// key and a wrong value all still fail.
 ///
 /// ⛔ EVERY PATCH IS ASSERTED IN BOTH POLARITIES. `JSONValue.object(_:)` drops a nil
-/// pair, so "leave alone" is spelled by ABSENCE — and a test that only ever sent a
+/// pair, so "leave alone" is spelled by ABSENCE, and a test that only ever sent a
 /// fully populated draft would pass identically against a builder that ignored nil
 /// and sent nulls, which the server reads as a different instruction.
 final class SchedulingAdminRepositoryEventTypesTests: XCTestCase {

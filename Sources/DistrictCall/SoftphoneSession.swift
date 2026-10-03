@@ -47,7 +47,7 @@ public struct SoftphoneState: Sendable, Equatable {
 
     /// ⛔ LATCHED AT THE FIRST PARTICIPANT AND NEVER RECOMPUTED. Once answered, a
     /// room that empties means the callee hung up rather than that they were
-    /// never there — a flag that fell back to false would redraw the ringing UI
+    /// never there, a flag that fell back to false would redraw the ringing UI
     /// over a call that had just ended and restart the duration from zero. It
     /// survives into ``SoftphonePhase/ended(_:)`` because it is what says whether
     /// ``CallMediaState/elapsedSeconds`` is a billed length or a zero.
@@ -57,7 +57,7 @@ public struct SoftphoneState: Sendable, Equatable {
     ///
     /// ⛔ THE ONLY THING THAT CAN END THE CARRIER LEG, AND IT ARRIVES LATE. It is
     /// unknown for the whole of ``SoftphonePhase/dialing``, which is precisely the
-    /// window an operator hangs up in when they mis-dial — so a design that could
+    /// window an operator hangs up in when they mis-dial, so a design that could
     /// only spend it while a call was live would miss the case it exists for. See
     /// ``SoftphoneServerLeg`` for how a credential arriving AFTER the ending is
     /// still spent.
@@ -100,7 +100,7 @@ public enum SoftphoneEvent: Sendable, Equatable {
     ///
     /// ⛔ IT CARRIES THE `callId` TOO, AND THAT IS NOT BOOKKEEPING. Without it the
     /// reducer never learns the id and nothing in the machine can ask the server
-    /// to end the carrier leg — which is the whole of the billing defect recorded
+    /// to end the carrier leg, which is the whole of the billing defect recorded
     /// on ``DialResponse/callId``. The id is the ONLY handle on the SIP participant;
     /// the room name is not one, and no client mints either.
     case dialAccepted(url: String, token: String, callId: String)
@@ -116,7 +116,7 @@ public enum SoftphoneEvent: Sendable, Equatable {
 
     /// One second of a call that has been answered.
     ///
-    /// ⚠️ THE TIMER'S GRANULARITY, NOT A POLL — nothing is fetched. The clock
+    /// ⚠️ THE TIMER'S GRANULARITY, NOT A POLL, nothing is fetched. The clock
     /// lives in whatever drives this; putting a sleep in here would make every
     /// duration assertion wait in real time.
     case tick
@@ -134,7 +134,7 @@ public extension SoftphoneEvent {
     ///
     /// ⚠️ The rest is unchanged: the server has already written the `Call` row and
     /// already told the carrier to dial by the time it mints a credential, so there
-    /// is no retry — retrying places a SECOND call. Naming the DTO here keeps the
+    /// is no retry, retrying places a SECOND call. Naming the DTO here keeps the
     /// "used verbatim" rule in one place instead of at every caller.
     static func dialAccepted(_ response: DialResponse) -> SoftphoneEvent {
         .dialAccepted(url: response.url, token: response.token, callId: response.callId)
@@ -150,7 +150,7 @@ public extension SoftphoneEvent {
 /// needs a media server, a carrier or a device. The Kotlin equivalent
 /// (`SoftphoneSession.kt`) is a coroutine-scoped object whose tests carry three
 /// paragraphs about `runTest` hanging on a `while (true) { delay(tick) }` ticker
-/// — that hazard cannot exist here because the ticker is an event.
+/// that hazard cannot exist here because the ticker is an event.
 ///
 /// ⛔ ONE SESSION PER CALL, NEVER A REUSED ONE. ``SoftphonePhase/ended(_:)`` is
 /// terminal and absorbs everything, which is what makes "hang up disconnects
@@ -200,8 +200,8 @@ public struct SoftphoneSession: Sendable, Equatable {
             //
             // ⛔ WITH EXACTLY ONE EXCEPTION, AND IT IS THE CASE THE BILLING
             // DEFECT LIVES IN. A credential that arrives after the
-            // ending carries the one thing the machine still needs — the `callId`
-            // — so it is absorbed for every purpose but that one. See
+            // ending carries the one thing the machine still needs, the `callId`
+            // so it is absorbed for every purpose but that one. See
             // `SoftphoneServerLeg.swift`, which is where the whole argument is.
             reduceEnded(state, event)
         }
@@ -231,8 +231,8 @@ public struct SoftphoneSession: Sendable, Equatable {
             // ⛔ AND THE OS IS TOLD. "No call was placed" is true of the CARRIER and false of
             // CallKit: the dial only goes out once a `CXStartCallAction` has been
             // PERFORMED, so by the time a refusal can exist at all the system is
-            // already holding a call. Every coded refusal reaches here — a DNC hit,
-            // a 402, a dormant workspace, a handset that is simply offline — and
+            // already holding a call. Every coded refusal reaches here, a DNC hit,
+            // a 402, a dormant workspace, a handset that is simply offline, and
             // without the report each one leaves that call standing forever.
             var next = state
             next.phase = .idle
@@ -413,7 +413,7 @@ public struct SoftphoneSession: Sendable, Equatable {
         // the endings the OS performed from the ones it cannot see; the SERVER can
         // see none of them. ``CallEndReason/remoteHungUp`` is the one case where
         // the leg is genuinely already down, and the route answers that with
-        // `{ended: false}` at no cost — whereas ``CallEndReason/failed(message:)``
+        // `{ended: false}` at no cost, whereas ``CallEndReason/failed(message:)``
         // and ``CallEndReason/remoteEnded(reason:)`` mean OUR socket died, which
         // says nothing at all about the telephone. Guessing which of the three is
         // which, wrongly, is a bill.
@@ -453,7 +453,7 @@ public struct SoftphoneSession: Sendable, Equatable {
         // ⚠️ NOT REACHABLE ON AN OUTBOUND CALL, AND ANSWERED ANYWAY RATHER THAN
         // DEFAULTED. All four belong to ``IncomingCallController``. Writing them
         // out is what makes a NEW ``CallEndReason`` a compile error here rather
-        // than an ending that is silently never reported — which is the exact
+        // than an ending that is silently never reported, which is the exact
         // shape of the defect this function was added to close.
         case .declined, .ringTimedOut, .callerCancelled, .answerRefused:
             [.reportCallEnded, .engine(.disconnect)]

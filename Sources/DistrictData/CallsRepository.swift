@@ -15,12 +15,12 @@ public struct CallsRepository: Sendable {
     /// ⛔ NO TOTAL, SO END-OF-LIST IS INFERRED FROM A SHORT PAGE. The route
     /// answers a BARE ARRAY with no `total`, no `hasMore` and no cursor. That is
     /// what ``OffsetPage/total`` being nil expresses, and it costs one extra empty
-    /// request on an exactly-divisible feed — the right price for not guessing.
+    /// request on an exactly-divisible feed, the right price for not guessing.
     ///
     /// ⛔ `[CallSummary].self`, WITH NO WRAPPER. `NextResponse.json(calls)` is
     /// what the route does; a DTO expecting `{success, …}` fails to decode every
     /// response it sends. This is one of three bare-array routes and the only one
-    /// on the MVP surface — see ``BareArrayEndpoints``.
+    /// on the MVP surface, see ``BareArrayEndpoints``.
     ///
     /// ⚠️ A NEW PAGER PER WORKSPACE. Switching workspace must produce a new one
     /// rather than resetting this: the dedup set and the offsets are only
@@ -99,7 +99,7 @@ public struct CallsRepository: Sendable {
     /// ownership afterwards, so another tenant's id looks exactly like one that
     /// does not exist. Word any message accordingly.
     ///
-    /// ⚠️ THE PAYLOAD IS THE FEED'S OWN ``CallSummary``, not a richer type — the
+    /// ⚠️ THE PAYLOAD IS THE FEED'S OWN ``CallSummary``, not a richer type, the
     /// route reuses the server's one `toCallSummaries` mapping. What differs is
     /// the ENVELOPE: the feed is a bare array, this is `{success, call}`.
     public func detail(workspaceId: String, callId: String) async -> Result<CallSummary, ApiError> {
@@ -137,7 +137,7 @@ public struct CallsRepository: Sendable {
         )
         return outcome
             .flatMap { ResponseEnvelope.affirm("CallTranscriptResponse", $0.success, $0) }
-            // ⚠️ An absent transcript is "" rather than nil — the handler does
+            // ⚠️ An absent transcript is "" rather than nil, the handler does
             // `call.transcript || ""`, so emptiness is the "nothing to show"
             // test and a nil check would never fire.
             .map(\.transcript)
@@ -150,7 +150,7 @@ public struct CallsRepository: Sendable {
     /// fails silently in whatever player receives it, at which point the failure
     /// looks like a broken recording rather than a stale link.
     ///
-    /// ⛔ AND THE REDIRECT IS NOT FOLLOWED — see
+    /// ⛔ AND THE REDIRECT IS NOT FOLLOWED, see
     /// ``ApiClient/redirectTarget(_:)``. Following it downloads the whole audio
     /// file through this process just to learn its address.
     ///

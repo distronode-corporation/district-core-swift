@@ -8,8 +8,8 @@ import XCTest
 ///
 /// ⚠️ THE STRICT GATE PROVES THE KEY SET; THESE PROVE THE BRANCHES. See
 /// `AuthWorkspaceContractTests` for the full statement of why both exist. A
-/// computed property is invisible to the gate by construction — the gate
-/// decodes, re-encodes and compares keys, and never asks the DTO a question — so
+/// computed property is invisible to the gate by construction, the gate
+/// decodes, re-encodes and compares keys, and never asks the DTO a question, so
 /// nothing but a test like this covers ``Contact/displayName`` at all.
 final class ContactsContractTests: XCTestCase {
     // MARK: - The two rows the list fixture exists to cover
@@ -22,7 +22,7 @@ final class ContactsContractTests: XCTestCase {
     ///
     /// ⛔ AND `dgiStatus: null` IS NOT `pending`. `contacts/clear-intel` resets
     /// the column to NULL so nothing re-crawls the contact, so null means "no
-    /// dossier, and none queued" — the state that should offer enrichment rather
+    /// dossier, and none queued", the state that should offer enrichment rather
     /// than spin on a job that will never complete.
     func testTheListCoversAnEnrichedRowAndAnEmailFirstOne() throws {
         let response = try StrictDecodeVerifier.verify(
@@ -57,7 +57,7 @@ final class ContactsContractTests: XCTestCase {
 
     /// ⛔ ONE DTO SERVES BOTH ROUTES BECAUSE BOTH RETURN THE RAW PRISMA ROW, AND
     /// THIS IS THE ASSERTION THAT SAYS SO. The alternative the server could have
-    /// taken — reusing `getPaginatedContacts` for the list — returns a MAPPED
+    /// taken, reusing `getPaginatedContacts` for the list, returns a MAPPED
     /// shape that silently drops `dgiStatus`, `dgiError` and `visualMemory`. The
     /// detail screen needs `dgiStatus`, so that choice would have forced two
     /// contact shapes with different nullability onto this client. Comparing the
@@ -91,7 +91,7 @@ final class ContactsContractTests: XCTestCase {
 
     /// ⛔ THE "Unknown" LITERAL IS THE WHOLE REASON THIS HELPER EXISTS. `name` is
     /// non-null server-side, so a blank check alone leaves a contact list full of
-    /// rows all called Unknown — the voice agent writes that exact string for a
+    /// rows all called Unknown, the voice agent writes that exact string for a
     /// caller it could not identify. nil means "fall back to the number or the
     /// address", which is a decision the caller has to be given the chance to
     /// make.
@@ -103,8 +103,8 @@ final class ContactsContractTests: XCTestCase {
     }
 
     /// ⚠️ ONE LITERAL, NOT A HEURISTIC. Suppressing anything that merely looked
-    /// unidentified would hide real names — people are called Unknown Ltd and
-    /// unknown@ is a real mailbox — so the comparison is exact and
+    /// unidentified would hide real names, people are called Unknown Ltd and
+    /// unknown@ is a real mailbox, so the comparison is exact and
     /// case-sensitive, matching the one string the agent actually stores.
     func testOnlyTheExactLiteralIsSuppressed() throws {
         XCTAssertEqual(try contact(named: "Unknown Caller").displayName, "Unknown Caller")
@@ -119,7 +119,7 @@ final class ContactsContractTests: XCTestCase {
     /// ⛔ DIVERGENCE FROM THE KOTLIN CLIENT, DELIBERATE AND STRICTER. Kotlin's
     /// `Contact.displayName` is
     /// `name.takeUnless { it.isBlank() || it == UNKNOWN_NAME }`, which compares
-    /// the RAW value — so a padded `"  Unknown  "` is displayable on Android and
+    /// the RAW value, so a padded `"  Unknown  "` is displayable on Android and
     /// suppressed here. iOS trims before comparing because padding changes
     /// nothing about how useless that literal is as a label, and a row written
     /// with stray whitespace is exactly the row a raw comparison misses. Every
@@ -133,7 +133,7 @@ final class ContactsContractTests: XCTestCase {
 
     /// ⚠️ CARRIED, NEVER REWRITTEN, AND READ DEFENSIVELY AT THE POINT OF DISPLAY.
     /// All three of these are `Json?` columns with no server-side shape, so the
-    /// documented form is a convention rather than a guarantee — reading one the
+    /// documented form is a convention rather than a guarantee, reading one the
     /// wrong way has to answer "nothing to show" instead of throwing.
     func testTheOpaqueColumnsAreCarriedAndReadDefensively() throws {
         let response = try StrictDecodeVerifier.verify(
@@ -160,7 +160,7 @@ final class ContactsContractTests: XCTestCase {
 
     /// ⚠️ EVERY FIELD OF ``ContactCompany`` IS OPTIONAL BECAUSE A ROW WRITTEN BY
     /// AN EARLIER PIPELINE MAY CARRY FEWER KEYS. The strict gate covers drift in
-    /// the other direction — a NEW key — while the shipped parser stays lenient,
+    /// the other direction, a NEW key, while the shipped parser stays lenient,
     /// so this is the half the gate cannot see.
     func testCompanyDecodesARowAnEarlierPipelineWroteFewerKeysOn() throws {
         let partial = try decode(ContactCompany.self, from: #"{"name":"Analytical Engines"}"#)

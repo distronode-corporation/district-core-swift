@@ -4,7 +4,7 @@
 /// INDISTINGUISHABLE ONCE THEY ARE BOTH `String`. `POST
 /// /api/district/calls/{callId}/answer?workspaceId=` takes one of each, adjacent,
 /// in that order, and the Kotlin client records the pair in its tests as the
-/// single string `"CA1/ws-1"` precisely because a swap is otherwise invisible —
+/// single string `"CA1/ws-1"` precisely because a swap is otherwise invisible,
 /// the request is well-formed either way and comes back 404 for a call that
 /// exists. Swapping these two is a compile error.
 ///

@@ -2,7 +2,7 @@ import DistrictModel
 import Foundation
 import XCTest
 
-/// ``WireInstant`` — the one ISO-8601 parser the app and the package share.
+/// ``WireInstant``, the one ISO-8601 parser the app and the package share.
 final class WireInstantTests: XCTestCase {
     func testParsesAStampWithFractionalSeconds() throws {
         let date = try XCTUnwrap(WireInstant.parse("2026-09-12T14:30:00.123Z"))

@@ -6,8 +6,8 @@ import Foundation
 // S1a landed it in `SchedulingOverrideCreated.swift`, because
 // `availability.overrides.create` answers a union of that row and a range summary
 // and the union could not exist without it. A second definition beside the rest of
-// the availability family would compile — two types in one module may not share a
-// name, but nothing stops `SchedulingAvailabilityOverrideRow` sitting next to it —
+// the availability family would compile, two types in one module may not share a
+// name, but nothing stops `SchedulingAvailabilityOverrideRow` sitting next to it,
 // and the two would then drift a field at a time, with the contract gate pinning
 // whichever one the fixture list happened to name. The list op, the patch op and
 // the create op all decode the one type in that file.
@@ -17,7 +17,7 @@ import Foundation
 /// ⛔ `event_type_id` IS NULLABLE AND THE NULL IS THE LOAD-BEARING VALUE: it means
 /// the rule applies to EVERY event type the member hosts, not that the rule is
 /// unattached or broken. A screen that filtered nulls out would hide the default
-/// working week — which is the only rule most tenancies ever create — and a
+/// working week, which is the only rule most tenancies ever create, and a
 /// caller that sent a real id "to tidy it up" would narrow a global rule to one
 /// event type silently. It arrives as an explicit `null` rather than as an absent
 /// key (the catalog spells it `.nullable()` with no `.optional()`), which is why

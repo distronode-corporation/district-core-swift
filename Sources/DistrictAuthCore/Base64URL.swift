@@ -3,8 +3,8 @@ import Foundation
 /// base64url encoding without padding, per RFC 7636 Appendix A.
 ///
 /// This is the one piece of PKCE that has no dependency on a hash function.
-/// Getting it wrong is a silent auth failure rather than a loud one — the
-/// authorisation server simply rejects the exchange — so it is unit-tested
+/// Getting it wrong is a silent auth failure rather than a loud one, the
+/// authorisation server simply rejects the exchange, so it is unit-tested
 /// against the RFC's own vector.
 public enum Base64URL {
     /// Encode bytes as base64url with `+`/`/` substituted and padding removed.

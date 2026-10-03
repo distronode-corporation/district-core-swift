@@ -4,7 +4,7 @@ import XCTest
 
 /// ⚠️ THESE ARE HAND-WRITTEN PAYLOADS, NOT CONTRACT FIXTURES. There are no
 /// committed fixtures for the native-auth token/refresh responses on either
-/// platform, so nothing here would notice the server changing the shape — only
+/// platform, so nothing here would notice the server changing the shape, only
 /// that this DTO decodes what this file says it decodes. The payloads below are
 /// transcribed from the two JSON literals the `token` and `refresh` routes
 /// return; once fixtures exist, they replace these and ``NativeTokenResponse``

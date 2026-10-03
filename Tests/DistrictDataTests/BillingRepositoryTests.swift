@@ -9,8 +9,8 @@ import XCTest
 /// ⛔ THE TWO HALVES USE DIFFERENT ENVELOPE RULES AND THAT IS WHAT THESE TESTS
 /// ARE ABOUT. `workspace/billing` answers `{success, billing}` and MUST be
 /// affirmed, because every field of `WorkspaceBilling` would otherwise decode
-/// out of a `{}` body into a plan reading no tier, no status and — the dangerous
-/// one — `overageCapExceeded: false`, which says "you are within your plan" and
+/// out of a `{}` body into a plan reading no tier, no status and, the dangerous
+/// one, `overageCapExceeded: false`, which says "you are within your plan" and
 /// is the opposite of the fact this screen exists to surface. `/api/billing`
 /// sends no `success` key at all and must NOT be affirmed, because affirming an
 /// absent flag rejects every healthy response.
@@ -38,7 +38,7 @@ final class BillingRepositoryTests: XCTestCase {
 
     /// ⛔ THE COMBINATION THAT MEANS CALLS ARE BEING REFUSED SURVIVES THE
     /// REPOSITORY. `hard_cap` plus an exceeded cap is an outage the operator is
-    /// living through, and the app is the only place they can learn it from — so
+    /// living through, and the app is the only place they can learn it from, so
     /// a layer that dropped either field would leave the screen unable to say so.
     func testACappedWorkspaceReachesTheCallerStillReportingRefusedCalls() async throws {
         let transport = RepositoryTransport(json: BillingBodies.workspaceCapped)
@@ -53,7 +53,7 @@ final class BillingRepositoryTests: XCTestCase {
 
     /// ⛔ A 200 CARRYING `success: false` IS NOT A PLAN. Every field of the DTO
     /// has a shape that would decode out of a thin body, and the reading a caller
-    /// would act on is "within your plan" — so the envelope guard is the only
+    /// would act on is "within your plan", so the envelope guard is the only
     /// thing between a refused read and a confident wrong number.
     func testABodyThatDoesNotAffirmSuccessIsADecodeFailureRatherThanAnEmptyPlan() async {
         let transport = RepositoryTransport(json: #"{"success":false,"billing":null}"#)
@@ -65,8 +65,8 @@ final class BillingRepositoryTests: XCTestCase {
     }
 
     /// ⛔ AN AFFIRMED 200 WITH NO `billing` OBJECT IS MALFORMED, NOT AN EMPTY
-    /// PLAN. Absence of a plan is representable on the wire —
-    /// `subscriptionStatus: "none"` beside a null tier — so a missing object can
+    /// PLAN. Absence of a plan is representable on the wire,
+    /// `subscriptionStatus: "none"` beside a null tier, so a missing object can
     /// only mean drift, and reporting it as "no plan" would hide a server bug
     /// behind an ordinary empty state.
     func testAnAffirmedBodyWithNoBillingObjectIsReportedAsDrift() async {
@@ -127,8 +127,8 @@ final class BillingRepositoryTests: XCTestCase {
     /// ⛔ THE BODY CARRIES NO `success` KEY AND THAT IS THE CONTRACT, NOT A THIN
     /// FIXTURE. Almost every district route answers `{success, …}` and this layer
     /// checks the flag by hand; this one does not send one, so a repository that
-    /// affirmed an envelope would turn every healthy response — every working
-    /// subscription — into a decode failure. Pinned explicitly because the
+    /// affirmed an envelope would turn every healthy response, every working
+    /// subscription, into a decode failure. Pinned explicitly because the
     /// mistake is a one-line copy from any neighbouring repository.
     func testAStripeBodyWithNoSuccessEnvelopeIsStillASuccess() async {
         let transport = RepositoryTransport(json: BillingBodies.stripeHealthy)

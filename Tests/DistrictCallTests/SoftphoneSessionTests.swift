@@ -191,7 +191,7 @@ final class SoftphoneSessionTests: XCTestCase {
         // ⚠️ AND ``SoftphoneCommand/requestServerHangUp(callId:)`` IS ABSENT FROM
         // ALL OF THEM, WHICH IS THE SHAPE RATHER THAN AN OMISSION. This helper
         // decides from the REASON alone, and whether the carrier leg is still ours
-        // to end is a question about the STATE — the id, and whether it has already
+        // to end is a question about the STATE, the id, and whether it has already
         // been spent. ``SoftphoneSession/end(_:_:)`` appends it afterwards; see
         // `SoftphoneServerLegTests.swift`.
         for reason in Self.everyEndReason {

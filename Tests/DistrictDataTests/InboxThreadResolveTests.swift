@@ -14,8 +14,8 @@ import XCTest
 /// ⛔ THE ADDRESS-KEYED BRANCH IS DECODED FROM BYTES RATHER THAN FROM A FIXTURE, and
 /// that is a property of the corpus rather than a lowered bar.
 /// `district-message-thread.json` is contact-keyed, so the `addr:<key>` /
-/// `contactId: null` shape — a stranger who has just written in, which is the common
-/// case for a FIRST inbound message and therefore for most pushes — has no committed
+/// `contactId: null` shape, a stranger who has just written in, which is the common
+/// case for a FIRST inbound message and therefore for most pushes, has no committed
 /// document. The corpus belongs to the Android side, so the branch is pinned here
 /// the way `district-draft-null.json`'s null draft is.
 final class InboxThreadResolveTests: XCTestCase {
@@ -24,7 +24,7 @@ final class InboxThreadResolveTests: XCTestCase {
     /// ⛔ THE SELECTOR PREFERS THE CONTACT ID, AND THE FALLBACK IS THE COUNTERPART
     /// RATHER THAN THE THREAD KEY. `addr:<normalized>` sent whole as the address
     /// parameter matches nothing, so a `mark-read` built from it succeeds against
-    /// ZERO rows and the badge never clears — the same trap the App's
+    /// ZERO rows and the badge never clears, the same trap the App's
     /// `ThreadTarget` documents from the list's side.
     func testAContactKeyedThreadResolvesToTheContactSelector() async {
         let transport = RepositoryTransport(json: Self.contactKeyed)
@@ -102,7 +102,7 @@ final class InboxThreadResolveTests: XCTestCase {
 
     /// ⚠️ `message.type` IS NULLABLE AND THE CHANNEL DOES NOT COME FROM IT. The column
     /// predates being written on every row, and the route falls back to the ADDRESS
-    /// SHAPE rather than to a bare `"sms"` — telling a client to text an email address
+    /// SHAPE rather than to a bare `"sms"`, telling a client to text an email address
     /// produces a send that fails at the provider with a message the operator wrote and
     /// cannot see. That fallback is the SERVER's; this only proves a null decodes.
     func testANullMessageTypeStillCarriesAServerChosenChannel() async {

@@ -109,8 +109,8 @@ final class SchedulingRecordingFormatTests: XCTestCase {
 
     // MARK: - consentDecision
 
-    /// ⛔ `pending` IS A REAL AND COMMON STATE — the guest left before the prompt resolved
-    /// — and is NEVER "granted by default". These rows are the evidence for a
+    /// ⛔ `pending` IS A REAL AND COMMON STATE, the guest left before the prompt resolved
+    /// and is NEVER "granted by default". These rows are the evidence for a
     /// two-party-consent jurisdiction.
     func testTheDefaultConsentArmIsAnAbsenceAndNotAConsent() {
         XCTAssertEqual(

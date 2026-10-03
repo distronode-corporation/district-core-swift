@@ -9,7 +9,7 @@ import XCTest
 ///
 /// ⚠️ EVERY BODY HERE IS INLINE RATHER THAN A CONTRACT FIXTURE, deliberately. The two
 /// real fixtures are gated in `ContractFixtureTests`, which re-encodes and compares
-/// key sets — a far stronger assertion about SHAPE than this file could make. What is
+/// key sets, a far stronger assertion about SHAPE than this file could make. What is
 /// under test here is the envelope handling and, for the routing save, which rows
 /// reach the wire.
 final class WorkspacePersonaRepositoryTests: XCTestCase {
@@ -18,7 +18,7 @@ final class WorkspacePersonaRepositoryTests: XCTestCase {
     }
 
     private static let optionsBody = """
-    {"success":true,"region":"eu","engines":[{"id":"deepgram-pipeline","label":"Deepgram — EU",\
+    {"success":true,"region":"eu","engines":[{"id":"deepgram-pipeline","label":"Deepgram \u{2014} EU",\
     "inRegion":true,"responseLengths":[{"value":"concise","label":"Concise"}]}],\
     "languages":{"deepgram":[{"value":"en-US","label":"English"}],\
     "general":[{"value":"en-US","label":"English"}]},\
@@ -48,7 +48,7 @@ final class WorkspacePersonaRepositoryTests: XCTestCase {
     /// ⛔ A 200 CARRYING `success:false` IS A FAILURE, NOT AN EMPTY CATALOGUE. This
     /// surface answers exactly that whenever a handler falls into its own error branch
     /// after the headers are written, and an empty catalogue reaching a form would
-    /// leave every picker blank — which is indistinguishable from a workspace with one
+    /// leave every picker blank, which is indistinguishable from a workspace with one
     /// engine and no voices.
     func testAnAffirmedFailureIsAFailureRatherThanAnEmptyCatalogue() async {
         let transport = RepositoryTransport(json: #"{"success":false,"region":"us","engines":[],"# +
@@ -60,7 +60,7 @@ final class WorkspacePersonaRepositoryTests: XCTestCase {
     }
 
     /// ⚠️ A 403 IS THE VIEWER EXCLUSION, which this surface applies to the READ as
-    /// well as the writes — unusual here and deliberate.
+    /// well as the writes, unusual here and deliberate.
     func testAForbiddenReadIsReportedRatherThanDegraded() async {
         let transport = RepositoryTransport(json: #"{"error":"Forbidden"}"#, status: 403)
         let result = await repository(transport).personaOptions(workspaceId: "ws_1")
@@ -240,8 +240,8 @@ final class WorkspacePersonaRepositoryTests: XCTestCase {
         XCTAssertEqual(transport.bodies, [#"{"routingRules":[],"workspaceId":"ws_1"}"#])
     }
 
-    /// ⚠️ A **400 HERE IS OFTEN A REAL, SPECIFIC REFUSAL** — a workspace that restricts
-    /// voices or models rejects a rule naming one, BY NAME — so the sentence is
+    /// ⚠️ A **400 HERE IS OFTEN A REAL, SPECIFIC REFUSAL**, a workspace that restricts
+    /// voices or models rejects a rule naming one, BY NAME, so the sentence is
     /// carried verbatim rather than replaced with a generic one. ⚠️ Its body carries no
     /// `success` key at all, unlike its siblings; that costs nothing because the status
     /// mapping runs first.

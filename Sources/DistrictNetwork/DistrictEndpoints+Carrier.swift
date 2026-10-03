@@ -44,8 +44,8 @@ public extension DistrictEndpoints {
     /// ⛔ ITS ORDINARY FIRST ANSWER IS A **400 CARRYING `code:
     /// "TRUST_BUNDLES_NOT_APPROVED"`**, AND THAT IS AN ACCOUNT STATE RATHER THAN A
     /// FAULT. A TrustHub Customer Profile and an A2P Trust Bundle have to clear
-    /// Twilio's own regulatory vetting first — a manual, multi-day, once-per-account
-    /// Console step — and no amount of retrying moves it. ⚠️ The route still PERSISTS
+    /// Twilio's own regulatory vetting first, a manual, multi-day, once-per-account
+    /// Console step, and no amount of retrying moves it. ⚠️ The route still PERSISTS
     /// the business-identity fields on that path, deliberately, because that is
     /// exactly when whoever builds the Customer Profile needs them: a refused
     /// submission is not wasted typing, and telling the operator otherwise would
@@ -85,7 +85,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ IT FILES A REAL VERIFICATION AGAINST THE WORKSPACE'S OWN CARRIER ACCOUNT,
     /// ENTERS A SLOW MANUAL REVIEW QUEUE, AND FLIPS THE HUB'S OWNERSHIP ROW TO
-    /// `pending_verification` — so a loop churns a live number's routing state, and a
+    /// `pending_verification`, so a loop churns a live number's routing state, and a
     /// stream of duplicates for one number is the pattern that gets an account's
     /// compliance standing questioned. 10/hour per workspace.
     ///
@@ -94,7 +94,7 @@ public extension DistrictEndpoints {
     /// with error 30509 if one does not load, so the route refuses an empty list up
     /// front: a doomed submission costs days and reviewer goodwill, a 400 is instant
     /// and actionable. ⛔ And a Distronode-owned asset could never satisfy it in
-    /// principle — this is a BYOK flow, each workspace is a different business with
+    /// principle, this is a BYOK flow, each workspace is a different business with
     /// its own consent form, and the evidence has to demonstrate the declared opt-in
     /// for THAT business. The placeholder this route used to hardcode
     /// (`opt-in-placeholder`) is now explicitly rejected by pathname, so passing it
@@ -141,7 +141,7 @@ public extension DistrictEndpoints {
     /// The workspace's SIP trunks.
     ///
     /// ⚠️ A TWILIO-SIDE PBX ENDPOINT, NOT THE VOICE AGENT'S TRUNK. The provisioned
-    /// domain is `<domain>.sip.twilio.com` because Twilio requires that suffix — a
+    /// domain is `<domain>.sip.twilio.com` because Twilio requires that suffix, a
     /// different thing entirely from `sip.distronode.com`, which is the District AI
     /// platform's own SIP endpoint. Nothing on this route touches that.
     ///
@@ -152,7 +152,7 @@ public extension DistrictEndpoints {
     /// for them.
     ///
     /// ⛔ THERE IS NO DELETE ON THIS PATH, so nothing in this client can take a trunk
-    /// down — and the $25/month billing item it opened keeps standing. A screen that
+    /// down, and the $25/month billing item it opened keeps standing. A screen that
     /// offered a create without saying so would be offering a one-way door.
     ///
     /// ⚠️ THE READ ADMITS `viewer` AND THE WRITE DOES NOT.
@@ -210,7 +210,7 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ THIS IS THE SERVICE'S CONFIGURATION, NOT THE OTP FLOW.
     /// `workspace/verify/start` and `workspace/verify/check` send and check a code and
-    /// are deliberately not ported — see the ⚠️ at the top of
+    /// are deliberately not ported, see the ⚠️ at the top of
     /// `DistrictEndpoints+Numbers.swift`. What this reads is whether a Twilio Verify
     /// Service has been created and its sid persisted.
     ///
@@ -235,8 +235,8 @@ public extension DistrictEndpoints {
     ///
     /// ⛔ ENABLE AND DISABLE ARE NOT SYMMETRICAL, AND THE ASYMMETRY IS WHAT MAKES THIS
     /// ABUSABLE. Enabling creates a REAL, carrier-billable Twilio Verify Service.
-    /// Disabling deliberately does NOT delete it — verification history and config are
-    /// preserved — and only clears our pointer. So an enable/disable/enable loop mints
+    /// Disabling deliberately does NOT delete it, verification history and config are
+    /// preserved, and only clears our pointer. So an enable/disable/enable loop mints
     /// an unbounded number of billable OTP senders, each of which outlives the
     /// workspace's pointer to it and has to be reaped by hand in the Twilio Console.
     /// ⚠️ That is why the route's 10/hour limit covers BOTH directions and sits above
@@ -244,7 +244,7 @@ public extension DistrictEndpoints {
     /// of the same loop uncapped, and the loop needs both.
     ///
     /// ⚠️ AN ENABLE ON AN ALREADY-CONFIGURED WORKSPACE IS A CHEAP SHORT-CIRCUIT
-    /// answering the stored sid, which caps the steady state at one service — but only
+    /// answering the stored sid, which caps the steady state at one service, but only
     /// while the pointer survives, which the disable path removes.
     ///
     /// ⚠️ IT REQUIRES TWILIO SPECIFICALLY: a workspace on another carrier gets a
@@ -273,7 +273,7 @@ public extension DistrictEndpoints {
     /// SURFACE.** Twilio bills every Lookup and Line Type Intelligence costs more than
     /// a basic one. It is a GET, so it is trivially loopable, and it admits `viewer`,
     /// the lowest role. Nothing downstream caps it: the carrier bills whatever
-    /// arrives, and the only brake is 60/minute per workspace — which is a runaway
+    /// arrives, and the only brake is 60/minute per workspace, which is a runaway
     /// brake, not a budget.
     ///
     /// ⛔ SO IT MUST NOT FIRE ON A KEYSTROKE, ON APPEAR, OR IN A RETRY LOOP, AND IT
@@ -281,7 +281,7 @@ public extension DistrictEndpoints {
     /// numbers as an operator types, which is defensible on a desktop form and is not
     /// on a phone where a scroll can re-run an effect. One tap, one lookup.
     ///
-    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200 CARRYING `info.valid: false`**, not a 404 —
+    /// ⚠️ AN UNPARSEABLE NUMBER IS A **200 CARRYING `info.valid: false`**, not a 404,
     /// the route translates Twilio's own 404 itself. The money is spent either way,
     /// which is the fact worth knowing before treating "invalid" as a cheap answer or
     /// as something to probe for.

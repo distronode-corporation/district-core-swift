@@ -21,7 +21,7 @@ private struct SoftphoneRow {
 ///
 /// ⛔ THE ILLEGAL ONES ARE THE POINT. A recomposition can fire a handler against
 /// a call that has already gone, the OS can deliver an end-call callback twice,
-/// and a late engine event can arrive after a hang-up — so "does nothing" has to
+/// and a late engine event can arrive after a hang-up, so "does nothing" has to
 /// be asserted rather than assumed. None of this needs a media server, a carrier
 /// or a device, which is the whole reason the machine is a reducer.
 ///
@@ -62,7 +62,7 @@ final class SoftphoneTransitionTableTests: XCTestCase {
     ///
     /// ⛔ THE REPORT IS THE ONLY THING THAT ENDS THE SYSTEM'S CALL HERE, and its
     /// absence is what left CallKit believing every finished outbound call was
-    /// still live — which with `maximumCallGroups = 1` refuses every later call in
+    /// still live, which with `maximumCallGroups = 1` refuses every later call in
     /// both directions.
     private static let systemMustBeTold: [SoftphoneCommand] = [.reportCallEnded, .engine(.disconnect)]
 
@@ -106,7 +106,7 @@ final class SoftphoneTransitionTableTests: XCTestCase {
         var rows: [SoftphoneRow] = [
             SoftphoneRow(.dialRequested, .dialing),
             // ⛔ Back to the keypad: no call was placed at the CARRIER. CallKit is
-            // a different question and the answer is the other way round — a
+            // a different question and the answer is the other way round, a
             // `CXStartCallAction` has already been performed, so the system is
             // holding a call that nothing else will ever end.
             SoftphoneRow(.dialRefused, .idle, [.reportCallEnded]),

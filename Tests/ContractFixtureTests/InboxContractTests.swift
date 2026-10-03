@@ -29,7 +29,7 @@ final class InboxContractTests: XCTestCase {
         XCTAssertEqual(persisted.draft?.mediaUrls.count, 1)
 
         // The PUT echoes the stored row, so it is the same shape rather than a
-        // receipt — which is what makes a re-read after autosave unnecessary.
+        // receipt, which is what makes a re-read after autosave unnecessary.
         let saved = try StrictDecodeVerifier.verify(
             fixture: "district-draft-put.json",
             as: DraftResponse.self
@@ -138,7 +138,7 @@ final class InboxContractTests: XCTestCase {
     }
 
     /// ⚠️ ZERO IS A SUCCESS, the same shape as a device revoke. A thread another
-    /// agent already opened marks nothing — the ordinary race, not a failure.
+    /// agent already opened marks nothing, the ordinary race, not a failure.
     /// ⛔ And the route excludes `viewer`, so the call has to be gated in the UI
     /// or a read-only seat gets a permanent badge plus an error on every tap.
     func testMarkReadIsACount() throws {
@@ -167,8 +167,8 @@ final class InboxContractTests: XCTestCase {
     /// the absence: an added key fails as loudly as a dropped one, so the day this
     /// route starts echoing a body, this fixture reds.
     ///
-    /// ⚠️ `readAt: null` IS THE ORDINARY STATE HERE, not an edge — the notification
-    /// exists because nobody has read the message yet — and it is the fixture's one
+    /// ⚠️ `readAt: null` IS THE ORDINARY STATE HERE, not an edge, the notification
+    /// exists because nobody has read the message yet, and it is the fixture's one
     /// allowlisted path.
     func testTheThreadTargetAnswersEveryInboxVocabularyAtOnce() throws {
         let resolved = try StrictDecodeVerifier.verify(
@@ -181,7 +181,7 @@ final class InboxContractTests: XCTestCase {
         // `mark-read`'s and `timeline`'s selector, preferred over the address.
         XCTAssertEqual(resolved.thread.contactId, "contact_contract_1")
         // `send`'s `to` plus its `channel`. ⛔ The counterpart is the UNWRAPPED
-        // address — the route runs `normalizeAddress` so a display-name-wrapped
+        // address, the route runs `normalizeAddress` so a display-name-wrapped
         // `from` cannot reach a carrier.
         XCTAssertEqual(resolved.thread.counterpart, "+14165551234")
         XCTAssertEqual(resolved.thread.channel, MessageChannel.sms)
@@ -227,7 +227,7 @@ final class InboxContractTests: XCTestCase {
     }
 
     /// The opt-out refusal names the settings page the opt-in lives on, and it
-    /// carries no code — so the sentence is the whole product and must be
+    /// carries no code, so the sentence is the whole product and must be
     /// surfaced verbatim rather than replaced with "that did not work".
     func testEnrichDisabledIsARouteOwnedEnvelopeWithNoCode() throws {
         let envelope = try StrictDecodeVerifier.verify(
@@ -241,7 +241,7 @@ final class InboxContractTests: XCTestCase {
 
     /// ⛔ THERE IS NO `processing`, AND POLLING FOR IT NEVER TERMINATES. It is the
     /// web dashboard's optimistic local state; no route sends it. ⚠️ An absent
-    /// status is not in progress either — after a clear it is null, which is the
+    /// status is not in progress either, after a clear it is null, which is the
     /// state that should offer enrichment again.
     func testDgiProgressStopsOnlyOnTheTerminalStates() {
         XCTAssertTrue(DgiStatus.isInProgress(DgiStatus.pending))
@@ -253,7 +253,7 @@ final class InboxContractTests: XCTestCase {
     }
 
     /// The call directory PATCH echoes nothing, so a save must be followed by a
-    /// re-read — the same shape of problem the workspace rename has, and handled
+    /// re-read, the same shape of problem the workspace rename has, and handled
     /// the same way.
     func testDirectoryPatchIsABareAcknowledgement() throws {
         let response = try StrictDecodeVerifier.verify(

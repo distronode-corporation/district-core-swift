@@ -11,7 +11,7 @@ import Foundation
 //
 // ⛔ AND THE `.merging(schedulingA)` IN `AllowedExplicitNulls+Union.swift` IS HALF
 // OF THIS CHANGE. A group declared here and not chained there exempts nothing at
-// all — the table is composed pairwise, and an unmerged group is simply never
+// all, the table is composed pairwise, and an unmerged group is simply never
 // consulted, so its fixtures fail for a reason nobody would look for. The union
 // traps on a duplicate key rather than picking a side, which is what makes adding
 // a fourth and a fifth group safe.
@@ -39,7 +39,7 @@ extension StrictDecodeVerifier {
     ///
     ///   description       `EventType.description`, nullable. The event type with
     ///                     no blurb is the ordinary one, not the edge.
-    ///   location_value    Nullable AND polymorphic — it holds a URL, a phone
+    ///   location_value    Nullable AND polymorphic, it holds a URL, a phone
     ///                     number or an address depending on `location_type`, and
     ///                     nothing at all for the three location types the
     ///                     scheduler generates itself. `in_person` with no address
@@ -54,7 +54,7 @@ extension StrictDecodeVerifier {
     ///
     /// ⚠️ THE FIRST ROW OF THE LIST CARRIES NO NULL AT ALL and has no entry. It is
     /// the fully-populated event type, and the pair is a near-complement on
-    /// purpose — the gate is proving that a DTO which regressed any of these
+    /// purpose, the gate is proving that a DTO which regressed any of these
     /// twelve Optionals to non-null fails on one row while still passing on the
     /// other.
     static let schedulingA: [String: Set<String>] = [
@@ -89,7 +89,7 @@ extension StrictDecodeVerifier {
         // ── Booking questions ───────────────────────────────────────────────
         //
         //   options  `Question.options`, a nullable array. NULL ON EVERY
-        //            NON-`select` QUESTION, which is most of them — a `text`
+        //            NON-`select` QUESTION, which is most of them, a `text`
         //            question has nothing to offer. ⚠️ The row that is a `select`
         //            carries a real array and has no entry, which is the pair that
         //            proves the Optional in both directions.
@@ -136,7 +136,7 @@ extension StrictDecodeVerifier {
         //
         // ⚠️ `group_id` IS **NOT** LISTED AND MUST NOT BE. It is ABSENT on a
         // standalone override rather than null, which is the shape a nil Optional
-        // already round-trips — and it is the field that makes
+        // already round-trips, and it is the field that makes
         // `availability.overrides.deleteGroup` addressable, so a null nobody has
         // seen is exactly the thing this register should keep loud.
         "district-scheduling-overrides.json": [
@@ -144,7 +144,7 @@ extension StrictDecodeVerifier {
             "$.data.items[1].start_time",
         ],
         // ⚠️ THE CREATE ECHO IS THE ROW ARM OF A UNION, and its sibling
-        // `district-scheduling-override-range.json` is the OTHER arm — a summary
+        // `district-scheduling-override-range.json` is the OTHER arm, a summary
         // with no `id` and no times at all, and therefore no entry here. The two
         // fixtures exist to keep those apart.
         "district-scheduling-override-created.json": [

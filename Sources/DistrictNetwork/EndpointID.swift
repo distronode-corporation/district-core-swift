@@ -119,6 +119,13 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case registerPushToken
     case unregisterPushToken
 
+    /// Live updates: the credential for the desktop's telemetry socket.
+    ///
+    /// ⚠️ NO KOTLIN COUNTERPART: a phone is woken by push, so neither Android nor the
+    /// iOS app opens the socket. The raw value follows the Linux desktop client's
+    /// name for it (`telemetry_token`) in this client's camelCase.
+    case telemetryToken
+
     // Billing (read only)
     case workspaceBilling
     case stripeBilling

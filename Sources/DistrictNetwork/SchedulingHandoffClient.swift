@@ -89,7 +89,7 @@ public struct SchedulingHandoffClient: Sendable {
             guard ApiErrorNormalizer.isSuccess(raw.statusCode) else {
                 return .failure(Self.refusal(raw))
             }
-            return decode(raw.body).flatMap(verified).mapError(SchedulingHandoffFailure.api)
+            return Self.decode(raw.body).flatMap(verified).mapError(SchedulingHandoffFailure.api)
         }
     }
 
@@ -111,7 +111,11 @@ public struct SchedulingHandoffClient: Sendable {
     /// ⛔ STRICT: MISSING KEYS AND UNKNOWN KEYS BOTH FAIL. A body that grew a field is
     /// a contract change somebody must look at, and a body that lost one is a client
     /// about to render nothing.
-    private func decode(_ body: Data) -> Result<SchedulingHandoff, ApiError> {
+    ///
+    /// ⚠️ INTERNAL AND STATIC RATHER THAN PRIVATE so `DesktopContractFixtureTests` can
+    /// run `contracts/desktop/district-scheduling-handoff.json` through exactly this
+    /// decoder; it reads nothing from the instance.
+    static func decode(_ body: Data) -> Result<SchedulingHandoff, ApiError> {
         guard let object = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else {
             return .failure(.decoding("The hand-off response was not a JSON object."))
         }

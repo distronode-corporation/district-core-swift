@@ -103,13 +103,24 @@ public enum PushRegistrationOutcome: Equatable, Sendable {
 /// ⚠️ WHAT IT BUYS is one fewer request per foreground sign-in against a 20/min
 /// per-account ceiling. That is small, and the rule above is what keeps it from
 /// being expensive.
+///
+/// ⛔ IT NEVER SENDS ``PushTokenKind/desktop``. Presence is renewed every five
+/// minutes BECAUSE the server counts a desktop as ringable only while its row is
+/// fresh, so the unchanged-token skip below would be exactly wrong for it.
+/// `DistrictLive.PresenceController` owns that row.
 public struct PushTokenRepository: Sendable {
     private let client: ApiClient
     private let memory: any PushTokenMemory
+    private let platform: ClientPlatform
 
-    public init(client: ApiClient, memory: any PushTokenMemory) {
+    /// - Parameter platform: which app is registering. ⚠️ Defaulted to
+    ///   ``ClientPlatform/ios`` so the iOS register is byte-identical. The macOS
+    ///   app passes ``ClientPlatform/macos`` and calls ``register(token:)`` only:
+    ///   the server refuses `voip` from a Mac.
+    public init(client: ApiClient, memory: any PushTokenMemory, platform: ClientPlatform = .ios) {
         self.client = client
         self.memory = memory
+        self.platform = platform
     }
 
     /// Tell the server this installation can be pushed to at `token`.
@@ -130,7 +141,7 @@ public struct PushTokenRepository: Sendable {
     /// new one replaces the old. The skip below is a courtesy to the rate limit,
     /// never a correctness requirement.
     public func register(token: String) async -> Result<PushRegistrationOutcome, ApiError> {
-        await send(token: token, kind: .alert)
+        await send(token: token, slot: .alert)
     }
 
     /// Tell the server this installation can be RUNG at `token`.
@@ -155,18 +166,18 @@ public struct PushTokenRepository: Sendable {
     /// ⚠️ IDEMPOTENT SERVER-SIDE and skipped locally on an unchanged token, the
     /// same way the alert register is, against its own remembered value.
     public func registerVoip(token: String) async -> Result<PushRegistrationOutcome, ApiError> {
-        await send(token: token, kind: .voip)
+        await send(token: token, slot: .voip)
     }
 
     /// ⛔ ONE BODY FOR BOTH TOKENS, PARAMETERISED BY KIND RATHER THAN COPIED. The
     /// envelope check, the empty-token refusal, the skip and the
     /// remember-only-after-affirming rule are the same four decisions for each,
     /// and a second copy is what would drift.
-    private func send(token: String, kind: PushTokenKind) async -> Result<PushRegistrationOutcome, ApiError> {
+    private func send(token: String, slot: RememberedSlot) async -> Result<PushRegistrationOutcome, ApiError> {
         guard !token.isEmpty else { return .success(.noTokenToRegister) }
-        guard remembered(kind) != token else { return .success(.alreadyRegistered) }
+        guard remembered(slot) != token else { return .success(.alreadyRegistered) }
 
-        let descriptor = DistrictEndpoints.registerPushToken(token: token, kind: kind)
+        let descriptor = DistrictEndpoints.registerPushToken(token: token, kind: slot.kind, platform: platform)
         let outcome = await client.send(descriptor, as: SuccessResponse.self)
         let affirmed = outcome.flatMap { ResponseEnvelope.affirm("PushRegisterResponse", $0.success, $0) }
         switch affirmed {
@@ -175,22 +186,39 @@ public struct PushTokenRepository: Sendable {
             // 200 arrived. A `{success:false}` body is contract drift, and
             // remembering a token the server may not hold would make the next
             // register skip and leave push silently off.
-            remember(token, kind)
+            remember(token, slot)
             return .success(.registered)
         case let .failure(error):
             return .failure(error)
         }
     }
 
-    private func remembered(_ kind: PushTokenKind) -> String? {
-        switch kind {
+    /// The two tokens this repository remembers, and the kind each is sent as.
+    ///
+    /// ⚠️ ITS OWN TWO-CASE TYPE RATHER THAN ``PushTokenKind``, because that one has a
+    /// third case (``PushTokenKind/desktop``) this repository never sends, and an
+    /// exhaustive switch over it here would need an arm no input can reach.
+    private enum RememberedSlot {
+        case alert
+        case voip
+
+        var kind: PushTokenKind {
+            switch self {
+            case .alert: .alert
+            case .voip: .voip
+            }
+        }
+    }
+
+    private func remembered(_ slot: RememberedSlot) -> String? {
+        switch slot {
         case .alert: memory.lastRegisteredToken()
         case .voip: memory.lastRegisteredVoipToken()
         }
     }
 
-    private func remember(_ token: String, _ kind: PushTokenKind) {
-        switch kind {
+    private func remember(_ token: String, _ slot: RememberedSlot) {
+        switch slot {
         case .alert: memory.rememberRegisteredToken(token)
         case .voip: memory.rememberRegisteredVoipToken(token)
         }

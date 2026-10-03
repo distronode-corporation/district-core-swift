@@ -59,6 +59,7 @@ FoundationNetworking on Linux).
 | `DistrictNetwork` | Every endpoint and path, the API client, error-envelope normalisation and the native sign-in exchanges. The HTTP transport is the `HTTPTransport` protocol, so libcurl and Darwin `URLSession` differences never reach feature code. |
 | `DistrictData` | Repositories and paging over `DistrictNetwork`. |
 | `DistrictCall` | Everything about a call that is not the media SDK or the OS call registry: the `CallEngine` seam, the outbound and inbound state machines and the commands they emit. |
+| `DistrictLive` | The desktop's live updates: the telemetry socket's state machine (`TelemetryConnection`) and the actor that runs it, the Mac's presence (`PresenceController`) and the ring gate (`DesktopRingGate`). The socket is the `TelemetrySocketTransport` protocol and time is the `LiveClock` protocol, so every rule is tested on Linux without a server or a wait; the `URLSessionWebSocketTask` adapter lives in the macOS app. |
 
 The one external dependency is [apple/swift-crypto](https://github.com/apple/swift-crypto),
 pinned `exact:`, for SHA-256 on Linux (and swift-asn1 through it). `Package.resolved` is
@@ -94,6 +95,11 @@ must equal the fixture's at every level. It asserts the exact number of fixtures
 and an explicit list of fixtures that have no model yet, so a missing directory or a
 newly added fixture is a failure rather than a silent pass. Set `DISTRICT_CONTRACTS_DIR`
 to read the fixtures from somewhere else.
+
+`DesktopContractFixtureTests` does the same for `contracts/desktop/`: an exact count (13)
+and one verifier per file, twelve through the strict gate and the scheduling hand-off
+through the client's own hand-written decoder. Set `DISTRICT_DESKTOP_CONTRACTS_DIR` to
+read them from somewhere else.
 
 The strictness is in the tests only. The decoders ignore unknown fields, so an installed
 app keeps working when the service adds one.

@@ -140,11 +140,12 @@ public struct CallAnswerResponse: Codable, Sendable {
 /// live one path segment apart and the rules could not be further apart, which is
 /// why this is written on the type rather than left to the repository.
 ///
-/// ⚠️ NO FIXTURE, ON THE SAME FOOTING AS `messages/search` AND `createContact`.
-/// The shared contract corpus mirrors the Android client, and that client has
-/// no hang-up call, so nothing on disk pins this
-/// shape and ``ContractManifest/expectedFixtureCount`` must NOT move for it. What
-/// pins it is the route's own source and `DialRepositoryTests`.
+/// ⚠️ NO MOBILE FIXTURE, ON THE SAME FOOTING AS `messages/search` AND `createContact`.
+/// The mobile corpus mirrors the Android client, and that client has no hang-up
+/// call, so ``ContractManifest/expectedFixtureCount`` must NOT move for it. The
+/// desktop set does record it (`contracts/desktop/district-call-hangup.json`, gated
+/// in `DesktopContractFixtureTests`), alongside the route's own source and
+/// `DialRepositoryTests`.
 public struct CallHangUpResponse: Codable, Sendable {
     /// Present and `true` on the 200. Envelope-checked like every other write.
     public let success: Bool

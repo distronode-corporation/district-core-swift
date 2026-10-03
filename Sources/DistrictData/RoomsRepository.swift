@@ -23,9 +23,13 @@ import Foundation
 /// for a billing one. A retry loop behind a flaky connection is an invite mill.
 public struct RoomsRepository: Sendable {
     private let client: ApiClient
+    private let platform: ClientPlatform
 
-    public init(client: ApiClient) {
+    /// - Parameter platform: which app is asking. ⚠️ Defaulted to
+    ///   ``ClientPlatform/ios`` so the iOS request is byte-identical.
+    public init(client: ApiClient, platform: ClientPlatform = .ios) {
         self.client = client
+        self.platform = platform
     }
 
     /// Ask for the credential that joins `roomName`.
@@ -51,7 +55,7 @@ public struct RoomsRepository: Sendable {
     ///   400 for a name the route's own regex refuses, offline, signed out.
     public func token(roomName: RoomName) async -> Result<RoomTokenResponse, ApiError> {
         let outcome = await client.send(
-            DistrictEndpoints.roomToken(roomName: roomName),
+            DistrictEndpoints.roomToken(roomName: roomName, platform: platform),
             as: RoomTokenResponse.self
         )
         return outcome.flatMap { ResponseEnvelope.affirm("RoomTokenResponse", $0.success, $0) }

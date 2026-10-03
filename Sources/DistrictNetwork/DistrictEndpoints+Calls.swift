@@ -182,14 +182,18 @@ public extension DistrictEndpoints {
     /// ⚠️ IDEMPOTENT IN THE SENSE THAT NOTHING IS PERSISTED, but each call mints
     /// a fresh twelve-hour guest invite, so a screen calling it on every redraw
     /// would be minting capabilities at the rate it redraws.
-    static func roomToken(roomName: RoomName) -> ApiRequestDescriptor {
+    ///
+    /// - Parameter platform: which app is asking, sent as the ignored `identity`.
+    ///   ⚠️ Defaulted to ``ClientPlatform/ios`` so the iOS bytes are unchanged; see
+    ///   ``RoomIdentity``.
+    static func roomToken(roomName: RoomName, platform: ClientPlatform = .ios) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .roomToken,
             .post,
             DistrictPaths.callsToken,
             body: .json(.object([
                 ("roomName", .string(roomName.value)),
-                ("identity", .string(RoomIdentity.value)),
+                ("identity", .string(RoomIdentity.value(for: platform))),
             ]))
         )
     }

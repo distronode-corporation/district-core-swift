@@ -96,7 +96,7 @@ public struct NativeAuthClient<
             ("codeVerifier", .string(request.codeVerifier)),
             ("redirectUri", .string(request.redirectUri)),
             ("deviceId", .string(request.deviceId)),
-            ("platform", .string(CodeExchangeRequest.platform)),
+            ("platform", .string(request.clientPlatform.wire)),
             ("deviceName", .optional(request.deviceName)),
         ])
 

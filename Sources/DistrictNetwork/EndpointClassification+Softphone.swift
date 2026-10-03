@@ -18,12 +18,14 @@ public extension TypedEndpoints {
     /// nothing logged. `calls/{id}/hangup` is the
     /// only thing in this client that reaches the carrier leg.
     ///
-    /// ⚠️ IT HAS NO CONTRACT FIXTURE, on the same footing as `createContact`,
-    /// `searchMessages` and call handling: the shared corpus mirrors the Android
-    /// client and that client has no hang-up. What pins the shape is the route source
-    /// and `DialHangUpRepositoryTests`.
-    /// ⛔ SO `ContractManifest.expectedFixtureCount` MUST NOT MOVE FOR IT. It is
-    /// asserted EXACTLY against the files on disk and nothing is on disk.
+    /// ⚠️ IT HAS NO MOBILE CONTRACT FIXTURE, on the same footing as `createContact`,
+    /// `searchMessages` and call handling: the mobile corpus mirrors the Android
+    /// client and that client has no hang-up. Its shape is pinned by the DESKTOP set
+    /// instead (`contracts/desktop/district-call-hangup.json`, gated in
+    /// `DesktopContractFixtureTests`), by the route source and by
+    /// `DialHangUpRepositoryTests`.
+    /// ⛔ SO `ContractManifest.expectedFixtureCount` MUST NOT MOVE FOR IT. That count
+    /// is the mobile set's, asserted EXACTLY against `contracts/mobile/`.
     ///
     /// ⛔ AND IT IS THE ONE WRITE IN THIS CLIENT THAT IS SAFE TO SEND TWICE, one path
     /// segment from `dial`, which may never be re-sent because a re-send places a

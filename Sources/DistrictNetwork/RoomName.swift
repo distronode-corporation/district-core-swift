@@ -159,6 +159,15 @@ public struct RoomName: Sendable, Equatable {
 /// hole, and a random one per join produced duplicate tiles, LiveKit evicts only
 /// on a REPEATED identity. Sending a device id or an email would put a value on
 /// the wire that is neither used nor needed.
+///
+/// ⚠️ THE PLATFORM NAME RATHER THAN ONE FIXED STRING, so the macOS app's request
+/// says what it is in a server log. The server reads neither value.
 public enum RoomIdentity {
-    public static let value = "ios"
+    /// The iOS app's value, and the default.
+    public static let value = ClientPlatform.ios.wire
+
+    /// The value `platform` sends.
+    public static func value(for platform: ClientPlatform) -> String {
+        platform.wire
+    }
 }

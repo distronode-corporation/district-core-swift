@@ -58,6 +58,7 @@ let package = Package(
         .library(name: "DistrictNetwork", targets: ["DistrictNetwork"]),
         .library(name: "DistrictData", targets: ["DistrictData"]),
         .library(name: "DistrictCall", targets: ["DistrictCall"]),
+        .library(name: "DistrictLive", targets: ["DistrictLive"]),
     ],
     // ⚠️ AFTER `products:`. `Package.init` is not a free-form argument list,
     // SwiftPM's manifest API pins the order and a `dependencies:` block moved
@@ -131,6 +132,24 @@ let package = Package(
             dependencies: ["DistrictModel"],
             swiftSettings: districtSwiftSettings
         ),
+        // The desktop's live updates: the telemetry socket's state machine and the
+        // actor that runs it, the Mac's presence, and the ring gate.
+        //
+        // ⛔ THE SOCKET IS A PROTOCOL HERE, FOR THE REASON `HTTPTransport` IS ONE.
+        // `URLSessionWebSocketTask` cannot be exercised by `swift test` on Linux
+        // without a live server, so the adapter lives in the macOS app and every
+        // decision about the socket lives here, in a pure state machine with an
+        // injected clock. A module with a 100% floor cannot hold the adapter.
+        //
+        // ⚠️ `DistrictNetwork` FOR ONE REASON: `ApiClient` conforms to the two seams
+        // the module reaches the API through (`TelemetryTokenMinter`,
+        // `PresenceAPI`). Nothing here builds a request of its own; both calls go
+        // through `DistrictEndpoints`.
+        .target(
+            name: "DistrictLive",
+            dependencies: ["DistrictModel", "DistrictNetwork"],
+            swiftSettings: districtSwiftSettings
+        ),
 
         // ⛔ TEST INFRASTRUCTURE, DELIBERATELY UNDER Tests/ AND NOT UNDER
         // Sources/. This is the strict contract gate, the
@@ -193,6 +212,11 @@ let package = Package(
             dependencies: ["DistrictCall"],
             swiftSettings: districtSwiftSettings
         ),
+        .testTarget(
+            name: "DistrictLiveTests",
+            dependencies: ["DistrictLive"],
+            swiftSettings: districtSwiftSettings
+        ),
 
         // ⛔ THE CROSS-CUTTING EXCEPTION TO THE ONE-TEST-TARGET-PER-LIBRARY RULE
         // ABOVE, AND IT IS ON PURPOSE. The contract gate is not a test OF
@@ -208,9 +232,14 @@ let package = Package(
         // having one shared corpus. The mitigation is a non-empty-directory guard plus an
         // exact fixture count, so a broken path is RED rather than a green run
         // that verified nothing, the same guard the Kotlin loader carries.
+        //
+        // ⚠️ `DistrictNetwork` FOR ONE DESKTOP FIXTURE. `DesktopContractFixtureTests`
+        // runs `district-scheduling-handoff.json` through the decoder
+        // `SchedulingHandoffClient` uses, which is strict by hand rather than a
+        // Codable DTO, so it is reached with `@testable import` instead of the gate.
         .testTarget(
             name: "ContractFixtureTests",
-            dependencies: ["ContractGateSupport", "DistrictModel"],
+            dependencies: ["ContractGateSupport", "DistrictModel", "DistrictNetwork"],
             path: "Tests/ContractFixtureTests",
             swiftSettings: districtSwiftSettings
         ),

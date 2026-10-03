@@ -79,7 +79,14 @@ public enum ContractFixtures {
     /// ⛔ THROWS RATHER THAN RETURNING AN EMPTY ARRAY. "No fixtures" must never
     /// be a value a caller can accidentally treat as "nothing to check".
     public static func allFixtureNames() throws -> [String] {
-        let dir = directory
+        try fixtureNames(in: directory)
+    }
+
+    /// Every `.json` fixture in `dir`, sorted, with the same throwing guard.
+    ///
+    /// ⚠️ SHARED WITH ``DesktopContractFixtures``, so the desktop set gets the same
+    /// "an empty directory is a failure, never a pass" rule rather than a copy of it.
+    public static func fixtureNames(in dir: URL) throws -> [String] {
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: dir.path, isDirectory: &isDirectory),
               isDirectory.boolValue
@@ -96,7 +103,12 @@ public enum ContractFixtures {
 
     /// Read one fixture's bytes.
     public static func read(_ name: String) throws -> Data {
-        let url = directory.appendingPathComponent(name)
+        try read(name, in: directory)
+    }
+
+    /// Read one fixture's bytes from `dir`.
+    public static func read(_ name: String, in dir: URL) throws -> Data {
+        let url = dir.appendingPathComponent(name)
         guard let data = FileManager.default.contents(atPath: url.path) else {
             throw ContractFixturesUnavailable.missingFixture(name: name, path: url.path)
         }

@@ -2,13 +2,19 @@ import Foundation
 
 /// One code exchange, as the token route's schema describes it.
 public struct CodeExchangeRequest: Sendable, Equatable {
-    /// ⛔ The server's schema is `z.enum(["ios", "android"])`. Anything else is a
-    /// 400 that reads exactly like a rejected code.
+    /// The iOS app's value, which is what ``clientPlatform`` defaults to.
     ///
-    /// ⚠️ A CONSTANT RATHER THAN A FIELD ON PURPOSE. It is not the CALLER's
-    /// choice, this client is the iOS one, and a settable field is how a
-    /// device ends up listed as the wrong platform in the settings device list.
-    public static let platform = "ios"
+    /// ⛔ The server's schema is `z.enum(["ios", "android", "linux", "macos"])`.
+    /// Anything else is a 400 that reads exactly like a rejected code.
+    public static let platform = ClientPlatform.ios.wire
+
+    /// Which app is signing in.
+    ///
+    /// ⚠️ THE APP'S CHOICE, NEVER A SCREEN'S, which is why it defaults to ``ClientPlatform/ios``
+    /// and the macOS app sets it once where it builds its requests. A value
+    /// chosen per call is how a device ends up listed as the wrong platform in the
+    /// settings device list. See ``ClientPlatform``.
+    public let clientPlatform: ClientPlatform
 
     public let code: String
     public let codeVerifier: String
@@ -32,8 +38,10 @@ public struct CodeExchangeRequest: Sendable, Equatable {
         codeVerifier: String,
         redirectUri: String,
         deviceId: String,
-        deviceName: String?
+        deviceName: String?,
+        clientPlatform: ClientPlatform = .ios
     ) {
+        self.clientPlatform = clientPlatform
         self.code = code
         self.codeVerifier = codeVerifier
         self.redirectUri = redirectUri

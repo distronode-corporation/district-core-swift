@@ -195,6 +195,11 @@ enum DistrictPaths {
     static let devicesRegister = pushDevices + ["register"]
     static let devicesUnregister = pushDevices + ["unregister"]
 
+    /// ⚠️ THE CREDENTIAL FOR THE SOCKET, NOT THE SOCKET. The socket's address comes
+    /// back in the response body (`wsUrl`), chosen by the workspace's region, and is
+    /// on another host entirely, so it is never built from a constant here.
+    static let telemetryToken = district + ["telemetry", "token"]
+
     /// ⚠️ A TOP-LEVEL DISTRICT ROUTE, NOT A `workspace/` ONE, even though it
     /// takes a `workspaceId` query parameter like the workspace family does.
     /// `workspace/meetings` would 404. The detail route is this path plus the id

@@ -316,12 +316,17 @@ actor ScriptedRefreshClient: RefreshClient {
         }
     }
 
+    /// ⛔ THE ANSWER IS TAKEN AT CALL TIME, NOT ON RESUME. `open()` resumes every
+    /// blocked call at once and the order they run in is not defined, so taking it
+    /// after the wait handed the first answer to whichever call resumed first (a
+    /// Linux CI flake in the abandoned-refresh test). The Nth answer goes to the Nth call.
     func refresh(refreshToken: String) async -> RefreshResult {
         presented.append(refreshToken)
+        let result = script.isEmpty ? fallback : script.removeFirst()
         if !isOpen {
             await withCheckedContinuation { waiters.append($0) }
         }
-        return script.isEmpty ? fallback : script.removeFirst()
+        return result
     }
 }
 

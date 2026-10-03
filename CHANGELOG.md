@@ -6,8 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
-Planned as 1.1.0, a minor release: every change is additive, and an app that passes
-nothing new sends exactly the bytes it sent on 1.0.0.
+## [2.0.0] - 2026-10-03
+
+A major release only because `PushTokenKind` gained a case (see Changed): every other
+change is additive, and an app that passes nothing new sends exactly the bytes it sent
+on 1.0.0.
 
 ### Added
 
@@ -56,5 +59,6 @@ nothing new sends exactly the bytes it sent on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0
 [1.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/1.0.0

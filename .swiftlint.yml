@@ -1,4 +1,4 @@
-# SwiftLint configuration for district-ios.
+# SwiftLint configuration for district-core-swift.
 #
 # Minimal on purpose: the default rule set, no opt-in rules and NO BASELINE.
 # A baseline sits there looking like it enforces something while recording
@@ -14,26 +14,17 @@
 # ignored, because a warning tier in CI is a tier nobody reads.
 
 included:
-  - Packages
-  # ⛔ THE ONLY THING THAT LINTS App/ AT ALL. SwiftLint and SwiftFormat PARSE
-  # Swift, they do not compile it, so they are the only tools in the Linux
-  # `verify` job that can inspect the Darwin half — it cannot build a file that
-  # imports Security or AuthenticationServices. The macOS `app` job builds and
-  # tests App/ but does not lint it, so without this line the app shell would
-  # get no lint anywhere.
+  - Package.swift
+  - Sources
+  - Tests
   # ⚠️ SwiftLint fails outright ("No lintable files found") on an `included` path
   # that does not exist.
-  - App
 
 excluded:
-  # SwiftPM and Xcode build output, and the app's remote package checkouts
-  # (`-clonedSourcePackagesDirPath SourcePackages` in the workflow). Gitignored,
-  # but the linter would still walk them — and .build and SourcePackages hold
-  # checked-out dependency sources, whose style is not ours to enforce.
-  - Packages/DistrictCore/.build
+  # SwiftPM build output. Gitignored, but the linter would still walk it, and
+  # .build holds checked-out dependency sources, whose style is not ours to
+  # enforce.
   - .build
-  - DerivedData
-  - SourcePackages
 
 # ⚠️ Reported as errors, not warnings, because of --strict above: the two
 # numbers below are the same gate at two severities only when run without it.
@@ -122,7 +113,7 @@ trailing_comma:
 #
 # ⛔ DO NOT WIDEN THIS TO EVERY BARE METHOD REFERENCE. The trigger is not "a bare
 # method reference", it is "a bare method reference AT A PARAMETER WHOSE TYPE
-# FORCES A REABSTRACTION THUNK TO AN INDIRECT PARAMETER" — which is what
+# FORCES A REABSTRACTION THUNK TO AN INDIRECT PARAMETER", which is what
 # `Binding<T>`'s setter produces and almost nothing else here does. Measured, not
 # reasoned: the same shape at `onDismiss:` (`@MainActor` method reference passed
 # as `(() -> Void)?`) compiles CLEAN on a standalone reproducer under the exact
@@ -146,7 +137,7 @@ trailing_comma:
 # carries no such kind, verified by running with and without it) and is listed so
 # that a future reclassification of argument labels cannot quietly disarm the rule.
 # ⚠️ The leading `\b` is not decoration: without it the pattern matches the tail of
-# `offset:`, and `offset: offset` is live in both App/Sources and DistrictCore.
+# `offset:`, and `offset: offset` is live in this package and in the apps.
 custom_rules:
   binding_setter_method_reference:
     name: "Binding Setter Method Reference"

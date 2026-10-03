@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Line-coverage floors for Packages/DistrictCore, enforced per module.
+# Line-coverage floors for this package, enforced per module.
 #
 # Run it AFTER `swift test --enable-code-coverage`, from anywhere:
 #   ci/coverage-gate.sh   (path relative to the project root)
@@ -23,7 +23,7 @@
 # why it could never run. A line that can run gets a test, with hostile input if
 # that is what reaches it. The one legitimate reason to want a lower floor is a
 # module growing a genuinely-untestable-on-Linux surface, and that belongs in
-# App/ rather than here by construction (a debug-only `assertionFailure` is the
+# the consuming app rather than here by construction (a debug-only `assertionFailure` is the
 # worked example: see SchedulingAdminRepository's initialiser).
 #
 # ⚠️ llvm-cov COUNTS LINES PER FUNCTION, AND SWIFT COMPILES THE RIGHT-HAND SIDE
@@ -51,12 +51,13 @@ FLOOR_DistrictCall=100
 
 # Modules the gate requires to be present in the report. Adding a target to
 # Package.swift without adding it here means it is built, possibly tested, and
-# NOT gated — so the list is duplicated deliberately and the script fails if a
+# NOT gated, so the list is duplicated deliberately and the script fails if a
 # name here has no files in the report.
 MODULES="DistrictModel DistrictAuthCore DistrictNetwork DistrictData DistrictCall"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE_DIR="${DISTRICT_CORE_DIR:-$SCRIPT_DIR/../Packages/DistrictCore}"
+# The package is the repository root, one level above this script.
+PACKAGE_DIR="${DISTRICT_CORE_DIR:-$SCRIPT_DIR/..}"
 
 fatal() {
     echo "FATAL: $*" >&2
@@ -66,11 +67,11 @@ fatal() {
 [ -d "$PACKAGE_DIR" ] || fatal "package directory not found: $PACKAGE_DIR"
 cd "$PACKAGE_DIR"
 
-command -v swift >/dev/null 2>&1 || fatal "swift not on PATH — wrong image?"
+command -v swift >/dev/null 2>&1 || fatal "swift not on PATH: wrong image?"
 # ⚠️ python3 is asserted rather than assumed. ci/Dockerfile and the workflow's
 # `verify` job install it explicitly for this script; the stock swift image is
 # not guaranteed to carry it.
-command -v python3 >/dev/null 2>&1 || fatal "python3 not on PATH — see ci/Dockerfile"
+command -v python3 >/dev/null 2>&1 || fatal "python3 not on PATH: see ci/Dockerfile"
 
 # ── Locate the coverage export ───────────────────────────────────────────────
 # ⛔ A MISSING FILE ABORTS. It never falls through to "nothing to check, pass":
@@ -115,7 +116,7 @@ with open(path, encoding="utf-8") as handle:
 
 data = report.get("data")
 if not data:
-    sys.exit("FATAL: coverage export has no `data` array — llvm-cov schema changed.")
+    sys.exit("FATAL: coverage export has no `data` array: llvm-cov schema changed.")
 
 modules = os.environ["MODULES"].split()
 counts = {name: [0, 0] for name in modules}   # module -> [covered, total]
@@ -131,7 +132,7 @@ for block in data:
             continue
         lines = entry.get("summary", {}).get("lines")
         if lines is None:
-            sys.exit(f"FATAL: no line summary for {filename} — llvm-cov schema changed.")
+            sys.exit(f"FATAL: no line summary for {filename}: llvm-cov schema changed.")
         covered, count = lines["covered"], lines["count"]
         total[0] += covered
         total[1] += count
@@ -154,7 +155,7 @@ def check(label, covered, count, floor):
     if count == 0:
         # ⛔ NOT A PASS. Zero measurable lines means the module was not built
         # with coverage, was renamed, or its sources vanished.
-        failures.append(f"{label}: NO COVERAGE DATA (0 measurable lines) — floor {floor}%")
+        failures.append(f"{label}: NO COVERAGE DATA (0 measurable lines): floor {floor}%")
         print(f"  {label:<20} no data                 floor {floor}%   FAIL")
         return
     pct = 100.0 * covered / count

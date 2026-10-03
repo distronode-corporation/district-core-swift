@@ -1,8 +1,8 @@
-# The Linux toolchain for district-ios: Swift, SwiftLint and SwiftFormat.
+# The Linux toolchain for district-core-swift: Swift, SwiftLint and SwiftFormat.
 #
-# ⛔ THIS TOOLCHAIN BUILDS AND TESTS Packages/DistrictCore, WHICH IS THE WHOLE
-# LINUX-FIRST ARCHITECTURE. Everything that does not need Xcode runs on Linux;
-# macOS is needed only for the app build, its simulator tests and the release.
+# ⛔ THIS TOOLCHAIN BUILDS AND TESTS THE PACKAGE, WHICH IS THE WHOLE LINUX-FIRST
+# ARCHITECTURE. Everything that does not need Xcode runs on Linux; macOS is
+# needed only for the `darwin` job's Xcode builds and for the apps themselves.
 # The `verify` job in .github/workflows/ci.yml runs the same swift image as its
 # container and installs the same two tools itself, so this file is that
 # environment as an image, for running the Linux checks outside CI.
@@ -13,7 +13,7 @@
 # deliberate, reviewable diff, in this file and in the workflow's `container:`.
 #
 # ⚠️ 6.2.4, NOT 6.3, DELIBERATELY. The Linux toolchain is paired with the
-# Xcode the workflow's `app` job selects, which ships Swift 6.2. A Linux
+# Xcode the apps build with (and the `darwin` job selects), which ships Swift 6.2. A Linux
 # toolchain ahead of the Xcode one compiles code the app target then rejects,
 # and the failure surfaces in the slower macOS job instead of here. Move both
 # together, or neither.
@@ -22,7 +22,7 @@ FROM swift:6.2.4@sha256:29b983751c605c2d3102d2ab93438c6e0cadf110d9d2aa6e929b6dec
 # ── SwiftLint / SwiftFormat ──────────────────────────────────────────────────
 # ⚠️ OFFICIAL PREBUILT LINUX BINARIES, NOT `swift build` FROM SOURCE. Building
 # SwiftLint from source on a runner takes ~10 minutes and pulls in
-# SwiftSyntax — a compile cost paid on every image rebuild for a tool whose
+# SwiftSyntax, a compile cost paid on every image rebuild for a tool whose
 # maintainers publish a Linux binary per release. The versions AND their
 # SHA-256 sums are pinned; a checksum here is not ceremony, it is the only
 # thing that distinguishes the real archive from a redirect page or a
@@ -41,10 +41,10 @@ RUN set -eux; \
     apt-get update; \
     # ⚠️ python3 IS A REQUIREMENT, NOT A CONVENIENCE. ci/coverage-gate.sh parses
     # llvm-cov's JSON export with it and asserts its presence rather than
-    # assuming it — the stock swift image does not guarantee it, and a missing
+    # assuming it, the stock swift image does not guarantee it, and a missing
     # interpreter otherwise surfaces only as `command not found` when the job
     # first runs in the image.
-    # ⚠️ libxml2 is for SwiftLint, not for anything of ours — see the ⛔ below.
+    # ⚠️ libxml2 is for SwiftLint, not for anything of ours, see the ⛔ below.
     apt-get install -y --no-install-recommends \
       ca-certificates curl unzip git python3 libxml2; \
     rm -rf /var/lib/apt/lists/*; \
@@ -59,13 +59,13 @@ RUN set -eux; \
     # SourceKit compiled out, so it prints
     #   "warning: Skipping enabled rule 'statement_position' because it requires
     #    SourceKit and SourceKit access is prohibited"
-    # and then reports "0 violations" — a rule that stopped running, inside a
+    # and then reports "0 violations", a rule that stopped running, inside a
     # green result. The dynamic build loads sourcekitd from the Swift toolchain
     # already in this image and runs the full rule set with no such warning.
     # Both behaviours verified in this exact image.
     # ⚠️ IT IS WHY `libxml2` IS INSTALLED ABOVE. Without it the dynamic binary
     # dies at startup with "error while loading shared libraries:
-    # libxml2.so.2" — a runtime failure in every verify job that reads as
+    # libxml2.so.2", a runtime failure in every verify job that reads as
     # "swiftlint is broken" rather than as a missing package.
     install -m 0755 /tmp/swiftlint-extract/swiftlint /usr/local/bin/swiftlint; \
     rm -rf swiftlint.zip /tmp/swiftlint-extract; \

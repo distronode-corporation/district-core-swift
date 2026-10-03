@@ -6,8 +6,8 @@ import XCTest
 ///
 /// ⛔ INLINE BYTES RATHER THAN THE CONTRACT FIXTURES, WHICH IS THE DIVISION OF
 /// LABOUR AND NOT A SHORTCUT. `ImplementedFixtures+SchedulingC.swift` runs the
-/// committed corpus through `StrictDecodeVerifier`, which pins the SHAPE — every
-/// key modelled, none invented — and cannot pin a branch the fixture does not
+/// committed corpus through `StrictDecodeVerifier`, which pins the SHAPE, every
+/// key modelled, none invented, and cannot pin a branch the fixture does not
 /// happen to contain. These tests are the other half: the absent-key polarity of
 /// every Optional, and the two `CodingKeys` maps that a rename would break
 /// silently because the wire spelling is a string.
@@ -85,7 +85,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
 
     /// ⛔ `""` IS THE ORDINARY VALUE FOR AN UNSET LINK AND NOT A MISSING KEY. The
     /// schema types `privacy_url` a required `z.string()`, so emptiness is the "no
-    /// link" test — an Optional here would model a shape the server never sends,
+    /// link" test, an Optional here would model a shape the server never sends,
     /// and a screen testing for nil would render a link to nowhere.
     func testAnUnsetBrandingLinkIsAnEmptyStringRatherThanAnAbsentKey() throws {
         XCTAssertEqual(try decode(SchedulingBranding.self, Self.fullBranding).privacyUrl, "")
@@ -141,7 +141,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
     func testNotetakerSettingsIgnoreTheInstanceFieldsTheCatalogStrips() throws {
         let settings = try decode(
             SchedulingNotetakerSettings.self,
-            #"{"enabled":true,"stt_api_key_set":true,"stt_base_url":"https://stt.internal"}"#
+            #"{"enabled":true,"stt_api_key_set":true,"stt_base_url":"https://stt.example.com"}"#
         )
         XCTAssertTrue(settings.enabled)
     }
@@ -154,7 +154,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
             SchedulingLLMSettings.self,
             #"""
             {"enabled":true,"extra_instructions":"List the agreed next steps first.",
-             "endpoint":"https://llm.internal","model":"gpt-9","api_key_set":true,
+             "endpoint":"https://llm.example.com","model":"gpt-9","api_key_set":true,
              "configured":true,"active":true,"base_prompt":"…"}
             """#
         )
@@ -197,7 +197,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
     /// ⛔ `""` IS REACHABLE AND MEANS "UPLOADED, ADDRESS UNREADABLE". The route
     /// writes `typeof url === "string" ? url : ""`, so a fork that answered 2xx
     /// with a shape it did not recognise yields an empty string rather than an
-    /// error — and ``SchedulingUploadResult/publishedUrl`` must hand that back as
+    /// error, and ``SchedulingUploadResult/publishedUrl`` must hand that back as
     /// `""` rather than skipping to the next key or answering nil.
     func testAnEmptyUrlIsCarriedThroughRatherThanTreatedAsAbsent() throws {
         let result = try decode(SchedulingUploadResult.self, #"{"logo_url":""}"#)
@@ -207,7 +207,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
 
     /// ⚠️ A BODY WITH NO URL KEY AT ALL IS NOT SOMETHING THE ROUTE SENDS, and
     /// ``SchedulingUploadResult/publishedUrl`` answers nil rather than `""` for it
-    /// — so "the server said nothing" stays distinguishable from "the server said
+    /// so "the server said nothing" stays distinguishable from "the server said
     /// the address is unknown".
     func testAnEmptyUploadBodyAnswersNilRatherThanAnEmptyString() throws {
         XCTAssertNil(try decode(SchedulingUploadResult.self, #"{}"#).publishedUrl)

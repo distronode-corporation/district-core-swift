@@ -2,8 +2,8 @@ import Foundation
 
 /// Where the committed contract fixtures live, and how to read one.
 ///
-/// ⛔ THE FIXTURES LIVE OUTSIDE THIS PACKAGE, IN `contracts/` AT THE REPOSITORY
-/// ROOT, AND THIS TYPE READS ACROSS FOLDERS TO REACH THEM. The corpus is
+/// ⛔ THE FIXTURES LIVE OUTSIDE THE TEST TARGETS, IN `contracts/mobile/` AT THE
+/// REPOSITORY ROOT, AND THIS TYPE READS ACROSS FOLDERS TO REACH THEM. The corpus is
 /// generated from the server's real handlers and copied in unchanged, so there
 /// is exactly one copy of each wire shape, and the Android client checks the
 /// same files.
@@ -40,7 +40,7 @@ public enum ContractFixtures {
     /// ⚠️ A BLANK OVERRIDE IS TREATED AS UNSET rather than as an empty path,
     /// because a CI variable that exists but was never populated is the common
     /// way this goes wrong and `URL(fileURLWithPath: "")` resolves to the working
-    /// directory — which would look for the fixtures wherever `swift test`
+    /// directory, which would look for the fixtures wherever `swift test`
     /// happened to be run from and find none.
     ///
     /// ⚠️ Written as one flat condition on purpose: a multi-line `if let` here is
@@ -55,19 +55,22 @@ public enum ContractFixtures {
         return URL(fileURLWithPath: override, isDirectory: true)
     }
 
-    /// `<repo>/contracts`, walked up from this source file.
+    /// `<repo>/contracts/mobile`, walked up from this source file.
     ///
-    /// The five components removed are, innermost first: this file, its
-    /// directory (`ContractGateSupport`), `Tests`, `DistrictCore` and
-    /// `Packages`, which leaves the repository root. Adding a directory level
-    /// between the package root and this file breaks the walk — which the guard
-    /// turns into a red suite rather than a silent zero-fixture pass.
+    /// The three components removed are, innermost first: this file, its
+    /// directory (`ContractGateSupport`) and `Tests`, which leaves the
+    /// repository root (the package root and the repository root are the same
+    /// directory). Adding a directory level between the package root and this
+    /// file breaks the walk, which the guard turns into a red suite rather than
+    /// a silent zero-fixture pass.
     private static var defaultDirectory: URL {
         var url = URL(fileURLWithPath: #filePath)
-        for _ in 0 ..< 5 {
+        for _ in 0 ..< 3 {
             url = url.deletingLastPathComponent()
         }
-        return url.appendingPathComponent("contracts", isDirectory: true)
+        return url
+            .appendingPathComponent("contracts", isDirectory: true)
+            .appendingPathComponent("mobile", isDirectory: true)
     }
 
     /// Every `.json` fixture on disk, sorted, or a diagnosis of why there are
@@ -102,7 +105,7 @@ public enum ContractFixtures {
 }
 
 /// The three ways the fixture corpus can be unusable. Separate from
-/// `ContractGateFailure` because none of these is a contract problem — they all
+/// `ContractGateFailure` because none of these is a contract problem, they all
 /// mean the gate could not run at all, which is a worse failure and needs a
 /// different message.
 public enum ContractFixturesUnavailable: Error, CustomStringConvertible, Equatable {
@@ -115,10 +118,10 @@ public enum ContractFixturesUnavailable: Error, CustomStringConvertible, Equatab
         case let .missingDirectory(path):
             """
             contract fixtures: DIRECTORY NOT FOUND at \(path).
-              The fixtures live in contracts/ at the repository root, found by
-              walking up from #filePath, unless \(ContractFixtures.overrideEnvironmentKey)
+              The fixtures live in contracts/mobile/ at the repository root, found
+              by walking up from #filePath, unless \(ContractFixtures.overrideEnvironmentKey)
               names another directory. If it is set, the directory it names does
-              not exist; unset it or point it at a copy of contracts/. If it is
+              not exist; unset it or point it at a copy of contracts/mobile/. If it is
               unset, the walk no longer lands on the repository root (a test
               directory moved), or this is a partial checkout.
             """

@@ -1,4 +1,4 @@
-# SwiftFormat configuration for district-ios.
+# SwiftFormat configuration for district-core-swift.
 #
 # Deliberately minimal: the default rule set, with only the options that pin
 # house style so `swiftformat --lint` in CI is reproducible. Opt-in rules are
@@ -25,7 +25,7 @@
 --wrapcollections before-first
 --closingparen balanced
 # ⚠️ `collections-only`, NOT the `always` default. `always` also adds a trailing
-# comma to FUNCTION ARGUMENT LISTS, which is Swift 6.1+ syntax — so the
+# comma to FUNCTION ARGUMENT LISTS, which is Swift 6.1+ syntax, so the
 # formatter would emit code that only the newest parser accepts, and the first
 # place that bites is the macOS tier's Xcode, not this Linux job. Collections
 # have taken a trailing comma since Swift 1.

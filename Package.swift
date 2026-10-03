@@ -1,20 +1,21 @@
 // swift-tools-version: 6.2
 //
-// DistrictCore — the Linux-testable half of the District iOS app.
+// DistrictCore, the Linux-testable core shared by the District AI apps for iOS
+// (district-ios) and macOS (district-macos). Repository: district-core-swift.
 //
 // ⛔ THIS PACKAGE MUST KEEP BUILDING AND TESTING ON LINUX, AND THAT IS THE WHOLE
 // POINT OF IT. macOS CI time is scarce and expensive and is reserved for the
-// app build and its simulator tests. Everything that can be tested on an
-// ordinary Linux CI machine lives here, and the app target in App/ stays thin.
+// app builds and their tests. Everything that can be tested on an ordinary
+// Linux CI machine lives here, and the app targets stay thin.
 //
 // The rule that keeps that true is enforced by CI (the `verify` job greps the
 // sources): these targets import only Foundation / FoundationNetworking.
-// UIKit, SwiftUI, Security (Keychain), AuthenticationServices and LiveKit live
-// in App/ behind protocols declared here.
+// UIKit, AppKit, SwiftUI, Security (Keychain), AuthenticationServices and
+// LiveKit live in the apps behind protocols declared here.
 //
 // ⚠️ EXACTLY ONE EXTERNAL DEPENDENCY:
-// apple/swift-crypto, for SHA-256. It is the only way to hash on Linux — Darwin
-// has CryptoKit, corelibs-foundation has nothing — and hashing is not optional
+// apple/swift-crypto, for SHA-256. It is the only way to hash on Linux, Darwin
+// has CryptoKit, corelibs-foundation has nothing, and hashing is not optional
 // here, since PKCE's S256 challenge is what makes an intercepted authorization
 // code worthless.
 //
@@ -25,7 +26,7 @@
 //
 // ⛔ AND `Package.resolved` MUST BE COMMITTED. Without it CI resolves against
 // whatever swift-crypto tags exist at build time and the pin above enforces
-// nothing. A blanket `*.json` ignore rule swallows it silently — `git status`
+// nothing. A blanket `*.json` ignore rule swallows it silently, `git status`
 // says nothing, because an ignored file is not an untracked file, and `git add`
 // skips it while reporting success.
 //
@@ -58,7 +59,7 @@ let package = Package(
         .library(name: "DistrictData", targets: ["DistrictData"]),
         .library(name: "DistrictCall", targets: ["DistrictCall"]),
     ],
-    // ⚠️ AFTER `products:`. `Package.init` is not a free-form argument list —
+    // ⚠️ AFTER `products:`. `Package.init` is not a free-form argument list,
     // SwiftPM's manifest API pins the order and a `dependencies:` block moved
     // above `products:` fails manifest COMPILATION, which reports as
     // "Invalid manifest" rather than as an argument-order problem.
@@ -77,10 +78,10 @@ let package = Package(
             swiftSettings: districtSwiftSettings
         ),
         // PKCE, token refresh coordination and sign-out. Pure logic; the token
-        // STORE is a protocol here and a Keychain implementation in App/.
+        // STORE is a protocol here and a Keychain implementation in each app.
         //
         // ⛔ `Crypto` (swift-crypto), NOT `CryptoKit`. CryptoKit is Darwin-only
-        // and importing it would end the Linux tier — the same class of break
+        // and importing it would end the Linux tier, the same class of break
         // the banned-import grep in CI catches for UIKit and Security.
         // swift-crypto's API is CryptoKit's, so the App target sees no
         // difference.
@@ -121,7 +122,7 @@ let package = Package(
         //
         // ⚠️ `DistrictModel` ONLY, AND DELIBERATELY NOT `DistrictNetwork`. The
         // machines take a url/token pair as two strings and never make a request
-        // — the round trips are COMMANDS their owner performs — so a dependency
+        // the round trips are COMMANDS their owner performs, so a dependency
         // on the client would let a state machine start calling routes. The one
         // thing it does take from the model layer is `DialResponse`, so the
         // "used verbatim" rule about that credential pair is stated once.
@@ -132,14 +133,14 @@ let package = Package(
         ),
 
         // ⛔ TEST INFRASTRUCTURE, DELIBERATELY UNDER Tests/ AND NOT UNDER
-        // Sources/. This is the strict contract gate — the
+        // Sources/. This is the strict contract gate, the
         // assert/decode/re-encode/compare walk that stands in for the
         // `ignoreUnknownKeys = false` that JSONDecoder does not have. It is a
         // plain library target rather than a test target because several test
         // targets will use it and because it has to be importable, but its
         // PATH is what matters: ci/coverage-gate.sh scopes coverage to
         // `/Sources/`, so putting the gate here keeps it out of the floors it
-        // would otherwise inflate — it is a hundred percent exercised by
+        // would otherwise inflate, it is a hundred percent exercised by
         // construction and would flatter every module it was counted against.
         //
         // ⚠️ It links only Foundation. It must never depend on a DistrictCore
@@ -167,7 +168,7 @@ let package = Package(
         // generated from the SERVER's own implementation.
         // A self-consistency test would pass happily while both sides were
         // wrong in the same way, and the server reports the disagreement as one
-        // opaque `invalid_grant` — so this is the only place that failure can be
+        // opaque `invalid_grant`, so this is the only place that failure can be
         // caught. It reuses the loader purely for the non-empty-directory guard;
         // the fixture carries no DTO and stays in
         // `ContractManifest.unimplemented`. Kotlin does exactly this, in
@@ -206,7 +207,7 @@ let package = Package(
         // ⚠️ IT READS FILES FROM OUTSIDE THE PACKAGE, a deliberate trade for
         // having one shared corpus. The mitigation is a non-empty-directory guard plus an
         // exact fixture count, so a broken path is RED rather than a green run
-        // that verified nothing — the same guard the Kotlin loader carries.
+        // that verified nothing, the same guard the Kotlin loader carries.
         .testTarget(
             name: "ContractFixtureTests",
             dependencies: ["ContractGateSupport", "DistrictModel"],

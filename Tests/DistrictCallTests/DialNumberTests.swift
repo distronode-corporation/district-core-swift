@@ -208,10 +208,10 @@ final class CallbackNumberTests: XCTestCase {
         return (rows ?? []).compactMap { $0["from"] as? String }
     }
 
-    /// `<repo>/contracts`, walked up from this source file.
+    /// `<repo>/contracts/mobile`, walked up from this source file.
     ///
-    /// ⚠️ FIVE COMPONENTS, INNERMOST FIRST: this file, `DistrictCallTests`,
-    /// `Tests`, `DistrictCore`, `Packages`, which leaves the repository root. It
+    /// ⚠️ THREE COMPONENTS, INNERMOST FIRST: this file, `DistrictCallTests` and
+    /// `Tests`, which leaves the repository root (also the package root). It
     /// mirrors `ContractFixtures.defaultDirectory` rather than importing it,
     /// because depending on `ContractGateSupport` from this target would be a
     /// `Package.swift` change for one path.
@@ -225,10 +225,12 @@ final class CallbackNumberTests: XCTestCase {
             return URL(fileURLWithPath: override, isDirectory: true)
         }
         var url = URL(fileURLWithPath: #filePath)
-        for _ in 0 ..< 5 {
+        for _ in 0 ..< 3 {
             url = url.deletingLastPathComponent()
         }
-        return url.appendingPathComponent("contracts", isDirectory: true)
+        return url
+            .appendingPathComponent("contracts", isDirectory: true)
+            .appendingPathComponent("mobile", isDirectory: true)
     }
 }
 
@@ -241,10 +243,10 @@ private struct FixtureNotFound: Error, CustomStringConvertible {
     var description: String {
         """
         contract fixture NOT FOUND at \(path).
-          The fixtures live in contracts/ at the repository root, found by walking
-          up from #filePath, unless \(Self.overrideKey) names another directory.
-          If it is set, that directory lacks this file; unset it or point it at a
-          copy of contracts/. If it is unset, the walk no longer lands on the
+          The fixtures live in contracts/mobile/ at the repository root, found by
+          walking up from #filePath, unless \(Self.overrideKey) names another
+          directory. If it is set, that directory lacks this file; unset it or point
+          it at a copy of contracts/mobile/. If it is unset, the walk no longer lands on the
           repository root (a test directory moved), or this is a partial checkout.
         """
     }

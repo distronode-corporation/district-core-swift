@@ -7,6 +7,10 @@
 #
 # ⚠️ Paths are matched with `(^|/)` rather than `^` because `gitleaks dir <path>` reports them
 # with the scanned directory in front, while `gitleaks git` reports them repository-relative.
+#
+# ⚠️ The paths are the ones this repository has had since it was split out of district-ios.
+# `git filter-repo` rewrote every commit, so the older history carries these paths too, and a
+# full-history scan needs no allowlist for the iOS layout.
 
 [extend]
 useDefault = true
@@ -21,9 +25,8 @@ description = "LiveKit E2EE keys in contract fixtures and tests (test data)"
 targetRules = ["generic-api-key"]
 condition = "AND"
 paths = [
-  '''(^|/)contracts/district-(room-token|room-token-viewer|persona-preview-token)\.json$''',
-  '''(^|/)App/Tests/PersonaPreviewStateTests\.swift$''',
-  '''(^|/)Packages/DistrictCore/Tests/DistrictDataTests/WorkspacePersonaRepositoryTests\.swift$''',
+  '''(^|/)contracts/mobile/district-(room-token|room-token-viewer|persona-preview-token)\.json$''',
+  '''(^|/)Tests/DistrictDataTests/WorkspacePersonaRepositoryTests\.swift$''',
 ]
 regexTarget = "secret"
 regexes = [
@@ -38,7 +41,7 @@ regexes = [
 description = "Placeholder access and refresh tokens in NativeTokenResponseTests (test data)"
 targetRules = ["generic-api-key"]
 condition = "AND"
-paths = ['''(^|/)Packages/DistrictCore/Tests/DistrictAuthCoreTests/NativeTokenResponseTests\.swift$''']
+paths = ['''(^|/)Tests/DistrictAuthCoreTests/NativeTokenResponseTests\.swift$''']
 regexTarget = "secret"
 regexes = [
   '''^eyJhbGciOiJIUzI1NiJ9\.header\.signature$''',
@@ -54,34 +57,12 @@ description = "Test idempotencyKey UUIDs in the desk and support request tests (
 targetRules = ["generic-api-key"]
 condition = "AND"
 paths = [
-  '''(^|/)Packages/DistrictCore/Tests/DistrictDataTests/DeskTicketRepositoryTests\.swift$''',
-  '''(^|/)Packages/DistrictCore/Tests/DistrictDataTests/SupportRepositoryTests\.swift$''',
-  '''(^|/)Packages/DistrictCore/Tests/DistrictNetworkTests/EndpointTable\+Desk\.swift$''',
+  '''(^|/)Tests/DistrictDataTests/DeskTicketRepositoryTests\.swift$''',
+  '''(^|/)Tests/DistrictDataTests/SupportRepositoryTests\.swift$''',
+  '''(^|/)Tests/DistrictNetworkTests/EndpointTable\+Desk\.swift$''',
 ]
 regexTarget = "secret"
 regexes = [
   '''^6f1c3f2e-6c4a-4a2f-9b1e-2c9d0f5a7b31$''',
   '''^4f1c8f2e-0f2a-4a7c-8b1e-2f0a9c3d5e77$''',
 ]
-
-# The published SHA-256 of the sentry-cli release binary that release.yml pins and checks
-# before running it. A checksum of a public download, not a credential; the Sentry token
-# rule matches it only because of the variable name beside it.
-[[allowlists]]
-description = "sentry-cli release checksum pinned in release.yml (public SHA-256)"
-targetRules = ["sentry-access-token"]
-condition = "AND"
-paths = ['''(^|/)\.github/workflows/release\.yml$''']
-regexTarget = "secret"
-regexes = ['''^2c26914636c47ab9bf9e710484ad7b44d371cbec8bd29cafb36b3cf877bf4285$''']
-
-# The stand-in App Store Connect key in the key-fetch script's tests. Its one body line is the
-# fixed PKCS#8 prefix every P-256 private key starts with (the algorithm and curve
-# identifiers), cut off before any key bytes, so it is not a key and signs nothing.
-[[allowlists]]
-description = "Truncated PKCS#8 P-256 header used as a stand-in .p8 in asc-key.test.sh (test data)"
-targetRules = ["private-key"]
-condition = "AND"
-paths = ['''(^|/)scripts/asc-key\.test\.sh$''']
-regexTarget = "secret"
-regexes = ['''^-----BEGIN PRIVATE KEY-----\s+MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg\s+-----END PRIVATE KEY-----$''']

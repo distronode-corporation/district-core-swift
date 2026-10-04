@@ -6,6 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-04
+
+A major release because public API is removed (see Removed). Nothing is added, and
+every request that still exists is byte-identical to 2.0.0.
+
 ### Removed
 
 Nothing is recorded in any region, and the District AI service retired every surface
@@ -98,6 +103,7 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0
 [2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0
 [1.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/1.0.0

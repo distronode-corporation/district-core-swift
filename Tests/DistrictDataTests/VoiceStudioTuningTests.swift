@@ -94,9 +94,10 @@ final class VoiceStudioTuningTests: XCTestCase {
         let studio = try VoiceStudioFixture.response()
         var nova = VoiceStudioFixture.fluxChain
         nova.stt.model = "nova-3-general"
-        XCTAssertNil(Tuning.range(try key("engineMix.turn.eotThreshold", in: studio), for: .chained(nova)))
-        XCTAssertFalse(Tuning.honoured(try key("engineMix.turn.eotThreshold", in: studio), by: .chained(nova)))
-        XCTAssertTrue(Tuning.honoured(try key("engineMix.turn.minDelay", in: studio), by: .chained(nova)))
+        let threshold = try key("engineMix.turn.eotThreshold", in: studio)
+        XCTAssertNil(Tuning.range(threshold, for: .chained(nova)))
+        XCTAssertFalse(Tuning.honoured(threshold, by: .chained(nova)))
+        XCTAssertTrue(try Tuning.honoured(key("engineMix.turn.minDelay", in: studio), by: .chained(nova)))
     }
 
     /// ⚠️ A slider starts where the key says, else where the model's default is, else at its

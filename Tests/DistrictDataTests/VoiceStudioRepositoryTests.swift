@@ -29,7 +29,8 @@ final class VoiceStudioRepositoryTests: XCTestCase {
     }
 
     func testAReadThatDoesNotAffirmSuccessIsAFailure() async throws {
-        let body = try VoiceStudioFixture.body().replacingOccurrences(of: #""success": true"#, with: #""success": false"#)
+        let body = try VoiceStudioFixture.body()
+            .replacingOccurrences(of: #""success": true"#, with: #""success": false"#)
         let result = await repository(RepositoryTransport(json: body)).load(workspaceId: "ws_1")
         XCTAssertEqual(result.failureOnly, .decoding("VoiceStudioResponse did not affirm success=true"))
     }

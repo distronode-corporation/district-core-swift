@@ -76,7 +76,7 @@ final class VoiceStudioEndpointTests: XCTestCase {
     }
 
     /// Every tuning key, present, in its place.
-    func testEveryTuningKeyIsWrittenWhenSet() throws {
+    func testEveryTuningKeyIsWrittenWhenSet() {
         var tuned = mix
         tuned.stt.language = "en"
         tuned.stt.location = "us"

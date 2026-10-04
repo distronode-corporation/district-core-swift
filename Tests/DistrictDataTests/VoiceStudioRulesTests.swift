@@ -226,7 +226,7 @@ final class VoiceStudioRulesTests: XCTestCase {
         XCTAssertEqual(Rules.changedKeys(saved: saved, current: current), [.bilingual])
     }
 
-    func testEveryKeyIsComparedOnItsOwn() throws {
+    func testEveryKeyIsComparedOnItsOwn() {
         let saved = VoiceStudioFields(modelId: Rules.geminiLive25, voice: "Puck", temperature: 0.7)
         var current = saved
         current.temperature = 0.5

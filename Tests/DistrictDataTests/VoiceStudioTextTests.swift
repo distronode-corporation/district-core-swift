@@ -98,14 +98,16 @@ final class VoiceStudioTextTests: XCTestCase {
     /// own `ms` and `atLeast`, is the sentence the service wrote.
     func testTheTemplatesReproduceEveryMeterInTheRead() throws {
         let studio = try VoiceStudioFixture.response()
-        let meters = [studio.latency] + studio.recipes.map(\.timeToFirstWord)
-        for meter in meters {
-            var headline = VoiceStudioMeterHeadline.none
-            if let ms = meter.ms {
-                headline = .local(ms: ms, atLeast: meter.atLeast)
-            }
-            XCTAssertEqual(Text.headline(headline, labels: studio.labels), meter.text)
+        let current = studio.latency
+        XCTAssertEqual(rebuilt(current.ms, atLeast: current.atLeast, studio.labels), current.text)
+        for meter in studio.recipes.map(\.timeToFirstWord) {
+            XCTAssertEqual(rebuilt(meter.ms, atLeast: meter.atLeast, studio.labels), meter.text)
         }
+    }
+
+    private func rebuilt(_ ms: Double?, atLeast: Bool, _ labels: VoiceStudioLabels) -> String {
+        guard let ms else { return Text.headline(VoiceStudioMeterHeadline.none, labels: labels) }
+        return Text.headline(.local(ms: ms, atLeast: atLeast), labels: labels)
     }
 
     // MARK: - A bare median

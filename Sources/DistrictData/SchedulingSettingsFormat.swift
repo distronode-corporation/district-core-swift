@@ -28,10 +28,14 @@ public struct SchedulingNotificationGroup: Equatable, Sendable {
 public enum SchedulingSettingsFormat {
     /// ⚠️ THE FOUR TABS, IN THE WEB'S ORDER. The ids are the `?tab=` values, so a link
     /// out of the dashboard names the same tab here.
-    public static let settingsTabIds = ["booking-page", "recordings", "profile", "notifications"]
+    ///
+    /// ⚠️ `assistant` REPLACED `recordings` WHEN MEETING RECORDING WAS RETIRED
+    /// (2026-10-03). The tab now holds only the booking assistant (`settings.llm.*`); a
+    /// stale `?tab=recordings` falls back to the booking page on the web.
+    public static let settingsTabIds = ["booking-page", "assistant", "profile", "notifications"]
 
     public static let settingsTabLabels = [
-        "Booking page", "Recordings and notes", "Your profile", "Your notifications",
+        "Booking page", "Booking assistant", "Your profile", "Your notifications",
     ]
 
     /// `12h` → `12-hour (2:30 pm)`.
@@ -87,18 +91,6 @@ public enum SchedulingSettingsFormat {
         guard !trimmed.isEmpty else { return "Not set" }
         guard let match = supported?.first(where: { $0.code == trimmed }) else { return trimmed }
         return match.name.isEmpty ? trimmed : match.name
-    }
-
-    /// Whether recordings can be written at all, and the sentence that says why not.
-    ///
-    /// ⛔ THE DESCRIPTION CHANGES WITH `recordingsStorageReady`, NOT WITH THE TOGGLE. A
-    /// region with no storage cannot record whatever the switch says, and describing the
-    /// feature as if it were merely off would leave an operator turning it on and waiting
-    /// for recordings that can never arrive.
-    public static func recordingDescription(_ settings: SchedulingStorageSettings) -> String {
-        settings.recordingsStorageReady == false
-            ? "Recording storage is not enabled for this region yet, so meetings cannot be recorded."
-            : "Meetings held on the built-in video are recorded to your workspace's storage."
     }
 
     /// ⚠️ THE TWO GROUPS AND THEIR SEVEN SWITCHES, IN THE WEB'S ORDER. The split is by

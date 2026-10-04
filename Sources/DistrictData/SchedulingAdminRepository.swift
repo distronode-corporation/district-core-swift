@@ -24,7 +24,7 @@ import Foundation
 /// START. The server's route already performs exactly ONE re-mint and ONE re-send on a
 /// 401, bounded because an unbounded one rotates the member's scheduler key on
 /// every request and a rotation logs out everyone else holding it. A retry loop
-/// added on this side multiplies that, and 46 of the 75 ops are writes.
+/// added on this side multiplies that, and 41 of the 64 ops are writes.
 ///
 /// ⛔ AND NOTHING HERE VALIDATES `params`. The catalog's zod schema is the only
 /// validator and it runs server-side; a second, laxer copy here would refuse
@@ -66,7 +66,7 @@ public struct SchedulingAdminRepository: Sendable {
     /// OP. Nothing on this side knows that `eventTypes.list` answers a list of
     /// event types, the catalog does, and it is not importable from Swift. Naming
     /// the wrong type is a ``SchedulingAdminError/decoding(_:)`` at runtime rather
-    /// than a compile error, which is the cost of not duplicating 75 schemas. Use
+    /// than a compile error, which is the cost of not duplicating 64 schemas. Use
     /// ``SchedulingNoContent`` for the sixteen ops that answer nothing.
     public func perform<Response: Decodable>(
         _ op: SchedulingAdminOp,
@@ -111,8 +111,8 @@ public struct SchedulingAdminRepository: Sendable {
             return try JSONDecoder().decode(SchedulingAdminSuccess<Response>.self, from: raw.body).data
         } catch {
             // ⛔ NO BODY PREVIEW, for ``ApiErrorNormalizer``'s reason: this text
-            // can reach a screen and these bodies are customer bookings,
-            // transcripts and meeting notes. The op name and the size are enough
+            // can reach a screen and these bodies are customer bookings and
+            // answers to booking questions. The op name and the size are enough
             // to tell "sent nothing" from "sent a shape we do not know".
             throw SchedulingAdminError.decoding(
                 "The scheduler's answer to '\(op.rawValue)' did not match the shape this app expects "

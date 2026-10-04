@@ -6,6 +6,50 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-04
+
+A major release because public API is removed (see Removed). Nothing is added, and
+every request that still exists is byte-identical to 2.0.0.
+
+### Removed
+
+Nothing is recorded in any region, and the District AI service retired every surface
+that served recordings on 2026-10-03. Each of these is now a 404 or an `unknown_op`
+there, so the client code could only fail. Source-breaking, hence a major version.
+
+- `CallsRepository.recordingURL(workspaceId:callId:)`, `DistrictEndpoints.callRecordingUrl`
+  and `EndpointID.callRecordingUrl` (`GET /api/district/calls/{id}/recording`).
+- `SchedulingAdminMediaRepository.recordingDownloadURL(workspaceId:recordingId:)`,
+  `DistrictEndpoints.schedulingAdminDownload` and `EndpointID.schedulingAdminDownload`.
+- With both redirect routes gone: `ApiClient.redirectTarget(_:)`, `RedirectTarget` and
+  `RedirectEndpoints`. `HTTPTransport` keeps `followRedirects`, which the app's
+  `scheduling/sso` leg still sets to false.
+- Eleven `SchedulingAdminOp` cases (75 to 64): `recordings.list`, `.delete`, `.deleteAll`,
+  `.consent`; `settings.storage.get`, `.patch`; `settings.notetaker.get`, `.patch`;
+  `bookings.notes`, `bookings.notes.regenerate`, `bookings.transcript`. Their repository
+  methods (`recordings`, `deleteRecording`, `deleteAllRecordings`, `recordingConsents`,
+  `storageSettings`, `setRecordingsEnabled`, `notetakerSettings`, `setNotetakerEnabled`,
+  `bookingNotes`, `regenerateBookingNotes`, `bookingTranscript`) and models
+  (`SchedulingRecording`, `SchedulingRecordingList`, `SchedulingRecordingsDeleted`,
+  `SchedulingRecordingConsent`, `SchedulingRecordingConsents`,
+  `SchedulingStorageSettings`, `SchedulingNotetakerSettings`, `SchedulingBookingNotes`,
+  `SchedulingBookingNotesRegenerated`, `SchedulingBookingTranscript`) went with them.
+- `SchedulingRecordingFormat`, `SchedulingMarkdown` and `SchedulingNotesBlock` (the
+  booking notes parser), `SchedulingClock.paddedClock(_:)` and
+  `SchedulingSettingsFormat.recordingDescription(_:)`, which only those screens used.
+
+### Changed
+
+- `CallSummary.recordingUrl` stays an optional `String` and is now always null on the
+  wire (the key is kept so installed apps keep decoding).
+- `SchedulingSettingsFormat.settingsTabIds` and `settingsTabLabels`: the second tab is
+  `assistant` ("Booking assistant") instead of `recordings` ("Recordings and notes"), as
+  on the web.
+- `contracts/mobile/` synced with the service (156 fixtures, was 164): the eight
+  recording, storage, notetaker, booking notes and transcript fixtures are gone, and
+  `recordingUrl` is null on the answered row of `district-calls.json`,
+  `district-overview.json` and `district-call-detail.json`.
+
 ## [2.0.0] - 2026-10-03
 
 A major release only because `PushTokenKind` gained a case (see Changed): every other
@@ -59,6 +103,7 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0
 [2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0
 [1.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/1.0.0

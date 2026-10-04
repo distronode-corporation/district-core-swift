@@ -245,12 +245,12 @@ public enum AppLinkResolver {
     /// section lands on that section. Android has the same behaviour, pinned by a test.
     ///
     /// ⚠️ `scheduling/<sub>` IS THE SECOND DEEPER PATH THAT IS KEPT. The web
-    /// publishes eight real sub-pages under `/dashboard/district/scheduling` (`event-types`,
-    /// `hours`, `bookings`, `calendar`, `team`, `recordings`, `settings`, `developer`) and
-    /// the app now draws every one of them, so sending all eight to the hub would be the
-    /// same wrong answer the `openInBrowser` case was introduced to stop, a link that
-    /// resolved, opened the app, and showed something the user did not ask for. ⚠️ A ninth
-    /// name, `overview`, is accepted for the register that the web serves at the scheduling
+    /// publishes seven real sub-pages under `/dashboard/district/scheduling` (`event-types`,
+    /// `hours`, `bookings`, `calendar`, `team`, `settings`, `developer`; `recordings` was
+    /// retired on 2026-10-03) and the app draws every one of them, so sending all seven to
+    /// the hub would be the same wrong answer the `openInBrowser` case was introduced to
+    /// stop, a link that resolved, opened the app, and showed something the user did not
+    /// ask for. ⚠️ An eighth name, `overview`, is accepted for the register that the web serves at the scheduling
     /// ROOT; nothing produces that URL today, and it is mapped on the same reasoning the
     /// `calls/<id>` paragraph below gives for a page the website has not published either.
     ///

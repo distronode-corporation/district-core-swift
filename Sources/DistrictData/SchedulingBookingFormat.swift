@@ -133,8 +133,6 @@ public enum SchedulingBookingFormat {
     /// ⚠️ AN UNKNOWN STATUS IS ECHOED VERBATIM rather than shown as "Unknown". A status
     /// the fork added since this build shipped is still meaningful to an operator, and
     /// replacing it would throw away the only information the row had.
-    /// ⛔ ``SchedulingRecordingFormat/recordingState(_:)`` makes the OPPOSITE call on
-    /// purpose; the difference is noted there.
     public static func statusLabel(_ status: String) -> SchedulingStatusLabel {
         switch status {
         case "confirmed": SchedulingStatusLabel(label: "Confirmed", kind: .success)

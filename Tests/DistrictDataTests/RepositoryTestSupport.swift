@@ -55,10 +55,6 @@ final class RepositoryTransport: HTTPTransport, @unchecked Sendable {
         })
     }
 
-    convenience init(redirectTo location: String) {
-        self.init([HTTPResponse(statusCode: 302, headers: ["Location": location], body: nil)])
-    }
-
     var requestedURLs: [String] {
         lock.lock()
         defer { lock.unlock() }

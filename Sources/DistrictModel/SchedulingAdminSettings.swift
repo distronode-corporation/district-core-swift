@@ -1,7 +1,8 @@
 import Foundation
 
-// The scheduling admin's SELF and SETTINGS rows: `me.*`, `settings.branding.*`,
-// `settings.storage.*`, `settings.notetaker.*` and `settings.llm.*`.
+// The scheduling admin's SELF and SETTINGS rows: `me.*`, `settings.branding.*` and
+// `settings.llm.*`. (`settings.storage.*` and `settings.notetaker.*` were retired by
+// the server on 2026-10-03, with meeting recording.)
 //
 // ⛔ IN `DistrictModel` RATHER THAN BESIDE THE REPOSITORY, for the reason
 // `SchedulingOverrideCreated.swift` states: `ContractFixtureTests` depends on
@@ -18,7 +19,7 @@ import Foundation
 // because its unknown-key check IS a re-encode.
 //
 // ⛔ THE SHAPES HERE ARE THE CATALOG'S ALLOWLIST, NOT THE FORK'S RESPONSE, AND
-// THE DIFFERENCE IS THE WHOLE POINT OF THREE OF THESE FIVE TYPES. `admin-ops.ts`
+// THE DIFFERENCE IS THE WHOLE POINT OF TWO OF THESE THREE TYPES. `admin-ops.ts`
 // re-declares each body as a zod schema and the route parses through it, so a
 // field the fork sends and the schema omits never reaches this client at all.
 // Adding a property here to "match the fork" would model a key that is stripped
@@ -173,46 +174,6 @@ public struct SchedulingBranding: Codable, Equatable, Sendable {
         case fallbackLocale = "fallback_locale"
         case supportedLocales = "supported_locales"
     }
-}
-
-/// Recording storage, as much of it as a tenant may see (`settings.storage.*`).
-///
-/// ⛔ `backups_configured`, `backups_bucket` AND `backups_endpoint` ARE ABSENT
-/// FROM THE CATALOG'S SCHEMA AND MUST NOT BE ADDED HERE. They describe the
-/// INSTANCE's own object storage, which is ours and is shared: naming the bucket
-/// to one tenant tells them where every other tenancy's recordings live. The
-/// route strips them, so a property for one would model a key that cannot arrive.
-public struct SchedulingStorageSettings: Codable, Equatable, Sendable {
-    /// Whether meetings are recorded at all. The one field
-    /// `settings.storage.patch` accepts.
-    public let recordingsEnabled: Bool
-    /// ⛔ "THE INSTANCE HAS SOMEWHERE TO PUT THEM", WHICH IS NOT THE SAME QUESTION
-    /// AS ``recordingsEnabled`` AND IS NOT THE TENANT'S TO FIX. Recording switched
-    /// on with storage unready produces meetings that record and then have nothing
-    /// to upload to; a screen should say so rather than offering a retry.
-    /// ⚠️ Optional: absent on a fork that predates the field.
-    public let recordingsStorageReady: Bool?
-    /// Where this tenancy's objects are keyed. ⚠️ A PREFIX, not a bucket, the
-    /// bucket is deliberately not published. Optional for the same reason as above.
-    public let recordingsPrefix: String?
-
-    enum CodingKeys: String, CodingKey {
-        case recordingsEnabled = "recordings_enabled"
-        case recordingsStorageReady = "recordings_storage_ready"
-        case recordingsPrefix = "recordings_prefix"
-    }
-}
-
-/// The meeting notetaker's one switch (`settings.notetaker.*`).
-///
-/// ⛔ ONE FIELD, AND THE PATCH SCHEMA IS `z.strictObject` SO A SECOND ONE IS A
-/// 400 NAMING IT. `stt_api_key` is the field that closure exists to refuse: the
-/// fork would store a tenant-supplied speech-to-text credential on the INSTANCE,
-/// which every other tenancy on that deployment then transcribes through.
-/// `stt_base_url` is stripped from the response for the same reason. A tenant
-/// needs to know the notetaker is on, not what powers it.
-public struct SchedulingNotetakerSettings: Codable, Equatable, Sendable {
-    public let enabled: Bool
 }
 
 /// The meeting summariser (`settings.llm.*`).

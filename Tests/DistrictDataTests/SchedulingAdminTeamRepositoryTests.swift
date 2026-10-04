@@ -10,7 +10,7 @@ import XCTest
 /// TESTS PIN. `users.list` answers a BARE ARRAY, `users.upcomingBookings` and
 /// `teams.list` answer `{items:[…]}`, and the rest answer a team or a bare `{ok}`.
 /// Naming the wrong one is a runtime decode failure rather than a compile error,
-/// which is the cost of not duplicating 75 schemas in Swift.
+/// which is the cost of not duplicating 64 schemas in Swift.
 ///
 /// ⚠️ `userId` IS CAMELCASE ON THE WIRE FOR THE TWO MEMBER OPS while the add's is
 /// `user_id`. That is the catalog's own spelling for a path key and it is not ours

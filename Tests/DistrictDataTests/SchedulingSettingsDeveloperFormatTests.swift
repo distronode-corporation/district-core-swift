@@ -16,11 +16,11 @@ final class SchedulingSettingsDeveloperFormatTests: XCTestCase {
     func testTheFourSettingsTabsAreInTheWebsOrder() {
         XCTAssertEqual(
             Settings.settingsTabIds,
-            ["booking-page", "recordings", "profile", "notifications"]
+            ["booking-page", "assistant", "profile", "notifications"]
         )
         XCTAssertEqual(
             Settings.settingsTabLabels,
-            ["Booking page", "Recordings and notes", "Your profile", "Your notifications"]
+            ["Booking page", "Booking assistant", "Your profile", "Your notifications"]
         )
         XCTAssertEqual(Settings.settingsTabIds.count, Settings.settingsTabLabels.count)
     }
@@ -87,25 +87,6 @@ final class SchedulingSettingsDeveloperFormatTests: XCTestCase {
             SchedulingFixture.decode(SchedulingLocaleOption.self, #"{"code":"fr","name":""}"#),
         ]
         XCTAssertEqual(Settings.localeLabel(code: "fr", supported: supported), "fr")
-    }
-
-    // MARK: - recordingDescription
-
-    /// ⛔ THE SENTENCE CHANGES WITH STORAGE READINESS AND NOT WITH THE TOGGLE. A region
-    /// with no storage cannot record whatever the switch says.
-    func testTheRecordingSentenceTracksStorageAndNotTheToggle() throws {
-        let notReady = try SchedulingFixture.storage(enabled: true, ready: false)
-        XCTAssertTrue(Settings.recordingDescription(notReady).contains("not enabled for this region"))
-
-        let ready = try SchedulingFixture.storage(enabled: false, ready: true)
-        XCTAssertTrue(Settings.recordingDescription(ready).hasPrefix("Meetings held on the built-in video"))
-    }
-
-    /// ⚠️ AN ABSENT READINESS FLAG IS TREATED AS READY, because the comparison is against
-    /// `false` explicitly, an older payload should not claim the region is broken.
-    func testAnAbsentReadinessFlagReadsAsReady() throws {
-        let unknown = try SchedulingFixture.storage(enabled: true, ready: nil)
-        XCTAssertTrue(Settings.recordingDescription(unknown).hasPrefix("Meetings held"))
     }
 
     // MARK: - Notifications

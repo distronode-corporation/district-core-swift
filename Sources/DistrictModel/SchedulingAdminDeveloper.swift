@@ -12,9 +12,8 @@ import Foundation
 /// UNIVERSAL LIST ENVELOPE ON THIS SURFACE. `admin-ops.ts` defines
 /// `items = (schema) => z.object({ items: z.array(schema) })` and uses it for
 /// `apiKeys.list`, `oauth.connections.list`, `webhooks.list` and
-/// `webhooks.deliveries`, while `recordings.list` and `recordings.consent`
-/// declare their own key by hand. Reaching for this on one of those two throws a
-/// missing-key error that reads like an outage; see ``SchedulingRecordingList``.
+/// `webhooks.deliveries`; an op that declares its own container key by hand
+/// throws a missing-key error through this that reads like an outage.
 public struct SchedulingItems<Item: Codable & Sendable>: Codable, Sendable {
     public let items: [Item]
 }

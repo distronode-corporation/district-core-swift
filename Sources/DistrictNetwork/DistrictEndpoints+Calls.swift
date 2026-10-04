@@ -60,31 +60,6 @@ public extension DistrictEndpoints {
         )
     }
 
-    /// Resolve a playable URL for a call's recording.
-    ///
-    /// ⛔ THE SERVER ANSWERS **302, NOT JSON**, AND THIS CLIENT MUST NOT FOLLOW
-    /// IT. Following it streams the whole audio file through this process just to
-    /// learn its address, on a metered connection, for a file the player is
-    /// about to fetch again itself. Send it through
-    /// ``ApiClient/redirectTarget(_:)``, which surfaces the status and the
-    /// `Location` header and follows nothing.
-    ///
-    /// ⚠️ THE URL IS SHORT-LIVED (a presigned object URL): resolve it at the
-    /// moment of playback and never cache or persist it. A cached one expires and
-    /// fails inside whatever player received it, which looks like a broken
-    /// recording rather than a stale link.
-    ///
-    /// ⚠️ A call with no recording answers **404 with a JSON body**, not a
-    /// redirect, so the ordinary error mapping still applies.
-    static func callRecordingUrl(workspaceId: String, callId: String) -> ApiRequestDescriptor {
-        ApiRequestDescriptor(
-            .callRecordingUrl,
-            .get,
-            DistrictPaths.calls + [callId, "recording"],
-            query: [ApiQueryItem("workspaceId", workspaceId)]
-        )
-    }
-
     /// Place a direct outbound call and receive the credential to join its room.
     ///
     /// ⛔ THIS SPENDS REAL MONEY AND RINGS A TELEPHONE. Nothing may retry it on

@@ -3,10 +3,8 @@ import Foundation
 
 /// The ``HTTPTransport`` double.
 ///
-/// ⚠️ IT RECORDS THE REQUEST AND THE `followRedirects` FLAG, because the flag is
-/// half of the recording-route trap: a transport asked to follow the 302 would
-/// download the whole audio file, and nothing about the resulting URL would look
-/// wrong.
+/// ⚠️ IT RECORDS THE REQUEST AND THE `followRedirects` FLAG, because a transport
+/// asked the wrong way round about a redirect does nothing visibly wrong.
 final class TestTransport: HTTPTransport, @unchecked Sendable {
     struct Recorded {
         let request: HTTPRequest

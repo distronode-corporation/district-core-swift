@@ -42,7 +42,6 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case calls
     case callDetail
     case callTranscript
-    case callRecordingUrl
     case dial
     case answerCall
     /// ⚠️ THE THIRD ROUTE IN THE DIAL/ANSWER FAMILY AND THE ONLY ONE THAT IS SAFE
@@ -244,28 +243,21 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // answers **410 `scheduler_console_retired`** only for a `next` that lands on
     // `/admin`. It has no case here for the reason it never had one: it answers a
     // **302** whose `Location` is a one-time sign-in credential, so the App target
-    // fetches it with redirects DISABLED and hands the URL to the browser.
-    // ``RedirectEndpoints`` is not the home for it either, that list is for
-    // targets that are presigned OBJECTS, where following the redirect wastes
-    // bandwidth rather than SPENDING a credential on a transport nobody sees.
+    // fetches it with redirects DISABLED and hands the URL to the browser, because
+    // following it would SPEND a credential on a transport nobody sees.
     //
-    // ⛔ THE THREE SCHEDULING ADMIN CASES ARE ONE ROUTE FAMILY WITH THREE TRANSPORTS, NOT
-    // THREE FEATURES. `schedulingAdmin` is the RPC that carries all 75 catalogued
+    // ⛔ THE TWO SCHEDULING ADMIN CASES ARE ONE ROUTE FAMILY WITH TWO TRANSPORTS, NOT
+    // TWO FEATURES. `schedulingAdmin` is the RPC that carries all 64 catalogued
     // ops (see ``SchedulingAdminOp``); `schedulingAdminUpload` exists only because
-    // an image cannot travel through a zod-validated params object, and
-    // `schedulingAdminDownload` only because a recording is a 302 to a presigned
-    // object the server refuses to proxy. A fourth transport would need a fourth
-    // reason of that kind, not a fourth screen.
+    // an image cannot travel through a zod-validated params object. A third
+    // transport would need a third reason of that kind, not a third screen.
+    // (`schedulingAdminDownload`, the recording download, was retired with
+    // `callRecordingUrl` when recording was, 2026-10-03.)
     case schedulingStatus
     case schedulingEnable
     case schedulingHandoff
     case schedulingAdmin
     case schedulingAdminUpload
-    /// ⛔ THE SECOND ENTRY ON ``RedirectEndpoints/all`` AND THE FIRST ONE THAT IS
-    /// NOT A RECORDING OF A PHONE CALL. Same handling, same reason: send it
-    /// through ``ApiClient/redirectTarget(_:)`` or the transport downloads a
-    /// multi-hundred-megabyte video to learn its address.
-    case schedulingAdminDownload
 
     // The tenant's own support requests WITH Distronode
     //

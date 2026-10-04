@@ -17,12 +17,12 @@ import Foundation
 /// ⚠️ THE RAW VALUES ARE THE SERVER'S KEYS VERBATIM, DOTS AND ALL, and the case
 /// names are their camelCase transliteration. A key renamed on the server is a
 /// **400 `unknown_op`** here, not a compile error, so `SchedulingAdminOpTests`
-/// embeds all 75 strings a second time rather than deriving them from
+/// embeds all 64 strings a second time rather than deriving them from
 /// `allCases`, a test that re-reads the enum would assert that the code equals
 /// itself and would pass through any rename.
 ///
-/// ⚠️ SEVENTY-FIVE, COUNTED FROM `ADMIN_OPS` RATHER THAN ASSUMED. The split is
-/// 35 `viewer` / 40 `client` and 29 reads / 46 writes; both are asserted, and
+/// ⚠️ SIXTY-FOUR, COUNTED FROM `ADMIN_OPS` RATHER THAN ASSUMED. The split is
+/// 29 `viewer` / 35 `client` and 23 reads / 41 writes; both are asserted, and
 /// neither is derivable from the other (the `me.*` and `calendar.*` namespaces
 /// are `viewer` even when they write, see ``minRole``).
 ///
@@ -32,6 +32,12 @@ import Foundation
 /// this side needs to know locally is who may send an op and whether sending it
 /// spends the workspace's write budget, and that is exactly what this type
 /// exposes.
+///
+/// ⚠️ ELEVEN OPS WERE RETIRED BY THE SERVER (2026-10-03) AND ARE GONE HERE: the
+/// four `recordings.*`, `settings.storage.{get,patch}`,
+/// `settings.notetaker.{get,patch}`, `bookings.notes`, `bookings.notes.regenerate`
+/// and `bookings.transcript`. Meetings are not recorded, so there is nothing for
+/// them to list, delete or summarise; the server answers each with `unknown_op`.
 public enum SchedulingAdminOp: String, CaseIterable, Sendable {
     // ── Self ────────────────────────────────────────────────────────────────
     case meGet = "me.get"
@@ -70,9 +76,6 @@ public enum SchedulingAdminOp: String, CaseIterable, Sendable {
     case bookingsCancel = "bookings.cancel"
     case bookingsReschedule = "bookings.reschedule"
     case bookingsReassign = "bookings.reassign"
-    case bookingsNotes = "bookings.notes"
-    case bookingsNotesRegenerate = "bookings.notes.regenerate"
-    case bookingsTranscript = "bookings.transcript"
 
     // ── The caller's own calendars ──────────────────────────────────────────
     case calendarStatus = "calendar.status"
@@ -98,21 +101,11 @@ public enum SchedulingAdminOp: String, CaseIterable, Sendable {
     case teamsMembersPatch = "teams.members.patch"
     case teamsMembersRemove = "teams.members.remove"
 
-    // ── Recordings ──────────────────────────────────────────────────────────
-    case recordingsList = "recordings.list"
-    case recordingsDelete = "recordings.delete"
-    case recordingsDeleteAll = "recordings.deleteAll"
-    case recordingsConsent = "recordings.consent"
-
     // ── Settings ────────────────────────────────────────────────────────────
     case settingsBrandingGet = "settings.branding.get"
     case settingsBrandingPatch = "settings.branding.patch"
     case settingsBrandingLogoDelete = "settings.branding.logo.delete"
     case settingsBrandingBannerDelete = "settings.branding.banner.delete"
-    case settingsStorageGet = "settings.storage.get"
-    case settingsStoragePatch = "settings.storage.patch"
-    case settingsNotetakerGet = "settings.notetaker.get"
-    case settingsNotetakerPatch = "settings.notetaker.patch"
     case settingsLlmGet = "settings.llm.get"
     case settingsLlmPatch = "settings.llm.patch"
 

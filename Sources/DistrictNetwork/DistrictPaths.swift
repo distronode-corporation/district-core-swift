@@ -325,14 +325,6 @@ enum DistrictPaths {
     /// with null while the URL looks perfectly correct.
     static let schedulingAdminUpload = schedulingAdmin + ["upload"]
 
-    /// ⛔ A **302** TO A PRESIGNED OBJECT, LIKE `calls/{id}/recording`, AND THE
-    /// ONLY OTHER ONE IN THIS CLIENT. The fork answers the download with a
-    /// redirect and has no 2xx path at all; the route forwards it rather than
-    /// streaming, so this must go through ``ApiClient/redirectTarget(_:)``.
-    static func schedulingAdminDownload(_ recordingId: String) -> [String] {
-        schedulingAdmin + ["download", recordingId]
-    }
-
     /// ⛔ THE REPLACEMENT FOR `scheduling/sso`, AND IT IS JSON WHERE THAT ONE WAS A
     /// 302. The console was retired (the route now answers 410); `handoff` mints a
     /// short-lived URL in a body this client can decode, so unlike its predecessor it

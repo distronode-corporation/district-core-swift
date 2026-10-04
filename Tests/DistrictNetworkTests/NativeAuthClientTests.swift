@@ -355,11 +355,10 @@ final class NativeAuthClientTests: XCTestCase {
 
     // ── The state of the seam ────────────────────────────────────────────────
 
-    /// ⛔ REDIRECTS ARE FOLLOWED HERE, WHICH IS THE DEFAULT EVERYWHERE EXCEPT THE
-    /// RECORDING ROUTE. `ApiClient.redirectTarget(_:)` passes `false` for
-    /// `calls/{id}/recording` and nothing else; a credential exchange that
-    /// silently stopped at a 308 would report `transportFailure` and read as an
-    /// outage. The flag is asserted rather than assumed because it is invisible
+    /// ⛔ REDIRECTS ARE FOLLOWED HERE, WHICH IS THE DEFAULT EVERYWHERE IN THIS
+    /// PACKAGE (only the app's `scheduling/sso` leg disables it); a credential
+    /// exchange that silently stopped at a 308 would report `transportFailure` and
+    /// read as an outage. The flag is asserted rather than assumed because it is invisible
     /// in the URL and in the response.
     func testBothRoutesPostJsonAndFollowRedirects() async {
         for (label, send) in Self.senders {

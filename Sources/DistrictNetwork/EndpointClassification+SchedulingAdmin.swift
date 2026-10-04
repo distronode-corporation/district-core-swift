@@ -3,10 +3,8 @@ import Foundation
 public extension TypedEndpoints {
     /// The scheduling admin surface's two BODY routes.
     ///
-    /// ⛔ TWO, NOT THREE. `schedulingAdminDownload` answers a **302** and is on
-    /// ``RedirectEndpoints/all`` instead; the three lists are exhaustive and
-    /// disjoint by test, so listing it in both would fail `EndpointSurfaceTests`'
-    /// partition assertion rather than merely being redundant.
+    /// ⚠️ TWO, AND NOW THE WHOLE FAMILY: the recording download that was the third
+    /// member was retired on 2026-10-03.
     ///
     /// ⛔ "TYPED" HERE MEANS SOMETHING SLIGHTLY DIFFERENT AND IT IS WORTH SAYING
     /// ONCE. Every other entry on these lists decodes ONE declared DTO.

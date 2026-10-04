@@ -10,7 +10,7 @@ import Foundation
 // and every caller would otherwise guess, WHICH RESPONSE TYPE GOES WITH WHICH OP.
 // Naming the wrong type at a call site is a runtime
 // ``SchedulingAdminError/decoding(_:)``, which is the cost `perform` pays for not
-// duplicating 75 schemas; these close that gap for the two namespaces S1b ports
+// duplicating 64 schemas; these close that gap for the two namespaces S1b ports
 // without reopening the one `perform` avoids.
 //
 // ⛔ THE PATH KEYS STAY IN THE BODY. `slug` and `id` are BOTH the address and a

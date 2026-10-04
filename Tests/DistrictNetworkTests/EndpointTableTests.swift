@@ -38,7 +38,7 @@ final class EndpointTableTests: XCTestCase {
         // ⚠️ A ROUTE MAY ANSWER TO SEVERAL BODIES AND STILL BE ONE ROW. `markAllRead`
         // is a third selector on `messages/mark-read`; `contacts/block` carries
         // block-by-id, block-by-number and unblock as three documents on one row; the
-        // scheduling admin RPC carries seventy-five operations whose name travels in
+        // scheduling admin RPC carries sixty-four operations whose name travels in
         // the BODY (pinned in `SchedulingAdminOpTests`). The other shapes are pinned
         // in their repository tests, because a duplicate id fails
         // `Set(covered).count == covered.count` above. Conversely one PATH can be two
@@ -77,7 +77,7 @@ final class EndpointTableTests: XCTestCase {
         // exactly like a duplicate row. The assertions are immune, they compare the
         // built array against `EndpointID.allCases`, but the ad-hoc check a reader
         // reaches for first is not.
-        XCTAssertEqual(rows.count, 119)
+        XCTAssertEqual(rows.count, 117)
     }
 
     func testMethodPathQueryAndBodyForEveryEndpoint() throws {

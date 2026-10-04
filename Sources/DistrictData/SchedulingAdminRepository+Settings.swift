@@ -107,57 +107,10 @@ public extension SchedulingAdminRepository {
         )
     }
 
-    // MARK: - Recording storage, the notetaker and the summariser
+    // MARK: - The summariser
 
-    /// `settings.storage.get`.
-    func storageSettings(workspaceId: String) async throws -> SchedulingStorageSettings {
-        try await perform(
-            .settingsStorageGet,
-            workspaceId: workspaceId,
-            params: .object([]),
-            as: SchedulingStorageSettings.self
-        )
-    }
-
-    /// `settings.storage.patch`, the one field it accepts.
-    ///
-    /// ⚠️ TURNING THIS ON DOES NOT MAKE RECORDING WORK. Read
-    /// ``SchedulingStorageSettings/recordingsStorageReady`` back: an instance with
-    /// no object storage records meetings that then have nowhere to upload to,
-    /// and nothing about this call's success says which case a workspace is in.
-    func setRecordingsEnabled(workspaceId: String, _ enabled: Bool) async throws -> SchedulingStorageSettings {
-        try await perform(
-            .settingsStoragePatch,
-            workspaceId: workspaceId,
-            params: .object([("recordings_enabled", .bool(enabled))]),
-            as: SchedulingStorageSettings.self
-        )
-    }
-
-    /// `settings.notetaker.get`.
-    func notetakerSettings(workspaceId: String) async throws -> SchedulingNotetakerSettings {
-        try await perform(
-            .settingsNotetakerGet,
-            workspaceId: workspaceId,
-            params: .object([]),
-            as: SchedulingNotetakerSettings.self
-        )
-    }
-
-    /// `settings.notetaker.patch`.
-    ///
-    /// ⛔ ONE FIELD, AND THE SCHEMA IS `z.strictObject`. Anything else in the body
-    /// `stt_api_key` above all, is a **400 naming the field**, which is the
-    /// intended behaviour: silently accepting a credential a customer believes
-    /// they set is the worse of the two failures.
-    func setNotetakerEnabled(workspaceId: String, _ enabled: Bool) async throws -> SchedulingNotetakerSettings {
-        try await perform(
-            .settingsNotetakerPatch,
-            workspaceId: workspaceId,
-            params: .object([("enabled", .bool(enabled))]),
-            as: SchedulingNotetakerSettings.self
-        )
-    }
+    // ⚠️ `settings.storage.*` and `settings.notetaker.*` were retired by the server
+    // (2026-10-03) with meeting recording itself, and their methods went with them.
 
     /// `settings.llm.get`.
     func llmSettings(workspaceId: String) async throws -> SchedulingLLMSettings {

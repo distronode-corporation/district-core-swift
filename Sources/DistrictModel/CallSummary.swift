@@ -72,7 +72,10 @@ public struct CallSummary: Codable, Sendable {
     /// ⛔ NEVER EMPTY AND OFTEN NOT A SUMMARY. See ``CallNarrative``, which is
     /// the only thing entitled to decide whether this string is one.
     public let aiSummary: String
-    /// nil when the call was never recorded. ⚠️ Explicit null on the wire.
+    /// ⛔ ALWAYS nil NOW, AND NEVER READ. No call is recorded in any region and the
+    /// server dropped the column (2026-10-03); it keeps the KEY, as an explicit null,
+    /// so installed builds keep decoding. Optional so both an old URL and the null
+    /// decode. ⚠️ Explicit null on the wire.
     public let recordingUrl: String?
     /// ⛔ ALWAYS `""`, AND NEVER READ. The text is not on this row (it would be
     /// the largest value on the feed); fetch it with ``CallTranscriptResponse``

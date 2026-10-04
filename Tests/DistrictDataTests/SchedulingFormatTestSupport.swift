@@ -125,41 +125,6 @@ enum SchedulingFixture {
         """)
     }
 
-    static func recording(
-        id: String = "rec1",
-        status: String = "complete",
-        durationS: Int? = nil,
-        hasFile: Bool? = nil,
-        createdAt: String? = nil,
-        bookerName: String? = nil
-    ) throws -> SchedulingRecording {
-        var fields = ["\"id\":\"\(id)\"", "\"status\":\"\(status)\""]
-        if let durationS {
-            fields.append("\"duration_s\":\(durationS)")
-        }
-        if let hasFile {
-            fields.append("\"has_file\":\(hasFile)")
-        }
-        if let createdAt {
-            fields.append("\"created_at\":\"\(createdAt)\"")
-        }
-        if let bookerName {
-            fields.append("\"booker_name\":\"\(bookerName)\"")
-        }
-        return try decode(SchedulingRecording.self, "{\(fields.joined(separator: ","))}")
-    }
-
-    static func consent(
-        identity: String,
-        name: String? = nil,
-        decision: String = "continue"
-    ) throws -> SchedulingRecordingConsent {
-        let nameField = name.map { "\"\($0)\"" } ?? "null"
-        return try decode(SchedulingRecordingConsent.self, """
-        {"identity":"\(identity)","name":\(nameField),"decision":"\(decision)","decided_at":null}
-        """)
-    }
-
     static func calendarConnection(
         id: String = "c1",
         provider: String = "google",
@@ -222,16 +187,5 @@ enum SchedulingFixture {
          "notify_host_booking":\(notifications),"notify_host_cancel":\(notifications),
          "notify_host_reschedule":\(notifications)}
         """)
-    }
-
-    static func storage(
-        enabled: Bool = true,
-        ready: Bool? = nil
-    ) throws -> SchedulingStorageSettings {
-        var fields = ["\"recordings_enabled\":\(enabled)"]
-        if let ready {
-            fields.append("\"recordings_storage_ready\":\(ready)")
-        }
-        return try decode(SchedulingStorageSettings.self, "{\(fields.joined(separator: ","))}")
     }
 }

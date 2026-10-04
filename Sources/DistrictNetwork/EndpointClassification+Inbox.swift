@@ -14,7 +14,7 @@ public extension TypedEndpoints {
     ///
     /// ⚠️ `markAllRead` IS NOT HERE AND MUST NOT BE ADDED. It is a second BODY on
     /// ``EndpointID/markRead``, not a second endpoint, so it is already classified,
-    /// and these three lists are asserted to partition ``EndpointID/allCases``
+    /// and these two lists are asserted to partition ``EndpointID/allCases``
     /// exactly, which a duplicate would break.
     ///
     /// ⚠️ ITS OWN FILE RATHER THAN ONE MORE LINE IN `EndpointClassification.swift`,

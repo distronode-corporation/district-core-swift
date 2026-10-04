@@ -1,15 +1,15 @@
 @testable import DistrictNetwork
 import XCTest
 
-/// ⛔ THE 75 KEYS ARE WRITTEN OUT A SECOND TIME, AND DERIVING THEM FROM
+/// ⛔ THE 64 KEYS ARE WRITTEN OUT A SECOND TIME, AND DERIVING THEM FROM
 /// `allCases` WOULD DEFEAT THE WHOLE FILE. The op crosses the wire as a STRING,
 /// so a key renamed on the server is a 400 `unknown_op` at runtime and not a
 /// compile error anywhere; a test that read the enum would assert that the code
 /// equals itself and would pass through any rename, in either direction. These
 /// strings were read off the server's `ADMIN_OPS` catalog.
 ///
-/// ⚠️ THE COUNTS BELOW WERE COUNTED, NOT COMPUTED. 75 ops, 35 `viewer` / 40
-/// `client`, 29 reads / 46 writes, the last pair from the server's own test
+/// ⚠️ THE COUNTS BELOW WERE COUNTED, NOT COMPUTED. 64 ops, 29 `viewer` / 35
+/// `client`, 23 reads / 41 writes, the last pair from the server's own test
 /// (`method !== "GET"`), which is NOT the role split: four viewer-level ops write.
 final class SchedulingAdminOpTests: XCTestCase {
     /// `ADMIN_OPS`' keys, in catalog order.
@@ -44,9 +44,6 @@ final class SchedulingAdminOpTests: XCTestCase {
         "bookings.cancel",
         "bookings.reschedule",
         "bookings.reassign",
-        "bookings.notes",
-        "bookings.notes.regenerate",
-        "bookings.transcript",
         "calendar.status",
         "calendar.caldav.connect",
         "calendar.connections.calendars.get",
@@ -65,18 +62,10 @@ final class SchedulingAdminOpTests: XCTestCase {
         "teams.members.add",
         "teams.members.patch",
         "teams.members.remove",
-        "recordings.list",
-        "recordings.delete",
-        "recordings.deleteAll",
-        "recordings.consent",
         "settings.branding.get",
         "settings.branding.patch",
         "settings.branding.logo.delete",
         "settings.branding.banner.delete",
-        "settings.storage.get",
-        "settings.storage.patch",
-        "settings.notetaker.get",
-        "settings.notetaker.patch",
         "settings.llm.get",
         "settings.llm.patch",
         "apiKeys.list",
@@ -105,15 +94,13 @@ final class SchedulingAdminOpTests: XCTestCase {
         "eventTypes.list", "eventTypes.get", "eventTypes.hosts.get",
         "eventTypes.questions.list", "eventTypes.slots",
         "availability.rules.list", "availability.overrides.list",
-        "bookings.list", "bookings.answers", "bookings.notes", "bookings.transcript",
+        "bookings.list", "bookings.answers",
         "calendar.status", "calendar.caldav.connect",
         "calendar.connections.calendars.get", "calendar.connections.calendars.put",
         "calendar.connections.destination", "calendar.connections.delete", "zoom.status",
         "users.list", "users.upcomingBookings",
         "teams.list", "teams.get",
-        "recordings.list", "recordings.consent",
-        "settings.branding.get", "settings.storage.get",
-        "settings.notetaker.get", "settings.llm.get",
+        "settings.branding.get", "settings.llm.get",
         "apiKeys.list", "oauth.connections.list",
         "webhooks.list", "webhooks.deliveries",
     ]
@@ -125,29 +112,27 @@ final class SchedulingAdminOpTests: XCTestCase {
         "eventTypes.list", "eventTypes.get", "eventTypes.hosts.get",
         "eventTypes.questions.list", "eventTypes.slots",
         "availability.rules.list", "availability.overrides.list",
-        "bookings.list", "bookings.answers", "bookings.notes", "bookings.transcript",
+        "bookings.list", "bookings.answers",
         "calendar.status", "calendar.connections.calendars.get", "zoom.status",
         "users.list", "users.upcomingBookings",
         "teams.list", "teams.get",
-        "recordings.list", "recordings.consent",
-        "settings.branding.get", "settings.storage.get",
-        "settings.notetaker.get", "settings.llm.get",
+        "settings.branding.get", "settings.llm.get",
         "apiKeys.list", "oauth.connections.list",
         "webhooks.list", "webhooks.deliveries",
     ]
 
     func testTheEnumIsTheCatalogExactly() {
-        XCTAssertEqual(SchedulingAdminOp.allCases.count, 75)
-        XCTAssertEqual(catalogKeys.count, 75)
+        XCTAssertEqual(SchedulingAdminOp.allCases.count, 64)
+        XCTAssertEqual(catalogKeys.count, 64)
         XCTAssertEqual(SchedulingAdminOp.allCases.map(\.rawValue), catalogKeys)
     }
 
     /// ⚠️ A DUPLICATE RAW VALUE IS NOT A COMPILE ERROR IN SWIFT WHEN THE VALUES
     /// ARE WRITTEN OUT, two cases may carry the same string, and the second one
     /// then becomes unreachable through `init(rawValue:)` while `allCases` still
-    /// reports 75. The count assertion above cannot see it; this can.
+    /// reports 64. The count assertion above cannot see it; this can.
     func testEveryRawValueIsUnique() {
-        XCTAssertEqual(Set(SchedulingAdminOp.allCases.map(\.rawValue)).count, 75)
+        XCTAssertEqual(Set(SchedulingAdminOp.allCases.map(\.rawValue)).count, 64)
     }
 
     func testEveryKeyRoundTrips() {
@@ -156,10 +141,10 @@ final class SchedulingAdminOpTests: XCTestCase {
         }
     }
 
-    func testTheRoleSplitIsThirtyFiveViewerAndFortyClient() {
+    func testTheRoleSplitIsTwentyNineViewerAndThirtyFiveClient() {
         let viewer = SchedulingAdminOp.allCases.filter { $0.minRole == .viewer }
-        XCTAssertEqual(viewer.count, 35)
-        XCTAssertEqual(SchedulingAdminOp.allCases.filter { $0.minRole == .client }.count, 40)
+        XCTAssertEqual(viewer.count, 29)
+        XCTAssertEqual(SchedulingAdminOp.allCases.filter { $0.minRole == .client }.count, 35)
         XCTAssertEqual(Set(viewer.map(\.rawValue)), viewerKeys)
     }
 
@@ -168,10 +153,10 @@ final class SchedulingAdminOpTests: XCTestCase {
     /// workspace's shared 120/hour budget, which is exactly the bucket the server
     /// separated them out of: otherwise one viewer changing their avatar in a loop
     /// locks every administrator out of writes for an hour.
-    func testTheWriteSplitIsTwentyNineReadsAndFortySixWrites() {
+    func testTheWriteSplitIsTwentyThreeReadsAndFortyOneWrites() {
         let reads = SchedulingAdminOp.allCases.filter { !$0.isWrite }
-        XCTAssertEqual(reads.count, 29)
-        XCTAssertEqual(SchedulingAdminOp.allCases.filter(\.isWrite).count, 46)
+        XCTAssertEqual(reads.count, 23)
+        XCTAssertEqual(SchedulingAdminOp.allCases.filter(\.isWrite).count, 41)
         XCTAssertEqual(Set(reads.map(\.rawValue)), readKeys)
 
         let viewerWrites = SchedulingAdminOp.allCases.filter { $0.minRole == .viewer && $0.isWrite }

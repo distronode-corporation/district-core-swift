@@ -35,13 +35,9 @@ public struct SchedulingZonedParts: Equatable, Sendable {
 /// Rendering the scheduler's timestamps the way each surface does. Parsing them is
 /// ``WireInstant``'s job, shared with the rest of the app.
 ///
-/// ⛔ THE PADDING IS INCONSISTENT ACROSS THE SURFACES **ON PURPOSE** AND MUST NOT BE
-/// TIDIED. Measured against the web rather than assumed: the overview register and the
-/// bookings table render an UNPADDED hour (`9:05`), the recordings table renders a
-/// PADDED one (`09:05`), and the minute is padded everywhere. Normalising them here
-/// would make one of the two clients disagree with the other on a value a person can
-/// read side by side, which is the class of difference that gets reported as a bug
-/// against whichever was seen second. Each renderer below names which shape it is.
+/// ⚠️ THE HOUR IS UNPADDED (`9:05`) AND THE MINUTE PADDED, as the overview register and
+/// the bookings table render them on the web. The padded `09:05` variant served only
+/// the recordings table, which was retired with meeting recording (2026-10-03).
 ///
 /// ⚠️ THE MONTH NAMES ARE A TABLE RATHER THAN A `DateFormatter`. Four separate arrays
 /// of them exist on the web and all four are the same English abbreviations; a
@@ -84,12 +80,6 @@ public enum SchedulingClock {
     /// reschedule slot list.
     public static func clock(_ parts: SchedulingZonedParts) -> String {
         "\(parts.hour):\(paddedTwo(parts.minute))"
-    }
-
-    /// `09:05`, PADDED hour and minute. The recordings table only; see the ⛔ on this
-    /// type.
-    public static func paddedClock(_ parts: SchedulingZonedParts) -> String {
-        "\(paddedTwo(parts.hour)):\(paddedTwo(parts.minute))"
     }
 
     /// ⚠️ THE MONTH NAME FOR A 1-BASED MONTH, OR nil. A `month` outside 1...12 is a

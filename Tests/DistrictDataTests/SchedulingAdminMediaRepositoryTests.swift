@@ -220,54 +220,6 @@ final class SchedulingAdminMediaRepositoryTests: XCTestCase {
         }
     }
 
-    // MARK: - The recording redirect
-
-    /// ⛔ THE 302 IS NOT FOLLOWED AND THE `Location` IS THE ANSWER. Following it
-    /// would stream a whole video through this process to learn its address.
-    func testTheDownloadReportsWhereTheRedirectPointsWithoutFollowingIt() async throws {
-        let transport = RepositoryTransport(redirectTo: "https://objects.test/rec_1.mp4?sig=abc")
-        let url = try await repository(transport).recordingDownloadURL(
-            workspaceId: "ws_1",
-            recordingId: "rec_1"
-        )
-        XCTAssertEqual(url, "https://objects.test/rec_1.mp4?sig=abc")
-        XCTAssertEqual(
-            transport.requestedURLs,
-            ["https://www.distronode.com/api/district/scheduling/admin/download/rec_1?workspaceId=ws_1"]
-        )
-    }
-
-    /// ⛔ `agency` AND `client` ONLY, WHICH IS STRICTER THAN THE OP THAT LISTS
-    /// THESE. A viewer may see that a recording exists and may not take a copy of a
-    /// customer conversation away, so a row drawn from the list must not assume
-    /// this will answer.
-    func testAViewerIsRefusedTheDownloadEvenThoughTheListAnswered() async {
-        let transport = RepositoryTransport(json: #"{"error":"forbidden"}"#, status: 403)
-        do {
-            _ = try await repository(transport).recordingDownloadURL(workspaceId: "ws_1", recordingId: "rec_1")
-            XCTFail("expected a refusal")
-        } catch let error as SchedulingAdminError {
-            XCTAssertEqual(error, .forbidden)
-        } catch {
-            XCTFail("expected a SchedulingAdminError, got \(error)")
-        }
-    }
-
-    /// ⚠️ A RECORDING WITH NO FILE ANSWERS A **404 WITH A JSON BODY**, not a
-    /// redirect, so it falls past the redirect check into the ordinary status
-    /// mapping. Read ``SchedulingRecording/hasFile`` before offering the control.
-    func testARecordingWithNoFileAnswersAFourOhFourRatherThanARedirect() async {
-        let transport = RepositoryTransport(json: #"{"error":"not_found"}"#, status: 404)
-        do {
-            _ = try await repository(transport).recordingDownloadURL(workspaceId: "ws_1", recordingId: "rec_9")
-            XCTFail("expected a refusal")
-        } catch let error as SchedulingAdminError {
-            XCTAssertEqual(error, .unknown)
-        } catch {
-            XCTFail("expected a SchedulingAdminError, got \(error)")
-        }
-    }
-
     // MARK: - The client-side pre-checks
 
     /// ⛔ FOUR TYPES, AND **SVG IS NOT ONE OF THEM**. An SVG logo is the obvious

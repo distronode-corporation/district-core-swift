@@ -1,8 +1,8 @@
 import DistrictModel
 import Foundation
 
-// The scheduling admin's settings, recordings, developer and upload rows, gated
-// against the fifteen fixtures they model.
+// The scheduling admin's settings, developer and upload rows, gated against the
+// ten fixtures they model.
 //
 // ⛔ SPLIT OUT BECAUSE `ImplementedFixtures.swift` IS AT ITS 500-LINE CEILING, the
 // same reason `+MessageThread.swift`, `+SchedulingAdmin.swift` and
@@ -11,9 +11,9 @@ import Foundation
 // failure a long way from the change that caused it.
 
 extension ImplementedFixtures {
-    // MARK: - Settings, recordings, developer and the image upload
+    // MARK: - Settings, developer and the image upload
 
-    /// ⛔ FOURTEEN RPC PAYLOADS PLUS ONE THAT IS NOT AN RPC PAYLOAD AT ALL, AND
+    /// ⛔ NINE RPC PAYLOADS PLUS ONE THAT IS NOT AN RPC PAYLOAD AT ALL, AND
     /// THE ODD ONE IS THE REASON TO READ THIS LIST RATHER THAN SKIM IT.
     /// `district-scheduling-upload.json` is the MULTIPART route's answer: it is not
     /// in the op catalog, it has no `op` name, and it arrives from
@@ -24,13 +24,11 @@ extension ImplementedFixtures {
     /// that deliberate agreement; if the upload route ever stopped matching, this
     /// entry fails and nothing else would.
     ///
-    /// ⛔ THREE CONTAINER CONVENTIONS LIVE IN THESE FIFTEEN FILES AND THEY ARE NOT
+    /// ⛔ TWO CONTAINER CONVENTIONS LIVE IN THESE TEN FILES AND THEY ARE NOT
     /// DERIVABLE FROM THE OP'S NAME. `apiKeys.list`, `oauth.connections.list`,
     /// `webhooks.list` and `webhooks.deliveries` use the catalog's shared
-    /// `items(...)` helper, so they gate through ``SchedulingItems``;
-    /// `recordings.list` and `recordings.consent` declare `recordings` and
-    /// `consents` BY HAND and gate through their own types; and every settings op
-    /// answers a bare object with no container at all. Reading one through
+    /// `items(...)` helper, so they gate through ``SchedulingItems``; and every
+    /// settings op answers a bare object with no container at all. Reading one through
     /// another's container is a missing-key decode error that presents as an
     /// outage, which is exactly the failure the strict gate turns into a named
     /// line.
@@ -45,30 +43,27 @@ extension ImplementedFixtures {
     /// object and "is the secret here" would become a runtime question asked in
     /// every cell. Two types make it a compile-time question asked once.
     ///
-    /// ⚠️ FOUR EXPLICIT NULLS ACROSS THREE OF THE FIFTEEN, so
-    /// ``ContractManifest/expectedAllowedNullPaths`` moves by four and
+    /// ⚠️ FOUR EXPLICIT NULLS ACROSS THREE OF THE TEN, and
     /// `AllowedExplicitNulls+SchedulingC.swift` says which columns and why. ⛔ The
-    /// twelve others carry NONE, checked against the fixture bytes rather than
-    /// inferred from the types, and that includes the three whose rows look most
-    /// like candidates: the failed recording missing six of eight keys, the guest
-    /// with no consent timestamp, and the delivery that got no answer are all
-    /// ABSENT keys, which a nil Optional already round-trips.
+    /// seven others carry NONE, checked against the fixture bytes rather than
+    /// inferred from the types, and that includes the row that looks most like a
+    /// candidate: the delivery that got no answer is ABSENT keys, which a nil
+    /// Optional already round-trips.
     ///
-    /// ⚠️ ``ContractManifest/expectedFixtureCount`` DOES NOT MOVE. It counts files
-    /// on disk; all fifteen have been there since the generator ran, and the only
-    /// thing changing is which of the two lists they are in.
+    /// ⚠️ THE FIVE RECORDING, STORAGE AND NOTETAKER FIXTURES WERE RETIRED BY THE
+    /// SERVER WITH THEIR OPS (2026-10-03) and left the directory in the same sync,
+    /// which is what moved ``ContractManifest/expectedFixtureCount``.
     static var schedulingC: [ImplementedFixture] {
-        settingsFixtures + recordingsFixtures + developerFixtures
+        settingsFixtures + developerFixtures
     }
 
-    /// `me.*` and the four `settings.*` namespaces.
+    /// `me.*` and the two `settings.*` namespaces.
     ///
-    /// ⛔ THE THREE SETTINGS BODIES ARE TINY BECAUSE THE CATALOG STRIPPED THEM, NOT
+    /// ⛔ THE LLM SETTINGS BODY IS TINY BECAUSE THE CATALOG STRIPPED IT, NOT
     /// BECAUSE THE FORK IS. `settings.llm` answers two fields here and six more at
     /// the far end (`endpoint`, `model`, `api_key_set`, `configured`, `active`,
-    /// `base_prompt`); notetaker drops `stt_api_key_set` and `stt_base_url`;
-    /// storage drops all three `backups_*`. Every one of those names an INSTANCE
-    /// credential or a resource shared with other tenancies. ⚠️ So a DTO grown
+    /// `base_prompt`). Every one of those names an INSTANCE credential or a
+    /// resource shared with other tenancies. ⚠️ So a DTO grown
     /// "to match the fork" would model keys that cannot arrive, and this gate would
     /// report them as ADDED on re-encode, which is the right failure, in the right
     /// place, for the right reason.
@@ -76,41 +71,11 @@ extension ImplementedFixtures {
         [
             gate("district-scheduling-me.json", SchedulingAdminSuccess<SchedulingMe>.self),
             gate("district-scheduling-branding.json", SchedulingAdminSuccess<SchedulingBranding>.self),
-            gate("district-scheduling-storage.json", SchedulingAdminSuccess<SchedulingStorageSettings>.self),
-            gate("district-scheduling-notetaker.json", SchedulingAdminSuccess<SchedulingNotetakerSettings>.self),
             gate("district-scheduling-llm.json", SchedulingAdminSuccess<SchedulingLLMSettings>.self),
             // ⚠️ NOT AN OP. The multipart route's answer, see the ⛔ on
             // ``schedulingC``. It is filed beside branding because `logo` and
             // `banner` are the two targets a branding screen sends.
             gate("district-scheduling-upload.json", SchedulingAdminSuccess<SchedulingUploadResult>.self),
-        ]
-    }
-
-    /// `recordings.*`.
-    ///
-    /// ⛔ THE LIST FIXTURE'S SECOND ROW IS THE ONE THAT MATTERS: `{id, status}` and
-    /// nothing else, a capture that FAILED and therefore has no room, no duration,
-    /// no file and no booker. A DTO that required `booking_id` would throw on the
-    /// one row an operator most needs to see, and the failure would present as
-    /// "recordings are broken" rather than "one recording failed". Row 0 is fully
-    /// populated, so the pair proves every Optional in both directions.
-    ///
-    /// ⚠️ `-recordings-deleted.json` IS TWO INTEGERS AND IS GATED ANYWAY. `failed:
-    /// 1` beside `deleted: 4` is a PARTIAL failure reported at HTTP 200, and a
-    /// client that dropped the second number would tell a customer their recordings
-    /// are gone while one of them is still in the bucket. The gate is what stops
-    /// the field being quietly dropped from the DTO later.
-    private static var recordingsFixtures: [ImplementedFixture] {
-        [
-            gate("district-scheduling-recordings.json", SchedulingAdminSuccess<SchedulingRecordingList>.self),
-            gate(
-                "district-scheduling-recordings-deleted.json",
-                SchedulingAdminSuccess<SchedulingRecordingsDeleted>.self
-            ),
-            gate(
-                "district-scheduling-recordings-consent.json",
-                SchedulingAdminSuccess<SchedulingRecordingConsents>.self
-            ),
         ]
     }
 

@@ -6,6 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-04
+
+A minor release: everything is additive, and every request 3.0.0 could make is
+byte-identical.
+
 ### Added
 
 - The native Voice Studio. `VoiceStudioResponse` and its parts in `DistrictModel` decode
@@ -129,7 +134,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0
 [3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0
 [2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0
 [1.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/1.0.0

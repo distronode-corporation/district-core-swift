@@ -31,7 +31,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "3.0.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "3.1.0"),
 ],
 ```
 
@@ -44,7 +44,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 3.0.0
+    exactVersion: 3.1.0
 ```
 
 ## Modules

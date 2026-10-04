@@ -6,6 +6,14 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- Repository only, no change to the package: the README carries the OpenSSF Scorecard
+  badge, links district-macos and drops the private-era CI note; `.github/SUPPORT.md` says
+  where questions and bugs go; the issue chooser links the README, Discussions and private
+  vulnerability reporting; CodeQL runs gain a workflow-level `concurrency` group; and a
+  new `dependency-review.yml` checks the dependencies a pull request adds.
+
 ## [3.1.0] - 2026-10-04
 
 A minor release: everything is additive, and every request 3.0.0 could make is

@@ -36,6 +36,15 @@ byte-identical.
   assembles an unsaved edit's from the same response's measured medians, never estimating.
 - `contracts/mobile/district-voice-studio.json`, the 157th mobile fixture, gated strictly
   with its explicit nulls permitted per field of a kind rather than per row.
+- The read's templates for text a client builds itself (`meterAbout`, `meterAtLeast`,
+  `meterNone`, `meterPartial`, `numberGrouping`, `basedOnOne`, `basedOnMany`) on
+  `VoiceStudioLabels`, and `VoiceStudioText`, which fills them: an unsaved edit's meter
+  headline, a bare median and the "Based on" line follow the portal language
+  (`VoiceStudioSession.basedOn`). An unsaved edit's "some steps are not measured" note is
+  now `meterPartial`.
+- `VoiceStudioRefit`: after a persona language save, a chain of the member's own that no
+  longer fits is moved to the nearest offered models speaking the language, saved and read
+  back (the web's `conformEngineMix`, as district-linux does it).
 
 ## [3.0.0] - 2026-10-04
 

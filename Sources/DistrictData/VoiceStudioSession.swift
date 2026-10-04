@@ -71,6 +71,12 @@ public struct VoiceStudioSession: Equatable, Sendable {
         tiles.first { $0.id == baseRecipe }?.name ?? ""
     }
 
+    /// "Based on Fastest, 2 changes.", from the service's templates; nil when the held engine
+    /// IS its recipe, or this tier has no such tile.
+    public var basedOn: String? {
+        VoiceStudioText.basedOn(recipe: baseName, changes: changes, labels: studio.labels)
+    }
+
     // MARK: - Transitions
 
     /// Stable or Latest. The chosen recipe is re-applied on the new tier; "Your chain" is not a

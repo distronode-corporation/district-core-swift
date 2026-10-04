@@ -85,11 +85,11 @@ public enum VoiceStudioLocalReadout {
         let headline: VoiceStudioMeterHeadline = measured.isEmpty
             ? .none
             : .local(ms: measured.reduce(0, +), atLeast: missing)
-        // The "some steps are not measured" sentence is the service's; every meter carries one.
-        let note = (studio.recipes.map(\.timeToFirstWord.note) + [studio.latency.note]).compactMap(\.self).first
+        // The "some steps are not measured" sentence is the service's template, in the portal
+        // language, shown under an "at least" headline and never under "not measured yet".
         return VoiceStudioMeterView(
             headline: headline,
-            note: missing && !measured.isEmpty ? note : nil,
+            note: missing && !measured.isEmpty ? studio.labels.meterPartial : nil,
             stages: stages.map { VoiceStudioStageView(label: $0.0, value: stageText($0.1)) }
         )
     }

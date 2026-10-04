@@ -78,6 +78,20 @@ public struct VoiceStudioLabels: Codable, Equatable, Sendable {
     public let saveFailed: String
     public let unsaved: String
     public let allSaved: String
+    /// ⛔ THE TEMPLATES FOR TEXT THE CLIENT BUILDS ITSELF: the web's own sentences with their
+    /// placeholders left in ("About {ms} ms"). The unit and its no-break space are already in
+    /// the template; `VoiceStudioText` fills them. Never English typed in a client.
+    public let meterAbout: String
+    public let meterAtLeast: String
+    public let meterNone: String
+    public let meterPartial: String
+    /// The thousands separator of the reader's portal locale: `,` in English, a no-break
+    /// space in French. A value, not a template.
+    public let numberGrouping: String
+    /// "Based on {recipe}, 1 change."
+    public let basedOnOne: String
+    /// "Based on {recipe}, {n} changes."
+    public let basedOnMany: String
     public let legs: VoiceStudioLegLabels
     public let stages: VoiceStudioStageLabels
     public let channels: VoiceStudioChannelLabels

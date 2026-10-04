@@ -82,5 +82,16 @@ final class ApiURLTests: XCTestCase {
         XCTAssertEqual(response.header("location"), "https://x")
         XCTAssertEqual(response.header("Location"), "https://x")
         XCTAssertNil(response.header("Content-Type"))
+
+        // ⚠️ Several headers, so the lookup walks past ones that do not match (the
+        // recording redirect tests used to cover that, and were retired with it).
+        let several = HTTPResponse(
+            statusCode: 200,
+            headers: ["Content-Type": "application/json", "X-Distronode-Error-Code": "rate_limited", "Etag": "1"],
+            body: nil
+        )
+        XCTAssertEqual(several.header("x-distronode-error-code"), "rate_limited")
+        XCTAssertEqual(several.header("ETAG"), "1")
+        XCTAssertNil(several.header("Location"))
     }
 }

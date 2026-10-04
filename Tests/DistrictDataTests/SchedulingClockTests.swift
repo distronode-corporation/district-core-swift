@@ -37,10 +37,9 @@ final class SchedulingClockTests: XCTestCase {
 
     /// ⛔ THE TWO CLOCK SHAPES ARE DIFFERENT AND BOTH ARE DELIBERATE. Pinned together so a
     /// tidy-up that unified them fails here rather than on one screen.
-    func testTheUnpaddedAndPaddedClocksDisagreeOnPurpose() {
+    func testTheClockLeavesTheHourUnpaddedAndPadsTheMinute() {
         let parts = SchedulingZonedParts(year: 2026, month: 9, day: 12, hour: 9, minute: 5)
         XCTAssertEqual(SchedulingClock.clock(parts), "9:05")
-        XCTAssertEqual(SchedulingClock.paddedClock(parts), "09:05")
     }
 
     func testMonthNamesAreOneBasedAndBounded() {

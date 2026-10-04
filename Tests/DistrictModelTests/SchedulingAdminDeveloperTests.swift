@@ -14,9 +14,8 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
 
     // MARK: - The shared `items` container
 
-    /// ⛔ FOUR OPS SHARE IT AND TWO NEARBY ONES DO NOT. `recordings.list` and
-    /// `recordings.consent` declare their key by hand, so the wrong container is a
-    /// missing-key error that presents as an outage rather than as a client bug.
+    /// ⛔ FOUR OPS SHARE IT, AND A BODY UNDER ANY OTHER KEY IS A MISSING-KEY ERROR
+    /// that presents as an outage rather than as a client bug.
     func testTheItemsContainerCarriesRowsAndRefusesAnotherKey() throws {
         let keys = try decode(
             SchedulingItems<SchedulingAPIKey>.self,

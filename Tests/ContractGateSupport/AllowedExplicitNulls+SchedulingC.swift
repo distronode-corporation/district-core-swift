@@ -1,7 +1,7 @@
 import Foundation
 
-// The scheduling admin's settings, recordings, developer and upload rows
-// and their four allowed nulls.
+// The scheduling admin's settings, developer and upload rows and their four
+// allowed nulls.
 //
 // ⛔ IN `Tests/ContractGateSupport/` AND NOT IN `Tests/ContractFixtureTests/`,
 // FOR THE REASON `AllowedExplicitNulls+SchedulingB.swift` STATES AND WHICH IS
@@ -19,24 +19,21 @@ import Foundation
 // `+Inbox.swift` and `+SchedulingB.swift` exist.
 
 extension StrictDecodeVerifier {
-    /// The `me.*`, `recordings.*`, `settings.*`, `apiKeys.*`,
-    /// `oauth.connections.*`, `webhooks.*` and image-upload fixtures.
+    /// The `me.*`, `settings.*`, `apiKeys.*`, `oauth.connections.*`, `webhooks.*`
+    /// and image-upload fixtures.
     ///
-    /// ⛔ FOUR PATHS ACROSS THREE OF FIFTEEN FIXTURES, ENUMERATED FROM THE BYTES
-    /// RATHER THAN FROM THE DTOs. The other twelve carry no null anywhere and must
+    /// ⛔ FOUR PATHS ACROSS THREE OF TEN FIXTURES, ENUMERATED FROM THE BYTES
+    /// RATHER THAN FROM THE DTOs. The other seven carry no null anywhere and must
     /// not be given an entry: their optional fields are ABSENT keys, which a nil
     /// Optional already round-trips, so permission there would silence a null the
     /// server does not send today and would keep silencing it the day it starts to.
     ///
-    /// ⚠️ THE THREE FIXTURES A READER WOULD MOST EXPECT TO FIND HERE ARE THE ONES
-    /// THAT ARE NOT. `district-scheduling-recordings.json`'s row 1 is a FAILED
-    /// capture missing six of its eight keys; `-recordings-consent.json`'s row 1 is
-    /// a guest with no name and no decision timestamp; and
-    /// `-webhook-deliveries.json`'s row 1 is a delivery that never got an answer.
-    /// Every one of those absences is an ABSENT KEY, the catalog types them
+    /// ⚠️ THE FIXTURE A READER WOULD MOST EXPECT TO FIND HERE IS NOT.
+    /// `-webhook-deliveries.json`'s row 1 is a delivery that never got an answer,
+    /// and every one of its absences is an ABSENT KEY: the catalog types them
     /// `.optional()` and `JSON.stringify` drops an undefined rather than writing
-    /// null, so all three are proved by the gate's ordinary key-set walk and none
-    /// of them belongs in this register. The distinction is the whole reason an
+    /// null, so it is proved by the gate's ordinary key-set walk and does not
+    /// belong in this register. The distinction is the whole reason an
     /// entry is a decision.
     ///
     /// ⛔ ALL FOUR BELOW ARE THE SAME MECHANISM SEEN TWICE OVER: a Go pointer or
@@ -70,9 +67,7 @@ extension StrictDecodeVerifier {
         // ⚠️ THE PATHS ARE INSIDE `$.data.items` BECAUSE THE FIXTURE IS THE WHOLE
         // RPC ENVELOPE **AND** THESE THREE OPS USE THE CATALOG'S SHARED `items`
         // CONTAINER. A path copied from the row's own shape would name nothing and
-        // the entry would silently exempt nothing at all, and note that the two
-        // recordings fixtures in this same group use `recordings` and `consents`
-        // instead, so the container key is not a property of the surface.
+        // the entry would silently exempt nothing at all.
         "district-scheduling-api-keys.json": [
             "$.data.items[1].last_used_at",
         ],

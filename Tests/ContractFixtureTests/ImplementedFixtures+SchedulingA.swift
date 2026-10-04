@@ -14,7 +14,7 @@ extension ImplementedFixtures {
 
     /// ⛔ TWELVE FIXTURES, AND EVERY ONE OF THEM IS WRAPPED IN
     /// ``SchedulingAdminSuccess`` RATHER THAN GATED AGAINST THE ROW DIRECTLY. The
-    /// route answers `{ok, data}` for all 75 ops; a fixture gated against
+    /// route answers `{ok, data}` for all 64 ops; a fixture gated against
     /// `SchedulingEventType` alone would fail on two unknown keys at the top level,
     /// and "fixing" that by unwrapping the fixture would retire the one assertion
     /// that the envelope's `ok` flag is still on the wire. The envelope group's
@@ -23,10 +23,8 @@ extension ImplementedFixtures {
     ///
     /// ⛔ THE LIST OPS GO THROUGH `SchedulingItems`, WHICH IS NOT THE UNIVERSAL LIST
     /// ENVELOPE ON THIS SURFACE. The catalog's `items(T)` helper wraps eight reads;
-    /// `recordings.list` and `recordings.consent` declare their key by hand and are
-    /// not this group's. `eventTypes.slots` is a third shape again, three keys of
-    /// its own, none of them `items`, which is why ``SchedulingSlots`` exists
-    /// rather than a fourth reuse.
+    /// `eventTypes.slots` is another shape, three keys of its own, none of them
+    /// `items`, which is why ``SchedulingSlots`` exists rather than another reuse.
     ///
     /// ⛔ THE TWO OVERRIDE-CREATE FIXTURES ARE THE TWO ARMS OF ONE UNION AND ARE
     /// PINNED SEPARATELY ON PURPOSE. `-override-created.json` is a row;

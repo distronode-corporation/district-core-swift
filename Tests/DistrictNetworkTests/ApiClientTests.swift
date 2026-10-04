@@ -182,50 +182,19 @@ final class ApiClientTests: XCTestCase {
         XCTAssertTrue(result.failureOnly?.message?.contains("offline") == true)
     }
 
-    /// ⛔ THE RECORDING 302 IS SURFACED, NEVER FOLLOWED.
-    func testTheRecordingRedirectIsSurfacedAndNotFollowed() async throws {
-        let transport = TestTransport(
-            status: 302,
-            headers: ["location": "https://storage.example.com/rec.mp3?sig=abc"]
-        )
+    /// ⚠️ EVERY `ApiClient` SEND FOLLOWS REDIRECTS. The only routes that answered a
+    /// redirect the client had to read rather than follow (the call and meeting
+    /// recordings) were retired on 2026-10-03, and `redirectTarget` with them; the one
+    /// redirect left that must not be followed, `scheduling/sso`, is fetched by the
+    /// app on its own transport with redirects disabled.
+    func testEverySendAsksTheTransportToFollowRedirects() async {
+        let transport = TestTransport(json: "[]")
         let client = ApiClient.test(transport)
 
-        let result = await client.redirectTarget(
-            DistrictEndpoints.callRecordingUrl(workspaceId: "ws_1", callId: "call_1")
-        )
-
-        XCTAssertEqual(transport.lastFollowedRedirects, false)
-        let target = try XCTUnwrap(result.successOnly)
-        XCTAssertEqual(target.statusCode, 302)
-        // ⚠️ Looked up case-insensitively: libcurl-backed Linux URLSession does
-        // not canonicalise header names the way Darwin's does, so a literal
-        // "Location" lookup would work on a Mac and return nil on the runner.
-        XCTAssertEqual(target.location, "https://storage.example.com/rec.mp3?sig=abc")
-    }
-
-    func testARedirectWithoutALocationIsContractDriftNotAnHttpFailure() async {
-        let client = ApiClient.test(TestTransport(status: 302, headers: [:]))
-
-        let result = await client.redirectTarget(
-            DistrictEndpoints.callRecordingUrl(workspaceId: "ws_1", callId: "call_1")
-        )
-
-        XCTAssertEqual(
-            result.failureOnly,
-            .decoding("The server redirected without saying where (HTTP 302).")
-        )
-    }
-
-    /// ⚠️ A call with no recording answers 404 WITH A JSON BODY, not a redirect,
-    /// so it must arrive as a 404 rather than as a missing `Location`.
-    func testACallWithNoRecordingIsA404NotAMissingLocation() async {
-        let client = ApiClient.test(TestTransport(json: #"{"error":"No recording"}"#, status: 404))
-
-        let result = await client.redirectTarget(
-            DistrictEndpoints.callRecordingUrl(workspaceId: "ws_1", callId: "call_1")
-        )
-
-        XCTAssertEqual(result.failureOnly, .http(status: 404, message: "No recording"))
+        _ = await client.send(DistrictEndpoints.workspaceList())
+        XCTAssertEqual(transport.lastFollowedRedirects, true)
+        _ = await client.sendUnmapped(DistrictEndpoints.workspaceList())
+        XCTAssertEqual(transport.lastFollowedRedirects, true)
     }
 
     /// ⛔ `sendUnmapped` KEEPS THE FAILURE BODY, because `workspace/list`'s 503

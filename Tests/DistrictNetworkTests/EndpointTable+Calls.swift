@@ -51,12 +51,6 @@ extension EndpointTable {
                 .get,
                 "\(host)/api/district/calls/call_1/transcript?workspaceId=ws_1"
             ),
-            EndpointExpectation(
-                .callRecordingUrl,
-                DistrictEndpoints.callRecordingUrl(workspaceId: "ws_1", callId: "call_1"),
-                .get,
-                "\(host)/api/district/calls/call_1/recording?workspaceId=ws_1"
-            ),
         ]
     }
 

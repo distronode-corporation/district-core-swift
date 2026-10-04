@@ -12,13 +12,13 @@ import Foundation
 extension ImplementedFixtures {
     // MARK: - Bookings, calendars and the tenancy's people
 
-    /// ⛔ SIXTEEN FIXTURES, AND EVERY ONE OF THEM IS GATED THROUGH
+    /// ⛔ THIRTEEN FIXTURES, AND EVERY ONE OF THEM IS GATED THROUGH
     /// ``SchedulingAdminSuccess`` RATHER THAN AGAINST THE ROW TYPE DIRECTLY. The
     /// bytes on disk are the whole RPC envelope, `{ok, data}`, because that is what
     /// `POST /api/district/scheduling/admin` puts on the wire, and the gate
     /// compares KEY SETS, so a fixture gated against the row alone would be
     /// reported as two dropped keys before it ever looked at the row. The four
-    /// envelope fixtures in `+SchedulingAdmin` prove the wrapper; these sixteen are
+    /// envelope fixtures in `+SchedulingAdmin` prove the wrapper; these thirteen are
     /// payloads carried inside it.
     ///
     /// ⛔ THREE ENVELOPE CONVENTIONS ARE VISIBLE IN THIS LIST AND THE TYPES ARE
@@ -35,13 +35,11 @@ extension ImplementedFixtures {
     /// ``SchedulingItems`` would drop four keys; ``SchedulingBookingPage`` is its
     /// own type for that reason and not for tidiness.
     ///
-    /// ⚠️ THE TWO NOTES FIXTURES AND THE TWO TEAM FIXTURES ARE EACH A PAIR THAT
-    /// MUST STAY SEPARATE. `-booking-notes.json` and `-booking-notes-regenerated.json`
-    /// are structurally different bodies from two ops, the regenerate response has
-    /// no `updated_at` KEY in its schema at all, so sharing a type would model a
-    /// key one op never sends. `-teams.json` and `-team.json` are the SAME team seen
-    /// through `teams.list` and `teams.get`, and pinning both is what makes either
-    /// read failing visible on its own.
+    /// ⚠️ THE TWO TEAM FIXTURES ARE A PAIR THAT MUST STAY SEPARATE. `-teams.json`
+    /// and `-team.json` are the SAME team seen through `teams.list` and `teams.get`,
+    /// and pinning both is what makes either read failing visible on its own. (The
+    /// booking notes and transcript fixtures were retired with their ops on
+    /// 2026-10-03.)
     ///
     /// ⛔ `district-scheduling-ok.json` IS BYTE-IDENTICAL TO
     /// `district-scheduling-no-content.json`, both are `{"ok":true,"data":{"ok":true}}`,
@@ -53,10 +51,10 @@ extension ImplementedFixtures {
     /// same object), so the day either source changes shape, the fixture belonging
     /// to it fails alone.
     ///
-    /// ⚠️ THREE OF THE SIXTEEN CARRY AN EXPLICIT NULL and are gated anyway, through
+    /// ⚠️ THREE OF THE THIRTEEN CARRY AN EXPLICIT NULL and are gated anyway, through
     /// exact `allowedExplicitNulls` paths in `AllowedExplicitNulls+SchedulingB.swift`
     /// `$.data[1].teams` on the users list, and `members` on both team bodies. The
-    /// other thirteen carry none, checked against the fixture BYTES rather than
+    /// other ten carry none, checked against the fixture BYTES rather than
     /// inferred from the DTOs: every optional on them is an ABSENT key, which a nil
     /// Optional already round-trips.
     static var schedulingB: [ImplementedFixture] {
@@ -75,15 +73,6 @@ extension ImplementedFixtures {
             gate(
                 "district-scheduling-booking-answers.json",
                 SchedulingAdminSuccess<SchedulingItems<SchedulingBookingAnswer>>.self
-            ),
-            gate("district-scheduling-booking-notes.json", SchedulingAdminSuccess<SchedulingBookingNotes>.self),
-            gate(
-                "district-scheduling-booking-notes-regenerated.json",
-                SchedulingAdminSuccess<SchedulingBookingNotesRegenerated>.self
-            ),
-            gate(
-                "district-scheduling-booking-transcript.json",
-                SchedulingAdminSuccess<SchedulingBookingTranscript>.self
             ),
         ]
     }

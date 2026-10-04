@@ -18,18 +18,15 @@ import XCTest
 /// against their own base compose into a figure neither of them wrote, and a delta
 /// from a branch is only true of that branch.
 extension EndpointSurfaceTests {
-    /// ⛔ THE THREE CLASSIFICATION LISTS MUST PARTITION THE SURFACE. Without this,
+    /// ⛔ THE TWO CLASSIFICATION LISTS MUST PARTITION THE SURFACE. Without this,
     /// an endpoint added later defaults to "not in any list" and the
     /// `UNTYPED_ENDPOINTS` burn-down quietly stops being the truth.
     func testTheClassificationListsPartitionEveryEndpoint() {
         let untyped = UntypedEndpoints.all
         let typed = TypedEndpoints.all
-        let redirect = RedirectEndpoints.all
 
         XCTAssertTrue(untyped.isDisjoint(with: typed))
-        XCTAssertTrue(untyped.isDisjoint(with: redirect))
-        XCTAssertTrue(typed.isDisjoint(with: redirect))
-        XCTAssertEqual(untyped.union(typed).union(redirect), Set(EndpointID.allCases))
+        XCTAssertEqual(untyped.union(typed), Set(EndpointID.allCases))
 
         // The burn-down's current position, stated so a DTO landing without its
         // list entry removed is a failing test rather than a stale comment.
@@ -73,12 +70,7 @@ extension EndpointSurfaceTests {
         // CALLER names, so what is fixed is the ENVELOPE rather than the payload. See
         // `TypedEndpoints.schedulingAdmin`.
         XCTAssertEqual(typed.count, 115)
-        // ⛔ A REDIRECT ENDPOINT ANSWERS A 302 TO A PRESIGNED OBJECT, and following it
-        // would download the object (for `scheduling/admin/download/{id}`, a
-        // multi-hundred-megabyte video) to learn its address.
-        // ⚠️ A 302 IS NOT ENOUGH TO JOIN THIS LIST. `scheduling/sso` answers one too
-        // and is deliberately absent, its `Location` is a single-use sign-in
-        // credential rather than an object, so it has no `EndpointID` at all.
-        XCTAssertEqual(redirect.count, 2)
+        // ⚠️ THE THIRD LIST, `RedirectEndpoints`, IS GONE. Its two members (the call
+        // recording and the scheduler recording download) were retired on 2026-10-03.
     }
 }

@@ -1,17 +1,16 @@
 import Foundation
 
-/// The scheduling admin surface: one RPC, one image upload, one recording
-/// download.
+/// The scheduling admin surface: one RPC and one image upload.
 ///
-/// ⛔ THREE DESCRIPTORS FOR NINE SCREENS, AND THE RATIO IS THE POINT. Every read
+/// ⛔ TWO DESCRIPTORS FOR EIGHT SCREENS, AND THE RATIO IS THE POINT. Every read
 /// and every write the native admin performs goes through ``schedulingAdmin``
 /// under an `op` NAME from ``SchedulingAdminOp``, so the set of scheduler routes
 /// this client can address is exactly the server's catalog and cannot be widened
-/// from here. The other two exist only because the RPC physically cannot carry
-/// their payloads: an image cannot travel through a zod-validated params object
-/// without a base64 inflation on both sides of a hop that already has a 5 MiB
-/// ceiling, and a recording is a 302 to a presigned object the server refuses to
-/// proxy.
+/// from here. The upload exists only because the RPC physically cannot carry its
+/// payload: an image cannot travel through a zod-validated params object without a
+/// base64 inflation on both sides of a hop that already has a 5 MiB ceiling. (The
+/// recording download that once sat beside it was retired with meeting recording,
+/// 2026-10-03.)
 ///
 /// ⛔ THESE ARE WORKSPACE-SCOPED MEMBER ROUTES on the session bearer:
 /// `requireWorkspaceRole` with every District role admitted and the op's own
@@ -100,31 +99,6 @@ public extension DistrictEndpoints {
                 contentType: mimeType,
                 bytes: bytes
             ))
-        )
-    }
-
-    /// Resolve a playable URL for a scheduler recording.
-    ///
-    /// ⛔ THE SERVER ANSWERS **302, NOT JSON**, AND THIS CLIENT MUST NOT FOLLOW IT
-    /// the same rule as ``callRecordingUrl(workspaceId:callId:)`` and for a
-    /// sharper version of the same reason: these are video, and the fork has no 2xx
-    /// path at all. Send it through ``ApiClient/redirectTarget(_:)``.
-    ///
-    /// ⚠️ THE URL IS PRESIGNED AND EXPIRES IN 15 MINUTES. Resolve it at the moment
-    /// of playback; a cached one fails inside whatever player received it, which
-    /// looks like a broken recording rather than a stale link.
-    ///
-    /// ⛔ `agency` AND `client` ONLY, WHICH IS STRICTER THAN THE OP THAT LISTS
-    /// THESE. ``SchedulingAdminOp/recordingsList`` is `viewer`: a viewer may see
-    /// that a recording exists and may not take a copy of a customer conversation
-    /// away. A UI that draws the row from the list must not assume the download
-    /// beside it will answer.
-    static func schedulingAdminDownload(workspaceId: String, recordingId: String) -> ApiRequestDescriptor {
-        ApiRequestDescriptor(
-            .schedulingAdminDownload,
-            .get,
-            DistrictPaths.schedulingAdminDownload(recordingId),
-            query: [ApiQueryItem("workspaceId", workspaceId)]
         )
     }
 }

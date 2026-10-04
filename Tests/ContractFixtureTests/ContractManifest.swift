@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 164
+    static let expectedFixtureCount = 156
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -167,8 +167,8 @@ enum ContractManifest {
         "district-scheduling-status-legacy.json",
         "district-scheduling-status-provisioning.json",
         "district-scheduling-status-ready.json",
-        // ⛔ THREE OF THE SIXTEEN BOOKINGS, CALENDAR, USERS AND TEAMS FIXTURES, AND
-        // THE OTHER THIRTEEN MUST NOT BE GIVEN AN ENTRY. One fact three times: a Go
+        // ⛔ THREE OF THE THIRTEEN BOOKINGS, CALENDAR, USERS AND TEAMS FIXTURES, AND
+        // THE OTHER TEN MUST NOT BE GIVEN AN ENTRY. One fact three times: a Go
         // slice the fork marshals WITHOUT `omitempty` arrives as an explicit `null`,
         // which is why `userSchema.teams` and `teamSchema.members` are `.nullish()`
         // where every optional array beside them is `.optional()`. ⛔ The two team
@@ -181,7 +181,7 @@ enum ContractManifest {
         "district-scheduling-team.json",
         "district-scheduling-teams.json",
         "district-scheduling-users.json",
-        // ⛔ THREE OF THE FIFTEEN SETTINGS AND DEVELOPER FIXTURES, same mechanism as the
+        // ⛔ THREE OF THE TEN SETTINGS AND DEVELOPER FIXTURES, same mechanism as the
         // team entries above.
         // Columns, and the three deliberate absences: `AllowedExplicitNulls+SchedulingC.swift`.
         "district-scheduling-api-keys.json",
@@ -252,5 +252,5 @@ enum ContractManifest {
     /// account with no billing is one key that is absent rather than null.
     ///
     /// Each path is named with its column in the `AllowedExplicitNulls*.swift` files.
-    static let expectedAllowedNullPaths = 190
+    static let expectedAllowedNullPaths = 193
 }

@@ -35,7 +35,7 @@ public extension StrictDecodeVerifier {
         .merging(schedulingB) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")
         }
-        // ⚠️ `AllowedExplicitNulls+SchedulingC.swift`: the settings, recordings,
+        // ⚠️ `AllowedExplicitNulls+SchedulingC.swift`: the settings,
         // developer and upload half of the scheduling admin surface.
         .merging(schedulingC) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")

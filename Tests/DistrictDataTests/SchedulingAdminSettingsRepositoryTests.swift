@@ -180,40 +180,7 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
         )
     }
 
-    // MARK: - Storage, notetaker, summariser
-
-    func testStorageReadAndWriteUseTheirOwnOps() async throws {
-        let read = RepositoryTransport(json: envelope(Self.storageBody))
-        let settings = try await repository(read).storageSettings(workspaceId: "ws_1")
-        XCTAssertTrue(settings.recordingsEnabled)
-        XCTAssertEqual(settings.recordingsStorageReady, true)
-        XCTAssertEqual(read.bodies, [#"{"op":"settings.storage.get","params":{},"workspaceId":"ws_1"}"#])
-
-        let write = RepositoryTransport(json: envelope(Self.storageBody))
-        _ = try await repository(write).setRecordingsEnabled(workspaceId: "ws_1", false)
-        XCTAssertEqual(
-            write.bodies,
-            [#"{"op":"settings.storage.patch","params":{"recordings_enabled":false},"workspaceId":"ws_1"}"#]
-        )
-    }
-
-    /// ⛔ THE PATCH SENDS `enabled` AND NOTHING ELSE. The schema is
-    /// `z.strictObject`, so a second key is a 400 naming it, `stt_api_key` above
-    /// all, which would put a tenant's credential on the shared instance.
-    func testNotetakerReadAndWriteUseTheirOwnOps() async throws {
-        let read = RepositoryTransport(json: envelope(#"{"enabled":false}"#))
-        let current = try await repository(read).notetakerSettings(workspaceId: "ws_1")
-        XCTAssertFalse(current.enabled)
-        XCTAssertEqual(read.bodies, [#"{"op":"settings.notetaker.get","params":{},"workspaceId":"ws_1"}"#])
-
-        let write = RepositoryTransport(json: envelope(#"{"enabled":true}"#))
-        let updated = try await repository(write).setNotetakerEnabled(workspaceId: "ws_1", true)
-        XCTAssertTrue(updated.enabled)
-        XCTAssertEqual(
-            write.bodies,
-            [#"{"op":"settings.notetaker.patch","params":{"enabled":true},"workspaceId":"ws_1"}"#]
-        )
-    }
+    // MARK: - The summariser
 
     func testLLMReadSendsTheGetOp() async throws {
         let transport = RepositoryTransport(json: envelope(#"{"enabled":true,"extra_instructions":"Next steps."}"#))
@@ -282,10 +249,5 @@ final class SchedulingAdminSettingsRepositoryTests: XCTestCase {
      "logo_opacity":100,"banner_url":"https://book.test/b.png","banner_opacity":80,
      "privacy_url":"","terms_url":"https://contract.test/terms","fallback_locale":"en",
      "supported_locales":[{"code":"en","name":"English"}]}
-    """#
-
-    private static let storageBody = #"""
-    {"recordings_enabled":true,"recordings_storage_ready":true,
-     "recordings_prefix":"tenants/contract/recordings"}
     """#
 }

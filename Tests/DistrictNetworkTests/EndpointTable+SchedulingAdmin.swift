@@ -8,7 +8,7 @@ extension EndpointTable {
     /// IT THAT WAY. This file asserts what this client can ADDRESS, and the op
     /// travels in the body rather than the path, so 74 more rows would all carry
     /// the same URL. What pins the op names is `SchedulingAdminOpTests`, which
-    /// holds all 75 strings a second time.
+    /// holds all 64 strings a second time.
     ///
     /// ⛔ THE RPC ROW PINS `params` AS AN EMPTY OBJECT RATHER THAN A DROPPED KEY,
     /// which is the opposite decision from the `scheduling/handoff` row three
@@ -52,16 +52,6 @@ extension EndpointTable {
                 .post,
                 "\(host)/api/district/scheduling/admin/upload?workspaceId=ws_1",
                 .multipart(fields: ["target": "logo"], fileName: "logo.png")
-            ),
-            // ⛔ A 302 TO A PRESIGNED OBJECT, like `calls/{id}/recording`. The row
-            // says nothing about that, it is a URL assertion, but the endpoint is
-            // on `RedirectEndpoints.all` and `EndpointSurfaceTests` is where that
-            // is pinned.
-            EndpointExpectation(
-                .schedulingAdminDownload,
-                DistrictEndpoints.schedulingAdminDownload(workspaceId: "ws_1", recordingId: "rec_1"),
-                .get,
-                "\(host)/api/district/scheduling/admin/download/rec_1?workspaceId=ws_1"
             ),
         ]
     }

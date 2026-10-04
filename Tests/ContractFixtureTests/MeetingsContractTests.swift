@@ -106,9 +106,8 @@ final class MeetingsContractTests: XCTestCase {
     /// ⛔ NO RECORDING KEY, AND A ROOMS SCREEN MUST NOT PROMISE PLAYBACK. The
     /// `Meeting` model has no recording column at all, its artefacts are the
     /// summary and the transcript, both written by the Companion, and neither
-    /// meetings route has a recording sibling. The one recording surface on this
-    /// API is `calls/{id}/recording`, a telephone call answering a 302 on
-    /// `RedirectEndpoints`. Asserted on the raw bytes so the absence is a
+    /// meetings route has a recording sibling (and nothing on this API records
+    /// anything since 2026-10-03). Asserted on the raw bytes so the absence is a
     /// committed fact rather than a reading of the schema.
     func testNoMeetingBodyCarriesARecordingForAScreenToOffer() throws {
         let data = try ContractFixtures.read("district-meeting-detail.json")

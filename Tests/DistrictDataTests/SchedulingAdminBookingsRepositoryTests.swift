@@ -99,44 +99,6 @@ final class SchedulingAdminBookingsRepositoryTests: XCTestCase {
         )
     }
 
-    func testNotesDecodeTheDiscriminatedShape() async throws {
-        let transport = RepositoryTransport(
-            json: #"{"ok":true,"data":{"exists":true,"content":"Wants a quote.","status":"ready"}}"#
-        )
-        let notes = try await repository(transport).bookingNotes(workspaceId: "ws_1", bookingId: "bk_1")
-        XCTAssertTrue(notes.exists)
-        XCTAssertEqual(notes.content, "Wants a quote.")
-        XCTAssertNil(notes.updatedAt)
-        XCTAssertEqual(transport.bodies, [#"{"op":"bookings.notes","params":{"id":"bk_1"},"workspaceId":"ws_1"}"#])
-    }
-
-    /// ⛔ A DIFFERENT OP AND A DIFFERENT TYPE, one hyphenated word apart from the
-    /// read above. The regenerate answer has no `updated_at` in its schema at all.
-    func testRegeneratingNotesUsesItsOwnOpAndItsOwnShape() async throws {
-        let transport = RepositoryTransport(
-            json: #"{"ok":true,"data":{"exists":true,"content":"Wants a quote.","status":"pending"}}"#
-        )
-        let notes = try await repository(transport).regenerateBookingNotes(workspaceId: "ws_1", bookingId: "bk_1")
-        XCTAssertEqual(notes.status, "pending")
-        XCTAssertTrue(notes.exists)
-        XCTAssertEqual(notes.content, "Wants a quote.")
-        XCTAssertEqual(
-            transport.bodies,
-            [#"{"op":"bookings.notes.regenerate","params":{"id":"bk_1"},"workspaceId":"ws_1"}"#]
-        )
-    }
-
-    func testATranscriptThatWasNeverCapturedIsAnOrdinaryAnswer() async throws {
-        let transport = RepositoryTransport(json: #"{"ok":true,"data":{"exists":false}}"#)
-        let transcript = try await repository(transport).bookingTranscript(workspaceId: "ws_1", bookingId: "bk_1")
-        XCTAssertFalse(transcript.exists)
-        XCTAssertNil(transcript.text)
-        XCTAssertEqual(
-            transport.bodies,
-            [#"{"op":"bookings.transcript","params":{"id":"bk_1"},"workspaceId":"ws_1"}"#]
-        )
-    }
-
     // MARK: - The three writes, which all answer a booking
 
     /// ⚠️ THE REASON IS OPTIONAL AND IS DROPPED WHEN ABSENT rather than sent as

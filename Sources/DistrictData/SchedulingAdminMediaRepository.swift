@@ -2,20 +2,18 @@ import DistrictModel
 import DistrictNetwork
 import Foundation
 
-/// The scheduling admin's two NON-RPC routes: the image upload and the recording
-/// download.
+/// The scheduling admin's NON-RPC route: the image upload. (The recording download
+/// beside it was retired with meeting recording, 2026-10-03.)
 ///
 /// ⛔ A SEPARATE TYPE FROM ``SchedulingAdminRepository``, AND THE REASON IS THE
 /// CONTRACT RATHER THAN TIDINESS. That repository's whole job is the op catalog's
-/// ENVELOPE, reached through one generic `perform`; neither route here is in
+/// ENVELOPE, reached through one generic `perform`; the upload is not in
 /// `admin-ops.ts` at all. An image cannot travel through a zod-validated params
 /// object without a base64 inflation on both sides of a hop that already has a
-/// 5 MiB ceiling, and a recording is a **302** to a presigned object the server
-/// refuses to proxy, so one takes multipart and the other decodes no body
-/// whatsoever. Folding either into `perform` would mean a generic that sometimes
-/// does not decode `data`.
+/// 5 MiB ceiling, so it takes multipart. Folding it into `perform` would mean a
+/// generic that sometimes does not decode `data`.
 ///
-/// ⚠️ THE FAILURE VOCABULARY IS SHARED ON PURPOSE. Both routes map through
+/// ⚠️ THE FAILURE VOCABULARY IS SHARED ON PURPOSE. The upload maps through
 /// ``SchedulingAdminError``, because a person who could not replace a logo and a
 /// person who could not rename an event type are owed the same five recoveries,
 /// and `admin-fetch.ts` performs the same collapse for the browser.
@@ -68,40 +66,6 @@ public struct SchedulingAdminMediaRepository: Sendable {
             throw SchedulingAdminRepository.error(forUnanswered: error)
         case let .success(raw):
             return try Self.decodeUpload(raw)
-        }
-    }
-
-    /// Resolve a playable URL for one scheduler recording.
-    ///
-    /// ⛔ THE REDIRECT IS NOT FOLLOWED. The server answers 302 and the `Location`
-    /// IS the answer; following it would stream a whole video through this process
-    /// to learn its address. Same rule as `calls/{id}/recording`, and sharper here
-    /// because the fork has no 2xx path at all.
-    ///
-    /// ⛔ RESOLVE AT THE MOMENT OF PLAYBACK AND NEVER CACHE OR PERSIST IT. The URL
-    /// is presigned and expires in 15 minutes; a stale one fails inside whatever
-    /// player received it, which reads as a broken recording rather than a stale
-    /// link.
-    ///
-    /// ⛔ `agency` AND `client` ONLY, WHICH IS STRICTER THAN THE OP THAT LISTS
-    /// THESE. ``SchedulingAdminOp/recordingsList`` is `viewer`: a viewer may see
-    /// that a recording exists and may not take a copy of a customer conversation
-    /// away. A row drawn from the list must not assume this will answer.
-    ///
-    /// ⚠️ A RECORDING WITH NO FILE ANSWERS A **404 WITH A JSON BODY**, not a
-    /// redirect, so it falls through the redirect check into the ordinary status
-    /// mapping and arrives as ``SchedulingAdminError/unknown``. Read
-    /// ``SchedulingRecording/hasFile`` before offering the control.
-    public func recordingDownloadURL(workspaceId: String, recordingId: String) async throws -> String {
-        let descriptor = DistrictEndpoints.schedulingAdminDownload(
-            workspaceId: workspaceId,
-            recordingId: recordingId
-        )
-        switch await client.redirectTarget(descriptor) {
-        case let .failure(error):
-            throw SchedulingAdminRepository.error(forUnanswered: error)
-        case let .success(target):
-            return target.location
         }
     }
 

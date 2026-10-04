@@ -254,13 +254,24 @@ final class EndpointSurfaceTests: XCTestCase {
         return try XCTUnwrap(String(data: JSONWire.encode(value), encoding: .utf8))
     }
 
+    /// ⛔ THE RETIRED RECORDING ROUTES MUST STAY UNREACHABLE. `calls/{id}/recording`
+    /// and `scheduling/admin/download/{id}` were removed by the server on 2026-10-03
+    /// (nothing is recorded in any region), so a descriptor for either is a 404 with
+    /// a control in front of it.
+    func testTheRetiredRecordingRoutesAreNotReachable() {
+        for row in EndpointTable.all() {
+            XCTAssertFalse(row.descriptor.segments.contains("recording"), "\(row.id.rawValue) addresses a recording")
+            XCTAssertFalse(row.descriptor.segments.contains("download"), "\(row.id.rawValue) addresses a download")
+        }
+        XCTAssertNil(EndpointID(rawValue: "callRecordingUrl"))
+        XCTAssertNil(EndpointID(rawValue: "schedulingAdminDownload"))
+    }
+
     /// ⛔ `scheduling/sso` MUST NOT BE EXPRESSIBLE. It answers a **302** whose
     /// `Location` is a ONE-TIME sign-in URL into the tenant's scheduler, so a
     /// descriptor for it would let `ApiClient.send` follow the redirect and spend
-    /// the credential on a transport the user never sees, and
-    /// `redirectTarget(_:)` would not help, because putting it on
-    /// ``RedirectEndpoints`` is what would make it constructible in the first
-    /// place. The App target fetches it directly, with redirects disabled.
+    /// the credential on a transport the user never sees. The App target fetches
+    /// it directly, with redirects disabled.
     ///
     /// ⚠️ `scheduling/webhook/{workspaceId}` is absent for the duller reason that
     /// this client is never its caller; the assertion below covers both, since

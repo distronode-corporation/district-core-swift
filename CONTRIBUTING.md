@@ -69,7 +69,7 @@ issue. A model change that needs a new or different fixture waits for the fixtur
 arrive from the service.
 
 **Test bundles must discover their tests.** CI counts the tests that ran and fails below
-the floor set in `.github/workflows/ci.yml` (1810). It sits a little below the current
+the floor set in `.github/workflows/ci.yml` (1740). It sits a little below the current
 count and is a ratchet: a change that adds many tests may raise it, and a change that
 deletes tests on purpose lowers it in the same commit and says why.
 

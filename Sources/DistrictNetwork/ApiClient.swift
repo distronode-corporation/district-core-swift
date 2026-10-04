@@ -157,32 +157,6 @@ public struct ApiClient: Sendable {
         }
     }
 
-    /// Send a descriptor that answers a redirect, and report where it points
-    /// WITHOUT following it.
-    ///
-    /// ⛔ THE ONLY CALLER IS `calls/{id}/recording`. See ``RedirectEndpoints``.
-    ///
-    /// ⚠️ A call with no recording answers **404 with a JSON body**, not a
-    /// redirect, so that case falls through to the ordinary error mapping and
-    /// arrives as a 404 rather than as a missing `Location`.
-    public func redirectTarget(_ descriptor: ApiRequestDescriptor) async -> Result<RedirectTarget, ApiError> {
-        let outcome = await perform(descriptor, followRedirects: false)
-        return outcome.flatMap { response in
-            guard (300 ... 399).contains(response.statusCode) else {
-                return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
-            }
-            guard let location = response.header("Location"), !location.isEmpty else {
-                // A 3xx with no Location is contract drift, not an HTTP failure:
-                // the status says "look elsewhere" and the response does not say
-                // where.
-                return .failure(.decoding(
-                    "The server redirected without saying where (HTTP \(response.statusCode))."
-                ))
-            }
-            return .success(RedirectTarget(statusCode: response.statusCode, location: location))
-        }
-    }
-
     private func perform(
         _ descriptor: ApiRequestDescriptor,
         followRedirects: Bool

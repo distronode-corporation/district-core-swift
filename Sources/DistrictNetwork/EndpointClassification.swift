@@ -16,9 +16,9 @@ import Foundation
 /// fixture test, not a client. This list means "the
 /// repository hands back bytes", not "no DTO exists".
 ///
-/// ⛔ AND THE THREE LISTS ARE EXHAUSTIVE AND DISJOINT BY TEST, NOT BY CONVENTION.
-/// `EndpointSurfaceTests` asserts that ``all`` ∪ ``TypedEndpoints/all`` ∪
-/// ``RedirectEndpoints/all`` is exactly ``EndpointID/allCases`` with no overlap,
+/// ⛔ AND THE TWO LISTS ARE EXHAUSTIVE AND DISJOINT BY TEST, NOT BY CONVENTION.
+/// `EndpointSurfaceTests` asserts that ``all`` ∪ ``TypedEndpoints/all`` is exactly
+/// ``EndpointID/allCases`` with no overlap,
 /// so an endpoint added without being classified fails the suite rather than
 /// quietly defaulting to "raw", which is the shape that makes a burn-down list
 /// stop being true without anyone noticing.

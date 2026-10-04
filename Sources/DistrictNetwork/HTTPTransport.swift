@@ -42,10 +42,10 @@ public struct HTTPRequest: Sendable, Equatable {
 
 /// One inbound response: the status, the headers and whatever bytes came back.
 ///
-/// ⚠️ A 3xx IS A LEGITIMATE OUTCOME HERE, NOT AN ERROR. `calls/{id}/recording`
-/// answers **302 with a `Location`** and the client must not follow it, see
-/// ``ApiClient/redirectTarget(_:)``. That is the whole reason this type carries
-/// headers at all.
+/// ⚠️ A 3xx IS A LEGITIMATE OUTCOME HERE, NOT AN ERROR. The app's calendar sign-in
+/// leg (`scheduling/sso`) answers **302 with a `Location`** that is a single-use
+/// credential, and the app reads it with redirects disabled. That is why this type
+/// carries headers at all.
 public struct HTTPResponse: Sendable, Equatable {
     public let statusCode: Int
     public let headers: [String: String]
@@ -63,8 +63,8 @@ public struct HTTPResponse: Sendable, Equatable {
     /// package will run against disagree in practice: Darwin's `URLSession`
     /// canonicalises them, the libcurl-backed Linux one does not. A literal
     /// `headers["Location"]` therefore works on a Mac and returns nil on Linux
-    /// which would present as "the recording has no URL" rather than as
-    /// a platform difference.
+    /// which would present as "the server sent no address" rather than as a
+    /// platform difference.
     public func header(_ name: String) -> String? {
         let wanted = name.lowercased()
         for (key, value) in headers where key.lowercased() == wanted {
@@ -91,10 +91,10 @@ public struct HTTPResponse: Sendable, Equatable {
 public protocol HTTPTransport: Sendable {
     /// Perform one request.
     ///
-    /// - Parameter followRedirects: ⛔ **false** for the recording route and
-    ///   nothing else. Following a 302 there downloads the entire audio file
-    ///   through this process purely to learn its address, on a metered
-    ///   connection, for a file the player is about to fetch again itself.
+    /// - Parameter followRedirects: ⛔ **false** only where the `Location` IS the
+    ///   answer (the app's `scheduling/sso` leg, whose target is a single-use
+    ///   sign-in credential that must reach the browser unspent). ``ApiClient``
+    ///   always passes true.
     /// - Throws: anything the stack raises. ``ApiClient`` converts a throw into
     ///   ``ApiError/transport(_:)``; no caller above it ever sees one.
     func send(_ request: HTTPRequest, followRedirects: Bool) async throws -> HTTPResponse

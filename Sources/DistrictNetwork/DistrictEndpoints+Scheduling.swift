@@ -9,12 +9,8 @@ import Foundation
 /// calendar-OAuth round trip still spends it with an explicit `next=/v1/calendar/connect…`, and
 /// that the **410 `scheduler_console_retired`** fires only for a `next` that lands
 /// on `/admin`. What it lacks is a DESCRIPTOR, for two reasons that still hold: it
-/// is not a JSON body, and it does not belong on ``RedirectEndpoints`` either,
-/// that list exists for `calls/{id}/recording` and now
-/// ``EndpointID/schedulingAdminDownload``, whose targets are presigned OBJECT
-/// URLs, and the failure modes are opposite. Following a recording redirect wastes
-/// bandwidth; following an SSO redirect SPENDS a single-use credential on a
-/// transport the user never sees. It is fetched in the App target with redirects
+/// is not a JSON body, and following its redirect SPENDS a single-use credential
+/// on a transport the user never sees. It is fetched in the App target with redirects
 /// disabled and the `Location` handed to the browser.
 /// `scheduling/webhook/{workspaceId}` is absent for the simpler reason that this
 /// client is never its caller.

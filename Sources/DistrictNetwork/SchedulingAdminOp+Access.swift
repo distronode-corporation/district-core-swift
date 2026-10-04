@@ -26,10 +26,9 @@ public extension SchedulingAdminOp {
     /// `calendar.connections.*` mutations.
     ///
     /// ⛔ THIS IS THE WEAKER HALF OF THE GATE AND MUST NOT BE READ AS THE ANSWER.
-    /// The scheduler enforces its own `requireAdmin` on the settings, recordings,
-    /// notes, transcript and reassign routes, and its own host-ownership checks on
-    /// the booking routes, against the MEMBER's key, carrying the member's
-    /// scheduler role. A District `viewer` calling a read this property allows can
+    /// The scheduler enforces its own `requireAdmin` on the settings and reassign
+    /// routes, and its own host-ownership checks on the booking routes, against the
+    /// MEMBER's key, carrying the member's scheduler role. A District `viewer` calling a read this property allows can
     /// still come back **403**. What it is for is deciding whether to draw a
     /// control and whether to spend a request, not whether the answer will be yes.
     ///
@@ -42,15 +41,13 @@ public extension SchedulingAdminOp {
              .eventTypesList, .eventTypesGet, .eventTypesHostsGet,
              .eventTypesQuestionsList, .eventTypesSlots,
              .availabilityRulesList, .availabilityOverridesList,
-             .bookingsList, .bookingsAnswers, .bookingsNotes, .bookingsTranscript,
+             .bookingsList, .bookingsAnswers,
              .calendarStatus, .calendarCaldavConnect,
              .calendarConnectionsCalendarsGet, .calendarConnectionsCalendarsPut,
              .calendarConnectionsDestination, .calendarConnectionsDelete, .zoomStatus,
              .usersList, .usersUpcomingBookings,
              .teamsList, .teamsGet,
-             .recordingsList, .recordingsConsent,
-             .settingsBrandingGet, .settingsStorageGet,
-             .settingsNotetakerGet, .settingsLlmGet,
+             .settingsBrandingGet, .settingsLlmGet,
              .apiKeysList, .oauthConnectionsList,
              .webhooksList, .webhooksDeliveries:
             .viewer
@@ -60,13 +57,12 @@ public extension SchedulingAdminOp {
              .availabilityRulesCreate, .availabilityRulesPatch, .availabilityRulesDelete,
              .availabilityOverridesCreate, .availabilityOverridesPatch,
              .availabilityOverridesDelete, .availabilityOverridesDeleteGroup,
-             .bookingsCancel, .bookingsReschedule, .bookingsReassign, .bookingsNotesRegenerate,
+             .bookingsCancel, .bookingsReschedule, .bookingsReassign,
              .usersArchive,
              .teamsCreate, .teamsPatch, .teamsDelete,
              .teamsMembersAdd, .teamsMembersPatch, .teamsMembersRemove,
-             .recordingsDelete, .recordingsDeleteAll,
              .settingsBrandingPatch, .settingsBrandingLogoDelete, .settingsBrandingBannerDelete,
-             .settingsStoragePatch, .settingsNotetakerPatch, .settingsLlmPatch,
+             .settingsLlmPatch,
              .apiKeysCreate, .apiKeysDelete, .oauthConnectionsDelete,
              .webhooksCreate, .webhooksPatch, .webhooksDelete:
             .client
@@ -78,7 +74,7 @@ public extension SchedulingAdminOp {
     /// ⛔ "NOT A GET", WHICH IS THE SERVER'S OWN TEST AND NOT A SEPARATE OPINION.
     /// The server route budgets `opSendsBody(op) || op.method === "DELETE"`, and
     /// `opSendsBody` is `method !== "GET" && method !== "DELETE"`, so the union is
-    /// exactly "the method is not GET". Twenty-nine reads, forty-six writes.
+    /// exactly "the method is not GET". Twenty-three reads, forty-one writes.
     ///
     /// ⚠️ IT IS NOT `minRole == .client`, AND THE TWO DISAGREE ON SIX OPS. The four
     /// viewer-level writes described on ``minRole`` are writes billed to a
@@ -97,13 +93,11 @@ public extension SchedulingAdminOp {
              .eventTypesList, .eventTypesGet, .eventTypesHostsGet,
              .eventTypesQuestionsList, .eventTypesSlots,
              .availabilityRulesList, .availabilityOverridesList,
-             .bookingsList, .bookingsAnswers, .bookingsNotes, .bookingsTranscript,
+             .bookingsList, .bookingsAnswers,
              .calendarStatus, .calendarConnectionsCalendarsGet, .zoomStatus,
              .usersList, .usersUpcomingBookings,
              .teamsList, .teamsGet,
-             .recordingsList, .recordingsConsent,
-             .settingsBrandingGet, .settingsStorageGet,
-             .settingsNotetakerGet, .settingsLlmGet,
+             .settingsBrandingGet, .settingsLlmGet,
              .apiKeysList, .oauthConnectionsList,
              .webhooksList, .webhooksDeliveries:
             false
@@ -114,15 +108,14 @@ public extension SchedulingAdminOp {
              .availabilityRulesCreate, .availabilityRulesPatch, .availabilityRulesDelete,
              .availabilityOverridesCreate, .availabilityOverridesPatch,
              .availabilityOverridesDelete, .availabilityOverridesDeleteGroup,
-             .bookingsCancel, .bookingsReschedule, .bookingsReassign, .bookingsNotesRegenerate,
+             .bookingsCancel, .bookingsReschedule, .bookingsReassign,
              .calendarCaldavConnect, .calendarConnectionsCalendarsPut,
              .calendarConnectionsDestination, .calendarConnectionsDelete,
              .usersArchive,
              .teamsCreate, .teamsPatch, .teamsDelete,
              .teamsMembersAdd, .teamsMembersPatch, .teamsMembersRemove,
-             .recordingsDelete, .recordingsDeleteAll,
              .settingsBrandingPatch, .settingsBrandingLogoDelete, .settingsBrandingBannerDelete,
-             .settingsStoragePatch, .settingsNotetakerPatch, .settingsLlmPatch,
+             .settingsLlmPatch,
              .apiKeysCreate, .apiKeysDelete, .oauthConnectionsDelete,
              .webhooksCreate, .webhooksPatch, .webhooksDelete:
             true

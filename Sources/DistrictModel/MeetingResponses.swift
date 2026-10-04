@@ -13,11 +13,10 @@ import Foundation
 // THESE TYPES MUST NOT PROMISE ONE. The `Meeting` model has no recording column
 // at all, its artefacts are ``MeetingDetail/summary`` and
 // ``MeetingDetail/transcript``, both written by the voice agent's Companion when
-// the room closes, and neither meetings route has a recording sibling. The one
-// recording surface on this whole API is `calls/{id}/recording`, which is a
-// telephone call, answers a **302** to a presigned object, and lives on
-// `RedirectEndpoints`. Offering a play control here would be offering a control
-// with nothing behind it.
+// the room closes, and neither meetings route has a recording sibling. Nothing on
+// this API records anything any more (`calls/{id}/recording` was retired on
+// 2026-10-03). Offering a play control here would be offering a control with
+// nothing behind it.
 
 /// One row of `GET /api/district/meetings`.
 ///

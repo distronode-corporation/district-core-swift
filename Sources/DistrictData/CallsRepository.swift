@@ -143,24 +143,6 @@ public struct CallsRepository: Sendable {
             .map(\.transcript)
     }
 
-    /// A playable URL for a call's recording.
-    ///
-    /// ⛔ RESOLVE THIS AT THE MOMENT OF PLAYBACK AND DO NOT STORE IT. The server
-    /// redirects to a short-lived presigned object URL; a cached one expires and
-    /// fails silently in whatever player receives it, at which point the failure
-    /// looks like a broken recording rather than a stale link.
-    ///
-    /// ⛔ AND THE REDIRECT IS NOT FOLLOWED, see
-    /// ``ApiClient/redirectTarget(_:)``. Following it downloads the whole audio
-    /// file through this process just to learn its address.
-    ///
-    /// ⚠️ A call with no recording answers 404, which is an ordinary state for a
-    /// missed call rather than an error worth an alarming message.
-    public func recordingURL(workspaceId: String, callId: String) async -> Result<String, ApiError> {
-        let descriptor = DistrictEndpoints.callRecordingUrl(workspaceId: workspaceId, callId: callId)
-        return await client.redirectTarget(descriptor).map(\.location)
-    }
-
     /// One page, because the filtering happens afterwards.
     ///
     /// ⚠️ SMALL ON PURPOSE. The server has no `direction` filter, so the whole

@@ -91,7 +91,7 @@ desktop clients' additions.
 
 `ContractFixtureTests` runs every mobile fixture that has a Swift model through a strict
 gate: no `null` outside a reviewed allow-list, decode, re-encode, and the re-encoded keys
-must equal the fixture's at every level. It asserts the exact number of fixtures (164)
+must equal the fixture's at every level. It asserts the exact number of fixtures (156)
 and an explicit list of fixtures that have no model yet, so a missing directory or a
 newly added fixture is a failure rather than a silent pass. Set `DISTRICT_CONTRACTS_DIR`
 to read the fixtures from somewhere else.

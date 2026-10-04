@@ -22,9 +22,6 @@ import Foundation
 // types of one name in one module do not compile, and the near-miss (a
 // `SchedulingEventTypeList` sitting beside a `SchedulingItems`) would give this
 // one family a private envelope that drifts from the one every other list uses.
-// ⚠️ Its doc there also records the exception worth knowing: `recordings.list` and
-// `recordings.consent` declare their `items` key by hand and must not be read
-// through it.
 
 /// One bookable event type, as the scheduler serves it.
 ///

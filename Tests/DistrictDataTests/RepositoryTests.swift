@@ -405,17 +405,6 @@ final class RepositoryTests: XCTestCase {
         XCTAssertEqual(result.successOnly, "hello")
     }
 
-    /// ⛔ THE RECORDING URL COMES FROM THE `Location` HEADER OF A 302 THAT IS NOT
-    /// FOLLOWED, and it is perishable, resolve it at playback, never cache it.
-    func testTheRecordingUrlIsTheRedirectTarget() async {
-        let transport = RepositoryTransport(redirectTo: "https://storage.example.com/rec.mp3?sig=abc")
-
-        let result = await CallsRepository(client: .repositoryTest(transport))
-            .recordingURL(workspaceId: "ws_1", callId: "call_1")
-
-        XCTAssertEqual(result.successOnly, "https://storage.example.com/rec.mp3?sig=abc")
-    }
-
     // MARK: - Contacts
 
     /// ⚠️ CONTACTS REPORTS A REAL `total`, so the end is KNOWN and a full final

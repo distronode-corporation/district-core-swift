@@ -49,6 +49,8 @@ public extension StrictDecodeVerifier {
         // three lists describe the same seven nullable columns three times. If a
         // column stops being nulled, all three fail together, which is the
         // signal that the surfaces have NOT drifted.
+        // ⚠️ `recordingUrl` IS NOW NULL ON EVERY ROW, THE ANSWERED ONE INCLUDED, and
+        // so it is the one column listed on all three fixtures' row 0 too.
         //
         //   analysis        `Call.analysis`, a Json? column. Written by the
         //                   post-call pipeline; null on every call that has not
@@ -57,8 +59,9 @@ public extension StrictDecodeVerifier {
         //   followUp        `Call.followUp*`. The route builds this object ONLY
         //                   when a follow-up was actually sent, and sends null
         //                   otherwise rather than omitting the key.
-        //   recordingUrl    `Call.recordingUrl`. Only a completed, recorded call
-        //                   has one; a missed or busy call never will.
+        //   recordingUrl    ⛔ ALWAYS NULL. Nothing is recorded and the column was
+        //                   dropped (server, 2026-10-03); the key stays on the wire
+        //                   so installed apps keep decoding, with the value null.
         //   sentiment       `Call.sentiment`. Analysis again.
         //   transferStatus  `Call.transferStatus` / `.transferReason`, the
         //   transferReason  warm-transfer outcome. Null on every call that was
@@ -69,7 +72,8 @@ public extension StrictDecodeVerifier {
             "$[1].analysis", "$[2].analysis", "$[3].analysis", "$[4].analysis",
             "$[1].disposition", "$[3].disposition", "$[4].disposition",
             "$[1].followUp", "$[2].followUp", "$[3].followUp", "$[4].followUp",
-            "$[1].recordingUrl", "$[2].recordingUrl", "$[3].recordingUrl", "$[4].recordingUrl",
+            "$[0].recordingUrl", "$[1].recordingUrl", "$[2].recordingUrl", "$[3].recordingUrl",
+            "$[4].recordingUrl",
             "$[1].sentiment", "$[3].sentiment", "$[4].sentiment",
             "$[0].transferReason", "$[1].transferReason", "$[3].transferReason", "$[4].transferReason",
             "$[0].transferStatus", "$[1].transferStatus", "$[3].transferStatus", "$[4].transferStatus",
@@ -87,8 +91,8 @@ public extension StrictDecodeVerifier {
             "$.recentCalls[1].disposition", "$.recentCalls[3].disposition", "$.recentCalls[4].disposition",
             "$.recentCalls[1].followUp", "$.recentCalls[2].followUp", "$.recentCalls[3].followUp",
             "$.recentCalls[4].followUp",
-            "$.recentCalls[1].recordingUrl", "$.recentCalls[2].recordingUrl", "$.recentCalls[3].recordingUrl",
-            "$.recentCalls[4].recordingUrl",
+            "$.recentCalls[0].recordingUrl", "$.recentCalls[1].recordingUrl", "$.recentCalls[2].recordingUrl",
+            "$.recentCalls[3].recordingUrl", "$.recentCalls[4].recordingUrl",
             "$.recentCalls[1].sentiment", "$.recentCalls[3].sentiment", "$.recentCalls[4].sentiment",
             "$.recentCalls[0].transferReason", "$.recentCalls[1].transferReason",
             "$.recentCalls[3].transferReason", "$.recentCalls[4].transferReason",
@@ -98,8 +102,10 @@ public extension StrictDecodeVerifier {
             "$.recentCalls[1].phoneIntel.lineType", "$.recentCalls[4].phoneIntel.lineType",
             "$.recentCalls[1].phoneIntel.carrier", "$.recentCalls[4].phoneIntel.carrier",
         ],
-        // The ANSWERED row, singly, so only the transfer pair is null here.
+        // The ANSWERED row, singly, so only the transfer pair and the retired
+        // `recordingUrl` are null here.
         "district-call-detail.json": [
+            "$.call.recordingUrl",
             "$.call.transferReason",
             "$.call.transferStatus",
         ],

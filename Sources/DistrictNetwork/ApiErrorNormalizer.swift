@@ -54,9 +54,8 @@ public enum ApiErrorNormalizer {
     }
 
     /// ⚠️ 2xx ONLY, NOT `< 400`. A 3xx that reaches this function is a redirect
-    /// the transport did not follow (the recording route answers 302 with a
-    /// `Location` the app is meant to read), and reporting one as a decode
-    /// failure would blame the contract for a redirect that was never followed.
+    /// the transport did not follow, and reporting one as a decode failure would
+    /// blame the contract for a redirect that was never followed.
     static func isSuccess(_ statusCode: Int) -> Bool {
         (200 ... 299).contains(statusCode)
     }

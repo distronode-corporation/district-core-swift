@@ -111,40 +111,7 @@ final class SchedulingAdminSettingsTests: XCTestCase {
         XCTAssertEqual(empty.supportedLocales, [])
     }
 
-    // MARK: - Storage, the notetaker and the summariser
-
-    /// ⛔ BOTH OF THE INTERESTING FIELDS ARE OPTIONAL AND ONE OF THEM IS NOT THE
-    /// TENANT'S TO FIX. `recordings_enabled` on with `recordings_storage_ready`
-    /// absent is a real state: meetings record and have nowhere to upload to.
-    func testStorageSettingsDecodeWithAndWithoutTheInstanceHalf() throws {
-        let full = try decode(
-            SchedulingStorageSettings.self,
-            #"""
-            {"recordings_enabled":true,"recordings_storage_ready":false,
-             "recordings_prefix":"tenants/contract/recordings"}
-            """#
-        )
-        XCTAssertTrue(full.recordingsEnabled)
-        XCTAssertEqual(full.recordingsStorageReady, false)
-        XCTAssertEqual(full.recordingsPrefix, "tenants/contract/recordings")
-
-        let bare = try decode(SchedulingStorageSettings.self, #"{"recordings_enabled":false}"#)
-        XCTAssertFalse(bare.recordingsEnabled)
-        XCTAssertNil(bare.recordingsStorageReady)
-        XCTAssertNil(bare.recordingsPrefix)
-    }
-
-    /// ⛔ ONE FIELD, AND THE ABSENCES ARE THE CONTRACT. `stt_api_key_set` and
-    /// `stt_base_url` are stripped by the catalog because both describe an INSTANCE
-    /// credential; this asserts they are ignored rather than modelled, which is the
-    /// lenient-in-the-field half of the gate's strict-in-CI rule.
-    func testNotetakerSettingsIgnoreTheInstanceFieldsTheCatalogStrips() throws {
-        let settings = try decode(
-            SchedulingNotetakerSettings.self,
-            #"{"enabled":true,"stt_api_key_set":true,"stt_base_url":"https://stt.example.com"}"#
-        )
-        XCTAssertTrue(settings.enabled)
-    }
+    // MARK: - The summariser
 
     /// ⛔ THE ALLOWLIST'S SHARPEST CASE. Six more fields exist at the far end and a
     /// tenant may see none of them; a build that grew a property for `model` would

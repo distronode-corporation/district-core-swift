@@ -1,5 +1,7 @@
 # District Core for Swift
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/distronode-corporation/district-core-swift/badge)](https://scorecard.dev/viewer/?uri=github.com/distronode-corporation/district-core-swift)
+
 The shared Swift core of the native [District AI](https://www.distronode.com/district-ai)
 apps: the models, networking, data repositories, sign-in logic and call state machines
 that the iPhone, iPad and Mac clients have in common. It builds and tests on Linux as
@@ -10,7 +12,7 @@ Consumers:
 
 - [District AI for iOS](https://github.com/distronode-corporation/district-ios)
   (iPhone and iPad)
-- District AI for macOS (`district-macos`)
+- [District AI for macOS](https://github.com/distronode-corporation/district-macos)
 
 This package was extracted from district-ios at `0b2354b`, with its history. Links:
 [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md)
@@ -120,8 +122,10 @@ every pull request, and uses no secrets:
 - **darwin** (macOS): `swift test`, then `xcodebuild` for generic iOS and generic macOS.
 
 [`codeql.yml`](.github/workflows/codeql.yml) and
-[`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard.
-The `darwin` job, CodeQL and Scorecard are skipped while the repository is private.
+[`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard,
+and [`dependency-review.yml`](.github/workflows/dependency-review.yml) fails a pull
+request that adds a dependency with a known vulnerability or a licence this package
+cannot ship.
 
 ## Changing the core
 
@@ -134,6 +138,7 @@ each app then bumps its exact pin in a pull request of its own. See
 - [CONTRIBUTING.md](CONTRIBUTING.md): the local gate and the rules CI enforces.
 - [SECURITY.md](SECURITY.md): report vulnerabilities privately, not in an issue.
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- [SUPPORT](.github/SUPPORT.md): where questions, bugs and account problems go.
 - [CHANGELOG.md](CHANGELOG.md).
 
 Questions about a District AI account, number or bill go to

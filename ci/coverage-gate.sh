@@ -136,6 +136,11 @@ for block in data:
         if lines is None:
             sys.exit(f"FATAL: no line summary for {filename}: llvm-cov schema changed.")
         covered, count = lines["covered"], lines["count"]
+        if covered < count:
+            # ⚠️ NAMED, so a red gate says which file to read rather than only which module.
+            short = filename.split("/Sources/", 1)[1]
+            zero = sorted({seg[0] for seg in entry.get("segments", []) if len(seg) > 4 and seg[3] and seg[2] == 0})
+            print(f"  uncovered: {short}  {count - covered} line(s), regions starting at {zero}")
         total[0] += covered
         total[1] += count
         for name in modules:

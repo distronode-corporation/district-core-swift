@@ -59,6 +59,8 @@ enum DistrictPaths {
     /// `knowledge-mode` has beside `knowledge`.
     static let workspacePersonaOptions = workspacePersona + ["options"]
     static let workspacePersonaPreviewToken = workspacePersona + ["preview-token"]
+    /// ⚠️ A GET ONE SEGMENT BELOW THE PATCH-ONLY `workspace/persona`, like the two above.
+    static let workspacePersonaVoiceStudio = workspacePersona + ["voice-studio"]
 
     static let workspaceTools = workspace + ["tools"]
 

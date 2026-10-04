@@ -19,8 +19,13 @@ public extension TypedEndpoints {
     /// carry the flag, so ``ResponseEnvelope/affirm(_:_:_:)`` applies, and it
     /// matters on the options read in particular, whose failure body is
     /// `{success:false,error}` with no catalogues at all.
+    ///
+    /// ⚠️ `personaVoiceStudio` IS THE THIRD, FIXTURE-GATED THE SAME WAY
+    /// (`district-voice-studio.json`) and decoded by `VoiceStudioRepository`. It affirms
+    /// `success` like the other two.
     static let persona: Set<EndpointID> = [
         .personaOptions,
         .personaPreviewToken,
+        .personaVoiceStudio,
     ]
 }

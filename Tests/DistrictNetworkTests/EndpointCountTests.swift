@@ -69,7 +69,7 @@ extension EndpointSurfaceTests {
         // `SchedulingAdminRepository.perform` is generic and decodes whatever type the
         // CALLER names, so what is fixed is the ENVELOPE rather than the payload. See
         // `TypedEndpoints.schedulingAdmin`.
-        XCTAssertEqual(typed.count, 115)
+        XCTAssertEqual(typed.count, 116)
         // ⚠️ THE THIRD LIST, `RedirectEndpoints`, IS GONE. Its two members (the call
         // recording and the scheduler recording download) were retired on 2026-10-03.
     }

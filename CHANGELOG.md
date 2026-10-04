@@ -6,6 +6,46 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-04
+
+A minor release: everything is additive, and every request 3.0.0 could make is
+byte-identical.
+
+### Added
+
+- The native Voice Studio. `VoiceStudioResponse` and its parts in `DistrictModel` decode
+  `GET /api/district/workspace/persona/voice-studio` (recipes, the resolved signal chain,
+  the time-to-first-word meter, the per-leg catalogue, voices and every tuning key, with
+  labels already in the reader's portal language), and `EngineMix` models
+  `aiPersona.engineMix` v1, its absent-when-unset keys included. `VoiceStudioKey` names the
+  persona keys the Studio owns.
+- `EndpointID.personaVoiceStudio`, `DistrictEndpoints.personaVoiceStudio(workspaceId:)`,
+  `DistrictEndpoints.saveVoiceStudio(workspaceId:fields:keys:)` (the existing persona PATCH,
+  carrying only the named keys) and `JSONValue.engineMix(_:)`, which writes a mix in the web
+  Studio's exact shape.
+- `VoiceStudioRepository` in `DistrictData`: the read, and a save that always reads the
+  Studio back, naming the two refusals (`invalid_engine_mix`,
+  `model_unavailable_in_region`) and telling a write whose re-read failed from one that
+  never landed.
+- The Studio's rules, ported from the web Studio with Android's client as the sibling:
+  `VoiceStudioSession` (the held state and every transition), `VoiceStudioRules` (the
+  preset rule, the save body, the changed keys, whether a save landed, the change count),
+  `VoiceStudioRecipes`, `VoiceStudioLegEdits`, `VoiceStudioTuning` with
+  `VoiceStudioNumberPath` and `VoiceStudioChoicePath`, `VoiceStudioPickers`, and
+  `VoiceStudioReadout`, which shows the service's own words for any engine it described and
+  assembles an unsaved edit's from the same response's measured medians, never estimating.
+- `contracts/mobile/district-voice-studio.json`, the 157th mobile fixture, gated strictly
+  with its explicit nulls permitted per field of a kind rather than per row.
+- The read's templates for text a client builds itself (`meterAbout`, `meterAtLeast`,
+  `meterNone`, `meterPartial`, `numberGrouping`, `basedOnOne`, `basedOnMany`) on
+  `VoiceStudioLabels`, and `VoiceStudioText`, which fills them: an unsaved edit's meter
+  headline, a bare median and the "Based on" line follow the portal language
+  (`VoiceStudioSession.basedOn`). An unsaved edit's "some steps are not measured" note is
+  now `meterPartial`.
+- `VoiceStudioRefit`: after a persona language save, a chain of the member's own that no
+  longer fits is moved to the nearest offered models speaking the language, saved and read
+  back (the web's `conformEngineMix`, as district-linux does it).
+
 ## [3.0.0] - 2026-10-04
 
 A major release because public API is removed (see Removed). Nothing is added, and
@@ -103,7 +143,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0
 [3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0
 [2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0
 [1.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/1.0.0

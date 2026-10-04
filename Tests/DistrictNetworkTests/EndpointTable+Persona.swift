@@ -2,7 +2,7 @@
 import Foundation
 
 extension EndpointTable {
-    /// The two routes that make the persona form editable.
+    /// The routes that make the persona form and the Voice Studio editable.
     ///
     /// ⛔ THE PATHS ARE WRITTEN OUT RATHER THAN BUILT FROM `DistrictPaths`, like
     /// every other row in this table, and this family earns that twice over. Both
@@ -30,6 +30,14 @@ extension EndpointTable {
                 DistrictEndpoints.personaOptions(workspaceId: "ws_1"),
                 .get,
                 "\(host)/api/district/workspace/persona/options?workspaceId=ws_1"
+            ),
+            // ⛔ THE STUDIO'S READ, AND NO LOCALE ON THE URL: the labels follow the reader's
+            // portal language by the service's rule, never a parameter.
+            EndpointExpectation(
+                .personaVoiceStudio,
+                DistrictEndpoints.personaVoiceStudio(workspaceId: "ws_1"),
+                .get,
+                "\(host)/api/district/workspace/persona/voice-studio?workspaceId=ws_1"
             ),
             EndpointExpectation(
                 .personaPreviewToken,

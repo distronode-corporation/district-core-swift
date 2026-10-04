@@ -202,9 +202,14 @@ let package = Package(
             dependencies: ["DistrictNetwork"],
             swiftSettings: districtSwiftSettings
         ),
+        // ⚠️ DEPENDS ON `ContractGateSupport` FOR ONE FIXTURE, like the auth tests above.
+        // The Voice Studio's rules (presets, leg edits, tuning ranges, the local meter) are
+        // tested against `district-voice-studio.json`, the service's own answer, edited per
+        // test where a case needs a shape the fixture does not carry. A catalogue typed out in
+        // Swift for the tests would be a second catalogue nothing compares with the first.
         .testTarget(
             name: "DistrictDataTests",
-            dependencies: ["DistrictData"],
+            dependencies: ["DistrictData", "ContractGateSupport"],
             swiftSettings: districtSwiftSettings
         ),
         .testTarget(

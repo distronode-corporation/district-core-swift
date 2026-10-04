@@ -36,7 +36,7 @@ enum ImplementedFixtures {
         authAndSessions + push + membership + meetings + overview
             + callsAndAnalytics + meteredUsage + inbox + messageThread + contacts + workspaceConfig + contactWrites
             + persona + scheduling + schedulingAdmin + knowledge + messaging + districtHQ + automation + deskAndSupport
-            + billing + numbers + meetingRecords + schedulingA + schedulingB + schedulingC + setup
+            + billing + numbers + meetingRecords + schedulingA + schedulingB + schedulingC + setup + voiceStudio
     }
 
     static var names: Set<String> {

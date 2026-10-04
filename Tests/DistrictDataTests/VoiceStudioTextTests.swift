@@ -121,6 +121,18 @@ final class VoiceStudioTextTests: XCTestCase {
         XCTAssertEqual(Text.latency(VoiceStudioLatencyText.none, labels: french), french.notMeasured)
     }
 
+    /// ⛔ THE UNIT IS THE TEMPLATE'S: what follows `{ms}` in `meterAbout`, never typed here.
+    func testABareMediansUnitIsWhatFollowsThePlaceholder() throws {
+        let edited = try VoiceStudioFixture.response { document in
+            try document.edit(["labels", "meterAbout"]) { $0 = .string("About {ms} msec") }
+        }
+        XCTAssertEqual(Text.latency(.milliseconds(90), labels: edited.labels), "90 msec")
+        let bare = try VoiceStudioFixture.response { document in
+            try document.edit(["labels", "meterAbout"]) { $0 = .string("About") }
+        }
+        XCTAssertEqual(Text.latency(.milliseconds(90), labels: bare.labels), "90")
+    }
+
     // MARK: - Based on
 
     func testBasedOnInEnglish() throws {

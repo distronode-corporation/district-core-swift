@@ -17,10 +17,6 @@ public enum VoiceStudioText {
     static let recipePlaceholder = "{recipe}"
     static let countPlaceholder = "{n}"
 
-    /// The unit after a bare measured median, as the templates write it: a no-break space,
-    /// then `ms`, in both locales.
-    static let unit = "\u{00A0}ms"
-
     /// The meter's headline.
     ///
     /// ⛔ "AT LEAST", NEVER "ABOUT", WHEN A STAGE IS MISSING: the missing stage is not estimated,
@@ -42,7 +38,7 @@ public enum VoiceStudioText {
         case let .server(sentence):
             sentence
         case let .milliseconds(ms):
-            grouped(ms, labels) + unit
+            grouped(ms, labels) + unit(labels)
         case .none:
             labels.notMeasured
         }
@@ -74,6 +70,14 @@ public enum VoiceStudioText {
             out.append(digit)
         }
         return out
+    }
+
+    /// The unit after a bare measured median: whatever follows `{ms}` in `meterAbout` (a
+    /// no-break space and `ms` in both locales today), never a unit typed here. Nothing when
+    /// the template has no placeholder.
+    static func unit(_ labels: VoiceStudioLabels) -> String {
+        guard let range = labels.meterAbout.range(of: msPlaceholder) else { return "" }
+        return String(labels.meterAbout[range.upperBound...])
     }
 
     /// `template` with its first `placeholder` replaced by `value`; unchanged when it has none.

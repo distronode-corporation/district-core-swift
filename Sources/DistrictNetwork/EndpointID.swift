@@ -159,6 +159,12 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // files are gated in `ImplementedFixtures` rather than skip-listed.
     case personaOptions
     case personaPreviewToken
+    /// ⛔ THE NATIVE VOICE STUDIO'S ONE READ, AND IT HAS NO WRITE OF ITS OWN. A Studio save
+    /// is ``savePersona`` with the Studio's keys (see
+    /// ``DistrictEndpoints/saveVoiceStudio(workspaceId:fields:keys:)``), always followed by
+    /// this read, because the PATCH does not echo the persona and ignores some values with a
+    /// 200. The raw value is the Android client's name for it (`PersonaApi.personaVoiceStudio`).
+    case personaVoiceStudio
     case saveTools
     case saveDirectory
     case saveRoutingRules

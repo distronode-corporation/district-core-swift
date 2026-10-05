@@ -6,8 +6,22 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- District Studio links. `AppLinkResolver` maps `/dashboard/district/studio` (the web's
+  section for the AI receptionist's settings since 2026-10-04) to the new
+  `DistrictSection.studio`, and `/dashboard/district/studio/<area>` to it with the area
+  carried: `StudioArea` names the pages the apps draw (`persona`, `voice`,
+  `call-handling`, `skills`, `knowledge`), read back through
+  `AppLinkDestination.studioArea`. A Studio page outside that list (`integrations`,
+  `video`, anything else) resolves to `openInBrowser`. A Studio destination waits for a
+  workspace.
+
 ### Changed
 
+- ⚠️ Source-breaking: `DistrictSection` gains a case, so an exhaustive `switch` over it
+  (both apps' `AppLinkRouting`) needs a `.studio` arm when it adopts this release. That
+  makes the next release a major version.
 - Repository only, no change to the package: the README carries the OpenSSF Scorecard
   badge, links district-macos and drops the private-era CI note; `.github/SUPPORT.md` says
   where questions and bugs go; the issue chooser links the README, Discussions and private

@@ -6,7 +6,8 @@ import Foundation
 /// what this app has screens for.
 ///
 /// ⛔ THIS IS NOT A COPY OF THE WEB'S ROUTE LIST AND MUST NOT BECOME ONE. The web
-/// dashboard publishes 23 pages under `/dashboard/district`; seven of them are here.
+/// dashboard publishes many more pages under `/dashboard/district` than this app draws;
+/// eight of its sections are here.
 /// Every other one is listed in ``AppLinkResolver/resolve(_:)``'s documentation with the
 /// reason it is absent, because "no mapping yet" and "no mapping that is not a dead end"
 /// are different states and the second one is a decision rather than a gap.
@@ -51,6 +52,31 @@ public enum DistrictSection: String, Hashable, Sendable, CaseIterable {
     /// exists the client half is already right. Until then this arm is reachable only
     /// from a hand-typed URL, which lands somewhere real rather than on the overview.
     case devices
+
+    /// District Studio, the web's section for the AI receptionist's settings
+    /// (`/dashboard/district/studio`, since 2026-10-04). ⚠️ ONLY THE AREAS IN
+    /// ``StudioArea`` RESOLVE HERE; the Studio's other pages (`integrations`, `video`)
+    /// have no screen in either app and resolve to ``AppLinkOutcome/openInBrowser``.
+    /// The area travels as ``AppLinkDestination/detailId`` and is read back through
+    /// ``AppLinkDestination/studioArea``; no area at all is the Studio home, which the
+    /// apps draw as their settings hub.
+    case studio
+}
+
+/// A District Studio page this app has a native screen for, by its web path segment.
+///
+/// ⛔ A CLOSED LIST, AND THE ABSENCES ARE DECISIONS. The web's Studio has seven pages
+/// after its home: Persona, Voice, Call handling, Skills, Knowledge, Integrations,
+/// Video. `integrations` and `video` are absent because neither app draws them, and a
+/// link to one that landed on the settings hub would show something the user did not
+/// ask for; they open the web page instead. The raw values are the web's path
+/// segments, so `call-handling` keeps its hyphen.
+public enum StudioArea: String, Hashable, Sendable, CaseIterable {
+    case persona
+    case voice
+    case callHandling = "call-handling"
+    case skills
+    case knowledge
 }
 
 /// What a claimed URL means: a section, optionally one detail id, optionally a tenant.
@@ -67,12 +93,15 @@ public struct AppLinkDestination: Equatable, Sendable {
     /// ``AppLinkOutcome/openInBrowser``.
     public let section: DistrictSection
 
-    /// The second path segment, for the two sections that have a drill-down.
+    /// The second path segment, for the three sections that have a drill-down.
     ///
-    /// ⚠️ ALWAYS NIL EXCEPT ON ``DistrictSection/calls`` AND ``DistrictSection/scheduling``,
-    /// AND IT MEANS DIFFERENT THINGS ON THE TWO. A detail id guessed out of a URL is only
-    /// worth carrying where the app has a destination that can show it AND a stack to fall
-    /// back onto; see the ⚠️ in ``AppLinkResolver/resolve(_:)``.
+    /// ⚠️ ALWAYS NIL EXCEPT ON ``DistrictSection/calls``, ``DistrictSection/scheduling``
+    /// AND ``DistrictSection/studio``, AND IT MEANS DIFFERENT THINGS ON EACH. On `studio`
+    /// it is always a ``StudioArea`` raw value, already checked, because an area the
+    /// apps cannot draw has to become the browser HERE, where that outcome is decided.
+    /// A detail id guessed out of a URL is only worth carrying where the app has a
+    /// destination that can show it AND a stack to fall back onto; see the ⚠️ in
+    /// ``AppLinkResolver/resolve(_:)``.
     ///
     /// ⛔ ON `calls` IT IS AN OPAQUE SERVER ID AND ON `scheduling` IT IS A FIXED
     /// VOCABULARY, which is why this type does not validate it. A call id is whatever the
@@ -98,6 +127,13 @@ public struct AppLinkDestination: Equatable, Sendable {
         self.workspaceId = workspaceId
     }
 
+    /// The Studio page named, on ``DistrictSection/studio`` only; nil there is the
+    /// Studio home.
+    public var studioArea: StudioArea? {
+        guard section == .studio else { return nil }
+        return detailId.flatMap(StudioArea.init(rawValue:))
+    }
+
     /// Whether this destination cannot be honoured until a workspace has resolved.
     ///
     /// ⛔ THE ANSWER IS "WAIT", NOT "NOWHERE", AND THAT IS WHY THIS IS A QUESTION AT
@@ -108,7 +144,7 @@ public struct AppLinkDestination: Equatable, Sendable {
     /// only when the app was already open and loaded, which is never the case they
     /// exist for. Kotlin's `appLinkRoute` states the same rule as a nullable return.
     ///
-    /// ⚠️ FOUR OF THE SEVEN SECTIONS ANSWER FALSE, WHICH IS THE PLACE THIS DIVERGES
+    /// ⚠️ FOUR OF THE EIGHT SECTIONS ANSWER FALSE, WHICH IS THE PLACE THIS DIVERGES
     /// FROM ANDROID AND IT IS A PLATFORM DIFFERENCE RATHER THAN A DECISION. Android's
     /// inbox, calls and contacts are workspace-scoped ROUTES and cannot be built
     /// without an id; here they are TABS, and `Tab` carries no tenant. Selecting a tab
@@ -117,8 +153,8 @@ public struct AppLinkDestination: Equatable, Sendable {
     /// reasoning `ShellView.apply(_:)` already records for a push that switches tenant.
     public var requiresWorkspace: Bool {
         switch section {
-        case .analytics, .scheduling:
-            // Both become a `Route` carrying the workspace id in the value.
+        case .analytics, .scheduling, .studio:
+            // Each becomes a `Route` carrying the workspace id in the value.
             true
         case .calls:
             // The LIST is a tab; only the drill-down needs an id.
@@ -139,7 +175,7 @@ public struct AppLinkDestination: Equatable, Sendable {
 /// break sign-in, which is the exact ⛔ Kotlin's `AppLinkDestination` carries.
 ///
 /// ⛔ AND ``openInBrowser`` IS NEVER A DEAD END, WHICH IS THE WHOLE REASON IT EXISTS.
-/// The app claims a broad path prefix and draws seven of the dashboard's screens; before
+/// The app claims a broad path prefix and draws eight of the dashboard's screens; before
 /// this case, every other claimed URL landed on the overview, which is a real screen and
 /// the WRONG one. A user who tapped a link to billing waited for an app to launch in
 /// order to be shown something they did not ask for, with nothing on screen to say the
@@ -207,7 +243,7 @@ public enum AppLinkResolver {
     /// give us. ⚠️ THE MIRROR OF THAT DIVERGENCE IS BELOW: Kotlin answers OVERVIEW for
     /// an unrecognised segment INSIDE the prefix and states that choice in its own ⚠️.
     /// This client answers the browser, because Android maps ten sections to this
-    /// client's seven, so the segments that fall through here (`hq`, `billing`,
+    /// client's eight, so the segments that fall through here (`hq`, `billing`,
     /// `marketplace`, `workflows`) are pages Android actually draws.
     ///
     /// ## Web pages deliberately NOT mapped
@@ -216,6 +252,8 @@ public enum AppLinkResolver {
     /// to ``AppLinkOutcome/openInBrowser`` and opens the real web page. Any other
     /// segment inside the prefix resolves the same way.
     ///
+    /// - `studio/integrations`, `studio/video` and any other Studio page outside
+    ///   ``StudioArea``: neither app draws them. See ``DistrictSection/studio``.
     /// - `settings`: ⛔ AMBIGUOUS IN A WAY THAT MATTERS, exactly as on Android. This
     ///   app has TWO settings surfaces, `Tab.account` (sign-out and account deletion,
     ///   deliberately tenant-free) and `Route.workspaceSettings` (persona, routing,
@@ -254,6 +292,11 @@ public enum AppLinkResolver {
     /// ROOT; nothing produces that URL today, and it is mapped on the same reasoning the
     /// `calls/<id>` paragraph below gives for a page the website has not published either.
     ///
+    /// ⚠️ `studio/<area>` IS KEPT TOO, and unlike `scheduling/<sub>` an unknown area is
+    /// the BROWSER rather than the section's root. The Studio's unmapped pages
+    /// (`integrations`, `video`) are real pages with real controls, and the settings hub
+    /// is not them. Only the area segment is read: `studio/persona/anything` is Persona.
+    ///
     /// ⚠️ `calls/<id>` IS THE OTHER DEEPER PATH THAT IS KEPT, AND THIS IS THE DELIBERATE
     /// DIVERGENCE FROM ANDROID. Android drops the id because it navigates to a single
     /// route and "a detail id guessed out of a URL is a 404 with a back button that
@@ -283,6 +326,11 @@ public enum AppLinkResolver {
         // "YES" THIS IS. An unmapped section is the browser, never nil: nil would leave a
         // tapped link doing nothing at all, which is the one outcome worse than both.
         guard let section = section(for: segments.first) else { return .openInBrowser }
+        // ⛔ A STUDIO PAGE THE APPS DO NOT DRAW IS THE BROWSER, decided here rather than
+        // in the App target, because only this level can still answer `openInBrowser`.
+        if section == .studio, segments.count > 1, StudioArea(rawValue: segments[1].lowercased()) == nil {
+            return .openInBrowser
+        }
         return .destination(AppLinkDestination(
             section: section,
             detailId: detailId(for: section, segments: segments),
@@ -327,6 +375,7 @@ public enum AppLinkResolver {
         case "analytics": return .analytics
         case "scheduling": return .scheduling
         case "devices": return .devices
+        case "studio": return .studio
         default: return nil
         }
     }
@@ -349,8 +398,10 @@ public enum AppLinkResolver {
     /// `/Scheduling` reached the section, one rule applied to half a path is worse than
     /// either rule applied whole.
     private static func detailId(for section: DistrictSection, segments: [String]) -> String? {
-        guard section == .calls || section == .scheduling, segments.count > 1 else { return nil }
-        return section == .scheduling ? segments[1].lowercased() : segments[1]
+        guard section == .calls || section == .scheduling || section == .studio, segments.count > 1 else {
+            return nil
+        }
+        return section == .calls ? segments[1] : segments[1].lowercased()
     }
 
     /// ⚠️ AN EMPTY VALUE IS TREATED AS ABSENT. `?workspaceId=` is what a truncated or

@@ -19,6 +19,10 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Changed
 
+- Contract fixtures only, no change to the package: `district-enrich-disabled.json` and
+  `district-voice-studio.json` mirror the service's new copies. The enrichment refusal now
+  names District Studio → Integrations, and the Voice Studio read's `heading` is "Voice",
+  the name of the web's District Studio page.
 - ⚠️ Source-breaking: `DistrictSection` gains a case, so an exhaustive `switch` over it
   (both apps' `AppLinkRouting`) needs a `.studio` arm when it adopts this release. That
   makes the next release a major version.

@@ -236,7 +236,7 @@ final class InboxContractTests: XCTestCase {
         )
         XCTAssertEqual(envelope.success, false)
         XCTAssertNil(envelope.code)
-        XCTAssertTrue(envelope.error?.contains("Settings") ?? false)
+        XCTAssertTrue(envelope.error?.contains("District Studio → Integrations") ?? false)
     }
 
     /// ⛔ THERE IS NO `processing`, AND POLLING FOR IT NEVER TERMINATES. It is the

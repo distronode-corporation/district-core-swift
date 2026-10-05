@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       run_darwin:
-        description: Run the macOS job on this dispatch (needed only while the repository is private)
+        description: Run the macOS job on this dispatch (needed only if the repository is private)
         type: boolean
         default: false
 
@@ -256,9 +256,8 @@ jobs:
   # credential persistence, cache poisoning, unpinned actions. Suppressions are inline
   # `# zizmor: ignore[...]` comments with a reason.
   #
-  # Annotations mode, not SARIF: uploading SARIF to code scanning needs GitHub Code
-  # Security on a private repository, so zizmor reports as annotations and FAILS the job
-  # on a finding, on pushes and pull requests alike.
+  # Annotations mode, not SARIF: zizmor reports a finding as an annotation and FAILS the
+  # job, on pushes and pull requests alike, rather than only filing a code scanning alert.
   zizmor:
     name: zizmor
     runs-on: ubuntu-24.04
@@ -276,10 +275,11 @@ jobs:
 
   darwin:
     name: darwin (macOS)
-    # ⛔ SKIPPED WHILE THE REPOSITORY IS PRIVATE, unless started by hand. The free plan
-    # bills a private repository's macOS minutes at ten times the Linux rate, and
-    # everything this job can catch that `verify` cannot is a Darwin-only compile error.
-    # Once the repository is public it runs on every push and pull request.
+    # Runs on every push and pull request. This guard and the run_darwin input matter only
+    # if the repository is ever private again: the free plan bills a private repository's
+    # macOS minutes at ten times the Linux rate, and everything this job can catch that
+    # `verify` cannot is a Darwin-only compile error, so there this job runs only when
+    # started by hand (workflow_dispatch with run_darwin).
     if: ${{ !github.event.repository.private || (github.event_name == 'workflow_dispatch' && inputs.run_darwin) }}
     runs-on: macos-26
     timeout-minutes: 45

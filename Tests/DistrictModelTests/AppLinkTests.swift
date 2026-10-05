@@ -117,6 +117,7 @@ final class AppLinkTests: XCTestCase {
             "analytics": .analytics,
             "scheduling": .scheduling,
             "devices": .devices,
+            "studio": .studio,
         ]
         for (segment, section) in expected {
             let resolved = destination("https://www.distronode.com/dashboard/district/" + segment)
@@ -197,6 +198,65 @@ final class AppLinkTests: XCTestCase {
         XCTAssertNil(resolved?.detailId)
     }
 
+    // MARK: - District Studio
+
+    func testEveryStudioAreaTheAppsDrawResolvesToItsArea() {
+        let expected: [String: StudioArea] = [
+            "persona": .persona,
+            "voice": .voice,
+            "call-handling": .callHandling,
+            "skills": .skills,
+            "knowledge": .knowledge,
+        ]
+        XCTAssertEqual(Set(expected.values), Set(StudioArea.allCases))
+        for (segment, area) in expected {
+            let resolved = destination("https://www.distronode.com/dashboard/district/studio/" + segment)
+            XCTAssertEqual(resolved?.section, .studio, segment)
+            XCTAssertEqual(resolved?.detailId, segment, segment)
+            XCTAssertEqual(resolved?.studioArea, area, segment)
+        }
+    }
+
+    func testTheStudioHomeIsTheStudioWithNoArea() {
+        for path in ["/dashboard/district/studio", "/dashboard/district/studio/"] {
+            let resolved = destination("https://www.distronode.com" + path)
+            XCTAssertEqual(resolved?.section, .studio, path)
+            XCTAssertNil(resolved?.detailId, path)
+            XCTAssertNil(resolved?.studioArea, path)
+        }
+    }
+
+    /// ⛔ THE BROWSER, NOT THE SETTINGS HUB: these are real Studio pages neither app draws.
+    func testAStudioPageTheAppsDoNotDrawOpensInTheBrowser() {
+        for segment in ["integrations", "video", "home", "not-a-page", "integrations/jira"] {
+            let resolved = AppLinkResolver.resolve(
+                url("https://www.distronode.com/dashboard/district/studio/" + segment + "?workspaceId=ws-2")
+            )
+            XCTAssertEqual(resolved, AppLinkOutcome.openInBrowser, segment)
+        }
+    }
+
+    func testTheStudioAreaIsCaseFoldedAndOnlyItsFirstSegmentIsRead() {
+        let folded = destination("https://www.distronode.com/dashboard/district/Studio/Call-Handling")
+        XCTAssertEqual(folded?.studioArea, .callHandling)
+        XCTAssertEqual(folded?.detailId, "call-handling")
+        let deeper = destination("https://www.distronode.com/dashboard/district/studio/persona/extra#calls-routing")
+        XCTAssertEqual(deeper?.studioArea, .persona)
+    }
+
+    func testAStudioLinkCarriesItsWorkspace() {
+        let resolved = destination("https://www.distronode.com/dashboard/district/studio/voice?workspaceId=ws-2")
+        XCTAssertEqual(resolved?.studioArea, .voice)
+        XCTAssertEqual(resolved?.workspaceId, "ws-2")
+    }
+
+    func testOnlyTheStudioHasAStudioArea() {
+        // A detail id that happens to spell an area means nothing on another section.
+        XCTAssertNil(AppLinkDestination(section: .scheduling, detailId: "persona").studioArea)
+        XCTAssertNil(AppLinkDestination(section: .calls, detailId: "voice").studioArea)
+        XCTAssertEqual(AppLinkDestination(section: .studio, detailId: "skills").studioArea, .skills)
+    }
+
     // MARK: - The workspace query item
 
     func testTheWorkspaceIdQueryItemIsCarried() {
@@ -235,6 +295,8 @@ final class AppLinkTests: XCTestCase {
 
         XCTAssertTrue(AppLinkDestination(section: .analytics).requiresWorkspace)
         XCTAssertTrue(AppLinkDestination(section: .scheduling).requiresWorkspace)
+        XCTAssertTrue(AppLinkDestination(section: .studio).requiresWorkspace)
+        XCTAssertTrue(AppLinkDestination(section: .studio, detailId: "voice").requiresWorkspace)
     }
 
     func testTheCallLogWaitsOnlyWhenItCarriesAnId() {

@@ -6,6 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-05
+
+A major release for one reason: `DistrictSection` gains a case (below). Every request
+3.1.0 could make is byte-identical.
+
 ### Added
 
 - District Studio links. `AppLinkResolver` maps `/dashboard/district/studio` (the web's
@@ -24,7 +29,8 @@ All notable changes to this package are recorded here. The format is based on
   names District Studio → Integrations, and the Voice Studio read's `heading` is "Voice",
   the name of the web's District Studio page.
 - ⚠️ Source-breaking: `DistrictSection` gains a case, so an exhaustive `switch` over it
-  (both apps' `AppLinkRouting`) needs a `.studio` arm when it adopts this release. That
+  (district-ios's `AppLinkRouting`) needs a `.studio` arm when it adopts this release;
+  district-macos has no such switch and needs only the pin. That
   makes the next release a major version.
 - Repository only, no change to the package: the README carries the OpenSSF Scorecard
   badge, links district-macos and drops the private-era CI note; `.github/SUPPORT.md` says
@@ -169,7 +175,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/3.1.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/4.0.0
 [3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0
 [3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0
 [2.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/2.0.0

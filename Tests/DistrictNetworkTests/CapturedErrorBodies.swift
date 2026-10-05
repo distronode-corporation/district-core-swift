@@ -40,8 +40,8 @@ enum CapturedErrorBodies {
     {
       "success": false,
       "error": "Lead enrichment is off for this workspace. Turn it on in \
-    Settings → AI Agent → Skills & Integrations to enrich contacts with \
-    external business data."
+    District Studio → Integrations to enrich contacts with external business \
+    data."
     }
     """
 

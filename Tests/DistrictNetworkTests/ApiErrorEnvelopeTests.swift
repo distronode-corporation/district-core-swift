@@ -231,8 +231,8 @@ final class ApiErrorEnvelopeTests: XCTestCase {
         XCTAssertNil(enrich?.code, "a route's own refusal carries nothing to branch on")
         XCTAssertEqual(
             enrich?.message,
-            "Lead enrichment is off for this workspace. Turn it on in Settings → AI Agent → "
-                + "Skills & Integrations to enrich contacts with external business data."
+            "Lead enrichment is off for this workspace. Turn it on in District Studio → "
+                + "Integrations to enrich contacts with external business data."
         )
 
         let dnc = ApiErrorEnvelope.lenient(Data(CapturedErrorBodies.dialDoNotCall.utf8))

@@ -157,9 +157,8 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 body: CapturedErrorBodies.enrichDisabled,
                 expected: .http(
                     status: 403,
-                    message: "Lead enrichment is off for this workspace. Turn it on in Settings → "
-                        + "AI Agent → Skills & Integrations to enrich contacts with external "
-                        + "business data."
+                    message: "Lead enrichment is off for this workspace. Turn it on in District "
+                        + "Studio → Integrations to enrich contacts with external business data."
                 ),
                 line: #line
             ),

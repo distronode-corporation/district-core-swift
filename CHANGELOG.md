@@ -57,6 +57,12 @@ could make is byte-identical; what is new is the socket's outbound side.
   retraction's `epoch`, no empty opening snapshot, the snapshot's `endedReason`), and
   `TranscriptFrameTests` puts each through the strict gate and checks §4.12's invariants
   on them.
+- Contracts: `contracts/mobile/` gains the service's seven new fixtures (164 files, was
+  157): the six `telemetry-event-transcript-*` events and `district-telemetry-token.json`
+  (the desktop file, byte for byte). `ContractFixtureTests` gates all seven, the events as
+  the envelope and again as their typed `data`, with eight allowed-null paths (201, was
+  193), and `TranscriptFrameTests` asserts its frames match the vendored copies byte for
+  byte.
 
 ### Changed
 

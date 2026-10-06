@@ -61,4 +61,8 @@ public extension StrictDecodeVerifier {
         .merging(setup) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")
         }
+        // ⚠️ `AllowedExplicitNulls+LiveTranscript.swift`, the `transcript_*` events.
+        .merging(liveTranscript) { _, _ in
+            preconditionFailure("a fixture appears in both allowed-null tables")
+        }
 }

@@ -95,6 +95,15 @@ final class TranscriptFrameTests: XCTestCase {
         XCTAssertEqual(Set(names), Set(Self.frames.keys))
     }
 
+    /// ⛔ THE SAME SIX FILES ARE VENDORED IN `contracts/mobile/`, and two copies may never
+    /// differ: a sync that moved one and not the other would leave these invariants
+    /// checking a shape the service no longer sends.
+    func testEveryFrameIsByteIdenticalToTheVendoredFixture() throws {
+        for name in Self.frames.keys {
+            XCTAssertEqual(try Self.read(name), try ContractFixtures.read(name), name)
+        }
+    }
+
     // MARK: - Every frame
 
     /// ⛔ THE ENVELOPE IS UNCHANGED: five keys, everything new inside `data`.

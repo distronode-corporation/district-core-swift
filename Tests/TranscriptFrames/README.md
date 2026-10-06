@@ -20,9 +20,8 @@ only what holds for any frame the contract allows, so a regenerated set is a fil
 with no other edit. If one fails to decode, the models and the contract disagree: report
 it, never edit the file.
 
-The same files (with `district-telemetry-token.json`) reach `contracts/mobile/` with this
-package's next contract sync; that sync moves `ContractFixtureTests`' count and decides
-whether this directory is kept or deleted. Until then this copy is what the transcript
-models are tested against.
+The same files are vendored in `contracts/mobile/` (with `district-telemetry-token.json`),
+where `ContractFixtureTests` gates them like every other fixture.
+`TranscriptFrameTests` asserts the two copies are byte-identical, so a sync updates both.
 
 Nothing here is edited by hand, like `contracts/` (see CONTRIBUTING.md).

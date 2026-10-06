@@ -6,9 +6,11 @@ name: CI
 # repository owes its readers: no dashes, internal host names or GitLab URLs, the licence
 # files, no secrets anywhere in the history, and workflows that pass static analysis.
 # `darwin` builds the package with Xcode for iOS and macOS, the two platforms its
-# consumers ship on.
+# consumers ship on. `dependency graph` submits the Package.resolved pins to GitHub's
+# dependency graph, which does not read that file itself.
 #
-# No job reads a secret, so pull requests from forks run the same checks as `main`.
+# No job reads a secret, so pull requests from forks run the same checks as `main`
+# (all but `dependency graph`, which needs a token that can write).
 on:
   push:
     branches: [main]
@@ -347,3 +349,81 @@ jobs:
             xcodebuild-*.log
           if-no-files-found: warn
           retention-days: 7
+
+  # ⛔ GITHUB'S DEPENDENCY GRAPH DOES NOT READ THIS Package.resolved (format v3), so without
+  # this job it holds the workflow actions only, and "0 Dependabot alerts" means no Swift
+  # package was looked at. This submits the pins as a snapshot through the dependency
+  # submission API: each one as `pkg:swift/github.com/<owner>/<repo>@<version>`, the name
+  # the GitHub Advisory Database files Swift advisories under. dependency-review.yml waits
+  # for it (`retry-on-snapshot-warnings`) to compare a pull request against `main`.
+  # Push to main and pull requests from this repository only: a fork's pull request gets
+  # no token that can write a snapshot. The only job with a write permission, and it
+  # reads nothing but the two committed files.
+  dependency-graph:
+    name: dependency graph
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write # POST /repos/{owner}/{repo}/dependency-graph/snapshots
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Submit the Swift package snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESOLVED: Package.resolved
+          MANIFEST: Package.swift
+          SOURCE: Package.resolved
+          CORRELATOR: swiftpm-package-resolved
+          # A pull request's snapshot belongs to its head commit, which is what
+          # dependency-review compares; GITHUB_SHA there is the test merge commit.
+          SNAPSHOT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime, json, os, re, sys
+
+          def identity(url):
+              return url.rstrip("/").removesuffix(".git").rsplit("/", 1)[-1].lower()
+
+          pins = json.load(open(os.environ["RESOLVED"]))["pins"]
+          spec = open(os.environ["MANIFEST"]).read()
+          direct = {identity(u) for u in re.findall(r'\burl:\s*"?(https://[^\s",)]+)', spec)}
+          resolved = {}
+          for pin in pins:
+              state = pin.get("state", {})
+              version = state.get("version") or state.get("revision")
+              m = re.fullmatch(r"https://([^/]+)/(.+?)(?:\.git)?/?", pin.get("location", ""))
+              if pin.get("kind") != "remoteSourceControl" or not m or not version:
+                  print(f"::warning::{pin['identity']} not submitted: no remote URL and version")
+                  continue
+              purl = f"pkg:swift/{m.group(1).lower()}/{m.group(2)}@{version}"
+              relationship = "direct" if pin["identity"] in direct else "indirect"
+              resolved[pin["identity"]] = {"package_url": purl, "relationship": relationship, "scope": "runtime"}
+              print(f"{purl} ({relationship})")
+          missing = sorted(direct - resolved.keys())
+          if not resolved or missing:
+              print(f"FATAL - {os.environ['RESOLVED']} does not pin every package {os.environ['MANIFEST']} names: {missing}")
+              sys.exit(1)
+          server, repo, run = os.environ["GITHUB_SERVER_URL"], os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_RUN_ID"]
+          source = os.environ["SOURCE"]
+          snapshot = {
+              "version": 0,
+              "job": {"id": run, "correlator": os.environ["CORRELATOR"], "html_url": f"{server}/{repo}/actions/runs/{run}"},
+              "sha": os.environ["SNAPSHOT_SHA"],
+              "ref": os.environ["GITHUB_REF"],
+              "detector": {"name": "swiftpm-package-resolved", "version": "1.0.0", "url": f"{server}/{repo}/blob/main/.github/workflows/ci.yml"},
+              "scanned": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+              "manifests": {source: {"name": source, "file": {"source_location": source}, "resolved": resolved}},
+          }
+          json.dump(snapshot, open(os.path.join(os.environ["RUNNER_TEMP"], "snapshot.json"), "w"), indent=2)
+          PY
+          gh api --method POST "repos/$GITHUB_REPOSITORY/dependency-graph/snapshots" \
+            --input "$RUNNER_TEMP/snapshot.json" >"$RUNNER_TEMP/response.json"
+          cat "$RUNNER_TEMP/response.json"
+          echo
+          # ACCEPTED or SUCCESS; INVALID means the graph kept the previous snapshot.
+          jq -e '.result != "INVALID"' "$RUNNER_TEMP/response.json" >/dev/null

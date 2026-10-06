@@ -120,12 +120,15 @@ every pull request, and uses no secrets:
 - **gitleaks** (Linux): the full git history, with [`.gitleaks.toml`](.gitleaks.toml).
 - **zizmor** (Linux): static analysis of the workflows.
 - **darwin** (macOS): `swift test`, then `xcodebuild` for generic iOS and generic macOS.
+- **dependency graph** (Linux): submits the `Package.resolved` pins to GitHub's dependency graph,
+  which cannot see them on its own; on pushes to `main` and pull requests from this
+  repository.
+- **dependency-review** (Linux, pull requests): fails a pull request that adds a
+  dependency with a known moderate-or-worse vulnerability or a licence this package cannot
+  ship, compared after the snapshot above has landed.
 
 [`codeql.yml`](.github/workflows/codeql.yml) and
-[`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard,
-and [`dependency-review.yml`](.github/workflows/dependency-review.yml) fails a pull
-request that adds a dependency with a known vulnerability or a licence this package
-cannot ship.
+[`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard.
 
 ## Changing the core
 

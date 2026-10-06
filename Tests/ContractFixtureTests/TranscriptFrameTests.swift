@@ -7,10 +7,10 @@ import XCTest
 /// strict gate (no unlisted null, decode, re-encode, equal key sets at every level) and
 /// read as the event its type names.
 ///
-/// ⛔ THE FRAMES ARE HAND-WRITTEN UNTIL THE SERVICE SHIPS ITS OWN, and this file is written
-/// so that swapping them in is a file copy: it asserts only what holds for any frame the
-/// contract allows (see `Tests/TranscriptFrames/README.md`), never a value typed by hand.
-/// The values are pinned by `TranscriptEventsTests` and the reducer's tests instead.
+/// ⛔ THE FRAMES ARE THE SERVICE'S OWN FIXTURES, copied unchanged, and this file asserts
+/// only what holds for any frame the contract allows (see `Tests/TranscriptFrames/README.md`),
+/// never a fixture's values, so a regenerated set is a file copy. The values are pinned by
+/// `TranscriptEventsTests` and the reducer's tests instead.
 ///
 /// ⚠️ SIX FILES, AN EXACT COUNT AND AN EXPLICIT MAP, the desktop suite's two guards, so a
 /// frame that vanished or one nobody verifies is red rather than skipped.
@@ -43,7 +43,7 @@ final class TranscriptFrameTests: XCTestCase {
     /// The keys the contract allows to be null in each event's data, as strict-gate paths.
     ///
     /// ⚠️ A SNAPSHOT'S SEGMENTS ARE LISTED BY INDEX, so the paths are derived from the frame
-    /// itself: a server frame with more segments than the hand-written one needs no edit.
+    /// itself: a regenerated frame with more segments needs no edit.
     private static func allowedNulls(_ name: String, json: Data) throws -> Set<String> {
         let segmentKeys = ["speakerName", "language", "endedAt"]
         switch frames[name] {

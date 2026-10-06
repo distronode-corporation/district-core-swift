@@ -1,15 +1,12 @@
-# Live transcript frames (hand-written, temporary)
+# Live transcript frames (the service's fixtures)
 
-These six files are **written by hand** from the examples in the service's `transcript` v1
-wire contract, the revision with the §4.12 clarifications (Q1 to Q12): a retraction carries
-`epoch` beside `seq`, both null from the website; a subscribe is answered only once a first
-line exists, so there is no empty opening snapshot; a snapshot carries `endedReason`, null
-while live; `transcript_error.op` echoes the op sent. They are written by hand because the
-service's own fixtures for the five `transcript_*` events do not exist yet. They stand in
-for them so the transcript models and the reducer can be tested before the server side
-ships.
-
-They are named exactly as the service will name its fixtures:
+These six files are the service's own fixtures for the five `transcript_*` events of the
+`transcript` v1 wire contract, copied byte for byte from its `contracts/mobile/` set
+(service commit `909936271`). They follow the contract revision with the §4.12
+clarifications (Q1 to Q17): a retraction carries `epoch` beside `seq`, both null from the
+website; a subscribe is answered only once a first line exists, so there is no empty
+opening snapshot; a snapshot carries `endedReason`, null while live; `transcript_error.op`
+echoes the op sent.
 
 - `telemetry-event-transcript-segment.json`
 - `telemetry-event-transcript-segment-interim.json`
@@ -18,13 +15,14 @@ They are named exactly as the service will name its fixtures:
 - `telemetry-event-transcript-retracted.json`
 - `telemetry-event-transcript-error.json`
 
-**When the service's fixtures arrive,** copy them over these files, unchanged.
 `TranscriptFrameTests` (in `Tests/ContractFixtureTests`) reads whatever is here and asserts
-nothing that depends on the values written by hand, so it then checks the models against
-the server's own output with no other edit. The same fixtures also arrive in
-`contracts/mobile/` with the service's next contract sync, together with
-`district-telemetry-token.json`; that sync moves `ContractFixtureTests`' count and decides
-whether this directory is kept or deleted.
+only what holds for any frame the contract allows, so a regenerated set is a file copy
+with no other edit. If one fails to decode, the models and the contract disagree: report
+it, never edit the file.
 
-Nothing here is a contract fixture, and `contracts/` is not edited by hand (see
-CONTRIBUTING.md).
+The same files (with `district-telemetry-token.json`) reach `contracts/mobile/` with this
+package's next contract sync; that sync moves `ContractFixtureTests`' count and decides
+whether this directory is kept or deleted. Until then this copy is what the transcript
+models are tested against.
+
+Nothing here is edited by hand, like `contracts/` (see CONTRIBUTING.md).

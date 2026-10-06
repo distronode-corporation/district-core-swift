@@ -9,7 +9,7 @@
     "endedReason": null,
     "complete": true,
     "epoch": 1791297000000,
-    "lastSeq": 4,
+    "lastSeq": 2,
     "segments": [
       {
         "segmentId": "item_a1",
@@ -40,36 +40,6 @@
         "language": "en",
         "startedAt": "2026-10-06T14:30:07.200Z",
         "endedAt": "2026-10-06T14:30:10.700Z"
-      },
-      {
-        "segmentId": "item_c3",
-        "index": 2,
-        "epoch": 1791297000000,
-        "seq": 3,
-        "rev": 0,
-        "speaker": "agent",
-        "speakerName": "Ava",
-        "text": "Of course. Thursday morning or",
-        "final": true,
-        "interrupted": true,
-        "language": "en",
-        "startedAt": "2026-10-06T14:30:11.400Z",
-        "endedAt": "2026-10-06T14:30:13.000Z"
-      },
-      {
-        "segmentId": "item_d4",
-        "index": 3,
-        "epoch": 1791297000000,
-        "seq": 4,
-        "rev": 0,
-        "speaker": "caller",
-        "speakerName": null,
-        "text": "Morning, please.",
-        "final": true,
-        "interrupted": false,
-        "language": "en",
-        "startedAt": "2026-10-06T14:30:12.800Z",
-        "endedAt": "2026-10-06T14:30:14.100Z"
       }
     ],
     "part": 0,

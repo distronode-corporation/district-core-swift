@@ -51,11 +51,12 @@ could make is byte-identical; what is new is the socket's outbound side.
   server and then nil), written back as an explicit null.
 - `TranscriptRetractedData` carries `epoch` beside `seq` (both null from the website),
   written back as explicit nulls; its initialiser takes the contract's key order.
-- Tests: hand-written frames for the five events in `Tests/TranscriptFrames/`, named as
-  the service's fixtures will be, so the service's own replace them by a file copy. They
-  follow the contract revision with §4.12 Q1 to Q12 (the retraction's `epoch`, no empty
-  opening snapshot, the snapshot's `endedReason`), and `TranscriptFrameTests` checks
-  §4.12's invariants on whatever frames are there.
+- Tests: the service's own fixtures for the five events (six frames, an interim segment
+  among them) in `Tests/TranscriptFrames/`, copied byte for byte from its
+  `contracts/mobile/` set. They follow the contract revision with §4.12 Q1 to Q17 (the
+  retraction's `epoch`, no empty opening snapshot, the snapshot's `endedReason`), and
+  `TranscriptFrameTests` puts each through the strict gate and checks §4.12's invariants
+  on them.
 
 ### Changed
 

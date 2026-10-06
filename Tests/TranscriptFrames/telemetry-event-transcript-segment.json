@@ -1,0 +1,25 @@
+{
+  "workspaceId": "ws_1",
+  "callId": "call_1",
+  "eventType": "transcript_segment",
+  "data": {
+    "v": 1,
+    "callId": "call_1",
+    "segment": {
+      "segmentId": "item_a1",
+      "index": 0,
+      "epoch": 1791297000000,
+      "seq": 1,
+      "rev": 0,
+      "speaker": "agent",
+      "speakerName": "Ava",
+      "text": "Good afternoon, Northside Dental. How can I help?",
+      "final": true,
+      "interrupted": false,
+      "language": "en",
+      "startedAt": "2026-10-06T14:30:03.100Z",
+      "endedAt": "2026-10-06T14:30:06.300Z"
+    }
+  },
+  "timestamp": "2026-10-06T14:30:06.420Z"
+}

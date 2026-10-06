@@ -59,9 +59,14 @@ final class TelemetryResponsesTests: XCTestCase {
     func testEveryKnownEventTypeRoundTripsByName() throws {
         let names = [
             "call_started", "call_updated", "call_ended", "call_ringing", "tool_outcome", "message_received",
-            "message_sent",
+            "message_sent", "transcript_snapshot", "transcript_segment", "transcript_ended", "transcript_retracted",
+            "transcript_error",
         ]
         XCTAssertEqual(TelemetryEventType.known.map(\.wire), names)
+        XCTAssertEqual(TelemetryEventType.known.filter(\.isTranscript).map(\.wire), names.filter {
+            $0.hasPrefix("transcript_")
+        })
+        XCTAssertFalse(TelemetryEventType.unknown("transcript_paused").isTranscript)
         for name in names {
             let decoded = try decode(TelemetryEventType.self, "\"\(name)\"")
             XCTAssertNotEqual(decoded, .unknown(name))

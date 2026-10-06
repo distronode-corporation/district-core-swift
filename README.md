@@ -61,7 +61,7 @@ FoundationNetworking on Linux).
 | `DistrictNetwork` | Every endpoint and path, the API client, error-envelope normalisation and the native sign-in exchanges. The HTTP transport is the `HTTPTransport` protocol, so libcurl and Darwin `URLSession` differences never reach feature code. |
 | `DistrictData` | Repositories and paging over `DistrictNetwork`. |
 | `DistrictCall` | Everything about a call that is not the media SDK or the OS call registry: the `CallEngine` seam, the outbound and inbound state machines and the commands they emit. |
-| `DistrictLive` | The desktop's live updates: the telemetry socket's state machine (`TelemetryConnection`) and the actor that runs it, the Mac's presence (`PresenceController`) and the ring gate (`DesktopRingGate`). The socket is the `TelemetrySocketTransport` protocol and time is the `LiveClock` protocol, so every rule is tested on Linux without a server or a wait; the `URLSessionWebSocketTask` adapter lives in the macOS app. |
+| `DistrictLive` | Live updates: the telemetry socket's state machine (`TelemetryConnection`) and the actor that runs it, with the live transcript's ops; a call's live transcript (`TranscriptReducer`); the Mac's presence (`PresenceController`) and the ring gate (`DesktopRingGate`). The socket is the `TelemetrySocketTransport` protocol and time is the `LiveClock` protocol, so every rule is tested on Linux without a server or a wait; the `URLSessionWebSocketTask` adapter lives in the macOS app. |
 
 The one external dependency is [apple/swift-crypto](https://github.com/apple/swift-crypto),
 pinned `exact:`, for SHA-256 on Linux (and swift-asn1 through it). `Package.resolved` is

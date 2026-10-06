@@ -24,6 +24,10 @@ import Foundation
 ///   (the delegate's `didCloseWith`, or `closeCode` once `receive()` throws), because
 ///   4401 and 4403 are the protocol: one means "mint again", the other "stop".
 ///   A close with no code is 1005.
+/// - ``TelemetrySocket/send(_:)`` sends one text message. ⚠️ Two sends issued one after
+///   the other must reach the server in that order: ``TelemetryConnectionRunner`` waits for
+///   each send to return before starting the next, so an adapter that sends in call order
+///   (as `URLSessionWebSocketTask.send` does) owes nothing more.
 public protocol TelemetrySocketTransport: Sendable {
     /// Open `url`, offering `subprotocols` in order, and return once the handshake
     /// has completed.
@@ -38,6 +42,10 @@ public protocol TelemetrySocket: Sendable {
     /// The next frame. ⚠️ After ``TelemetrySocketFrame/closed(code:reason:)`` the
     /// socket is finished and is not read again; a throw means the connection broke.
     func receive() async throws -> TelemetrySocketFrame
+
+    /// Send one text message (a transcript op, see `DistrictModel.TranscriptClientOp`).
+    /// A throw means the connection broke; the read side reports it.
+    func send(_ text: String) async throws
 
     /// Close with a normal closure (1000) and stop reading. ⚠️ Idempotent, and
     /// called on sockets that may already be closed.

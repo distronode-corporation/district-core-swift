@@ -6,6 +6,45 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+Prepared as **5.0.0**, a major release (see Changed), not yet tagged. Every request 4.0.0
+could make is byte-identical; what is new is the socket's outbound side.
+
+### Added
+
+- The live call transcript (`transcript` v1 on the telemetry socket). In `DistrictModel`:
+  `TelemetryEventType` gains `transcriptSnapshot`, `transcriptSegment`, `transcriptEnded`,
+  `transcriptRetracted` and `transcriptError` (and `isTranscript`);
+  `TelemetryEnvelope.transcriptEvent` reads their `data` into `TranscriptEvent`
+  (`TranscriptSnapshotData`, `TranscriptSegmentData`, `TranscriptEndedData`,
+  `TranscriptRetractedData`, `TranscriptErrorData`, with `TranscriptSegment`), refusing a
+  `v` other than 1 and data whose `callId` disagrees with the envelope's. The speaker, end
+  reason, retract reason and error code are open vocabularies (`.other` keeps an unknown
+  name), unknown `data` keys are ignored, and a segment's text is left out of every
+  printed form. `TranscriptClientOp` writes the three client ops
+  (`transcript.subscribe`, `transcript.unsubscribe`, `socket.mode`), refusing a call id
+  outside `[A-Za-z0-9_-]{1,64}`.
+- In `DistrictLive`: `TelemetryConnection` (and `TelemetryConnectionRunner`) keep a set of
+  transcript subscriptions and send them again on every open, renewals included, after a
+  `socket.mode` when built with `broadcast: false`; new events
+  `subscribeTranscript`/`unsubscribeTranscript`/`resubscribeTranscript`, a new command
+  `send`, and the runner's three matching methods. `TranscriptReducer` is the contract's
+  client algorithm for one call as a pure state machine: stale and duplicate frames by
+  `seq` per epoch (with late frames filling gaps rather than being dropped), revisions,
+  `(epoch, index)` order, gap detection with a re-subscribe after 2 s, snapshots in parts
+  replacing the state, retraction with tombstones, the end, and fetching the full
+  transcript with backoff until it is written.
+- Tests: hand-written frames for the five events in `Tests/TranscriptFrames/`, named as
+  the service's fixtures will be, so the service's own replace them by a file copy.
+
+### Changed
+
+- ⚠️ Source-breaking: `TelemetryEventType` gains five cases, so an exhaustive `switch`
+  over it needs them (district-macos has none; `DesktopRingGate`'s own is updated).
+  `TelemetrySocket` gains a requirement, `send(_:)`, which district-macos's
+  `URLSessionTelemetrySocket` must implement; `TelemetryConnectionEvent` and
+  `TelemetryConnectionCommand` gain cases. That makes this release a major version.
+- CI's floor on the number of tests run rises from 1850 to 1960.
+
 ## [4.0.0] - 2026-10-05
 
 A major release for one reason: `DistrictSection` gains a case (below). Every request

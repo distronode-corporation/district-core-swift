@@ -159,6 +159,12 @@ final class FakeSocket: TelemetrySocket, @unchecked Sendable {
     private let frames = Scripted<Result<TelemetrySocketFrame, FakeFailure>>()
     private let lock = NSLock()
     private var closedCount = 0
+    private var sentTexts: [String] = []
+    /// When set, the next send waits for ``releaseSend()`` before it is recorded: how a
+    /// test proves the runner waits for one send before starting the next.
+    private var gate: CheckedContinuation<Void, Never>?
+    private var holdNextSend = false
+    private var failSends = false
 
     init(selected: String? = TelemetryProtocol.subprotocol) {
         selectedSubprotocol = selected
@@ -166,6 +172,51 @@ final class FakeSocket: TelemetrySocket, @unchecked Sendable {
 
     var isClosed: Bool {
         lock.withLock { closedCount > 0 }
+    }
+
+    /// Every text sent, in the order it was sent.
+    var sent: [String] {
+        lock.withLock { sentTexts }
+    }
+
+    /// Hold the next send until ``releaseSend()``.
+    func holdSends() {
+        lock.withLock { holdNextSend = true }
+    }
+
+    var isHoldingASend: Bool {
+        lock.withLock { gate != nil }
+    }
+
+    func releaseSend() {
+        let held: CheckedContinuation<Void, Never>? = lock.withLock {
+            defer { gate = nil }
+            return gate
+        }
+        held?.resume()
+    }
+
+    /// Make every send throw, as a broken socket's does.
+    func breakSends() {
+        lock.withLock { failSends = true }
+    }
+
+    func send(_ text: String) async throws {
+        let hold = lock.withLock {
+            defer { holdNextSend = false }
+            return holdNextSend
+        }
+        if hold {
+            await withCheckedContinuation { continuation in
+                lock.withLock { gate = continuation }
+            }
+        }
+        try lock.withLock {
+            if failSends {
+                throw FakeFailure.broken
+            }
+            sentTexts.append(text)
+        }
     }
 
     var readers: Int {

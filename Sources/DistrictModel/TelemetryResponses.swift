@@ -104,13 +104,45 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     case messageReceived
     /// `message_sent`: a message was sent from the workspace.
     case messageSent
+    /// `transcript_snapshot`: the live transcript of a call so far, in reply to a
+    /// `transcript.subscribe`. See ``TranscriptSnapshotData``.
+    case transcriptSnapshot
+    /// `transcript_segment`: one new or updated line of a live transcript. See
+    /// ``TranscriptSegmentData``.
+    case transcriptSegment
+    /// `transcript_ended`: the assistant stopped transcribing the call. See
+    /// ``TranscriptEndedData``.
+    case transcriptEnded
+    /// `transcript_retracted`: lines that must come off every screen. See
+    /// ``TranscriptRetractedData``.
+    case transcriptRetracted
+    /// `transcript_error`: a transcript op could not be honoured. See
+    /// ``TranscriptErrorData``.
+    case transcriptError
     /// A name this client does not know, kept as it was sent.
     case unknown(String)
 
-    /// The seven names this client knows, for a table-driven test.
+    /// The twelve names this client knows, for a table-driven test.
+    ///
+    /// ⚠️ THE FIVE `transcript_*` NAMES REACH ONLY A SOCKET THAT SUBSCRIBED TO THAT CALL
+    /// (`transcript.subscribe`, see ``TranscriptClientOp``). The server never relays them
+    /// to the whole workspace, so a client that never subscribes never sees one.
     public static let known: [TelemetryEventType] = [
         .callStarted, .callUpdated, .callEnded, .callRinging, .toolOutcome, .messageReceived, .messageSent,
+        .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted, .transcriptError,
     ]
+
+    /// Whether this is one of the five `transcript_*` events, which belong to one call's
+    /// subscription rather than to the workspace.
+    public var isTranscript: Bool {
+        switch self {
+        case .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted, .transcriptError:
+            true
+        case .callStarted, .callUpdated, .callEnded, .callRinging, .toolOutcome, .messageReceived, .messageSent,
+             .unknown:
+            false
+        }
+    }
 
     /// Read a wire name.
     public init(wire: String) {
@@ -127,6 +159,11 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
         case .toolOutcome: "tool_outcome"
         case .messageReceived: "message_received"
         case .messageSent: "message_sent"
+        case .transcriptSnapshot: "transcript_snapshot"
+        case .transcriptSegment: "transcript_segment"
+        case .transcriptEnded: "transcript_ended"
+        case .transcriptRetracted: "transcript_retracted"
+        case .transcriptError: "transcript_error"
         case let .unknown(name): name
         }
     }
@@ -159,6 +196,9 @@ extension TelemetryEventType: Codable {
 /// row carries or invent ones the projection never sent. The typed reads the
 /// desktop needs are the accessors below, each answering nil for a shape that
 /// does not carry its key.
+///
+/// ⚠️ THE FIVE `transcript_*` EVENTS DO HAVE ONE SHAPE EACH, and
+/// ``transcriptEvent`` reads them into types (`TranscriptEvents.swift`).
 ///
 /// ⛔ CUSTOMER DATA. A call row carries the caller's number and name, a summary
 /// and a transcript, so `description` and the mirror leave ``data`` out.

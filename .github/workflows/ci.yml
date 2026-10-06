@@ -169,11 +169,12 @@ jobs:
       # no other failure. The floor is a ratchet, set a little below the count (1828 on
       # 2026-10-03; about 1759 after the recording removal, which deleted 71 tests with
       # the retired recording, storage, notetaker, booking notes and transcript surfaces
-      # and added 2; about 1867 with the Voice Studio's 108): raise it when tests are added,
-      # and lower it only in the commit that deletes tests on purpose, saying so.
+      # and added 2; about 1867 with the Voice Studio's 108; 2013 with the live
+      # transcript's 99): raise it when tests are added, and lower it only in the commit
+      # that deletes tests on purpose, saying so.
       - name: Tests were discovered
         run: |
-          minimum=1850
+          minimum=1980
           executed=$(sed -n 's/.*Executed \([0-9]*\) test.*/\1/p' swift-test.log | sort -n | tail -1)
           echo "unit tests executed - ${executed:-0} (at least $minimum expected)"
           if [ -z "$executed" ] || [ "$executed" -lt "$minimum" ]; then

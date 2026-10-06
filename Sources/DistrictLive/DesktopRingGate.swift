@@ -89,7 +89,10 @@ public struct DesktopRingGate: Sendable, Equatable {
         case .callUpdated:
             guard let status = envelope.callStatus, !Self.answerableStatuses.contains(status) else { return [] }
             return end(envelope, reason: .noLongerAnswerable(status: status))
-        case .callStarted, .toolOutcome, .messageReceived, .messageSent, .unknown:
+        // ⚠️ THE `transcript_*` EVENTS NEVER RING: they reach only a socket that subscribed
+        // to a call, and say nothing about who should answer it.
+        case .callStarted, .toolOutcome, .messageReceived, .messageSent, .transcriptSnapshot, .transcriptSegment,
+             .transcriptEnded, .transcriptRetracted, .transcriptError, .unknown:
             return []
         }
     }

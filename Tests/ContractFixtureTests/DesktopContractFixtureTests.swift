@@ -130,7 +130,9 @@ final class DesktopContractFixtureTests: XCTestCase {
                 false
             }
         })
-        XCTAssertEqual(Set(types), Set(TelemetryEventType.known))
+        // ⚠️ THE SEVEN WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
+        // not relayed, and their frames are checked by `TranscriptFrameTests`.
+        XCTAssertEqual(Set(types), Set(TelemetryEventType.known.filter { !$0.isTranscript }))
     }
 
     /// ⚠️ FOR A MESSAGE EVENT THE ENVELOPE'S `callId` IS THE MESSAGE ID.

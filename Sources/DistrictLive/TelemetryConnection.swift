@@ -92,6 +92,17 @@ public enum TelemetryConnectionEvent: Sendable, Equatable {
     /// Reading the socket threw: the connection broke.
     case broken(reason: String, attempt: Int)
     case timerFired(TelemetryTimer, attempt: Int)
+    /// Receive `callId`'s live transcript on this connection, now and after every
+    /// reconnect, until ``unsubscribeTranscript(callId:)``.
+    case subscribeTranscript(callId: String)
+    /// Stop receiving `callId`'s live transcript.
+    case unsubscribeTranscript(callId: String)
+    /// Ask again for `callId`'s transcript, which brings a fresh snapshot: how a client
+    /// heals a gap. Nothing for a call that is not subscribed. ⚠️ The server answers a
+    /// duplicate subscribe with a fresh snapshot every time; it does not add to the five
+    /// subscriptions a socket may hold, but it is an op, counted against 20 per 10 s and
+    /// 120 per minute, so `TranscriptReducer` keeps one in flight per call.
+    case resubscribeTranscript(callId: String)
 }
 
 /// What a connection asks its driver to do.
@@ -106,6 +117,8 @@ public enum TelemetryConnectionCommand: Sendable, Equatable {
     /// Arm `timer`, replacing any pending one of the same kind.
     case schedule(TelemetryTimer, afterMilliseconds: Int64, attempt: Int)
     case cancelTimers
+    /// Send `text` on `attempt`'s socket, after every send issued before it.
+    case send(String, attempt: Int)
     case emit(TelemetryUpdate)
     /// The connection has ended; release everything.
     case finish
@@ -133,6 +146,10 @@ public enum TelemetryConnectionCommand: Sendable, Equatable {
 ///   that stayed open 30 s resets the count.
 /// - A credential with more than the renewal lead left is reused on reconnect;
 ///   only a refused or expiring one is replaced.
+/// - ⛔ EVERY OPEN RE-SENDS THE CONNECTION'S OPS, because the server keeps them per socket:
+///   `socket.mode` first when ``broadcast`` is false, then a `transcript.subscribe` for
+///   every subscribed call, in call-id order. A renewal is an open like any other, so a
+///   transcript survives the socket being replaced every fifteen minutes.
 public struct TelemetryConnection: Sendable, Equatable {
     /// Where the connection is.
     public enum Phase: Sendable, Equatable {
@@ -146,6 +163,15 @@ public struct TelemetryConnection: Sendable, Equatable {
     }
 
     public let workspaceId: String
+
+    /// Whether this socket takes the workspace-wide `call_*` and `message_*` relay. ⚠️ The
+    /// server's default is true; false is sent as `socket.mode` on every open. A client
+    /// that wants only transcripts (the phone) says false; one that rings (the Mac) must not.
+    public let broadcast: Bool
+
+    /// The calls whose live transcript this connection receives.
+    public private(set) var transcriptSubscriptions: Set<String> = []
+
     public private(set) var phase: Phase = .idle
 
     /// The attempt every command is currently issued for. See the ⚠️ on
@@ -158,8 +184,9 @@ public struct TelemetryConnection: Sendable, Equatable {
     /// The credential the last socket used, kept while it has time left.
     private var token: TelemetryTokenResponse?
 
-    public init(workspaceId: String) {
+    public init(workspaceId: String, broadcast: Bool = true) {
         self.workspaceId = workspaceId
+        self.broadcast = broadcast
     }
 
     /// Apply one event at `now` (epoch milliseconds).
@@ -200,7 +227,43 @@ public struct TelemetryConnection: Sendable, Equatable {
         case let .timerFired(timer, attempt):
             guard attempt == self.attempt else { return [] }
             return timerFired(timer, now: now, jitter: jitter)
+        case let .subscribeTranscript(callId):
+            return subscribe(callId)
+        case let .unsubscribeTranscript(callId):
+            guard transcriptSubscriptions.remove(callId) != nil else { return [] }
+            return sendIfOpen(.unsubscribe(callId: callId))
+        case let .resubscribeTranscript(callId):
+            guard transcriptSubscriptions.contains(callId) else { return [] }
+            return sendIfOpen(.subscribe(callId: callId))
         }
+    }
+
+    // MARK: - Transcript ops
+
+    /// ⚠️ A CALL ID THE SERVER WOULD REFUSE IS NOT RECORDED, so it is never re-sent on
+    /// every open only to earn a `bad_request` each time.
+    private mutating func subscribe(_ callId: String) -> [TelemetryConnectionCommand] {
+        guard TranscriptClientOp.isValidCallId(callId), !transcriptSubscriptions.contains(callId) else { return [] }
+        transcriptSubscriptions.insert(callId)
+        return sendIfOpen(.subscribe(callId: callId))
+    }
+
+    /// While closed, nothing is sent: the next open sends every subscription.
+    private func sendIfOpen(_ op: TranscriptClientOp) -> [TelemetryConnectionCommand] {
+        guard case .open = phase else { return [] }
+        return send(op)
+    }
+
+    /// ⚠️ THE FORCE IS SAFE: an op's text is nil only for an invalid call id, and none
+    /// reaches here (``subscribe(_:)`` refuses one before it is recorded).
+    private func send(_ op: TranscriptClientOp) -> [TelemetryConnectionCommand] {
+        [.send(op.text!, attempt: attempt)]
+    }
+
+    /// What every open sends: the socket's mode, then each subscription.
+    private func opsOnOpen() -> [TelemetryConnectionCommand] {
+        let mode = broadcast ? [] : send(.socketMode(broadcast: false))
+        return mode + transcriptSubscriptions.sorted().flatMap { send(.subscribe(callId: $0)) }
     }
 
     // MARK: - Transitions
@@ -262,7 +325,7 @@ public struct TelemetryConnection: Sendable, Equatable {
                 attempt: attempt
             ),
             .schedule(.silence, afterMilliseconds: TelemetryProtocol.silenceLimitMilliseconds, attempt: attempt),
-        ]
+        ] + opsOnOpen()
     }
 
     private mutating func received(

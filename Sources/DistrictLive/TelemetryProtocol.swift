@@ -16,8 +16,12 @@ import Foundation
 ///    does not serve the workspace's region.
 /// 4. While open, the server relays every event for the workspace as one text
 ///    message, pings every thirty seconds, re-checks the membership and the session
-///    every sixty, and closes with 4401 once the credential has expired. It reads
-///    nothing the client sends.
+///    every sixty, and closes with 4401 once the credential has expired.
+/// 5. The client may send three ops as text messages (`DistrictModel.TranscriptClientOp`):
+///    subscribe to one call's live transcript, unsubscribe, and `socket.mode` to stop
+///    the workspace-wide relay. The server keeps them per socket, so they are sent again
+///    on every open (see ``TelemetryConnection``). A refused op is answered with a
+///    `transcript_error` event; the socket stays open.
 ///
 /// Ported from the Linux desktop client's `district-live` crate, behaviour for
 /// behaviour, with one deliberate change noted on ``backoffMilliseconds(failures:jitter:)``.

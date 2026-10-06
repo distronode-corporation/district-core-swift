@@ -127,7 +127,9 @@ every pull request, and uses no secrets:
   dependency with a known moderate-or-worse vulnerability or a licence this package cannot
   ship, compared after the snapshot above has landed.
 
-[`codeql.yml`](.github/workflows/codeql.yml) and
+[`codeql.yml`](.github/workflows/codeql.yml) (the workflows, on every pull request),
+[`codeql-swift.yml`](.github/workflows/codeql-swift.yml) (the library targets, on pushes to
+`main` that change them, weekly and on demand) and
 [`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard.
 
 ## Changing the core

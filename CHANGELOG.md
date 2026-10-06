@@ -6,8 +6,10 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
-Prepared as **5.0.0**, a major release (see Changed), not yet tagged. Every request 4.0.0
-could make is byte-identical; what is new is the socket's outbound side.
+## [5.0.0] - 2026-10-06
+
+A major release (see Changed). Every request 4.0.0 could make is byte-identical; what is
+new is the socket's outbound side.
 
 ### Added
 

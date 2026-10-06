@@ -43,14 +43,16 @@ final class TranscriptReducerSnapshotTests: XCTestCase {
         XCTAssertEqual(reducer.phase, .subscribing)
     }
 
-    /// §4.12 Q6: `live`, `complete`, `epoch` and `lastSeq` are identical on every part. A
-    /// part that disagrees, or one with no part 0 before it, breaks the snapshot.
+    /// §4.12 Q6: `live`, `endedReason`, `complete`, `epoch` and `lastSeq` are identical on
+    /// every part. A part that disagrees, or one with no part 0 before it, breaks the
+    /// snapshot.
     func testAPartWhoseHeaderChangedOrWithNoPartZeroBreaksTheSnapshot() {
         let changes: [TranscriptEvent] = [
             Frames.snapshot([two], lastSeq: 3, part: 1),
             Frames.snapshot([two], lastSeq: 2, live: false, part: 1),
             Frames.snapshot([two], lastSeq: 2, complete: false, part: 1),
             Frames.snapshot([two], epoch: Frames.epoch + 1, lastSeq: 2, part: 1),
+            Frames.snapshot([two], lastSeq: 2, endedReason: .agentError, part: 1),
         ]
         for change in changes {
             var reducer = TranscriptReducer(callId: "call_1")
@@ -124,20 +126,53 @@ final class TranscriptReducerSnapshotTests: XCTestCase {
 
     // MARK: - What a snapshot says
 
-    /// ⛔ D3: A SNAPSHOT THAT DOES NOT REACH BACK TO THE FIRST LINE SAYS SO. With no epoch
-    /// it sets no mark, so the next epoch counts from 0.
-    func testAnIncompleteSnapshotIsReportedAndOneWithNoEpochSetsNoMark() {
+    /// ⛔ D3: A SNAPSHOT THAT DOES NOT REACH BACK TO THE FIRST LINE SAYS SO.
+    func testAnIncompleteSnapshotIsReported() {
         var reducer = TranscriptReducer(callId: "call_1")
         XCTAssertTrue(reducer.complete)
 
-        _ = reducer.apply(Frames.snapshot([], epoch: nil, lastSeq: nil, complete: false), atMilliseconds: t0)
+        _ = reducer.apply(Frames.snapshot([one], lastSeq: 1, complete: false), atMilliseconds: t0)
 
         XCTAssertFalse(reducer.complete)
         XCTAssertEqual(reducer.phase, .live)
+    }
+
+    /// ⛔ §4.12 Q12: AFTER AN `all: true` PURGE THE SNAPSHOT HAS NO BASELINE. The state and the
+    /// missing set are cleared, and the next frame of any epoch sets that epoch's mark with
+    /// no earlier seq counted missing; after it, a skip is a gap again.
+    func testAPurgedSnapshotLetsTheNextFrameOfAnyEpochSetTheBaseline() {
+        var reducer = Frames.liveReducer()
+        _ = reducer.apply(Frames.live(Frames.segment("s4", index: 3, seq: 4)), atMilliseconds: t0)
+        _ = reducer.apply(Frames.retracted(all: true), atMilliseconds: t0)
+        reducer.reconnected()
+
+        _ = reducer.apply(Frames.snapshot([], epoch: nil, lastSeq: nil, complete: false), atMilliseconds: t0)
+        XCTAssertTrue(reducer.lines.isEmpty)
+        XCTAssertFalse(reducer.complete)
+        XCTAssertEqual(reducer.phase, .live)
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 5000), [], "the old gap went with the state")
+
+        let s9 = Frames.segment("s9", index: 8, seq: 9)
+        XCTAssertEqual(reducer.apply(Frames.live(s9), atMilliseconds: t0), [], "seq 9 sets the mark")
+        let n5 = Frames.segment("n5", index: 4, seq: 5, epoch: Frames.epoch + 60000)
+        XCTAssertEqual(reducer.apply(Frames.live(n5), atMilliseconds: t0), [], "so does another epoch's first")
+        XCTAssertEqual(reducer.lines, [s9, n5])
         XCTAssertEqual(
-            reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0),
-            [.checkGap(afterMilliseconds: 2000)]
+            reducer.apply(Frames.live(Frames.segment("s11", index: 10, seq: 11)), atMilliseconds: t0),
+            [.checkGap(afterMilliseconds: 2000)],
+            "after the mark, seq 10 is missing"
         )
+    }
+
+    /// A snapshot with a baseline ends the purge: an epoch first seen after it counts from 0.
+    func testASnapshotWithAnEpochEndsThePurge() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        _ = reducer.apply(Frames.snapshot([], epoch: nil, lastSeq: nil, complete: false), atMilliseconds: t0)
+        reducer.reconnected()
+        _ = reducer.apply(Frames.snapshot([one], lastSeq: 1), atMilliseconds: t0)
+
+        let n3 = Frames.segment("n3", index: 2, seq: 3, epoch: Frames.epoch + 60000)
+        XCTAssertEqual(reducer.apply(Frames.live(n3), atMilliseconds: t0), [.checkGap(afterMilliseconds: 2000)])
     }
 
     /// ⛔ §4.12 Q7: `lastSeq` COVERS THE SNAPSHOT'S EPOCH ONLY, AND OLDER EPOCHS ARE CLOSED.

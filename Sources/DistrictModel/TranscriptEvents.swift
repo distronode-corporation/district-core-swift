@@ -157,21 +157,27 @@ public struct TranscriptSegmentData: Codable, Sendable, Equatable {
 ///
 /// ⚠️ A CLIENT REPLACES ITS STATE FOR THE CALL WITH THE UNION OF THE PARTS once the part
 /// with ``more`` false has arrived, and not before. The parts arrive back to back, with no
-/// other frame between them, and ``live``, ``complete``, ``epoch`` and ``lastSeq`` repeat,
-/// identical, on every one.
+/// other frame between them, and ``live``, ``endedReason``, ``complete``, ``epoch`` and
+/// ``lastSeq`` repeat, identical, on every one.
 public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
     /// The `transcript` payload version (`v` on the wire).
     public let version: Int
     public let callId: String
     /// False once the transcript has ended (a `transcript_ended` is buffered). ⚠️ It does
-    /// not say why: after `agent_error` a fresh assistant may still follow.
+    /// not say why; ``endedReason`` does.
     public let live: Bool
+    /// Why the buffered transcript ended: nil while ``live``. ⚠️ `agent_error` with `live`
+    /// false is the wait for a fresh assistant ("reconnecting"), not an end. Absent from a
+    /// server older than the contract's §4.12 Q9, and then nil.
+    public let endedReason: TranscriptEndReason?
     /// False when the server's memory does not reach back to the call's first line (it
     /// started, or evicted lines, after the call began). The earlier lines appear in the
     /// full transcript after the call, and a client says so.
     public let complete: Bool
     /// The epoch ``lastSeq`` belongs to: the newest the server holds. Segments of older
-    /// epochs may be included for display; those epochs are closed.
+    /// epochs may be included for display; those epochs are closed. ⚠️ Nil with ``lastSeq``
+    /// only after an `all: true` retraction emptied the server's memory of the call (§4.12
+    /// Q12): no baseline, so the next frame of any epoch sets one.
     public let epoch: Int64?
     /// The high-water mark of ``epoch`` this snapshot includes, and of no other epoch.
     /// ⚠️ Never an empty `0`: the server holds a subscribe until the first line exists.
@@ -188,6 +194,7 @@ public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
         version: Int,
         callId: String,
         live: Bool,
+        endedReason: TranscriptEndReason?,
         complete: Bool,
         epoch: Int64?,
         lastSeq: Int?,
@@ -198,6 +205,7 @@ public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
         self.version = version
         self.callId = callId
         self.live = live
+        self.endedReason = endedReason
         self.complete = complete
         self.epoch = epoch
         self.lastSeq = lastSeq
@@ -208,7 +216,7 @@ public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case version = "v"
-        case callId, live, complete, epoch, lastSeq, segments, part, more
+        case callId, live, endedReason, complete, epoch, lastSeq, segments, part, more
     }
 
     /// ⚠️ BY HAND, for the explicit nulls; see ``TranscriptSegment/encode(to:)``.
@@ -217,6 +225,7 @@ public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
         try container.encode(version, forKey: .version)
         try container.encode(callId, forKey: .callId)
         try container.encode(live, forKey: .live)
+        try container.encode(endedReason, forKey: .endedReason)
         try container.encode(complete, forKey: .complete)
         try container.encode(epoch, forKey: .epoch)
         try container.encode(lastSeq, forKey: .lastSeq)

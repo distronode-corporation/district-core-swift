@@ -77,22 +77,44 @@ final class TranscriptEventsTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(TranscriptSegment.self, from: Data(interimText.utf8)), interim)
     }
 
+    /// The §4.12 Q12 purge: no baseline, and `endedReason` null while live.
     func testASnapshotIsReadWithItsNullBaseline() throws {
         let read = try envelope("transcript_snapshot", data: """
-        {"v":1,"callId":"call_1","live":true,"complete":false,"epoch":null,"lastSeq":null,"segments":[],\
-        "part":0,"more":false}
+        {"v":1,"callId":"call_1","live":true,"endedReason":null,"complete":false,"epoch":null,"lastSeq":null,\
+        "segments":[],"part":0,"more":false}
         """).transcriptEvent
 
         let expected = TranscriptSnapshotData(
-            version: 1, callId: "call_1", live: true, complete: false, epoch: nil, lastSeq: nil, segments: [], part: 0,
-            more: false
+            version: 1, callId: "call_1", live: true, endedReason: nil, complete: false, epoch: nil, lastSeq: nil,
+            segments: [], part: 0, more: false
         )
         XCTAssertEqual(read, .snapshot(expected))
         XCTAssertEqual(
             try encodeSorted(expected),
-            #"{"callId":"call_1","complete":false,"epoch":null,"lastSeq":null,"live":true,"more":false,"#
-                + #""part":0,"segments":[],"v":1}"#
+            #"{"callId":"call_1","complete":false,"endedReason":null,"epoch":null,"lastSeq":null,"live":true,"#
+                + #""more":false,"part":0,"segments":[],"v":1}"#
         )
+    }
+
+    /// §4.12 Q9: a snapshot that is not live says why, from the same vocabulary as
+    /// `transcript_ended`; one from a server older than Q9 has no key, read as nil.
+    func testASnapshotSaysWhyItIsNotLive() throws {
+        for (wire, reason) in [
+            ("agent_error", TranscriptEndReason.agentError), ("call_ended", .callEnded), ("handed_off", .handedOff),
+        ] {
+            let read = try envelope("transcript_snapshot", data: """
+            {"v":1,"callId":"call_1","live":false,"endedReason":"\(wire)","complete":true,"epoch":1,"lastSeq":2,\
+            "segments":[],"part":0,"more":false}
+            """).transcriptEvent
+            guard case let .snapshot(data)? = read else { return XCTFail(wire) }
+            XCTAssertEqual(data.endedReason, reason, wire)
+            XCTAssertTrue(try encodeSorted(data).contains(#""endedReason":"\#(wire)""#), wire)
+        }
+        let older = try envelope("transcript_snapshot", data: """
+        {"v":1,"callId":"call_1","live":false,"complete":true,"epoch":1,"lastSeq":2,"segments":[],"part":0,"more":false}
+        """).transcriptEvent
+        guard case let .snapshot(data)? = older else { return XCTFail("not read") }
+        XCTAssertNil(data.endedReason)
     }
 
     func testAnEndIsReadWithEveryReason() throws {
@@ -254,8 +276,8 @@ final class TranscriptEventsTests: XCTestCase {
     func testTheTextIsLeftOutOfEverythingPrintable() throws {
         let segment = try JSONDecoder().decode(TranscriptSegment.self, from: Data(callerSegmentJSON.utf8))
         let snapshot = TranscriptSnapshotData(
-            version: 1, callId: "call_1", live: true, complete: true, epoch: epoch, lastSeq: 2, segments: [segment],
-            part: 0, more: false
+            version: 1, callId: "call_1", live: true, endedReason: nil, complete: true, epoch: epoch, lastSeq: 2,
+            segments: [segment], part: 0, more: false
         )
         let event = TranscriptEvent.snapshot(snapshot)
         var dumped = ""

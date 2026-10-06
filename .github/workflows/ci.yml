@@ -169,8 +169,8 @@ jobs:
       # no other failure. The floor is a ratchet, set a little below the count (1828 on
       # 2026-10-03; about 1759 after the recording removal, which deleted 71 tests with
       # the retired recording, storage, notetaker, booking notes and transcript surfaces
-      # and added 2; about 1867 with the Voice Studio's 108; 2006 with the live
-      # transcript's 92): raise it when tests are added, and lower it only in the commit
+      # and added 2; about 1867 with the Voice Studio's 108; 2013 with the live
+      # transcript's 99): raise it when tests are added, and lower it only in the commit
       # that deletes tests on purpose, saying so.
       - name: Tests were discovered
         run: |

@@ -39,11 +39,14 @@ enum Frames {
         .segment(TranscriptSegmentData(version: 1, callId: callId, segment: segment))
     }
 
+    /// ⚠️ `endedReason` DEFAULTS TO NIL, which a live snapshot always carries; a test of a
+    /// not-live one with no reason is about a server older than §4.12 Q9.
     static func snapshot(
         _ segments: [TranscriptSegment],
         epoch: Int64? = epoch,
         lastSeq: Int?,
         live: Bool = true,
+        endedReason: TranscriptEndReason? = nil,
         complete: Bool = true,
         part: Int = 0,
         more: Bool = false
@@ -52,6 +55,7 @@ enum Frames {
             version: 1,
             callId: callId,
             live: live,
+            endedReason: endedReason,
             complete: complete,
             epoch: epoch,
             lastSeq: lastSeq,

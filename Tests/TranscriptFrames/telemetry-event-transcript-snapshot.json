@@ -6,6 +6,7 @@
     "v": 1,
     "callId": "call_1",
     "live": true,
+    "endedReason": null,
     "complete": true,
     "epoch": 1791297000000,
     "lastSeq": 4,

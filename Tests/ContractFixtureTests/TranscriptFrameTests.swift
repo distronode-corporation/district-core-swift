@@ -54,7 +54,7 @@ final class TranscriptFrameTests: XCTestCase {
             let data = try XCTUnwrap(object["data"] as? [String: Any])
             let count = try XCTUnwrap(data["segments"] as? [Any]).count
             let segments = (0 ..< count).flatMap { index in segmentKeys.map { "$.data.segments[\(index)].\($0)" } }
-            return Set(segments + ["$.data.epoch", "$.data.lastSeq"])
+            return Set(segments + ["$.data.endedReason", "$.data.epoch", "$.data.lastSeq"])
         case .transcriptEnded:
             return ["$.data.lastIndex"]
         case .transcriptRetracted:
@@ -175,6 +175,13 @@ final class TranscriptFrameTests: XCTestCase {
                 XCTAssertEqual(data.epoch == nil, data.lastSeq == nil, name)
                 XCTAssertNotEqual(data.lastSeq, 0, name)
                 XCTAssertTrue(data.segments.allSatisfy { $0.epoch <= data.epoch ?? $0.epoch }, name)
+                // Q9: a reason exactly when not live.
+                XCTAssertEqual(data.endedReason == nil, data.live, name)
+                // Q12: no mark only after a purge, which leaves nothing and says so.
+                if data.epoch == nil {
+                    XCTAssertTrue(data.segments.isEmpty, name)
+                    XCTAssertFalse(data.complete, name)
+                }
             case let .retracted(data)?:
                 // Q2: `epoch` whenever `seq`.
                 XCTAssertEqual(data.epoch == nil, data.seq == nil, name)

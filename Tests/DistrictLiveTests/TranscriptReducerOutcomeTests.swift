@@ -134,35 +134,32 @@ final class TranscriptReducerOutcomeTests: XCTestCase {
 
     // MARK: - Call-status signals
 
-    /// ⛔ §4.12 Q4: `not_live` IS FINAL FOR THAT SUBSCRIBE. Only a call-status change
-    /// subscribes again, once per change; a repeated status asks for nothing, and so does
-    /// one while the transcript is anything but `not_live`.
-    func testOnlyAStatusChangeSubscribesAgainAfterNotLive() {
+    /// ⛔ §4.12 Q4 AND Q10: `not_live` IS FINAL FOR THAT SUBSCRIBE. Only a signal that shows
+    /// the call in progress subscribes again, and at most once per 30 s per call; one while
+    /// the transcript is anything but `not_live` asks for nothing.
+    func testOnlyAnInProgressSignalSubscribesAgainAtMostEveryThirtySeconds() {
         var reducer = TranscriptReducer(callId: "call_1")
-        XCTAssertEqual(reducer.callStatusChanged(to: "ringing"), [], "subscribing: nothing to do")
+        XCTAssertEqual(reducer.callShownInProgress(atMilliseconds: t0), [], "subscribing: nothing to do")
         _ = reducer.apply(Frames.error(.notLive), atMilliseconds: t0)
 
-        XCTAssertEqual(reducer.callStatusChanged(to: "ringing"), [], "the same status is no signal")
-        XCTAssertEqual(reducer.phase, .unavailable(.notLive))
-        XCTAssertEqual(reducer.callStatusChanged(to: "in-progress"), [.subscribe])
+        XCTAssertEqual(reducer.callShownInProgress(atMilliseconds: t0), [.subscribe], "the first may go at once")
         XCTAssertEqual(reducer.phase, .subscribing)
         XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0), [])
+        _ = reducer.apply(Frames.error(.notLive), atMilliseconds: t0 + 30000)
+        XCTAssertEqual(reducer.callShownInProgress(atMilliseconds: t0 + 29999), [], "not within 30 s of the last")
+        XCTAssertEqual(reducer.phase, .unavailable(.notLive))
+        XCTAssertEqual(reducer.callShownInProgress(atMilliseconds: t0 + 30000), [.subscribe])
 
-        _ = reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 1), atMilliseconds: t0)
+        _ = reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 1), atMilliseconds: t0 + 30100)
         XCTAssertEqual(reducer.phase, .live)
-        XCTAssertEqual(reducer.callStatusChanged(to: "on-hold"), [], "live: nothing to do")
+        XCTAssertEqual(reducer.callShownInProgress(atMilliseconds: t0 + 90000), [], "live: nothing to do")
     }
 
-    /// The first status reported is a signal too, when the subscribe already ended in
-    /// `not_live`; another refusal is not undone by any status.
-    func testTheFirstStatusIsASignalAndOtherRefusalsStay() {
-        var notLive = TranscriptReducer(callId: "call_1")
-        _ = notLive.apply(Frames.error(.notLive), atMilliseconds: t0)
-        XCTAssertEqual(notLive.callStatusChanged(to: "in-progress"), [.subscribe])
-
+    /// Another refusal is not undone by any signal.
+    func testAnotherRefusalIsNotUndoneByASignal() {
         var refused = TranscriptReducer(callId: "call_1")
         _ = refused.apply(Frames.error(.forbiddenRole), atMilliseconds: t0)
-        XCTAssertEqual(refused.callStatusChanged(to: "in-progress"), [])
+        XCTAssertEqual(refused.callShownInProgress(atMilliseconds: t0), [])
         XCTAssertEqual(refused.phase, .unavailable(.forbiddenRole))
     }
 

@@ -100,16 +100,19 @@ final class TranscriptReducerEndTests: XCTestCase {
         XCTAssertEqual(reducer.phase, .ended(.callEnded))
     }
 
-    /// ⚠️ A SNAPSHOT THAT SAYS ONLY "NOT LIVE" FOR THE FAILED EPOCH keeps the screen
-    /// reconnecting (it carries no reason); one that is live with a newer epoch is the
-    /// fresh assistant.
+    /// ⛔ §4.12 Q9: A SNAPSHOT TAKEN AFTER `agent_error` SAYS SO (`live: false`,
+    /// `endedReason: agent_error`) and the screen keeps reconnecting; one that is live with
+    /// a newer epoch is the fresh assistant.
     func testASnapshotWhileReconnecting() {
         var reducer = Frames.liveReducer()
         _ = reducer.apply(Frames.ended(seq: 2, reason: .agentError), atMilliseconds: t0)
 
         reducer.reconnected()
         XCTAssertEqual(
-            reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 2, live: false), atMilliseconds: t0),
+            reducer.apply(
+                Frames.snapshot([Frames.greeting], lastSeq: 2, live: false, endedReason: .agentError),
+                atMilliseconds: t0
+            ),
             []
         )
         XCTAssertEqual(reducer.phase, .reconnecting)
@@ -123,14 +126,17 @@ final class TranscriptReducerEndTests: XCTestCase {
         XCTAssertEqual(reducer.phase, .live)
     }
 
-    /// While reconnecting, a "not live" snapshot of a newer epoch is an end (the fresh
-    /// assistant ended too), and the call's own end is final.
+    /// While reconnecting, a snapshot that the call ended is final, and so is the call's
+    /// own end.
     func testAReconnectingCallEnds() {
         var snapshotEnded = Frames.liveReducer()
         _ = snapshotEnded.apply(Frames.ended(seq: 2, reason: .agentError), atMilliseconds: t0)
         snapshotEnded.reconnected()
         XCTAssertEqual(
-            snapshotEnded.apply(Frames.snapshot([], epoch: newer, lastSeq: 4, live: false), atMilliseconds: t0),
+            snapshotEnded.apply(
+                Frames.snapshot([], epoch: newer, lastSeq: 4, live: false, endedReason: .callEnded),
+                atMilliseconds: t0
+            ),
             [.fetchFinal(afterMilliseconds: 2000)]
         )
         XCTAssertEqual(snapshotEnded.phase, .ended(.callEnded))
@@ -141,8 +147,9 @@ final class TranscriptReducerEndTests: XCTestCase {
         XCTAssertEqual(callEnded.phase, .ended(.callEnded))
     }
 
-    /// ⚠️ A "NOT LIVE" SNAPSHOT DOES NOT SAY WHY, so the end it causes is undone by a newer
-    /// epoch (only `agent_error` is followed by one), and the fetch it started is dropped.
+    /// ⚠️ A SERVER OLDER THAN §4.12 Q9 SENDS "NOT LIVE" WITH NO REASON, so the end it causes is
+    /// undone by a newer epoch (only `agent_error` is followed by one), and the fetch it
+    /// started is dropped.
     func testAnEndedSnapshotIsUndoneByANewerEpoch() {
         var reducer = TranscriptReducer(callId: "call_1")
         XCTAssertEqual(
@@ -160,13 +167,83 @@ final class TranscriptReducerEndTests: XCTestCase {
         XCTAssertEqual(reducer.finalFetched(.success("too early")), [], "the fetch it started is not wanted")
     }
 
-    /// A "not live" snapshot with no epoch names none to compare, so any line undoes it.
+    /// The same with no epoch: there is none to compare, so any line undoes it.
     func testAnEndedSnapshotWithNoEpochIsUndoneByAnyLine() {
         var reducer = TranscriptReducer(callId: "call_1")
         _ = reducer.apply(Frames.snapshot([], epoch: nil, lastSeq: nil, live: false), atMilliseconds: t0)
 
         _ = reducer.apply(Frames.live(Frames.greeting), atMilliseconds: t0)
 
+        XCTAssertEqual(reducer.phase, .live)
+    }
+
+    // MARK: - The snapshot's endedReason (§4.12 Q9)
+
+    /// ⛔ A FRESH SUBSCRIBE AFTER `agent_error` IS RECONNECTING, NOT ENDED: no fetch, and the
+    /// fresh assistant's first line makes it live.
+    func testAFreshSubscribeAfterAnAgentErrorIsReconnecting() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        XCTAssertEqual(
+            reducer.apply(
+                Frames.snapshot([Frames.greeting], lastSeq: 2, live: false, endedReason: .agentError),
+                atMilliseconds: t0
+            ),
+            []
+        )
+        XCTAssertEqual(reducer.phase, .reconnecting)
+        XCTAssertEqual(reducer.finalTranscript, .notRequested)
+
+        _ = reducer.apply(Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: newer)), atMilliseconds: t0)
+        XCTAssertEqual(reducer.phase, .live)
+    }
+
+    /// A snapshot's final reason is final: the reason is kept and no newer epoch undoes it.
+    func testASnapshotsFinalReasonIsFinal() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        XCTAssertEqual(
+            reducer.apply(
+                Frames.snapshot([Frames.greeting], lastSeq: 2, live: false, endedReason: .handedOff),
+                atMilliseconds: t0
+            ),
+            [.fetchFinal(afterMilliseconds: 2000)]
+        )
+        _ = reducer.apply(Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: newer)), atMilliseconds: t0)
+
+        XCTAssertEqual(reducer.phase, .ended(.handedOff))
+    }
+
+    /// An end with no reason, then a snapshot that says `agent_error`: reconnecting, and the
+    /// fetch the first started is no longer wanted.
+    func testAnAgentErrorSnapshotUndoesAnEndWithNoReason() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        _ = reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 2, live: false), atMilliseconds: t0)
+        XCTAssertEqual(reducer.finalTranscript, .fetching(attempt: 1))
+        reducer.reconnected()
+
+        _ = reducer.apply(
+            Frames.snapshot([Frames.greeting], lastSeq: 2, live: false, endedReason: .agentError),
+            atMilliseconds: t0
+        )
+
+        XCTAssertEqual(reducer.phase, .reconnecting)
+        XCTAssertEqual(reducer.finalTranscript, .notRequested)
+    }
+
+    /// §4.12 Q12 while reconnecting: a purged snapshot keeps `live` and `endedReason`, so the
+    /// screen keeps reconnecting, and with no epoch left any line is the fresh assistant's.
+    func testAPurgeWhileReconnectingKeepsReconnecting() {
+        var reducer = Frames.liveReducer()
+        _ = reducer.apply(Frames.ended(seq: 2, reason: .agentError), atMilliseconds: t0)
+        _ = reducer.apply(Frames.retracted(all: true), atMilliseconds: t0)
+        reducer.reconnected()
+
+        _ = reducer.apply(
+            Frames.snapshot([], epoch: nil, lastSeq: nil, live: false, endedReason: .agentError, complete: false),
+            atMilliseconds: t0
+        )
+        XCTAssertEqual(reducer.phase, .reconnecting)
+
+        _ = reducer.apply(Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: newer)), atMilliseconds: t0)
         XCTAssertEqual(reducer.phase, .live)
     }
 }

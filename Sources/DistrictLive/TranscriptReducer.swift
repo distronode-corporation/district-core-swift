@@ -27,7 +27,9 @@ import Foundation
 ///    `epoch`, `lastSeq`); the union replaces the state once the last arrives. It sets
 ///    `lastSeq[epoch]` with an empty missing set, and every older epoch is closed: a later
 ///    frame of one is dropped. A broken snapshot (a part out of order, a header that
-///    changed, or another frame between parts) is asked for again.
+///    changed, or another frame between parts) is asked for again. Its `endedReason` says
+///    why it is not live. One with no epoch follows an `all: true` purge: the next frame of
+///    each epoch sets its baseline.
 /// 6. **End.** `transcript_ended` with `call_ended` or `handed_off` (or `call_ended` on a
 ///    socket that takes broadcasts) is terminal: not live, and the full transcript is
 ///    fetched, which is written only after the call's session closes, so an empty answer is
@@ -39,6 +41,9 @@ public struct TranscriptReducer: Sendable, Equatable {
 
     /// The wait before re-subscribing after `rate_limited` that gave no `retryAfterMs`.
     public static let rateLimitFallbackMilliseconds: Int64 = 2000
+
+    /// The least time between two subscribes after `not_live` (§4.12 Q10).
+    public static let notLiveResubscribeMilliseconds: Int64 = 30000
 
     /// How many times the full transcript is asked for before giving up.
     public static let finalFetchAttempts = 8
@@ -80,12 +85,15 @@ public struct TranscriptReducer: Sendable, Equatable {
     /// The end is known to be final (`call_ended`, `handed_off`, or the call's own end), as
     /// opposed to `agent_error` or a snapshot that says only "not live".
     private var terminal = false
-    /// The last call status reported, so only a change is a signal.
-    private var lastStatus: String?
+    /// When the call was last subscribed again after `not_live`.
+    private var resubscribedAfterNotLiveAt: Int64?
+    /// An `all: true` purge left no baseline: the first frame of an epoch sets one, with no
+    /// earlier seq counted as missing (§4.12 Q12).
+    private var unbaselined = false
 
     /// What has been seen of one epoch's `seq` counter.
     private struct SeqTrack: Sendable, Equatable {
-        var high = 0
+        var high: Int
         /// The seqs below ``high`` not yet seen, as ranges: a jump of any size costs one.
         var missing: [ClosedRange<Int>] = []
 
@@ -175,14 +183,18 @@ public struct TranscriptReducer: Sendable, Equatable {
         return end(.callEnded, terminal: true)
     }
 
-    /// The call's status as the client last saw it (`call_updated`, `call_started`, or the
-    /// call row reloaded). ⛔ THE ONLY WAY BACK FROM `not_live`: a status that differs from
-    /// the last one reported subscribes again. A repeated status, or one while the
-    /// transcript is not `not_live`, asks for nothing.
-    public mutating func callStatusChanged(to status: String) -> [TranscriptCommand] {
-        guard status != lastStatus else { return [] }
-        lastStatus = status
+    /// A call-status signal shows the call in progress: `call_started` or `call_updated`
+    /// on a socket that takes broadcasts, or the call row as the app already reads it
+    /// (§4.12 Q4, Q10). ⛔ THE ONLY WAY BACK FROM `not_live`, and at most once per
+    /// ``notLiveResubscribeMilliseconds`` per call: never a timer, and never more often
+    /// than the reads that report it. While the transcript is anything but `not_live`, it
+    /// asks for nothing.
+    public mutating func callShownInProgress(atMilliseconds now: Int64) -> [TranscriptCommand] {
         guard phase == .unavailable(.notLive) else { return [] }
+        if let last = resubscribedAfterNotLiveAt, now &- last < Self.notLiveResubscribeMilliseconds {
+            return []
+        }
+        resubscribedAfterNotLiveAt = now
         phase = .subscribing
         awaitingSnapshot = true
         return [.subscribe]
@@ -250,9 +262,11 @@ public struct TranscriptReducer: Sendable, Equatable {
         return replace(with: whole, now: now)
     }
 
-    /// §4.12 Q6: `live`, `complete`, `epoch` and `lastSeq` are the same on every part.
+    /// §4.12 Q6: `live`, `endedReason`, `complete`, `epoch` and `lastSeq` are the same on
+    /// every part.
     private static func sameHeader(_ lhs: TranscriptSnapshotData, _ rhs: TranscriptSnapshotData) -> Bool {
         (lhs.live, lhs.complete, lhs.epoch, lhs.lastSeq) == (rhs.live, rhs.complete, rhs.epoch, rhs.lastSeq)
+            && lhs.endedReason == rhs.endedReason
     }
 
     private mutating func replace(with whole: Assembly, now: Int64) -> [TranscriptCommand] {
@@ -268,24 +282,33 @@ public struct TranscriptReducer: Sendable, Equatable {
             seqs = [epoch: SeqTrack(high: lastSeq)]
             closedBelow = max(closedBelow ?? epoch, epoch)
             newestEpoch = max(newestEpoch ?? epoch, epoch)
+            unbaselined = false
         } else {
+            // ⚠️ PURGED (§4.12 Q12): no mark and no missing seq, until a frame sets one.
             seqs = [:]
+            unbaselined = true
         }
         gapOpenedAt = nil
         // ⚠️ A FINAL END STAYS FINAL, whatever a later snapshot says.
         guard !terminal else { return [] }
-        guard header.live else {
-            // ⚠️ "NOT LIVE" CARRIES NO REASON: after `agent_error` in the same epoch it is the
-            // wait for a fresh assistant, and the screen keeps saying so. Otherwise it is an
-            // end that a newer epoch may still undo (see ``awaitingNewEpoch``).
-            if phase == .reconnecting, endedEpoch == header.epoch {
-                return []
-            }
-            endedEpoch = header.epoch
+        guard !header.live else {
+            revive()
+            return []
+        }
+        endedEpoch = header.epoch
+        switch header.endedReason {
+        case .agentError?:
+            // §4.12 Q9: the wait for a fresh assistant, as after the live frame.
+            phase = .reconnecting
+            finalTranscript = .notRequested
+            return []
+        case let reason?:
+            return end(reason, terminal: true)
+        case nil:
+            // ⚠️ A SERVER OLDER THAN §4.12 Q9 SENDS NO REASON: an end a newer epoch may still
+            // undo (see ``awaitingNewEpoch``).
             return end(.callEnded, terminal: false)
         }
-        revive()
-        return []
     }
 
     // MARK: - Live frames
@@ -381,6 +404,8 @@ public struct TranscriptReducer: Sendable, Equatable {
             awaitingSnapshot = false
             // ⚠️ AN ENDED TRANSCRIPT STAYS ENDED: `not_live` also answers a subscribe more
             // than two minutes after the end, which changes nothing about the lines shown.
+            // One still reconnecting gives up: no fresh assistant came before the server let
+            // the call go (§4.12 Q11), so the screen takes the path after the call.
             if case .ended = phase {
                 return []
             }
@@ -408,7 +433,7 @@ public struct TranscriptReducer: Sendable, Equatable {
     /// snapshot's is closed: both are dropped.
     private mutating func admit(epoch: Int64, seq: Int, now: Int64) -> (fresh: Bool, commands: [TranscriptCommand]) {
         guard seq >= 1, epoch >= (closedBelow ?? epoch) else { return (false, []) }
-        var track = seqs[epoch] ?? SeqTrack()
+        var track = seqs[epoch] ?? SeqTrack(high: unbaselined ? seq - 1 : 0)
         if seq <= track.high {
             guard track.fill(seq) else { return (false, []) }
         } else {

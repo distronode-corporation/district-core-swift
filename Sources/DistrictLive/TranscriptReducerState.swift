@@ -10,9 +10,10 @@ public enum LiveTranscriptPhase: Sendable, Equatable {
     case subscribing
     /// The transcript is live: lines arrive as they are spoken.
     case live
-    /// The assistant stopped with an error (`transcript_ended`, reason `agent_error`), and the
-    /// call may be handed to a fresh one, whose lines arrive as a new epoch. The lines on
-    /// screen stay. Ends with a new epoch (back to ``live``) or the call's end (``ended(_:)``).
+    /// The assistant stopped with an error (`agent_error`, on `transcript_ended` or as a
+    /// snapshot's `endedReason`), and the call may be handed to a fresh one, whose lines
+    /// arrive as a new epoch. The lines on screen stay. Ends with a new epoch (back to
+    /// ``live``) or the call's end (``ended(_:)``).
     case reconnecting
     /// The assistant stopped transcribing (or the call ended). The lines on screen stay;
     /// the full transcript is fetched (``TranscriptReducer/finalTranscript``).
@@ -20,7 +21,7 @@ public enum LiveTranscriptPhase: Sendable, Equatable {
     /// No live transcript can be shown for this call. The client offers the transcript
     /// after the call instead, the way it did before there was a live one.
     /// ⚠️ `not_live` IS FINAL FOR THAT SUBSCRIBE: only a new call-status signal subscribes
-    /// again (``TranscriptReducer/callStatusChanged(to:)``), never a timer.
+    /// again (``TranscriptReducer/callShownInProgress(atMilliseconds:)``), never a timer.
     case unavailable(TranscriptErrorCode)
 }
 

@@ -38,17 +38,24 @@ could make is byte-identical; what is new is the socket's outbound side.
   with tombstones (counted only when it carries `epoch` with `seq`), and the end:
   `call_ended`, `handed_off` or an unknown reason is final and fetches the full transcript
   with backoff; `agent_error` is the new `LiveTranscriptPhase.reconnecting` until a fresh
-  assistant's epoch or the call's end. `not_live` is final for its subscribe:
-  `callStatusChanged(to:)` (a changed call status) is the only way to subscribe again, as
-  the new `TranscriptCommand.subscribe`. Only an error whose `op` is exactly
+  assistant's epoch or the call's end; a snapshot's `endedReason` says the same (§4.12 Q9),
+  so a fresh subscribe after `agent_error` is reconnecting too. A snapshot with no epoch
+  follows an `all: true` purge (Q12): state and missing set are cleared, and the next frame
+  of each epoch sets its baseline. `not_live` is final for its subscribe:
+  `callShownInProgress(atMilliseconds:)` (a call-status signal that shows the call in
+  progress, at most once per 30 s per call, Q10) is the only way to subscribe again, as the
+  new `TranscriptCommand.subscribe`; after the 120 s eviction it is the path after the call
+  (Q11). Only an error whose `op` is exactly
   `transcript.subscribe` changes anything.
+- `TranscriptSnapshotData` carries `endedReason` (null while live, absent from an older
+  server and then nil), written back as an explicit null.
 - `TranscriptRetractedData` carries `epoch` beside `seq` (both null from the website),
   written back as explicit nulls; its initialiser takes the contract's key order.
 - Tests: hand-written frames for the five events in `Tests/TranscriptFrames/`, named as
   the service's fixtures will be, so the service's own replace them by a file copy. They
-  follow the contract revision with §4.12 (the retraction's `epoch`, no empty opening
-  snapshot), and `TranscriptFrameTests` checks §4.12's invariants on whatever frames are
-  there.
+  follow the contract revision with §4.12 Q1 to Q12 (the retraction's `epoch`, no empty
+  opening snapshot, the snapshot's `endedReason`), and `TranscriptFrameTests` checks
+  §4.12's invariants on whatever frames are there.
 
 ### Changed
 

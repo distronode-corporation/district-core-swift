@@ -98,7 +98,10 @@ public enum TelemetryConnectionEvent: Sendable, Equatable {
     /// Stop receiving `callId`'s live transcript.
     case unsubscribeTranscript(callId: String)
     /// Ask again for `callId`'s transcript, which brings a fresh snapshot: how a client
-    /// heals a gap. Nothing for a call that is not subscribed.
+    /// heals a gap. Nothing for a call that is not subscribed. ⚠️ The server answers a
+    /// duplicate subscribe with a fresh snapshot every time; it does not add to the five
+    /// subscriptions a socket may hold, but it is an op, counted against 20 per 10 s and
+    /// 120 per minute, so `TranscriptReducer` keeps one in flight per call.
     case resubscribeTranscript(callId: String)
 }
 

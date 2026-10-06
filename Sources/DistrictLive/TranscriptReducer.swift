@@ -1,53 +1,8 @@
 import DistrictModel
 import Foundation
 
-/// Where one call's live transcript stands.
-public enum LiveTranscriptPhase: Sendable, Equatable {
-    /// Subscribed; the first snapshot has not arrived.
-    case subscribing
-    /// The transcript is live: lines arrive as they are spoken.
-    case live
-    /// The assistant stopped transcribing (or the call ended). The lines on screen stay;
-    /// the full transcript is fetched (``TranscriptReducer/finalTranscript``).
-    case ended(TranscriptEndReason)
-    /// No live transcript can be shown for this call. The client offers the transcript
-    /// after the call instead, the way it did before there was a live one.
-    case unavailable(TranscriptErrorCode)
-}
-
-/// The full transcript, fetched once the live one ended.
-public enum FinalTranscriptState: Sendable, Equatable {
-    /// Not asked for: the transcript has not ended.
-    case notRequested
-    /// Being fetched; `attempt` counts from 1.
-    case fetching(attempt: Int)
-    /// The transcript the server keeps for the call.
-    case loaded(String)
-    /// Still empty after every attempt: nothing was said, or it was never written.
-    case empty
-    /// The fetch failed, for good or after every attempt.
-    case failed(ApiError)
-}
-
-/// What a ``TranscriptReducer`` asks its owner to do.
-///
-/// ⚠️ AT MOST ONE OF EACH KIND IS PENDING: a new one replaces any earlier one of its kind.
-public enum TranscriptCommand: Sendable, Equatable {
-    /// Send `transcript.subscribe` for the call again after the delay (0: now), for a fresh
-    /// snapshot. `TelemetryConnectionRunner.resubscribeTranscript(callId:)` does that.
-    case resubscribe(afterMilliseconds: Int64)
-    /// Call ``TranscriptReducer/gapCheck(atMilliseconds:)`` after the delay.
-    case checkGap(afterMilliseconds: Int64)
-    /// After the delay, fetch `GET /api/district/calls/{id}/transcript` and hand the answer
-    /// to ``TranscriptReducer/finalFetched(_:atMilliseconds:)``.
-    case fetchFinal(afterMilliseconds: Int64)
-    /// Stop receiving this call's transcript (`transcript.unsubscribe`): nothing more is
-    /// wanted from the server.
-    case unsubscribe
-}
-
 /// One call's live transcript, as a pure state machine: the client algorithm of the
-/// `transcript` v1 contract.
+/// `transcript` v1 contract (§4.6, with the §4.12 clarifications).
 ///
 /// ⛔ NO SOCKET, NO TIMER AND NO NETWORK CALL IN HERE, like ``TelemetryConnection``: events
 /// in, commands out, every rule tested on Linux with an injected time. The app performs
@@ -55,32 +10,35 @@ public enum TranscriptCommand: Sendable, Equatable {
 ///
 /// The rules:
 ///
-/// 1. **Stale frames.** A frame's `seq` counts per (call, epoch). One already seen is
-///    dropped: delivery is at least once and unordered. ⚠️ "Already seen" is tracked as
-///    the highest `seq` plus the gaps below it, NOT as the highest alone: a frame that
-///    arrives after a later one fills its gap rather than being dropped as stale, which a
-///    bare high-water mark would do, losing the line for good.
+/// 1. **Stale frames.** Per epoch, a high-water mark `lastSeq[epoch]` (0 before the first
+///    frame) and the set of missing seqs below it. A frame above the mark raises it, and
+///    the seqs it skipped join the missing set; a frame whose seq is missing fills its gap
+///    and is applied; anything else is a duplicate and is dropped. ⚠️ Delivery is at least
+///    once and unordered, so a late frame is normal: a bare "drop `seq` at or below the
+///    mark" would lose it for good.
 /// 2. **Revisions.** Each segment keeps its latest revision by `rev`; a lower one is
 ///    ignored, and a final always beats an interim at any `rev`.
 /// 3. **Order.** (epoch, index), then the segment id so ties are stable.
-/// 4. **Gaps.** A `seq` that skips ahead opens a gap. If one is still open
-///    ``gapHealMilliseconds`` later, the call is subscribed again and the snapshot
-///    replaces the state.
-/// 5. **Snapshot.** Replaces the state with the union of its parts once the last arrives;
-///    live frames that arrive meanwhile are held and applied after it, where any at or
-///    below its `lastSeq` is a duplicate.
-/// 6. **End.** `transcript_ended` (or `call_ended`, on a socket that takes broadcasts)
-///    marks it not live and starts fetching the full transcript, which is written only
-///    after the call's session closes: an empty answer is retried with backoff.
+/// 4. **Gaps.** If the missing set has been non-empty for ``gapHealMilliseconds``, the call
+///    is subscribed again and the snapshot replaces the state. ⛔ ONE HEAL IN FLIGHT: no
+///    subscribe goes out while an earlier one is unanswered (its snapshot's last part, or a
+///    refusal, has not arrived).
+/// 5. **Snapshot.** Its parts arrive back to back with the same header (`live`, `complete`,
+///    `epoch`, `lastSeq`); the union replaces the state once the last arrives. It sets
+///    `lastSeq[epoch]` with an empty missing set, and every older epoch is closed: a later
+///    frame of one is dropped. A broken snapshot (a part out of order, a header that
+///    changed, or another frame between parts) is asked for again.
+/// 6. **End.** `transcript_ended` with `call_ended` or `handed_off` (or `call_ended` on a
+///    socket that takes broadcasts) is terminal: not live, and the full transcript is
+///    fetched, which is written only after the call's session closes, so an empty answer is
+///    retried with backoff. ⚠️ `agent_error` is not: the call may get a fresh assistant, so
+///    the transcript is ``LiveTranscriptPhase/reconnecting`` until a new epoch or the end.
 public struct TranscriptReducer: Sendable, Equatable {
     /// How long a gap may stay open before the call is subscribed again.
     public static let gapHealMilliseconds: Int64 = 2000
 
     /// The wait before re-subscribing after `rate_limited` that gave no `retryAfterMs`.
     public static let rateLimitFallbackMilliseconds: Int64 = 2000
-
-    /// The longest gap tracked seq by seq. A larger jump is a gap only a snapshot heals.
-    public static let trackedGapLimit = 1000
 
     /// How many times the full transcript is asked for before giving up.
     public static let finalFetchAttempts = 8
@@ -91,7 +49,8 @@ public struct TranscriptReducer: Sendable, Equatable {
         min(2000 << Int64(min(max(attempt, 1) - 1, 8)), 30000)
     }
 
-    /// The op name a `transcript_error` carries for a refused subscribe.
+    /// The op a `transcript_error` about a subscribe carries: the server echoes the exact
+    /// `op` string the client sent (`not_live` carries it too).
     static let subscribeOp = "transcript.subscribe"
 
     public let callId: String
@@ -105,31 +64,51 @@ public struct TranscriptReducer: Sendable, Equatable {
     /// Segment ids retracted one by one, so a late copy cannot bring one back.
     private var tombstones: Set<String> = []
     private var seqs: [Int64: SeqTrack] = [:]
+    /// The newest snapshot's epoch: every older epoch is closed.
+    private var closedBelow: Int64?
+    /// The newest epoch any frame or snapshot named.
+    private var newestEpoch: Int64?
+    /// Since when the missing set has been non-empty.
     private var gapOpenedAt: Int64?
-    /// The parts of a snapshot still arriving, and the live frames held until it is whole.
-    private var pendingSnapshot: [TranscriptSnapshotData]?
-    private var heldFrames: [LiveFrame] = []
-    /// The epoch whose `transcript_ended` was applied.
+    /// ⛔ A SUBSCRIBE IS UNANSWERED: no other may be sent. True from the start, since the
+    /// owner subscribes before the first event.
+    private var awaitingSnapshot = true
+    /// The snapshot whose parts are still arriving.
+    private var assembly: Assembly?
+    /// The epoch the last end applied to.
     private var endedEpoch: Int64?
-
-    /// A frame that is not a snapshot.
-    private enum LiveFrame: Sendable, Equatable {
-        case segment(TranscriptSegment)
-        case ended(TranscriptEndedData)
-        case retracted(TranscriptRetractedData)
-        case error(TranscriptErrorData)
-    }
+    /// The end is known to be final (`call_ended`, `handed_off`, or the call's own end), as
+    /// opposed to `agent_error` or a snapshot that says only "not live".
+    private var terminal = false
+    /// The last call status reported, so only a change is a signal.
+    private var lastStatus: String?
 
     /// What has been seen of one epoch's `seq` counter.
     private struct SeqTrack: Sendable, Equatable {
-        var high: Int
-        var missing: Set<Int> = []
-        /// A jump beyond ``TranscriptReducer/trackedGapLimit``: only a snapshot heals it.
-        var overflowed = false
+        var high = 0
+        /// The seqs below ``high`` not yet seen, as ranges: a jump of any size costs one.
+        var missing: [ClosedRange<Int>] = []
 
-        var hasGap: Bool {
-            overflowed || !missing.isEmpty
+        /// Take `seq` out of the missing set; whether it was there.
+        mutating func fill(_ seq: Int) -> Bool {
+            guard let index = missing.firstIndex(where: { $0.contains(seq) }) else { return false }
+            let range = missing.remove(at: index)
+            if seq < range.upperBound {
+                missing.insert(seq + 1 ... range.upperBound, at: index)
+            }
+            if range.lowerBound < seq {
+                missing.insert(range.lowerBound ... seq - 1, at: index)
+            }
+            return true
         }
+    }
+
+    /// A snapshot being put together from its parts.
+    private struct Assembly: Sendable, Equatable {
+        let header: TranscriptSnapshotData
+        var segments: [TranscriptSegment]
+        var nextPart: Int
+        var broken: Bool
     }
 
     public init(callId: String) {
@@ -150,53 +129,77 @@ public struct TranscriptReducer: Sendable, Equatable {
     /// call change nothing.
     public mutating func apply(_ event: TranscriptEvent, atMilliseconds now: Int64) -> [TranscriptCommand] {
         guard event.callId == callId else { return [] }
-        let frame: LiveFrame
         switch event {
         case let .snapshot(data):
             return snapshotPart(data, now: now)
         case let .segment(data):
-            frame = .segment(data.segment)
+            let commands = interruptAssembly()
+            return commands + segment(data.segment, now: now)
         case let .ended(data):
-            frame = .ended(data)
+            let commands = interruptAssembly()
+            return commands + ended(data, now: now)
         case let .retracted(data):
-            frame = .retracted(data)
+            let commands = interruptAssembly()
+            return commands + retracted(data, now: now)
         case let .error(data):
-            frame = .error(data)
+            // An error answers an op, not the transcript's flow: it leaves a snapshot that is
+            // arriving alone.
+            return error(data)
         }
-        guard pendingSnapshot == nil else {
-            heldFrames.append(frame)
-            return []
-        }
-        return live(frame, now: now)
+    }
+
+    /// ⚠️ A SNAPSHOT'S PARTS ARRIVE BACK TO BACK (§4.12 Q6), so a segment, end or
+    /// retraction for the call while one is being put together means the rest of it was
+    /// lost: ask for a whole one.
+    private mutating func interruptAssembly() -> [TranscriptCommand] {
+        guard assembly != nil else { return [] }
+        assembly = nil
+        return heal(after: 0)
     }
 
     /// The socket opened again after a gap, and the connection has re-sent the subscribe:
     /// a snapshot is on its way and will replace the state. ⚠️ So a half-received snapshot
-    /// from the old socket, and the frames held behind it, are dropped, and any open gap is
-    /// closed. The lines on screen stay until the snapshot lands.
+    /// from the old socket is dropped. The lines on screen stay until the snapshot lands.
     public mutating func reconnected() {
-        pendingSnapshot = nil
-        heldFrames = []
-        clearGaps()
+        assembly = nil
+        awaitingSnapshot = true
     }
 
-    /// A `call_ended` for this call arrived (on a socket that takes broadcasts).
+    /// A `call_ended` for this call arrived (on a socket that takes broadcasts), or the
+    /// call row shows the call is over. ⚠️ Nothing for a call with no live transcript: the
+    /// client already offers the one after the call.
     public mutating func callEnded() -> [TranscriptCommand] {
-        end(.callEnded)
+        if case .unavailable = phase {
+            return []
+        }
+        return end(.callEnded, terminal: true)
+    }
+
+    /// The call's status as the client last saw it (`call_updated`, `call_started`, or the
+    /// call row reloaded). ⛔ THE ONLY WAY BACK FROM `not_live`: a status that differs from
+    /// the last one reported subscribes again. A repeated status, or one while the
+    /// transcript is not `not_live`, asks for nothing.
+    public mutating func callStatusChanged(to status: String) -> [TranscriptCommand] {
+        guard status != lastStatus else { return [] }
+        lastStatus = status
+        guard phase == .unavailable(.notLive) else { return [] }
+        phase = .subscribing
+        awaitingSnapshot = true
+        return [.subscribe]
     }
 
     /// The ``TranscriptCommand/checkGap(afterMilliseconds:)`` delay ran out.
     ///
     /// ⚠️ RE-CHECKS THE FACT RATHER THAN TRUSTING THE TIMER: a gap that closed meanwhile
-    /// asks for nothing, and one opened later is given the rest of its time.
+    /// asks for nothing, one opened later is given the rest of its time, and while a
+    /// subscribe is unanswered nothing is sent, since its snapshot will settle the gap.
     public mutating func gapCheck(atMilliseconds now: Int64) -> [TranscriptCommand] {
-        guard let opened = gapOpenedAt else { return [] }
+        guard let opened = gapOpenedAt, !awaitingSnapshot else { return [] }
         let waited = now &- opened
         guard waited >= Self.gapHealMilliseconds else {
             return [.checkGap(afterMilliseconds: Self.gapHealMilliseconds - waited)]
         }
-        clearGaps()
-        return [.resubscribe(afterMilliseconds: 0)]
+        return heal(after: 0)
     }
 
     /// The answer to ``TranscriptCommand/fetchFinal(afterMilliseconds:)``.
@@ -224,75 +227,92 @@ public struct TranscriptReducer: Sendable, Equatable {
     // MARK: - Snapshots
 
     private mutating func snapshotPart(_ data: TranscriptSnapshotData, now: Int64) -> [TranscriptCommand] {
-        var parts = data.part == 0 ? [] : (pendingSnapshot ?? [])
-        // ⚠️ A PART OUT OF ORDER means parts were lost between two subscribes; nothing can
-        // be assembled from them, so ask for a whole snapshot again.
-        guard parts.count == data.part else {
-            pendingSnapshot = nil
-            return [.resubscribe(afterMilliseconds: 0)]
+        var whole: Assembly
+        if data.part == 0 {
+            whole = Assembly(header: data, segments: data.segments, nextPart: 1, broken: false)
+        } else if var current = assembly, current.nextPart == data.part, Self.sameHeader(current.header, data) {
+            current.segments += data.segments
+            current.nextPart += 1
+            whole = current
+        } else {
+            // ⚠️ A PART OUT OF ORDER, ONE WITH NO PART 0, OR A HEADER THAT CHANGED: nothing
+            // can be put together from it. The rest of it is let through, then a whole
+            // snapshot is asked for, so two heals are never in flight at once.
+            whole = Assembly(header: data, segments: [], nextPart: data.part + 1, broken: true)
         }
-        parts.append(data)
         guard !data.more else {
-            pendingSnapshot = parts
+            assembly = whole
             return []
         }
-        pendingSnapshot = nil
-        var commands = replace(with: parts)
-        let held = heldFrames
-        heldFrames = []
-        for event in held {
-            commands += live(event, now: now)
-        }
-        return commands
+        assembly = nil
+        awaitingSnapshot = false
+        guard !whole.broken else { return heal(after: 0) }
+        return replace(with: whole, now: now)
     }
 
-    private mutating func replace(with parts: [TranscriptSnapshotData]) -> [TranscriptCommand] {
-        let last = parts[parts.count - 1]
+    /// §4.12 Q6: `live`, `complete`, `epoch` and `lastSeq` are the same on every part.
+    private static func sameHeader(_ lhs: TranscriptSnapshotData, _ rhs: TranscriptSnapshotData) -> Bool {
+        (lhs.live, lhs.complete, lhs.epoch, lhs.lastSeq) == (rhs.live, rhs.complete, rhs.epoch, rhs.lastSeq)
+    }
+
+    private mutating func replace(with whole: Assembly, now: Int64) -> [TranscriptCommand] {
+        let header = whole.header
         segments = [:]
-        for segment in parts.flatMap(\.segments) where !tombstones.contains(segment.segmentId) {
+        for segment in whole.segments where !tombstones.contains(segment.segmentId) {
             merge(segment)
         }
-        complete = last.complete
-        for epoch in seqs.keys {
-            seqs[epoch]?.missing = []
-            seqs[epoch]?.overflowed = false
-        }
-        if let epoch = last.epoch, let lastSeq = last.lastSeq {
-            seqs[epoch] = SeqTrack(high: lastSeq)
+        complete = header.complete
+        // ⚠️ `lastSeq` COVERS THE SNAPSHOT'S EPOCH ONLY, the newest the server holds. Older
+        // epochs' lines stay for display and the epochs are closed.
+        if let epoch = header.epoch, let lastSeq = header.lastSeq {
+            seqs = [epoch: SeqTrack(high: lastSeq)]
+            closedBelow = max(closedBelow ?? epoch, epoch)
+            newestEpoch = max(newestEpoch ?? epoch, epoch)
+        } else {
+            seqs = [:]
         }
         gapOpenedAt = nil
-        guard last.live else {
-            endedEpoch = last.epoch
-            return end(.callEnded)
+        // ⚠️ A FINAL END STAYS FINAL, whatever a later snapshot says.
+        guard !terminal else { return [] }
+        guard header.live else {
+            // ⚠️ "NOT LIVE" CARRIES NO REASON: after `agent_error` in the same epoch it is the
+            // wait for a fresh assistant, and the screen keeps saying so. Otherwise it is an
+            // end that a newer epoch may still undo (see ``awaitingNewEpoch``).
+            if phase == .reconnecting, endedEpoch == header.epoch {
+                return []
+            }
+            endedEpoch = header.epoch
+            return end(.callEnded, terminal: false)
         }
-        phase = .live
+        revive()
         return []
     }
 
     // MARK: - Live frames
 
-    private mutating func live(_ frame: LiveFrame, now: Int64) -> [TranscriptCommand] {
-        switch frame {
-        case let .segment(segment):
-            self.segment(segment, now: now)
-        case let .ended(data):
-            ended(data, now: now)
-        case let .retracted(data):
-            retracted(data, now: now)
-        case let .error(data):
-            error(data)
-        }
-    }
-
     private mutating func segment(_ segment: TranscriptSegment, now: Int64) -> [TranscriptCommand] {
         let (fresh, commands) = admit(epoch: segment.epoch, seq: segment.seq, now: now)
         guard fresh, !tombstones.contains(segment.segmentId) else { return commands }
         merge(segment)
-        // ⚠️ A NEWER EPOCH AFTER AN END IS A RE-DISPATCHED ASSISTANT: the call is live again.
-        if case .ended = phase, let endedEpoch, segment.epoch > endedEpoch {
-            phase = .live
+        // ⚠️ A NEWER EPOCH AFTER AN END THAT WAS NOT FINAL IS A FRESH ASSISTANT: live again.
+        if awaitingNewEpoch, endedEpoch.map({ segment.epoch > $0 }) ?? true {
+            revive()
         }
         return commands
+    }
+
+    /// After `agent_error`, or a snapshot that said only "not live".
+    private var awaitingNewEpoch: Bool {
+        guard !terminal else { return false }
+        switch phase {
+        case .reconnecting, .ended: return true
+        case .subscribing, .live, .unavailable: return false
+        }
+    }
+
+    private mutating func revive() {
+        phase = .live
+        finalTranscript = .notRequested
     }
 
     /// Rule 2: the latest revision wins, and a final beats an interim at any revision.
@@ -307,27 +327,36 @@ public struct TranscriptReducer: Sendable, Equatable {
         }
     }
 
+    /// ⚠️ ONLY THE NEWEST EPOCH'S END CHANGES THE PHASE: a late end of an older one is
+    /// counted and nothing more.
     private mutating func ended(_ data: TranscriptEndedData, now: Int64) -> [TranscriptCommand] {
         let (fresh, commands) = admit(epoch: data.epoch, seq: data.seq, now: now)
-        guard fresh else { return commands }
-        endedEpoch = max(endedEpoch ?? data.epoch, data.epoch)
-        return commands + end(data.reason)
+        guard fresh, data.epoch == newestEpoch else { return commands }
+        endedEpoch = data.epoch
+        guard data.reason == .agentError else {
+            return commands + end(data.reason, terminal: true)
+        }
+        if !terminal {
+            phase = .reconnecting
+        }
+        return commands
     }
 
-    private mutating func end(_ reason: TranscriptEndReason) -> [TranscriptCommand] {
+    private mutating func end(_ reason: TranscriptEndReason, terminal: Bool) -> [TranscriptCommand] {
         phase = .ended(reason)
+        self.terminal = self.terminal || terminal
         guard finalTranscript == .notRequested else { return [] }
         finalTranscript = .fetching(attempt: 1)
         return [.fetchFinal(afterMilliseconds: Self.finalFetchDelayMilliseconds(attempt: 1))]
     }
 
-    /// ⚠️ A RETRACTION IS APPLIED EVEN WHEN ITS `seq` WAS SEEN: dropping lines twice is
-    /// harmless, and leaving one on screen is not. Its `seq` is still recorded, so the
-    /// counter shows no gap. With no epoch on the frame (the v1 contract carries none),
-    /// the seq is taken as the newest epoch's.
+    /// ⚠️ A RETRACTION IS APPLIED EVEN WHEN ITS `seq` WAS SEEN, OR ITS EPOCH IS CLOSED:
+    /// dropping lines twice is harmless, and leaving one on screen is not. The agent's
+    /// carries `epoch` and `seq`, which are counted; the website's carries neither and
+    /// bypasses the counter.
     private mutating func retracted(_ data: TranscriptRetractedData, now: Int64) -> [TranscriptCommand] {
         var commands: [TranscriptCommand] = []
-        if let seq = data.seq, let epoch = data.epoch ?? seqs.keys.max() {
+        if let epoch = data.epoch, let seq = data.seq {
             commands = admit(epoch: epoch, seq: seq, now: now).commands
         }
         let gone = data.all ? Array(segments.keys) : data.segmentIds
@@ -339,14 +368,17 @@ public struct TranscriptReducer: Sendable, Equatable {
     }
 
     /// ⚠️ ONLY ERRORS ABOUT THIS CALL REACH HERE (see ``apply(_:atMilliseconds:)``), and
-    /// only one about a subscribe changes anything: a refused unsubscribe needs no answer,
-    /// and re-subscribing after it would undo it.
+    /// only one about a subscribe changes anything: the server echoes the op exactly, so a
+    /// refused unsubscribe (or a frame with no op) is not one, and re-subscribing after it
+    /// would undo it.
     private mutating func error(_ data: TranscriptErrorData) -> [TranscriptCommand] {
-        guard data.op == nil || data.op == Self.subscribeOp else { return [] }
+        guard data.op == Self.subscribeOp else { return [] }
         switch data.code {
         case .rateLimited:
-            return [.resubscribe(afterMilliseconds: data.retryAfterMs ?? Self.rateLimitFallbackMilliseconds)]
+            // The refused subscribe will bring no snapshot; this one replaces it.
+            return heal(after: data.retryAfterMs ?? Self.rateLimitFallbackMilliseconds)
         case .notLive:
+            awaitingSnapshot = false
             // ⚠️ AN ENDED TRANSCRIPT STAYS ENDED: `not_live` also answers a subscribe more
             // than two minutes after the end, which changes nothing about the lines shown.
             if case .ended = phase {
@@ -355,6 +387,7 @@ public struct TranscriptReducer: Sendable, Equatable {
             phase = .unavailable(data.code)
             return [.unsubscribe]
         case .badRequest, .unsupportedVersion, .forbiddenRole, .tooManySubscriptions, .other:
+            awaitingSnapshot = false
             phase = .unavailable(data.code)
             return [.unsubscribe]
         }
@@ -362,45 +395,41 @@ public struct TranscriptReducer: Sendable, Equatable {
 
     // MARK: - Sequence tracking
 
-    /// Whether the frame `(epoch, seq)` is new, and the gap check it may start.
+    /// Subscribe again for a fresh snapshot. ⛔ Every caller has settled that no other
+    /// subscribe is in flight.
+    private mutating func heal(after delay: Int64) -> [TranscriptCommand] {
+        awaitingSnapshot = true
+        return [.resubscribe(afterMilliseconds: delay)]
+    }
+
+    /// Whether the frame `(epoch, seq)` is new (rule 1), and the gap check it may start.
     ///
-    /// ⚠️ NO GAP IS OPENED BEFORE THE FIRST SNAPSHOT (it sets the baseline), NOR FOR THE
-    /// FIRST FRAME OF AN EPOCH OLDER THAN ONE ALREADY SEEN: that is a late copy of a
-    /// session the snapshot already summarised, not a sign of lost frames.
+    /// ⚠️ A `seq` BELOW 1 IS NOT ONE THE SERVER SENDS, and an epoch older than the newest
+    /// snapshot's is closed: both are dropped.
     private mutating func admit(epoch: Int64, seq: Int, now: Int64) -> (fresh: Bool, commands: [TranscriptCommand]) {
-        let older = seqs.keys.contains { $0 > epoch }
-        var track = seqs[epoch] ?? SeqTrack(high: phase == .subscribing || older ? seq - 1 : 0)
+        guard seq >= 1, epoch >= (closedBelow ?? epoch) else { return (false, []) }
+        var track = seqs[epoch] ?? SeqTrack()
         if seq <= track.high {
-            guard track.missing.remove(seq) != nil else { return (false, []) }
+            guard track.fill(seq) else { return (false, []) }
         } else {
-            let skipped = seq - track.high - 1
-            if skipped > Self.trackedGapLimit {
-                track.overflowed = true
-            } else if skipped > 0 {
-                track.missing.formUnion(track.high + 1 ..< seq)
+            if seq > track.high + 1 {
+                track.missing.append(track.high + 1 ... seq - 1)
             }
             track.high = seq
         }
         seqs[epoch] = track
+        newestEpoch = max(newestEpoch ?? epoch, epoch)
         return (true, updateGap(now: now))
     }
 
     private mutating func updateGap(now: Int64) -> [TranscriptCommand] {
-        guard seqs.values.contains(where: \.hasGap) else {
+        guard seqs.values.contains(where: { !$0.missing.isEmpty }) else {
             gapOpenedAt = nil
             return []
         }
         guard gapOpenedAt == nil else { return [] }
         gapOpenedAt = now
         return [.checkGap(afterMilliseconds: Self.gapHealMilliseconds)]
-    }
-
-    private mutating func clearGaps() {
-        for epoch in seqs.keys {
-            seqs[epoch]?.missing = []
-            seqs[epoch]?.overflowed = false
-        }
-        gapOpenedAt = nil
     }
 
     /// Whether a failed fetch may succeed later: no answer, a 5xx, a 429 or a 401 (see

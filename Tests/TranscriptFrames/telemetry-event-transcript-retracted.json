@@ -5,10 +5,11 @@
   "data": {
     "v": 1,
     "callId": "call_1",
+    "epoch": null,
+    "seq": null,
     "all": true,
     "segmentIds": [],
-    "reason": "erased",
-    "seq": null
+    "reason": "erased"
   },
   "timestamp": "2026-10-06T14:31:20.000Z"
 }

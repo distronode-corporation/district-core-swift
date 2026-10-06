@@ -3,29 +3,29 @@ import DistrictModel
 import Foundation
 import XCTest
 
-/// The reducer's rules, one at a time, as states and command lists on an injected time.
-/// The shuffled and duplicated runs are `TranscriptReducerPropertyTests`.
+/// The reducer's rules 1 to 4, one at a time, as states and command lists on an injected
+/// time. Snapshots and epochs are `TranscriptReducerSnapshotTests`, the end
+/// `TranscriptReducerEndTests`, and the shuffled and duplicated runs
+/// `TranscriptReducerPropertyTests`.
 final class TranscriptReducerTests: XCTestCase {
     private let t0 = Frames.t0
 
     // MARK: - The contract's example, end to end
 
-    /// ⛔ §4.11, FRAME BY FRAME: the opening snapshot, two finals, a redelivery that is
-    /// dropped, a reconnect and its snapshot, the end, and the full transcript fetched once
-    /// it is written.
+    /// ⛔ §4.11, FRAME BY FRAME: the subscribe held until the greeting exists and answered
+    /// with a snapshot that has it, a final, a redelivery that is dropped, a reconnect and
+    /// its snapshot, the end, and the full transcript fetched once it is written.
     func testTheContractsShortInboundCall() {
         var reducer = TranscriptReducer(callId: "call_1")
         XCTAssertEqual(reducer.phase, .subscribing)
 
-        XCTAssertEqual(reducer.apply(Frames.snapshot([], lastSeq: 0), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 1), atMilliseconds: t0 + 4410), [])
         XCTAssertEqual(reducer.phase, .live)
-        XCTAssertTrue(reducer.lines.isEmpty)
+        XCTAssertEqual(reducer.lines, [Frames.greeting])
 
-        let greeting = Frames.segment("item_a1", index: 0, seq: 1, speaker: .agent)
         let booking = Frames.segment("item_b2", index: 1, seq: 2)
-        XCTAssertEqual(reducer.apply(Frames.live(greeting), atMilliseconds: t0 + 4000), [])
-        XCTAssertEqual(reducer.apply(Frames.live(booking), atMilliseconds: t0 + 8000), [])
-        XCTAssertEqual(reducer.lines, [greeting, booking])
+        XCTAssertEqual(reducer.apply(Frames.live(booking), atMilliseconds: t0 + 8940), [])
+        XCTAssertEqual(reducer.lines, [Frames.greeting, booking])
 
         let before = reducer
         XCTAssertEqual(reducer.apply(Frames.live(booking), atMilliseconds: t0 + 9000), [], "seq 2 again")
@@ -34,12 +34,12 @@ final class TranscriptReducerTests: XCTestCase {
         reducer.reconnected()
         let interrupted = Frames.segment("item_c3", index: 2, seq: 3, speaker: .agent)
         let morning = Frames.segment("item_d4", index: 3, seq: 4)
-        let all = [greeting, booking, interrupted, morning]
-        XCTAssertEqual(reducer.apply(Frames.snapshot(all, lastSeq: 4), atMilliseconds: t0 + 39000), [])
+        let all = [Frames.greeting, booking, interrupted, morning]
+        XCTAssertEqual(reducer.apply(Frames.snapshot(all, lastSeq: 4), atMilliseconds: t0 + 38990), [])
         XCTAssertEqual(reducer.lines, all)
 
         XCTAssertEqual(
-            reducer.apply(Frames.ended(seq: 5), atMilliseconds: t0 + 63000),
+            reducer.apply(Frames.ended(seq: 5), atMilliseconds: t0 + 63290),
             [.fetchFinal(afterMilliseconds: 2000)]
         )
         XCTAssertEqual(reducer.phase, .ended(.callEnded))
@@ -53,37 +53,95 @@ final class TranscriptReducerTests: XCTestCase {
         XCTAssertEqual(reducer.finalFetched(.success("again")), [], "nothing is being fetched any more")
     }
 
-    // MARK: - Rule 1: stale frames
+    // MARK: - Rule 1: the high-water mark and the missing set
 
-    /// ⛔ A FRAME THAT ARRIVES AFTER A LATER ONE FILLS ITS GAP: a bare high-water mark would
-    /// drop it as stale and lose the line for good.
+    /// ⛔ §4.12 Q1: A FRAME THAT ARRIVES AFTER A LATER ONE FILLS ITS GAP. A bare high-water
+    /// mark would drop it as stale and lose the line for good.
     func testALateFrameFillsItsGapAndClosesIt() {
         var reducer = Frames.liveReducer()
+        let fourth = Frames.segment("s4", index: 3, seq: 4)
         let third = Frames.segment("s3", index: 2, seq: 3)
         let second = Frames.segment("s2", index: 1, seq: 2)
-        let first = Frames.segment("s1", index: 0, seq: 1)
 
         XCTAssertEqual(
-            reducer.apply(Frames.live(third), atMilliseconds: t0),
+            reducer.apply(Frames.live(fourth), atMilliseconds: t0),
             [.checkGap(afterMilliseconds: 2000)],
-            "seq 3 after 0 skips two"
+            "seq 4 after 1 skips two"
         )
-        XCTAssertEqual(reducer.apply(Frames.live(second), atMilliseconds: t0 + 10), [], "the gap is already timed")
-        XCTAssertEqual(reducer.apply(Frames.live(first), atMilliseconds: t0 + 20), [])
-        XCTAssertEqual(reducer.lines, [first, second, third])
+        XCTAssertEqual(reducer.apply(Frames.live(third), atMilliseconds: t0 + 10), [], "the gap is already timed")
+        XCTAssertEqual(reducer.apply(Frames.live(second), atMilliseconds: t0 + 20), [])
+        XCTAssertEqual(reducer.lines, [Frames.greeting, second, third, fourth])
         XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [], "the gap closed before its check")
-        XCTAssertEqual(reducer.apply(Frames.live(second), atMilliseconds: t0 + 30), [], "a filled seq is seen")
+        XCTAssertEqual(reducer.apply(Frames.live(third), atMilliseconds: t0 + 30), [], "a filled seq is seen")
     }
 
-    /// Anything at or below the high-water mark that is not a known gap is a duplicate.
+    /// The missing set splits around each seq that fills it, from either end or the middle,
+    /// and a seq filled once is a duplicate after.
+    func testTheMissingSetSplitsAroundEveryFill() {
+        var reducer = Frames.liveReducer()
+        XCTAssertEqual(
+            reducer.apply(Frames.live(Frames.segment("s7", index: 6, seq: 7)), atMilliseconds: t0),
+            [.checkGap(afterMilliseconds: 2000)]
+        )
+        for seq in [4, 6, 2, 5] {
+            _ = reducer.apply(Frames.live(Frames.segment("s\(seq)", index: seq - 1, seq: seq)), atMilliseconds: t0)
+        }
+        let replay = Frames.segment("s4", index: 3, seq: 4, rev: 1)
+        _ = reducer.apply(Frames.live(replay), atMilliseconds: t0)
+        XCTAssertEqual(reducer.lines.first { $0.segmentId == "s4" }?.rev, 0, "seq 4 was filled already")
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [.resubscribe(afterMilliseconds: 0)], "3 is open")
+
+        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
+
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "s2", "s3", "s4", "s5", "s6", "s7"])
+    }
+
+    /// ⚠️ A JUMP OF ANY SIZE IS TRACKED EXACTLY, as one range: a seq inside it fills it.
+    func testAJumpOfAnySizeIsTrackedSeqBySeq() {
+        var reducer = Frames.liveReducer()
+        _ = reducer.apply(Frames.live(Frames.segment("far", index: 9, seq: 1_000_000)), atMilliseconds: t0)
+
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2)), atMilliseconds: t0)
+        _ = reducer.apply(Frames.live(Frames.segment("late", index: 8, seq: 999_999)), atMilliseconds: t0)
+
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "s2", "late", "far"])
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [.resubscribe(afterMilliseconds: 0)])
+    }
+
+    /// Hostile input: a seq the server never sends (below 1) is dropped and opens nothing,
+    /// and the largest one is a mark like any other.
+    func testASeqBelowOneIsDroppedAndTheLargestIsAMark() {
+        var reducer = Frames.liveReducer()
+        let before = reducer
+        for seq in [0, -5, Int.min] {
+            XCTAssertEqual(
+                reducer.apply(Frames.live(Frames.segment("bad", index: 1, seq: seq)), atMilliseconds: t0),
+                [],
+                "seq \(seq)"
+            )
+        }
+        XCTAssertEqual(reducer, before)
+
+        XCTAssertEqual(
+            reducer.apply(Frames.live(Frames.segment("max", index: 1, seq: .max)), atMilliseconds: t0),
+            [.checkGap(afterMilliseconds: 2000)]
+        )
+        XCTAssertEqual(
+            reducer.apply(Frames.live(Frames.segment("max", index: 1, seq: .max, rev: 1)), atMilliseconds: t0),
+            []
+        )
+        XCTAssertEqual(reducer.lines.last?.rev, 0, "the largest seq again is a duplicate")
+    }
+
+    /// Anything at or below the high-water mark that is not missing is a duplicate.
     func testASeenSeqIsDroppedEvenWithANewRevision() {
         var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1, final: false)), atMilliseconds: t0)
-        let replay = Frames.segment("s1", index: 0, seq: 1, rev: 9, final: true)
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2, final: false)), atMilliseconds: t0)
+        let replay = Frames.segment("s2", index: 1, seq: 2, rev: 9, final: true)
 
         _ = reducer.apply(Frames.live(replay), atMilliseconds: t0)
 
-        XCTAssertEqual(reducer.lines.first?.rev, 0, "seq decides first; a seen seq is never applied")
+        XCTAssertEqual(reducer.lines.last?.rev, 0, "seq decides first; a seen seq is never applied")
     }
 
     // MARK: - Rule 2: revisions
@@ -106,11 +164,11 @@ final class TranscriptReducerTests: XCTestCase {
             Step(rev: 0, final: true, keptRev: 1, keptFinal: true), // a lower final does not
         ]
         for (offset, step) in steps.enumerated() {
-            let segment = Frames.segment("s1", index: 0, seq: offset + 1, rev: step.rev, final: step.final)
+            let segment = Frames.segment("s2", index: 1, seq: offset + 2, rev: step.rev, final: step.final)
             _ = reducer.apply(Frames.live(segment), atMilliseconds: t0)
-            XCTAssertEqual(reducer.lines.count, 1)
-            XCTAssertEqual(reducer.lines.first?.rev, step.keptRev, "step \(offset)")
-            XCTAssertEqual(reducer.lines.first?.final, step.keptFinal, "step \(offset)")
+            XCTAssertEqual(reducer.lines.count, 2)
+            XCTAssertEqual(reducer.lines.last?.rev, step.keptRev, "step \(offset)")
+            XCTAssertEqual(reducer.lines.last?.final, step.keptFinal, "step \(offset)")
         }
     }
 
@@ -121,21 +179,21 @@ final class TranscriptReducerTests: XCTestCase {
         let later = Frames.epoch + 60000
         let frames = [
             Frames.segment("b", index: 0, seq: 1, epoch: later),
-            Frames.segment("z", index: 5, seq: 1),
+            Frames.segment("z", index: 5, seq: 2),
             Frames.segment("a", index: 0, seq: 2, epoch: later),
-            Frames.segment("y", index: 1, seq: 2),
+            Frames.segment("y", index: 1, seq: 3),
         ]
         for frame in frames {
             _ = reducer.apply(Frames.live(frame), atMilliseconds: t0)
         }
 
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["y", "z", "a", "b"])
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "y", "z", "a", "b"])
     }
 
-    // MARK: - Rule 4: gaps
+    // MARK: - Rule 4: gaps, one heal in flight
 
     /// ⛔ A GAP STILL OPEN AFTER TWO SECONDS ASKS FOR A SNAPSHOT, which then replaces the
-    /// state, and the check before then asks only to be called again.
+    /// state; the check before then asks only to be called again.
     func testAGapThatPersistsTwoSecondsResubscribesAndTheSnapshotHealsIt() {
         var reducer = Frames.liveReducer()
         let third = Frames.segment("s3", index: 2, seq: 3)
@@ -143,61 +201,65 @@ final class TranscriptReducerTests: XCTestCase {
 
         XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 1500), [.checkGap(afterMilliseconds: 500)])
         XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [.resubscribe(afterMilliseconds: 0)])
-        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 4000), [], "asked once")
 
-        let healed = [Frames.segment("s1", index: 0, seq: 1), Frames.segment("s2", index: 1, seq: 2), third]
+        let healed = [Frames.greeting, Frames.segment("s2", index: 1, seq: 2), third]
         _ = reducer.apply(Frames.snapshot(healed, lastSeq: 3), atMilliseconds: t0 + 2100)
         XCTAssertEqual(reducer.lines, healed)
-        XCTAssertEqual(reducer.apply(Frames.live(healed[0]), atMilliseconds: t0 + 2200), [], "at or below lastSeq")
+        XCTAssertEqual(reducer.apply(Frames.live(healed[1]), atMilliseconds: t0 + 2200), [], "at or below lastSeq")
         XCTAssertEqual(reducer.lines, healed)
     }
 
-    /// A jump too large to track seq by seq is a gap only a snapshot heals: filling one of
-    /// its holes does not close it.
-    func testAnOverflowingJumpIsHealedOnlyByASnapshot() {
+    /// ⛔ §4.6 STEP 4: NO NEW HEAL UNTIL THE LAST ONE'S SNAPSHOT HAS ARRIVED WHOLE, however
+    /// often the check runs; after it, a new gap heals again.
+    func testOnlyOneHealIsInFlight() {
         var reducer = Frames.liveReducer()
-        let far = TranscriptReducer.trackedGapLimit + 2
+        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [.resubscribe(afterMilliseconds: 0)])
+
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 4000), [], "the first heal is unanswered")
+        _ = reducer.apply(Frames.live(Frames.segment("s5", index: 4, seq: 5)), atMilliseconds: t0 + 4100)
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 9000), [], "still unanswered")
+        _ = reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 5, more: true), atMilliseconds: t0 + 9100)
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 9200), [], "a part is not the answer, the last part is")
+        _ = reducer.apply(Frames.snapshot([], lastSeq: 5, part: 1), atMilliseconds: t0 + 9300)
+
         XCTAssertEqual(
-            reducer.apply(Frames.live(Frames.segment("far", index: 9, seq: far)), atMilliseconds: t0),
+            reducer.apply(Frames.live(Frames.segment("s7", index: 6, seq: 7)), atMilliseconds: t0 + 9400),
             [.checkGap(afterMilliseconds: 2000)]
         )
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["far"], "an untracked hole is not a known gap")
-
-        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [.resubscribe(afterMilliseconds: 0)])
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 11400), [.resubscribe(afterMilliseconds: 0)])
     }
 
-    /// The largest jump still tracked seq by seq.
-    func testAJumpAtTheLimitIsTrackedSeqBySeq() {
+    /// ⚠️ THE MISSING SET LASTS UNTIL THE SNAPSHOT CLEARS IT: a late frame that arrives while
+    /// the heal is in flight still fills its gap and is shown.
+    func testALateFrameDuringAHealIsStillApplied() {
         var reducer = Frames.liveReducer()
-        let limit = TranscriptReducer.trackedGapLimit
-        _ = reducer.apply(Frames.live(Frames.segment("edge", index: 9, seq: limit + 1)), atMilliseconds: t0)
-        for seq in 1 ... limit {
-            _ = reducer.apply(Frames.live(Frames.segment("s\(seq)", index: 0, seq: seq)), atMilliseconds: t0)
-        }
+        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
+        _ = reducer.gapCheck(atMilliseconds: t0 + 2000)
 
-        XCTAssertEqual(reducer.lines.count, limit + 1)
-        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 2000), [], "every hole was filled")
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2)), atMilliseconds: t0 + 2050)
+
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "s2", "s3"])
     }
 
-    /// ⚠️ NO GAP BEFORE THE FIRST SNAPSHOT, WHICH SETS THE BASELINE, and none for the first
-    /// frame of an epoch older than one already seen: a late copy, not a lost frame.
-    func testNoGapOpensBeforeTheFirstSnapshotOrForALateOlderEpoch() {
+    /// The first subscribe is a heal in flight too, and so is the one a reconnect sends: a
+    /// gap that opens before either is answered asks for nothing.
+    func testNoHealWhileTheFirstSubscribeOrAReconnectsIsUnanswered() {
         var waiting = TranscriptReducer(callId: "call_1")
-        XCTAssertEqual(waiting.apply(Frames.live(Frames.segment("s5", index: 4, seq: 5)), atMilliseconds: t0), [])
+        XCTAssertEqual(
+            waiting.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0),
+            [.checkGap(afterMilliseconds: 2000)]
+        )
+        XCTAssertEqual(waiting.gapCheck(atMilliseconds: t0 + 5000), [])
+        XCTAssertEqual(waiting.phase, .subscribing)
 
         var reducer = Frames.liveReducer()
-        let newer = Frames.epoch + 60000
-        _ = reducer.apply(Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: newer)), atMilliseconds: t0)
-        let older = Frames.epoch - 60000
-        XCTAssertEqual(
-            reducer.apply(Frames.live(Frames.segment("o7", index: 3, seq: 7, epoch: older)), atMilliseconds: t0),
-            []
-        )
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["o7", "n1"])
+        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
+        reducer.reconnected()
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 5000), [])
     }
 
-    /// A newer epoch's first frame that is not its first seq does open a gap: the new
+    /// A newer epoch's first frame that is not its first seq opens a gap: the new
     /// assistant's opening lines were lost.
     func testANewEpochsMissingOpeningLinesAreAGap() {
         var reducer = Frames.liveReducer()
@@ -209,134 +271,12 @@ final class TranscriptReducerTests: XCTestCase {
         )
     }
 
-    // MARK: - Rule 5: snapshots
-
-    /// ⛔ PARTS ARE UNIONED AND APPLIED ONLY AT THE LAST, and a live frame arriving between
-    /// them is held and applied after, where one at or below `lastSeq` is a duplicate.
-    func testASnapshotInPartsIsAppliedWholeWithTheFramesHeldBehindIt() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        let one = Frames.segment("s1", index: 0, seq: 1)
-        let two = Frames.segment("s2", index: 1, seq: 2)
-        let three = Frames.segment("s3", index: 2, seq: 3)
-
-        XCTAssertEqual(reducer.apply(Frames.snapshot([one], lastSeq: 2, more: true), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.phase, .subscribing)
-        XCTAssertEqual(reducer.apply(Frames.live(two), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.apply(Frames.live(three), atMilliseconds: t0), [])
-        XCTAssertTrue(reducer.lines.isEmpty, "nothing is applied before the last part")
-
-        _ = reducer.apply(Frames.snapshot([two], lastSeq: 2, part: 1), atMilliseconds: t0)
-
-        XCTAssertEqual(reducer.phase, .live)
-        XCTAssertEqual(reducer.lines, [one, two, three])
-    }
-
-    func testAPartOutOfOrderAsksForAWholeSnapshotAndPartZeroStartsAgain() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        let one = Frames.segment("s1", index: 0, seq: 1)
-
-        XCTAssertEqual(
-            reducer.apply(Frames.snapshot([one], lastSeq: 1, part: 1), atMilliseconds: t0),
-            [.resubscribe(afterMilliseconds: 0)]
-        )
-        _ = reducer.apply(Frames.snapshot([one], lastSeq: 1, more: true), atMilliseconds: t0)
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 1, more: true), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines, [], "a new part 0 started again")
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 1, part: 1), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines, [], "only the parts since the last part 0 count")
-    }
-
-    /// ⛔ D3: A SNAPSHOT THAT DOES NOT REACH BACK TO THE FIRST LINE SAYS SO, and the client
-    /// says the earlier lines will be in the full transcript.
-    func testAnIncompleteSnapshotIsReported() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        XCTAssertTrue(reducer.complete)
-
-        _ = reducer.apply(Frames.snapshot([], epoch: nil, lastSeq: nil, complete: false), atMilliseconds: t0)
-
-        XCTAssertFalse(reducer.complete)
-        XCTAssertEqual(reducer.phase, .live)
-    }
-
-    func testASnapshotOfAnEndedTranscriptEndsItAndFetchesTheFullOne() {
-        var reducer = TranscriptReducer(callId: "call_1")
-
-        XCTAssertEqual(
-            reducer.apply(Frames.snapshot([], lastSeq: 3, live: false), atMilliseconds: t0),
-            [.fetchFinal(afterMilliseconds: 2000)]
-        )
-        XCTAssertEqual(reducer.phase, .ended(.callEnded))
-    }
-
-    /// A reconnect drops a half-received snapshot and the frames held behind it, and closes
-    /// any gap: the new subscribe's snapshot replaces the state anyway.
-    func testAReconnectDropsAHalfSnapshotAndClosesGaps() {
-        var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 3, more: true), atMilliseconds: t0)
-        _ = reducer.apply(Frames.live(Frames.segment("s4", index: 3, seq: 4)), atMilliseconds: t0)
-
-        reducer.reconnected()
-
-        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 5000), [])
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s3"], "the screen keeps what it had")
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 9, part: 1), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s3"], "the dropped part 0 is not completed by a part 1")
-    }
-
-    // MARK: - Rule 6: the end
-
-    func testACallEndedEndsTheTranscriptOnceAndFetchesOnce() {
-        var reducer = Frames.liveReducer()
-
-        XCTAssertEqual(reducer.callEnded(), [.fetchFinal(afterMilliseconds: 2000)])
-        XCTAssertEqual(reducer.phase, .ended(.callEnded))
-        XCTAssertEqual(reducer.apply(Frames.ended(seq: 1, reason: .handedOff), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.phase, .ended(.handedOff), "the reason is updated, the fetch is not repeated")
-    }
-
-    /// ⚠️ A NEWER EPOCH AFTER AN END IS A RE-DISPATCHED ASSISTANT; a late line of the ended
-    /// epoch is shown but does not revive the call.
-    func testANewerEpochRevivesAnEndedTranscriptAndALateLineDoesNot() {
-        var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
-        _ = reducer.apply(Frames.ended(seq: 3, reason: .agentError), atMilliseconds: t0)
-
-        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2)), atMilliseconds: t0)
-        XCTAssertEqual(reducer.phase, .ended(.agentError))
-        XCTAssertEqual(reducer.lines.count, 2)
-
-        let newer = Frames.epoch + 60000
-        _ = reducer.apply(Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: newer)), atMilliseconds: t0)
-        XCTAssertEqual(reducer.phase, .live)
-    }
-
-    func testAnEndedSnapshotsEpochIsTheOneANewerEpochRevives() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 2, live: false), atMilliseconds: t0)
-
-        _ = reducer.apply(
-            Frames.live(Frames.segment("n1", index: 0, seq: 1, epoch: Frames.epoch + 1)),
-            atMilliseconds: t0
-        )
-
-        XCTAssertEqual(reducer.phase, .live)
-    }
-
-    func testARepeatedEndIsADuplicate() {
-        var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.ended(seq: 1), atMilliseconds: t0)
-
-        XCTAssertEqual(reducer.apply(Frames.ended(seq: 1, reason: .handedOff), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.phase, .ended(.callEnded))
-    }
-
     func testEventsForAnotherCallChangeNothing() {
         var reducer = Frames.liveReducer()
         let before = reducer
 
         XCTAssertEqual(
-            reducer.apply(Frames.live(Frames.segment("x", index: 0, seq: 1), callId: "call_2"), atMilliseconds: t0),
+            reducer.apply(Frames.live(Frames.segment("x", index: 0, seq: 2), callId: "call_2"), atMilliseconds: t0),
             []
         )
         XCTAssertEqual(reducer.apply(Frames.error(.notLive, callId: "call_2"), atMilliseconds: t0), [])

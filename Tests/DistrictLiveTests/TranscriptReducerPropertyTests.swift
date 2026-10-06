@@ -61,15 +61,24 @@ final class TranscriptReducerPropertyTests: XCTestCase {
         return (frames + duplicates).shuffled(using: &random)
     }
 
+    /// ⚠️ THE SUBSCRIBE IS ANSWERED ONCE THE FIRST FRAME EXISTS (§4.12 Q4), so every run
+    /// starts from a snapshot holding the call's first frame, as the server sends it.
+    private func subscribed(to call: Call) -> TranscriptReducer {
+        var reducer = TranscriptReducer(callId: "call_1")
+        _ = reducer.apply(Frames.snapshot([call.frames[0]], lastSeq: 1), atMilliseconds: t0)
+        return reducer
+    }
+
     // MARK: - Properties
 
     /// ⛔ SHUFFLED, DUPLICATED, INTERIM AND FINAL IN ANY ORDER, ACROSS AN EPOCH CHANGE: every
-    /// segment ends at its final, in order, with no gap left open.
+    /// segment ends at its final, in order, with no gap left open. This is §4.12 Q1: a late
+    /// frame is never lost.
     func testAnyOrderAndAnyDuplicationEndsAtTheFinals() {
         for seed in seeds {
             var random = SplitMix64(seed: seed)
             let call = randomCall(&random)
-            var reducer = Frames.liveReducer()
+            var reducer = subscribed(to: call)
 
             for (offset, segment) in delivery(call.frames, &random).enumerated() {
                 _ = reducer.apply(Frames.live(segment), atMilliseconds: t0 + Int64(offset))
@@ -83,16 +92,17 @@ final class TranscriptReducerPropertyTests: XCTestCase {
     }
 
     /// ⛔ A LOST FRAME IS A GAP, AND THE SNAPSHOT IT ASKS FOR HEALS IT: two seconds after the
-    /// loss is noticed the call is subscribed again, and the snapshot (built here from the
-    /// orderly state, as the server's memory holds it) puts the screen right.
+    /// loss is noticed the call is subscribed again, once, and the snapshot (built here from
+    /// the orderly state, as the server's memory holds it) puts the screen right.
     func testALostFrameIsHealedByTheSnapshotItAsksFor() {
         for seed in seeds {
             var random = SplitMix64(seed: seed)
             let call = randomCall(&random, epochs: [Frames.epoch])
-            guard call.frames.count > 1 else { continue }
-            // ⚠️ NOT THE LAST FRAME: a loss nothing after it reveals cannot be noticed.
-            let lost = Int.random(in: 0 ..< call.frames.count - 1, using: &random)
-            var reducer = Frames.liveReducer()
+            guard call.frames.count > 2 else { continue }
+            // ⚠️ NOT THE FIRST FRAME, which the opening snapshot holds, NOR THE LAST: a loss
+            // nothing after it reveals cannot be noticed.
+            let lost = Int.random(in: 1 ..< call.frames.count - 1, using: &random)
+            var reducer = subscribed(to: call)
             var asked: [TranscriptCommand] = []
             var kept = call.frames
             kept.remove(at: lost)
@@ -107,11 +117,12 @@ final class TranscriptReducerPropertyTests: XCTestCase {
                 [.resubscribe(afterMilliseconds: 0)],
                 "seed \(seed)"
             )
+            XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 4000), [], "seed \(seed): one heal in flight")
             let snapshot = Frames.snapshot(call.finals, lastSeq: call.lastSeq[Frames.epoch])
-            _ = reducer.apply(snapshot, atMilliseconds: t0 + 2100)
+            _ = reducer.apply(snapshot, atMilliseconds: t0 + 4100)
             XCTAssertEqual(reducer.lines, call.finals, "seed \(seed)")
             for segment in delivery(call.frames, &random) {
-                _ = reducer.apply(Frames.live(segment), atMilliseconds: t0 + 2200)
+                _ = reducer.apply(Frames.live(segment), atMilliseconds: t0 + 4200)
             }
             XCTAssertEqual(reducer.lines, call.finals, "seed \(seed): a late copy after the snapshot")
         }
@@ -122,7 +133,7 @@ final class TranscriptReducerPropertyTests: XCTestCase {
         for seed in seeds {
             var random = SplitMix64(seed: seed)
             let call = randomCall(&random)
-            var reducer = Frames.liveReducer()
+            var reducer = subscribed(to: call)
             for segment in delivery(call.frames, &random) {
                 _ = reducer.apply(Frames.live(segment), atMilliseconds: t0)
             }
@@ -140,36 +151,34 @@ final class TranscriptReducerPropertyTests: XCTestCase {
         }
     }
 
-    /// ⛔ A SNAPSHOT IN PARTS WITH THE LIVE FRAMES ARRIVING BETWEEN THEM, IN ANY ORDER, ends
-    /// where the frames say: the snapshot holds the first half of the call and the live
-    /// frames the rest, some of both delivered twice.
-    func testASnapshotInPartsWithLiveFramesBetweenThemEndsAtTheFinals() {
+    /// ⛔ A SNAPSHOT IN PARTS, BACK TO BACK (§4.12 Q6), THEN THE LIVE FRAMES IN ANY ORDER, ends
+    /// where the frames say: the snapshot holds the call up to a random point, split into one
+    /// to three parts with the same header, and the live frames the rest, with some of
+    /// both delivered twice.
+    func testASnapshotInPartsThenLiveFramesEndsAtTheFinals() {
         for seed in seeds {
             var random = SplitMix64(seed: seed)
             let call = randomCall(&random, epochs: [Frames.epoch])
-            let cut = Int.random(in: 0 ... call.frames.count, using: &random)
+            let cut = Int.random(in: 1 ... call.frames.count, using: &random)
             let before = Array(call.frames[..<cut])
             var latest: [String: TranscriptSegment] = [:]
             for segment in before {
                 latest[segment.segmentId] = segment
             }
             let summary = latest.values.sorted { $0.index < $1.index }
-            let half = summary.count / 2
+            let parts = Int.random(in: 1 ... 3, using: &random)
             var reducer = TranscriptReducer(callId: "call_1")
-            let lastSeq = cut == 0 ? nil : cut
 
-            _ = reducer.apply(
-                Frames.snapshot(Array(summary[..<half]), lastSeq: lastSeq, more: true),
-                atMilliseconds: t0
-            )
-            var between = delivery(Array(call.frames[cut...]) + before.suffix(2), &random)
-            let early = between.prefix(between.count / 2)
-            between.removeFirst(early.count)
-            for segment in early {
-                _ = reducer.apply(Frames.live(segment), atMilliseconds: t0)
+            for part in 0 ..< parts {
+                let slice = summary.indices.filter { $0 % parts == part }.map { summary[$0] }
+                let more = part < parts - 1
+                let commands = reducer.apply(
+                    Frames.snapshot(slice, lastSeq: cut, part: part, more: more),
+                    atMilliseconds: t0
+                )
+                XCTAssertEqual(commands, [], "seed \(seed) part \(part)")
             }
-            _ = reducer.apply(Frames.snapshot(Array(summary[half...]), lastSeq: lastSeq, part: 1), atMilliseconds: t0)
-            for segment in between {
+            for segment in delivery(Array(call.frames[cut...]) + before.suffix(2), &random) {
                 _ = reducer.apply(Frames.live(segment), atMilliseconds: t0)
             }
 

@@ -120,30 +120,33 @@ final class TranscriptEventsTests: XCTestCase {
         }
     }
 
-    /// ⚠️ THE WEBSITE'S RETRACTION CARRIES `seq: null` AND NO EPOCH; an epoch is read when
-    /// sent and written back only then.
-    func testARetractionIsReadWithAndWithoutAnEpoch() throws {
+    /// ⚠️ THE WEBSITE'S RETRACTION CARRIES `epoch` AND `seq` AS NULL, the assistant's carries
+    /// both (§4.12 Q2), and both are written back as sent, nulls included.
+    func testARetractionIsReadWithAndWithoutItsCounter() throws {
         let website = try envelope(
             "transcript_retracted",
-            data: #"{"v":1,"callId":"call_1","all":true,"segmentIds":[],"reason":"erased","seq":null}"#
+            data: #"{"v":1,"callId":"call_1","epoch":null,"seq":null,"all":true,"segmentIds":[],"reason":"erased"}"#
         ).transcriptEvent
         let fromWebsite = TranscriptRetractedData(
-            version: 1, callId: "call_1", all: true, segmentIds: [], reason: .erased, seq: nil
+            version: 1, callId: "call_1", epoch: nil, seq: nil, all: true, segmentIds: [], reason: .erased
         )
         XCTAssertEqual(website, .retracted(fromWebsite))
         XCTAssertEqual(
             try encodeSorted(fromWebsite),
-            #"{"all":true,"callId":"call_1","reason":"erased","segmentIds":[],"seq":null,"v":1}"#
+            #"{"all":true,"callId":"call_1","epoch":null,"reason":"erased","segmentIds":[],"seq":null,"v":1}"#
         )
 
         let agent = try envelope("transcript_retracted", data: """
-        {"v":1,"callId":"call_1","all":false,"segmentIds":["item_a1"],"reason":"policy","seq":6,"epoch":7}
+        {"v":1,"callId":"call_1","epoch":7,"seq":6,"all":false,"segmentIds":["item_a1"],"reason":"policy"}
         """).transcriptEvent
         let fromAgent = TranscriptRetractedData(
-            version: 1, callId: "call_1", all: false, segmentIds: ["item_a1"], reason: .policy, seq: 6, epoch: 7
+            version: 1, callId: "call_1", epoch: 7, seq: 6, all: false, segmentIds: ["item_a1"], reason: .policy
         )
         XCTAssertEqual(agent, .retracted(fromAgent))
-        XCTAssertTrue(try encodeSorted(fromAgent).contains(#""epoch":7"#))
+        XCTAssertEqual(
+            try encodeSorted(fromAgent),
+            #"{"all":false,"callId":"call_1","epoch":7,"reason":"policy","segmentIds":["item_a1"],"seq":6,"v":1}"#
+        )
         XCTAssertEqual(TranscriptRetractReason(wire: "court_order"), .other("court_order"))
         XCTAssertEqual(TranscriptRetractReason.other("court_order").wire, "court_order")
         XCTAssertEqual(TranscriptRetractReason.policy.wire, "policy")
@@ -202,7 +205,10 @@ final class TranscriptEventsTests: XCTestCase {
             ),
             ("transcript_segment", #"{"v":2,"callId":"call_1","segment":\#(callerSegmentJSON)}"#),
             ("transcript_ended", #"{"v":2,"callId":"call_1","epoch":1,"seq":1,"lastIndex":null,"reason":"x"}"#),
-            ("transcript_retracted", #"{"v":2,"callId":"call_1","all":true,"segmentIds":[],"reason":"x","seq":null}"#),
+            (
+                "transcript_retracted",
+                #"{"v":2,"callId":"call_1","epoch":null,"seq":null,"all":true,"segmentIds":[],"reason":"x"}"#
+            ),
             ("transcript_error", #"{"v":2,"callId":"call_1","op":null,"code":"x","retryAfterMs":null}"#),
         ]
         for (type, data) in frames {

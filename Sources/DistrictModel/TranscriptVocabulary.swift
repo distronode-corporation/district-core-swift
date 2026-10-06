@@ -50,13 +50,15 @@ extension TranscriptSpeaker: Codable {
 
 /// Why a live transcript ended.
 ///
-/// ⚠️ OPEN-ENDED, like ``TranscriptSpeaker``: a reason this client does not know is kept.
+/// ⚠️ OPEN-ENDED, like ``TranscriptSpeaker``: a reason this client does not know is kept,
+/// and read as final.
 public enum TranscriptEndReason: Sendable, Equatable, Hashable {
-    /// `call_ended`.
+    /// `call_ended`. Final.
     case callEnded
-    /// `handed_off`: the call was transferred and the assistant left it.
+    /// `handed_off`: the call was transferred and the assistant left it. Final.
     case handedOff
-    /// `agent_error`.
+    /// `agent_error`: the assistant failed. ⚠️ THE ONLY REASON A NEW EPOCH MAY FOLLOW: the
+    /// call can be handed to a fresh assistant, so a client shows "reconnecting", not "ended".
     case agentError
     case other(String)
 
@@ -132,9 +134,10 @@ public enum TranscriptErrorCode: Sendable, Equatable, Hashable {
     case badRequest
     /// `unsupported_version`: fall back to the transcript after the call.
     case unsupportedVersion
-    /// `not_live`: no live transcript for this call (unknown, another workspace's, ended
-    /// over two minutes ago, or not answered by the assistant). ⛔ Never worded as
-    /// "forbidden": another workspace's call is indistinguishable from a missing one.
+    /// `not_live`: no live transcript for this call within 30 s of the subscribe (unknown,
+    /// another workspace's, ended over two minutes ago, or not answered by the assistant).
+    /// ⛔ Never worded as "forbidden": another workspace's call is indistinguishable from a
+    /// missing one. ⚠️ Final for that subscribe: only a new call-status signal tries again.
     case notLive
     /// `forbidden_role`: this member's role may not watch.
     case forbiddenRole

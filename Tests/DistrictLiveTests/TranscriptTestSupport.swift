@@ -65,6 +65,8 @@ enum Frames {
         .ended(TranscriptEndedData(version: 1, callId: callId, epoch: epoch, seq: seq, lastIndex: nil, reason: reason))
     }
 
+    /// The assistant's retraction carries `epoch` with `seq`, the website's neither
+    /// (§4.12 Q2); a test that pairs them otherwise is about a malformed frame.
     static func retracted(
         _ segmentIds: [String] = [],
         all: Bool = false,
@@ -74,11 +76,11 @@ enum Frames {
         .retracted(TranscriptRetractedData(
             version: 1,
             callId: callId,
+            epoch: epoch,
+            seq: seq,
             all: all,
             segmentIds: segmentIds,
-            reason: .erased,
-            seq: seq,
-            epoch: epoch
+            reason: .erased
         ))
     }
 
@@ -91,10 +93,15 @@ enum Frames {
         .error(TranscriptErrorData(version: 1, callId: callId, op: op, code: code, retryAfterMs: retryAfterMs))
     }
 
-    /// A reducer that has had the §4.11 opening snapshot: live, nothing said, `lastSeq` 0.
+    /// The §4.11 greeting, the call's first line, which the opening snapshot carries.
+    static let greeting = segment("item_a1", index: 0, seq: 1, speaker: .agent)
+
+    /// A reducer that has had the §4.11 opening snapshot: live, holding the greeting at
+    /// seq 1. ⚠️ Never an empty `lastSeq: 0` one: the server holds a subscribe until the
+    /// first line exists (§4.12 Q4).
     static func liveReducer() -> TranscriptReducer {
         var reducer = TranscriptReducer(callId: callId)
-        _ = reducer.apply(snapshot([], lastSeq: 0), atMilliseconds: t0)
+        _ = reducer.apply(snapshot([greeting], lastSeq: 1), atMilliseconds: t0)
         return reducer
     }
 }

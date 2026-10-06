@@ -28,13 +28,27 @@ could make is byte-identical; what is new is the socket's outbound side.
   `socket.mode` when built with `broadcast: false`; new events
   `subscribeTranscript`/`unsubscribeTranscript`/`resubscribeTranscript`, a new command
   `send`, and the runner's three matching methods. `TranscriptReducer` is the contract's
-  client algorithm for one call as a pure state machine: stale and duplicate frames by
-  `seq` per epoch (with late frames filling gaps rather than being dropped), revisions,
-  `(epoch, index)` order, gap detection with a re-subscribe after 2 s, snapshots in parts
-  replacing the state, retraction with tombstones, the end, and fetching the full
-  transcript with backoff until it is written.
+  client algorithm for one call as a pure state machine, following the contract's §4.6
+  and its §4.12 clarifications: a high-water mark per epoch plus the set of missing seqs
+  below it (a late frame fills its gap, anything else at or below the mark is a duplicate;
+  the missing set is kept as ranges, so a jump of any size is tracked exactly), revisions,
+  `(epoch, index)` order, a re-subscribe after a gap lasts 2 s with one heal in flight per
+  call, snapshots whose parts arrive back to back with the same header (a broken one is
+  asked for again once its last part is in) and which close every older epoch, retraction
+  with tombstones (counted only when it carries `epoch` with `seq`), and the end:
+  `call_ended`, `handed_off` or an unknown reason is final and fetches the full transcript
+  with backoff; `agent_error` is the new `LiveTranscriptPhase.reconnecting` until a fresh
+  assistant's epoch or the call's end. `not_live` is final for its subscribe:
+  `callStatusChanged(to:)` (a changed call status) is the only way to subscribe again, as
+  the new `TranscriptCommand.subscribe`. Only an error whose `op` is exactly
+  `transcript.subscribe` changes anything.
+- `TranscriptRetractedData` carries `epoch` beside `seq` (both null from the website),
+  written back as explicit nulls; its initialiser takes the contract's key order.
 - Tests: hand-written frames for the five events in `Tests/TranscriptFrames/`, named as
-  the service's fixtures will be, so the service's own replace them by a file copy.
+  the service's fixtures will be, so the service's own replace them by a file copy. They
+  follow the contract revision with §4.12 (the retraction's `epoch`, no empty opening
+  snapshot), and `TranscriptFrameTests` checks §4.12's invariants on whatever frames are
+  there.
 
 ### Changed
 
@@ -43,7 +57,7 @@ could make is byte-identical; what is new is the socket's outbound side.
   `TelemetrySocket` gains a requirement, `send(_:)`, which district-macos's
   `URLSessionTelemetrySocket` must implement; `TelemetryConnectionEvent` and
   `TelemetryConnectionCommand` gain cases. That makes this release a major version.
-- CI's floor on the number of tests run rises from 1850 to 1960.
+- CI's floor on the number of tests run rises from 1850 to 1980.
 
 ## [4.0.0] - 2026-10-05
 

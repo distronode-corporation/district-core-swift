@@ -156,22 +156,28 @@ public struct TranscriptSegmentData: Codable, Sendable, Equatable {
 /// more parts.
 ///
 /// ⚠️ A CLIENT REPLACES ITS STATE FOR THE CALL WITH THE UNION OF THE PARTS once the part
-/// with ``more`` false has arrived, and not before.
+/// with ``more`` false has arrived, and not before. The parts arrive back to back, with no
+/// other frame between them, and ``live``, ``complete``, ``epoch`` and ``lastSeq`` repeat,
+/// identical, on every one.
 public struct TranscriptSnapshotData: Codable, Sendable, Equatable {
     /// The `transcript` payload version (`v` on the wire).
     public let version: Int
     public let callId: String
-    /// False once the transcript has ended (a `transcript_ended` is buffered).
+    /// False once the transcript has ended (a `transcript_ended` is buffered). ⚠️ It does
+    /// not say why: after `agent_error` a fresh assistant may still follow.
     public let live: Bool
     /// False when the server's memory does not reach back to the call's first line (it
     /// started, or evicted lines, after the call began). The earlier lines appear in the
     /// full transcript after the call, and a client says so.
     public let complete: Bool
-    /// The epoch ``lastSeq`` belongs to; nil before the first line.
+    /// The epoch ``lastSeq`` belongs to: the newest the server holds. Segments of older
+    /// epochs may be included for display; those epochs are closed.
     public let epoch: Int64?
-    /// The highest `seq` this snapshot includes; nil before the first line.
+    /// The high-water mark of ``epoch`` this snapshot includes, and of no other epoch.
+    /// ⚠️ Never an empty `0`: the server holds a subscribe until the first line exists.
     public let lastSeq: Int?
-    /// The latest revision of each segment, in (epoch, index) order.
+    /// The latest revision of each segment, in (epoch, index) order. The only field that
+    /// differs between parts.
     public let segments: [TranscriptSegment]
     /// This part's number, from 0.
     public let part: Int
@@ -260,56 +266,57 @@ public struct TranscriptEndedData: Codable, Sendable, Equatable {
 
 /// `transcript_retracted`'s data: lines that must come off every screen.
 ///
-/// ⚠️ ``seq`` IS NIL WHEN THE WEBSITE RETRACTS (a contact erase) and set when the
-/// assistant does. ``epoch`` is NOT IN THE v1 CONTRACT: a `seq` is counted per (call,
-/// epoch), so it is read here when the server sends one and is otherwise nil. See
-/// `DistrictLive.TranscriptReducer` for what a nil epoch means.
+/// ⚠️ ``epoch`` AND ``seq`` ARE SET TOGETHER OR NOT AT ALL. The assistant's retraction carries
+/// both, since a `seq` is counted per (call, epoch); the website's (a contact erase) carries
+/// neither, bypasses the counter and is applied however often it arrives. See
+/// `DistrictLive.TranscriptReducer`.
 public struct TranscriptRetractedData: Codable, Sendable, Equatable {
     /// The `transcript` payload version (`v` on the wire).
     public let version: Int
     public let callId: String
+    /// The assistant session whose counter ``seq`` belongs to; nil from the website.
+    public let epoch: Int64?
+    /// The message counter of (call, ``epoch``); nil from the website.
+    public let seq: Int?
     /// True: drop every line of the call.
     public let all: Bool
     /// The segments to drop when ``all`` is false.
     public let segmentIds: [String]
     public let reason: TranscriptRetractReason
-    public let seq: Int?
-    public let epoch: Int64?
 
     public init(
         version: Int,
         callId: String,
+        epoch: Int64?,
+        seq: Int?,
         all: Bool,
         segmentIds: [String],
-        reason: TranscriptRetractReason,
-        seq: Int?,
-        epoch: Int64? = nil
+        reason: TranscriptRetractReason
     ) {
         self.version = version
         self.callId = callId
+        self.epoch = epoch
+        self.seq = seq
         self.all = all
         self.segmentIds = segmentIds
         self.reason = reason
-        self.seq = seq
-        self.epoch = epoch
     }
 
     private enum CodingKeys: String, CodingKey {
         case version = "v"
-        case callId, all, segmentIds, reason, seq, epoch
+        case callId, epoch, seq, all, segmentIds, reason
     }
 
-    /// ⚠️ BY HAND: ``seq`` as an explicit null, the way the website sends it, and ``epoch``
-    /// only when it was sent, since the v1 contract has no such key.
+    /// ⚠️ BY HAND, for the explicit nulls; see ``TranscriptSegment/encode(to:)``.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(version, forKey: .version)
         try container.encode(callId, forKey: .callId)
+        try container.encode(epoch, forKey: .epoch)
+        try container.encode(seq, forKey: .seq)
         try container.encode(all, forKey: .all)
         try container.encode(segmentIds, forKey: .segmentIds)
         try container.encode(reason, forKey: .reason)
-        try container.encode(seq, forKey: .seq)
-        try container.encodeIfPresent(epoch, forKey: .epoch)
     }
 }
 
@@ -318,8 +325,10 @@ public struct TranscriptErrorData: Codable, Sendable, Equatable {
     /// The `transcript` payload version (`v` on the wire).
     public let version: Int
     /// The call the op named; nil for an op that names none (or that did not parse).
+    /// ⚠️ The envelope's `callId` is then `""`, which names no call.
     public let callId: String?
-    /// The op that failed, as sent; nil when it did not parse.
+    /// The `op` string the client sent, echoed exactly; nil when the frame had no string
+    /// `op` (not JSON, or the key missing). A `not_live` carries `transcript.subscribe`.
     public let op: String?
     public let code: TranscriptErrorCode
     /// How long to wait before trying again; set with ``TranscriptErrorCode/rateLimited``.
@@ -387,7 +396,8 @@ extension TelemetryEnvelope {
     /// nil for: an event type other than the five `transcript_*` names; data that does not
     /// decode; a `v` other than ``TranscriptClientOp/version``; and data whose `callId`
     /// disagrees with the envelope's. ⚠️ An error that names no call (`callId: null`) is
-    /// read whatever the envelope's `callId` says, since there is nothing to compare.
+    /// read whatever the envelope's `callId` says, since there is nothing to compare: the
+    /// server sends `""` there, which names no call and is never a key.
     public var transcriptEvent: TranscriptEvent? {
         let event: TranscriptEvent? = switch eventType {
         case .transcriptSnapshot:

@@ -11,69 +11,65 @@ final class TranscriptReducerOutcomeTests: XCTestCase {
     // MARK: - Retraction
 
     /// ⛔ A RETRACTED LINE STAYS GONE: neither a late copy nor a later revision of it can
-    /// bring it back.
+    /// bring it back. The assistant's retraction carries `epoch` with `seq` and is counted.
     func testARetractedSegmentIsRemovedAndCannotComeBack() {
         var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
         _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2)), atMilliseconds: t0)
+        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
 
-        XCTAssertEqual(reducer.apply(Frames.retracted(["s1"], seq: 3, epoch: Frames.epoch), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s2"])
+        XCTAssertEqual(reducer.apply(Frames.retracted(["s2"], seq: 4, epoch: Frames.epoch), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "s3"])
 
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 4, rev: 1)), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s2"], "a later revision of a retracted line")
-        _ = reducer.apply(
-            Frames.snapshot(
-                [Frames.segment("s1", index: 0, seq: 1), Frames.segment("s2", index: 1, seq: 2)],
-                lastSeq: 4
-            ),
-            atMilliseconds: t0
-        )
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s2"], "a snapshot taken before the retraction")
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 5, rev: 1)), atMilliseconds: t0)
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["item_a1", "s3"], "a later revision of a retracted line")
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 5000), [], "the retraction's seq left no gap")
     }
 
-    /// The website's retraction carries no seq: it is applied, and nothing is counted.
+    /// The website's retraction carries neither `epoch` nor `seq` (§4.12 Q2): it bypasses
+    /// the counter, and is applied however often it arrives.
     func testARetractionOfEverythingFromTheWebsiteClearsTheCall() {
         var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 2)), atMilliseconds: t0)
 
+        XCTAssertEqual(reducer.apply(Frames.retracted(all: true), atMilliseconds: t0), [])
         XCTAssertEqual(reducer.apply(Frames.retracted(all: true), atMilliseconds: t0), [])
 
         XCTAssertTrue(reducer.lines.isEmpty)
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 2, rev: 1)), atMilliseconds: t0)
+        _ = reducer.apply(Frames.live(Frames.segment("s2", index: 1, seq: 3, rev: 1)), atMilliseconds: t0)
         XCTAssertTrue(reducer.lines.isEmpty, "the cleared lines are tombstoned too")
-        _ = reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0)
-        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s3"], "a new line after the retraction is shown")
+        XCTAssertEqual(reducer.apply(Frames.live(Frames.segment("s4", index: 3, seq: 4)), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.lines.map(\.segmentId), ["s4"], "a new line after the retraction is shown")
     }
 
-    /// ⚠️ THE v1 RETRACTION HAS NO EPOCH, so its seq is counted against the newest epoch:
-    /// the counter then shows no gap where the retraction used a number.
-    func testARetractionsSeqWithoutAnEpochCountsAgainstTheNewestEpoch() {
+    /// Hostile input: a `seq` without its `epoch` (or the other way round) cannot be
+    /// counted, since a seq belongs to one epoch. The lines still come off; the seq it used
+    /// then shows as a gap, which a snapshot heals.
+    func testARetractionWithHalfACounterIsAppliedButNotCounted() {
         var reducer = Frames.liveReducer()
-        _ = reducer.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
-        _ = reducer.apply(Frames.retracted(["s1"], seq: 2), atMilliseconds: t0)
-
-        XCTAssertEqual(reducer.apply(Frames.live(Frames.segment("s3", index: 1, seq: 3)), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0 + 5000), [])
-    }
-
-    /// Before any frame there is no epoch to count against, and a seen retraction is still
-    /// applied: dropping a line twice is harmless.
-    func testARetractionIsAppliedWithNoEpochKnownAndWhenItsSeqWasSeen() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        _ = reducer.apply(Frames.retracted(["s1"], seq: 1), atMilliseconds: t0)
-        _ = reducer.apply(Frames.snapshot([Frames.segment("s1", index: 0, seq: 1)], lastSeq: 1), atMilliseconds: t0)
+        XCTAssertEqual(reducer.apply(Frames.retracted(["item_a1"], seq: 2), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.apply(Frames.retracted(["nothing"], epoch: Frames.epoch), atMilliseconds: t0), [])
         XCTAssertTrue(reducer.lines.isEmpty)
 
-        var seen = Frames.liveReducer()
-        _ = seen.apply(Frames.live(Frames.segment("s1", index: 0, seq: 1)), atMilliseconds: t0)
-        _ = seen.apply(Frames.retracted([], seq: 2, epoch: Frames.epoch), atMilliseconds: t0)
-        _ = seen.apply(Frames.retracted(["s1"], seq: 2, epoch: Frames.epoch), atMilliseconds: t0)
-        XCTAssertTrue(seen.lines.isEmpty)
+        XCTAssertEqual(
+            reducer.apply(Frames.live(Frames.segment("s3", index: 2, seq: 3)), atMilliseconds: t0),
+            [.checkGap(afterMilliseconds: 2000)]
+        )
+    }
+
+    /// A retraction whose seq was seen is still applied: dropping a line twice is harmless.
+    func testARetractionIsAppliedWhenItsSeqWasSeen() {
+        var reducer = Frames.liveReducer()
+        _ = reducer.apply(Frames.retracted([], seq: 2, epoch: Frames.epoch), atMilliseconds: t0)
+
+        _ = reducer.apply(Frames.retracted(["item_a1"], seq: 2, epoch: Frames.epoch), atMilliseconds: t0)
+
+        XCTAssertTrue(reducer.lines.isEmpty)
     }
 
     // MARK: - The server's refusals
 
+    /// ⚠️ A RATE-LIMITED SUBSCRIBE BRINGS NO SNAPSHOT, so it is sent again after the wait,
+    /// and that one is the heal in flight.
     func testRateLimitedWaitsAndSubscribesAgain() {
         var reducer = TranscriptReducer(callId: "call_1")
 
@@ -82,7 +78,7 @@ final class TranscriptReducerOutcomeTests: XCTestCase {
             [.resubscribe(afterMilliseconds: 4500)]
         )
         XCTAssertEqual(
-            reducer.apply(Frames.error(.rateLimited, op: nil), atMilliseconds: t0),
+            reducer.apply(Frames.error(.rateLimited), atMilliseconds: t0),
             [.resubscribe(afterMilliseconds: 2000)]
         )
         XCTAssertEqual(reducer.phase, .subscribing)
@@ -102,18 +98,25 @@ final class TranscriptReducerOutcomeTests: XCTestCase {
     }
 
     /// ⚠️ `not_live` ALSO ANSWERS A SUBSCRIBE TWO MINUTES AFTER THE END (a reconnect after
-    /// the call): an ended transcript stays ended, with its lines.
-    func testNotLiveAfterTheEndChangesNothing() {
-        var reducer = Frames.liveReducer()
-        _ = reducer.callEnded()
+    /// the call): an ended transcript stays ended, with its lines. One waiting for a fresh
+    /// assistant that never came is unavailable.
+    func testNotLiveAfterTheEndChangesNothingAndWhileReconnectingGivesUp() {
+        var ended = Frames.liveReducer()
+        _ = ended.callEnded()
+        XCTAssertEqual(ended.apply(Frames.error(.notLive), atMilliseconds: t0), [])
+        XCTAssertEqual(ended.phase, .ended(.callEnded))
 
-        XCTAssertEqual(reducer.apply(Frames.error(.notLive), atMilliseconds: t0), [])
-        XCTAssertEqual(reducer.phase, .ended(.callEnded))
+        var reconnecting = Frames.liveReducer()
+        _ = reconnecting.apply(Frames.ended(seq: 2, reason: .agentError), atMilliseconds: t0)
+        reconnecting.reconnected()
+        XCTAssertEqual(reconnecting.apply(Frames.error(.notLive), atMilliseconds: t0), [.unsubscribe])
+        XCTAssertEqual(reconnecting.phase, .unavailable(.notLive))
     }
 
-    /// ⛔ A REFUSED UNSUBSCRIBE NEEDS NO ANSWER, and re-subscribing after a rate-limited
-    /// one would undo it.
-    func testARefusalOfAnotherOpIsIgnored() {
+    /// ⛔ §4.12 Q8: `op` ECHOES THE OP SENT, so only an error whose `op` is exactly
+    /// `transcript.subscribe` is about the subscribe. A refused unsubscribe needs no answer
+    /// (re-subscribing after it would undo it), and a frame with no op is no op of ours.
+    func testARefusalOfAnythingButTheSubscribeIsIgnored() {
         var reducer = Frames.liveReducer()
 
         XCTAssertEqual(
@@ -124,20 +127,54 @@ final class TranscriptReducerOutcomeTests: XCTestCase {
             []
         )
         XCTAssertEqual(reducer.apply(Frames.error(.badRequest, op: "socket.mode"), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.apply(Frames.error(.notLive, op: nil), atMilliseconds: t0), [])
+        XCTAssertEqual(reducer.apply(Frames.error(.notLive, op: "Transcript.Subscribe"), atMilliseconds: t0), [])
         XCTAssertEqual(reducer.phase, .live)
     }
 
-    /// A refusal that arrives while a snapshot is still arriving is held with the live
-    /// frames and applied after it.
-    func testARefusalBehindAHalfSnapshotIsAppliedAfterIt() {
-        var reducer = TranscriptReducer(callId: "call_1")
-        _ = reducer.apply(Frames.snapshot([], lastSeq: 0, more: true), atMilliseconds: t0)
-        XCTAssertEqual(reducer.apply(Frames.error(.rateLimited, retryAfterMs: 7), atMilliseconds: t0), [])
+    // MARK: - Call-status signals
 
-        XCTAssertEqual(
-            reducer.apply(Frames.snapshot([], lastSeq: 0, part: 1), atMilliseconds: t0),
-            [.resubscribe(afterMilliseconds: 7)]
-        )
+    /// ⛔ §4.12 Q4: `not_live` IS FINAL FOR THAT SUBSCRIBE. Only a call-status change
+    /// subscribes again, once per change; a repeated status asks for nothing, and so does
+    /// one while the transcript is anything but `not_live`.
+    func testOnlyAStatusChangeSubscribesAgainAfterNotLive() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        XCTAssertEqual(reducer.callStatusChanged(to: "ringing"), [], "subscribing: nothing to do")
+        _ = reducer.apply(Frames.error(.notLive), atMilliseconds: t0)
+
+        XCTAssertEqual(reducer.callStatusChanged(to: "ringing"), [], "the same status is no signal")
+        XCTAssertEqual(reducer.phase, .unavailable(.notLive))
+        XCTAssertEqual(reducer.callStatusChanged(to: "in-progress"), [.subscribe])
+        XCTAssertEqual(reducer.phase, .subscribing)
+        XCTAssertEqual(reducer.gapCheck(atMilliseconds: t0), [])
+
+        _ = reducer.apply(Frames.snapshot([Frames.greeting], lastSeq: 1), atMilliseconds: t0)
+        XCTAssertEqual(reducer.phase, .live)
+        XCTAssertEqual(reducer.callStatusChanged(to: "on-hold"), [], "live: nothing to do")
+    }
+
+    /// The first status reported is a signal too, when the subscribe already ended in
+    /// `not_live`; another refusal is not undone by any status.
+    func testTheFirstStatusIsASignalAndOtherRefusalsStay() {
+        var notLive = TranscriptReducer(callId: "call_1")
+        _ = notLive.apply(Frames.error(.notLive), atMilliseconds: t0)
+        XCTAssertEqual(notLive.callStatusChanged(to: "in-progress"), [.subscribe])
+
+        var refused = TranscriptReducer(callId: "call_1")
+        _ = refused.apply(Frames.error(.forbiddenRole), atMilliseconds: t0)
+        XCTAssertEqual(refused.callStatusChanged(to: "in-progress"), [])
+        XCTAssertEqual(refused.phase, .unavailable(.forbiddenRole))
+    }
+
+    /// ⚠️ THE CALL'S END CHANGES NOTHING FOR A CALL WITH NO LIVE TRANSCRIPT: the screen
+    /// already offers the transcript after the call.
+    func testTheCallsEndLeavesAnUnavailableTranscriptAlone() {
+        var reducer = TranscriptReducer(callId: "call_1")
+        _ = reducer.apply(Frames.error(.notLive), atMilliseconds: t0)
+
+        XCTAssertEqual(reducer.callEnded(), [])
+        XCTAssertEqual(reducer.phase, .unavailable(.notLive))
+        XCTAssertEqual(reducer.finalTranscript, .notRequested)
     }
 
     // MARK: - The full transcript

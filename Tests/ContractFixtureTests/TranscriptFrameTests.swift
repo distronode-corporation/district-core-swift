@@ -58,7 +58,7 @@ final class TranscriptFrameTests: XCTestCase {
         case .transcriptEnded:
             return ["$.data.lastIndex"]
         case .transcriptRetracted:
-            return ["$.data.seq"]
+            return ["$.data.epoch", "$.data.seq"]
         case .transcriptError:
             return ["$.data.callId", "$.data.op", "$.data.retryAfterMs"]
         default:
@@ -163,5 +163,31 @@ final class TranscriptFrameTests: XCTestCase {
             }
         }
         XCTAssertTrue(segments.contains { !$0.final }, "the interim frame carries an interim segment")
+    }
+
+    /// The §4.12 clarifications, whatever frame carries them.
+    func testEveryFrameKeepsTheClarifiedInvariants() throws {
+        for name in Self.frames.keys {
+            let envelope = try Self.gate(name)
+            switch envelope.transcriptEvent {
+            case let .snapshot(data)?:
+                // Q4 and Q7: a mark for one epoch, and never an empty opening snapshot.
+                XCTAssertEqual(data.epoch == nil, data.lastSeq == nil, name)
+                XCTAssertNotEqual(data.lastSeq, 0, name)
+                XCTAssertTrue(data.segments.allSatisfy { $0.epoch <= data.epoch ?? $0.epoch }, name)
+            case let .retracted(data)?:
+                // Q2: `epoch` whenever `seq`.
+                XCTAssertEqual(data.epoch == nil, data.seq == nil, name)
+            case let .error(data)?:
+                // Q3: a call-less error keeps a string envelope `callId`, "".
+                XCTAssertEqual(envelope.callId, data.callId ?? "", name)
+                // Q8: `not_live` answers a subscribe and says so.
+                if data.code == .notLive {
+                    XCTAssertEqual(data.op, "transcript.subscribe", name)
+                }
+            default:
+                break
+            }
+        }
     }
 }

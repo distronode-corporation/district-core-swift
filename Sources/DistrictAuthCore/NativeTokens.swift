@@ -48,13 +48,11 @@ public struct NativeTokens: Sendable, Equatable {
 /// A future divergence would surface as a contract-gate failure on whichever
 /// fixture changed, which is the signal wanted, see the note below.
 ///
-/// ⛔ THESE DTOs ARE NOT YET UNDER THE CONTRACT GATE, AND THAT IS A KNOWN,
-/// TRACKED HOLE RATHER THAN AN OVERSIGHT. There are no fixtures for the
-/// native-auth token/refresh responses on EITHER platform, because they are
-/// generated on the server side alongside the Android client's. When they
-/// exist, this type joins `ImplementedFixtures` and its fixture name comes off
-/// `ContractManifest.unimplemented` in the same commit. Until then the only
-/// thing pinning this shape is the server's two routes.
+/// ⛔ UNDER THE CONTRACT GATE THROUGH ONE FIXTURE: `district-native-mfa.json`, the
+/// grant `POST /api/auth/native/mfa` answers with, which the server builds with the
+/// same `issueNativeGrant` as the token and Apple routes (pinned byte for byte in
+/// its `native-grant.test.ts`). The token and refresh routes have no fixture of
+/// their own yet; when one arrives it is gated against this type too.
 ///
 /// ⚠️ `tokenType` IS DECLARED EVEN THOUGH NOTHING READS IT, WHICH IS THE
 /// OPPOSITE OF WHAT THE KOTLIN CLIENT DOES, AND BOTH ARE RIGHT. `NativeAuthApi`

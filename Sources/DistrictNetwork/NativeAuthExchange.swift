@@ -80,6 +80,15 @@ public enum CodeExchangeResult<Tokens: Sendable>: Sendable {
     /// ambiguous (`transportFailure`).
     case noAccount
 
+    /// ⛔ THE APPLE ROUTE'S 401 `mfa_required`, AND ONLY THE APPLE ROUTE'S. The Apple ID
+    /// is verified and the account has an authenticator enrolled, so the server asks for
+    /// the code before it issues anything. Show the code step and spend the challenge
+    /// with ``NativeAuthClient/submitMfaCode(_:)``; nothing has been signed in yet.
+    ///
+    /// ⚠️ ``NativeAuthClient/exchangeCode(_:)`` NEVER PRODUCES IT: the browser leg asks
+    /// for the code on the web page before a PKCE code exists.
+    case mfaRequired(NativeMfaChallenge)
+
     /// No usable answer: an I/O failure, a 5xx, or a 200 this build cannot
     /// parse.
     case transportFailure

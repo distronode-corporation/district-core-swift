@@ -1,4 +1,5 @@
 import ContractGateSupport
+import DistrictAuthCore
 import DistrictModel
 import Foundation
 import XCTest
@@ -21,6 +22,32 @@ final class AuthWorkspaceContractTests: XCTestCase {
             as: SuccessResponse.self
         )
         XCTAssertTrue(response.success)
+    }
+
+    /// ⛔ THE DISCRIMINATOR AND A REDEEMABLE TICKET. A client keys on `error`, so a
+    /// regeneration that renamed it, or recorded an empty ticket, must fail here.
+    func testTheAppleMfaStepCarriesTheDiscriminatorAndATicket() throws {
+        let response = try StrictDecodeVerifier.verify(
+            fixture: "district-native-apple-mfa-required.json",
+            as: NativeMfaRequiredResponse.self
+        )
+        XCTAssertEqual(response.error, NativeMfaRequiredResponse.mfaRequiredError)
+        XCTAssertEqual(response.code, "MFA_REQUIRED")
+        XCTAssertFalse(response.mfaTicket.isEmpty)
+        XCTAssertNotNil(WireInstant.parse(response.mfaTicketExpiresAt), "an ISO-8601 instant")
+    }
+
+    /// ⛔ THE UNCHANGED FIVE-KEY GRANT, with both expiries as epoch MILLISECONDS.
+    func testTheMfaStepAnswersWithTheNativeGrant() throws {
+        let response = try StrictDecodeVerifier.verify(
+            fixture: "district-native-mfa.json",
+            as: NativeTokenResponse.self
+        )
+        XCTAssertEqual(response.tokenType, "Bearer")
+        XCTAssertFalse(response.accessToken.isEmpty)
+        XCTAssertFalse(response.refreshToken.isEmpty)
+        XCTAssertGreaterThan(response.accessTokenExpiresAt, 1_000_000_000_000, "milliseconds, not seconds")
+        XCTAssertGreaterThan(response.refreshTokenExpiresAt, response.accessTokenExpiresAt)
     }
 
     /// ⛔ `revoked` IS A COUNT, AND ZERO IS A SUCCESS. Pinned as a count rather

@@ -6,6 +6,42 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+The second factor after native Sign in with Apple. A major release (see Changed). Every
+request 5.0.0 could make is byte-identical; what is new is one answer to the Apple exchange
+and one route.
+
+### Added
+
+- `POST /api/auth/native/apple` now answers `401 mfa_required` with a single-use ticket when
+  the account has an authenticator enrolled (the service's S152, live since 2026-10-06).
+  `NativeAuthClient.exchangeAppleIdentityToken(_:)` reads it as the new
+  `CodeExchangeResult.mfaRequired(NativeMfaChallenge)` (the ticket, and its expiry parsed by
+  `WireInstant`); any other 401 stays `transportFailure`, and the PKCE exchange never
+  produces the case.
+- `NativeAuthClient.submitMfaCode(_:)` posts `NativeMfaRequest` (`mfaTicket`, `code`,
+  `deviceId`, `deviceName` omitted when nil, `platform`) to `POST /api/auth/native/mfa` and
+  answers `NativeMfaResult`: `success` with the unchanged five-key grant, `invalidCode`
+  (401: wrong code or locked account, the ticket stands), `ticketRejected` (400: expired,
+  spent, another install or the account changed; start again from the Apple sheet),
+  `rateLimited` (429) or `transportFailure`.
+- `NativeMfaChallenge.isExpired(at:)`, false when the expiry could not be read.
+- In `DistrictModel`: `NativeMfaRequiredResponse`, the 401's five keys.
+- In `DistrictAuthCore`: `NativeMfaCode`, the shape check the apps run before sending a code
+  (six ASCII digits for an authenticator code; a recovery code of 8 to 64 characters that is
+  not six digits, sent upper-cased), mirroring the service's routing by shape, and
+  `authenticatorInput(_:)` for filtering a field as it is typed.
+- Contracts: `contracts/mobile/` gains the service's two new fixtures (166 files, was 164),
+  `district-native-apple-mfa-required.json` and `district-native-mfa.json`, both gated
+  (`NativeMfaRequiredResponse`, and `NativeTokenResponse`, which is the first recorded native
+  grant). `ContractFixtureTests` now depends on `DistrictAuthCore`, and
+  `DistrictNetworkTests` on `ContractGateSupport` so the client tests read the recorded bytes.
+
+### Changed
+
+- ⚠️ Source-breaking: `CodeExchangeResult` gains a case, so an exhaustive `switch` over it
+  needs `.mfaRequired` (both apps' `AppleSignInController.exchange` have one). That makes
+  this release a major version.
+
 ## [5.0.0] - 2026-10-06
 
 A major release (see Changed). Every request 4.0.0 could make is byte-identical; what is

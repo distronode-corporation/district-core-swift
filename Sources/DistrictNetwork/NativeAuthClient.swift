@@ -1,6 +1,7 @@
+import DistrictModel
 import Foundation
 
-/// The four unauthenticated native-auth paths, as SEGMENTS.
+/// The five unauthenticated native-auth paths, as SEGMENTS.
 ///
 /// ⚠️ SEGMENTS, NOT A TEMPLATE, matching how ``DistrictPaths`` builds every
 /// other path in this client. Nothing user-supplied is interpolated into any of
@@ -10,7 +11,7 @@ import Foundation
 /// ⛔ THEY ARE NOT IN ``DistrictPaths`` AND HAVE NO ``EndpointID``, WHICH IS THE
 /// SAME GUARD `calls/outbound` RELIES ON RATHER THAN AN OMISSION. Those are the
 /// raw materials of ``ApiRequestDescriptor``, and a descriptor is a request
-/// ``ApiClient`` will attach a bearer to, which these four routes must never
+/// ``ApiClient`` will attach a bearer to, which these five routes must never
 /// be: the credential is the code (exchange), Apple's identity token, or the
 /// refresh token itself (refresh, revoke). Giving them an `EndpointID` would
 /// also put them in the untyped/typed/redirect partition that
@@ -30,20 +31,25 @@ enum NativeAuthPaths {
     /// for, against an identity token Apple signed, so they are separate
     /// handlers with separate rate-limit buckets on the server.
     static let apple = nativeAuth + ["apple"]
+
+    /// ⚠️ THE SECOND HALF OF AN APPLE SIGN-IN, NOT A SIGN-IN OF ITS OWN. Its authority is
+    /// the ticket the Apple route issued plus the code; it has its own rate-limit bucket.
+    static let mfa = nativeAuth + ["mfa"]
 }
 
-/// The four unauthenticated native-auth calls the shell needs: the PKCE code
-/// exchange, the Apple identity-token exchange, the refresh rotation, and the
-/// sign-out revoke.
+/// The five unauthenticated native-auth calls the shell needs: the PKCE code
+/// exchange, the Apple identity-token exchange and its second-factor step, the
+/// refresh rotation, and the sign-out revoke.
 ///
 /// ⛔ THESE CARRY NO BEARER TOKEN, WHICH IS WHY THEY CANNOT GO THROUGH
-/// ``ApiClient``. Acquiring an access token is what the first three are FOR, so
+/// ``ApiClient``. Acquiring an access token is what the first four are FOR, so
 /// routing them through a client that acquires one first is a deadlock; the
 /// revoke has a second reason, which is that it is called from a sign-out that
-/// has already decided to stop having a session. All four sit under `proxy.ts`'s
+/// has already decided to stop having a session. All five sit under `proxy.ts`'s
 /// public `/api/auth/` prefix for the same reason: the caller has no usable
-/// session, and the authority is the code (exchange), Apple's signature (apple)
-/// or the refresh token itself (refresh, revoke).
+/// session, and the authority is the code (exchange), Apple's signature (apple),
+/// the ticket Apple's leg issued plus a code (mfa) or the refresh token itself
+/// (refresh, revoke).
 ///
 /// ⛔ THE STATUS MAPPING IS SECURITY-RELEVANT, NOT PLUMBING. It is taken from
 /// `DistrictAuthCore.RefreshResult`'s table, which was derived from the route
@@ -167,8 +173,52 @@ public struct NativeAuthClient<
             return .success(tokens)
         case 400:
             return .rejected
+        case 401:
+            // ⛔ 401 IS THE SECOND-FACTOR STEP ONLY WHEN THE BODY SAYS SO. The route's
+            // one 401 is `mfa_required` with a ticket; any other 401 (a proxy, a
+            // body this build cannot read) stays ambiguous, as it was before the step
+            // existed, rather than opening a code sheet that cannot succeed.
+            return Self.mfaChallenge(from: response).map { .mfaRequired($0) } ?? .transportFailure
         case 403:
             return .noAccount
+        case 429:
+            return .rateLimited
+        default:
+            return .transportFailure
+        }
+    }
+
+    // ── The second factor ────────────────────────────────────────────────────
+
+    /// Trade the Apple route's MFA ticket and an authenticator or recovery code for the
+    /// first token pair: `POST /api/auth/native/mfa`.
+    ///
+    /// ⛔ THE STATUS MAP, READ OFF THE ROUTE. 200 is the unchanged five-key grant. 401
+    /// `invalid_credentials` is a wrong code (or a locked account) and the ticket stays
+    /// usable. 400 `invalid_grant` is every ticket refusal (expired, spent, another
+    /// install, the account changed, the factor removed) and means start again; a 400
+    /// for a malformed body lands there too, which is the right answer for it. 429 is
+    /// the per-IP limiter, before anything is checked. Everything else is ambiguous.
+    ///
+    /// ⚠️ NO RETRY HERE. A code is single-use server-side once it verifies, so a second
+    /// send after an ambiguous answer is the caller's decision, made with the person
+    /// watching.
+    public func submitMfaCode(_ request: NativeMfaRequest) async -> NativeMfaResult<Wire.Tokens> {
+        // ⚠️ THE ENCODE IS INSIDE THE `try?` for the reason the Apple exchange gives:
+        // every property is a `String`, so it cannot throw, and a separate branch would
+        // be a line no input reaches.
+        guard let response = try? await post(NativeAuthPaths.mfa, body: JSONEncoder().encode(request)) else {
+            return .transportFailure
+        }
+
+        switch response.statusCode {
+        case 200:
+            guard let tokens = Self.tokens(from: response) else { return .transportFailure }
+            return .success(tokens)
+        case 400:
+            return .ticketRejected
+        case 401:
+            return .invalidCode
         case 429:
             return .rateLimited
         default:
@@ -321,7 +371,7 @@ public struct NativeAuthClient<
     private func post(_ segments: [String], body: Data) async throws -> HTTPResponse {
         // ⚠️ ONE SEGMENT AT A TIME, WHICH IS BOTH THE SEGMENT DISCIPLINE AND A
         // TOTAL FUNCTION. ``ApiURL/build(base:segments:query:)`` answers an
-        // Optional for the empty-segment case these four constant paths cannot
+        // Optional for the empty-segment case these five constant paths cannot
         // reach, and a nil branch no input can take is a line that can never be
         // covered and a claim that can never be tested. Appending components
         // percent-encodes each one and cannot fail. ⚠️ It also absorbs a trailing
@@ -352,5 +402,13 @@ public struct NativeAuthClient<
     private static func tokens(from response: HTTPResponse) -> Wire.Tokens? {
         guard let body = response.body else { return nil }
         return try? JSONDecoder().decode(Wire.self, from: body).tokens
+    }
+
+    /// The Apple route's `mfa_required` body, or nil for any other 401.
+    private static func mfaChallenge(from response: HTTPResponse) -> NativeMfaChallenge? {
+        guard let body = response.body,
+              let decoded = try? JSONDecoder().decode(NativeMfaRequiredResponse.self, from: body)
+        else { return nil }
+        return NativeMfaChallenge(decoded)
     }
 }

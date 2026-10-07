@@ -197,9 +197,13 @@ let package = Package(
             dependencies: ["DistrictAuthCore", "ContractGateSupport"],
             swiftSettings: districtSwiftSettings
         ),
+        // ⚠️ DEPENDS ON `ContractGateSupport` FOR TWO FIXTURES. `NativeMfaClientTests` runs
+        // the service's own `district-native-apple-mfa-required.json` and
+        // `district-native-mfa.json` through `NativeAuthClient`, so the 401 that opens the
+        // code step and the grant that closes it are the recorded bytes, not a retyping.
         .testTarget(
             name: "DistrictNetworkTests",
-            dependencies: ["DistrictNetwork"],
+            dependencies: ["DistrictNetwork", "ContractGateSupport"],
             swiftSettings: districtSwiftSettings
         ),
         // ⚠️ DEPENDS ON `ContractGateSupport` FOR ONE FIXTURE, like the auth tests above.
@@ -242,9 +246,12 @@ let package = Package(
         // runs `district-scheduling-handoff.json` through the decoder
         // `SchedulingHandoffClient` uses, which is strict by hand rather than a
         // Codable DTO, so it is reached with `@testable import` instead of the gate.
+        //
+        // ⚠️ `DistrictAuthCore` FOR THE NATIVE GRANT. `district-native-mfa.json` is the
+        // first recorded five-key grant, and its DTO, `NativeTokenResponse`, lives there.
         .testTarget(
             name: "ContractFixtureTests",
-            dependencies: ["ContractGateSupport", "DistrictModel", "DistrictNetwork"],
+            dependencies: ["ContractGateSupport", "DistrictModel", "DistrictNetwork", "DistrictAuthCore"],
             path: "Tests/ContractFixtureTests",
             swiftSettings: districtSwiftSettings
         ),

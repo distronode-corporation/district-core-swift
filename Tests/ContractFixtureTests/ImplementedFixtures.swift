@@ -1,4 +1,5 @@
 import ContractGateSupport
+import DistrictAuthCore
 import DistrictModel
 import Foundation
 
@@ -49,6 +50,12 @@ enum ImplementedFixtures {
     private static var authAndSessions: [ImplementedFixture] {
         [
             gate("district-native-revoke.json", SuccessResponse.self),
+            // ⛔ THE TWO HALVES OF A NATIVE APPLE SIGN-IN WITH AN AUTHENTICATOR ON. The
+            // 401 that asks for the code, and the grant `native/mfa` answers it with.
+            // The grant is the same five keys every native route returns, so this is
+            // also the first fixture that pins `NativeTokenResponse` itself.
+            gate("district-native-apple-mfa-required.json", NativeMfaRequiredResponse.self),
+            gate("district-native-mfa.json", NativeTokenResponse.self),
             gate("district-revoke-all.json", DeviceRevokeResponse.self),
             gate("district-device-revoke.json", DeviceRevokeResponse.self),
             // ⛔ THE READ THAT MAKES THE TWO REVOKES ABOVE USABLE, AND IT ARRIVED

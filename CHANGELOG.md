@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-10-07
+
 The second factor after native Sign in with Apple. A major release (see Changed). Every
 request 5.0.0 could make is byte-identical; what is new is one answer to the Apple exchange
 and one route.

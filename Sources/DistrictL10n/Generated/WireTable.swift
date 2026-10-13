@@ -15,6 +15,26 @@ public enum WireCategory: String, CaseIterable, Sendable {
     case analyticsSentiment
     case memberRole
     case region
+    case deskTicketStatus
+    case deskTicketSource
+    case knowledgeDocumentStatus
+    case workflowTrigger
+    case workflowRunStatus
+    case workflowAction
+    case workflowActionOutcome
+    case workflowActionReason
+    case numberType
+    case numberCapability
+    case numberProvider
+    case meetingStatus
+    case messageDeliveryStatus
+    case researchStatus
+    case contactResearchKey
+    case lineType
+    case billingSubscriptionStatus
+    case billingInvoiceStatus
+    case messagingCarrier
+    case messagingCredentialSource
 }
 
 /// Wire value to its catalog label.
@@ -51,11 +71,15 @@ enum WireTable {
         case (.disposition, "other"): WireCopy.dispositionOther
         case (.transferStatus, "success"): WireCopy.transferStatusSuccess
         case (.transferStatus, "failed"): WireCopy.transferStatusFailed
+        case (.transferStatus, "completed"): WireCopy.transferStatusCompleted
         case (.transferReason, "ring_timeout"): WireCopy.transferReasonRingTimeout
         case (.transferReason, "no_answer"): WireCopy.transferReasonNoAnswer
         case (.transferReason, "auth_error"): WireCopy.transferReasonAuthError
         case (.transferReason, "trunk_not_configured"): WireCopy.transferReasonTrunkNotConfigured
         case (.transferReason, "error"): WireCopy.transferReasonError
+        case (.transferReason, "room_not_found"): WireCopy.transferReasonRoomNotFound
+        case (.transferReason, "provider_unsupported"): WireCopy.transferReasonProviderUnsupported
+        case (.transferReason, "caller_requested_human"): WireCopy.transferReasonCallerRequestedHuman
         case (.funnelStage, "total dials"): WireCopy.funnelStageTotalDials
         case (.funnelStage, "connected calls"): WireCopy.funnelStageConnectedCalls
         case (.funnelStage, "successful leads"): WireCopy.funnelStageSuccessfulLeads
@@ -69,6 +93,105 @@ enum WireTable {
         case (.region, "ca"): WireCopy.regionCa
         case (.region, "eu"): WireCopy.regionEu
         case (.region, "apac"): WireCopy.regionApac
+        case (.deskTicketStatus, "open"): WireCopy.deskTicketStatusOpen
+        case (.deskTicketStatus, "waiting"): WireCopy.deskTicketStatusWaiting
+        case (.deskTicketStatus, "resolved"): WireCopy.deskTicketStatusResolved
+        case (.deskTicketSource, "voice-call"): WireCopy.deskTicketSourceVoiceCall
+        case (.deskTicketSource, "manual"): WireCopy.deskTicketSourceManual
+        case (.knowledgeDocumentStatus, "processing"): WireCopy.knowledgeDocumentStatusProcessing
+        case (.knowledgeDocumentStatus, "ready"): WireCopy.knowledgeDocumentStatusReady
+        case (.knowledgeDocumentStatus, "failed"): WireCopy.knowledgeDocumentStatusFailed
+        case (.workflowTrigger, "call_ended"): WireCopy.workflowTriggerCallEnded
+        case (.workflowTrigger, "call_ended_answered"): WireCopy.workflowTriggerCallEndedAnswered
+        case (.workflowTrigger, "call_ended_unanswered"): WireCopy.workflowTriggerCallEndedUnanswered
+        case (.workflowTrigger, "negative_sentiment"): WireCopy.workflowTriggerNegativeSentiment
+        case (.workflowTrigger, "positive_sentiment"): WireCopy.workflowTriggerPositiveSentiment
+        case (.workflowTrigger, "neutral_sentiment"): WireCopy.workflowTriggerNeutralSentiment
+        case (.workflowTrigger, "intent_detected"): WireCopy.workflowTriggerIntentDetected
+        case (.workflowTrigger, "sms_received"): WireCopy.workflowTriggerSmsReceived
+        case (.workflowTrigger, "contact_created"): WireCopy.workflowTriggerContactCreated
+        case (.workflowTrigger, "dnc_registered"): WireCopy.workflowTriggerDncRegistered
+        case (.workflowTrigger, "booking_created"): WireCopy.workflowTriggerBookingCreated
+        case (.workflowTrigger, "booking_cancelled"): WireCopy.workflowTriggerBookingCancelled
+        case (.workflowTrigger, "booking_rescheduled"): WireCopy.workflowTriggerBookingRescheduled
+        case (.workflowTrigger, "booking_reminder"): WireCopy.workflowTriggerBookingReminder
+        case (.workflowRunStatus, "success"): WireCopy.workflowRunStatusSuccess
+        case (.workflowRunStatus, "partial"): WireCopy.workflowRunStatusPartial
+        case (.workflowRunStatus, "failed"): WireCopy.workflowRunStatusFailed
+        case (.workflowRunStatus, "skipped"): WireCopy.workflowRunStatusSkipped
+        case (.workflowAction, "send_sms"): WireCopy.workflowActionSendSms
+        case (.workflowAction, "send_email"): WireCopy.workflowActionSendEmail
+        case (.workflowAction, "add_crm_tag"): WireCopy.workflowActionAddCrmTag
+        case (.workflowAction, "remove_crm_tag"): WireCopy.workflowActionRemoveCrmTag
+        case (.workflowAction, "register_compliance_dnc"): WireCopy.workflowActionRegisterComplianceDnc
+        case (.workflowAction, "notify_ops"): WireCopy.workflowActionNotifyOps
+        case (.workflowActionOutcome, "ok"): WireCopy.workflowActionOutcomeOk
+        case (.workflowActionOutcome, "skipped"): WireCopy.workflowActionOutcomeSkipped
+        case (.workflowActionOutcome, "failed"): WireCopy.workflowActionOutcomeFailed
+        case (.workflowActionReason, "contact-not-found"): WireCopy.workflowActionReasonContactNotFound
+        case (.workflowActionReason, "dnc"): WireCopy.workflowActionReasonDnc
+        case (.workflowActionReason, "dormant"): WireCopy.workflowActionReasonDormant
+        case (.workflowActionReason, "empty-body"): WireCopy.workflowActionReasonEmptyBody
+        case (.workflowActionReason, "empty-subject"): WireCopy.workflowActionReasonEmptySubject
+        case (.workflowActionReason, "empty-tag"): WireCopy.workflowActionReasonEmptyTag
+        case (.workflowActionReason, "http-{status}"): WireCopy.workflowActionReasonHttpStatus
+        case (.workflowActionReason, "invalid-recipient"): WireCopy.workflowActionReasonInvalidRecipient
+        case (.workflowActionReason, "missing-webhook-url"): WireCopy.workflowActionReasonMissingWebhookUrl
+        case (.workflowActionReason, "no-provider-credentials"): WireCopy.workflowActionReasonNoProviderCredentials
+        case (.workflowActionReason, "no-recipient"): WireCopy.workflowActionReasonNoRecipient
+        case (.workflowActionReason, "no-sending-number"): WireCopy.workflowActionReasonNoSendingNumber
+        case (.workflowActionReason, "postmark-missing"): WireCopy.workflowActionReasonPostmarkMissing
+        case (.workflowActionReason, "report-recipient-refused"): WireCopy.workflowActionReasonReportRecipientRefused
+        case (.workflowActionReason, "report-unavailable"): WireCopy.workflowActionReasonReportUnavailable
+        case (.workflowActionReason, "send-failed"): WireCopy.workflowActionReasonSendFailed
+        case (.workflowActionReason, "tag-already-present"): WireCopy.workflowActionReasonTagAlreadyPresent
+        case (.workflowActionReason, "tag-not-present"): WireCopy.workflowActionReasonTagNotPresent
+        case (.workflowActionReason, "unknown-action-type"): WireCopy.workflowActionReasonUnknownActionType
+        case (.numberType, "local"): WireCopy.numberTypeLocal
+        case (.numberType, "tollfree"): WireCopy.numberTypeTollfree
+        case (.numberType, "mobile"): WireCopy.numberTypeMobile
+        case (.numberCapability, "sms"): WireCopy.numberCapabilitySms
+        case (.numberCapability, "voice"): WireCopy.numberCapabilityVoice
+        case (.numberCapability, "mms"): WireCopy.numberCapabilityMms
+        case (.numberProvider, "twilio"): WireCopy.numberProviderTwilio
+        case (.numberProvider, "sinch"): WireCopy.numberProviderSinch
+        case (.numberProvider, "telnyx"): WireCopy.numberProviderTelnyx
+        case (.numberProvider, "unknown"): WireCopy.numberProviderUnknown
+        case (.meetingStatus, "in-progress"): WireCopy.meetingStatusInProgress
+        case (.meetingStatus, "completed"): WireCopy.meetingStatusCompleted
+        case (.messageDeliveryStatus, "queued"): WireCopy.messageDeliveryStatusQueued
+        case (.messageDeliveryStatus, "sent"): WireCopy.messageDeliveryStatusSent
+        case (.messageDeliveryStatus, "delivered"): WireCopy.messageDeliveryStatusDelivered
+        case (.messageDeliveryStatus, "failed"): WireCopy.messageDeliveryStatusFailed
+        case (.messageDeliveryStatus, "received"): WireCopy.messageDeliveryStatusReceived
+        case (.researchStatus, "pending"): WireCopy.researchStatusPending
+        case (.researchStatus, "crawling"): WireCopy.researchStatusCrawling
+        case (.researchStatus, "complete"): WireCopy.researchStatusComplete
+        case (.researchStatus, "failed"): WireCopy.researchStatusFailed
+        case (.contactResearchKey, "executivesummary"): WireCopy.contactResearchKeyExecutivesummary
+        case (.contactResearchKey, "estimatedvalue"): WireCopy.contactResearchKeyEstimatedvalue
+        case (.contactResearchKey, "corepainpoints"): WireCopy.contactResearchKeyCorepainpoints
+        case (.contactResearchKey, "recommendedgreeting"): WireCopy.contactResearchKeyRecommendedgreeting
+        case (.contactResearchKey, "dynamicicebreakers"): WireCopy.contactResearchKeyDynamicicebreakers
+        case (.contactResearchKey, "person"): WireCopy.contactResearchKeyPerson
+        case (.contactResearchKey, "callerintel"): WireCopy.contactResearchKeyCallerintel
+        case (.lineType, "mobile"): WireCopy.lineTypeMobile
+        case (.lineType, "landline"): WireCopy.lineTypeLandline
+        case (.lineType, "voip"): WireCopy.lineTypeVoip
+        case (.billingSubscriptionStatus, "active"): WireCopy.billingSubscriptionStatusActive
+        case (.billingSubscriptionStatus, "trialing"): WireCopy.billingSubscriptionStatusTrialing
+        case (.billingSubscriptionStatus, "past_due"): WireCopy.billingSubscriptionStatusPastDue
+        case (.billingSubscriptionStatus, "unpaid"): WireCopy.billingSubscriptionStatusUnpaid
+        case (.billingInvoiceStatus, "draft"): WireCopy.billingInvoiceStatusDraft
+        case (.billingInvoiceStatus, "open"): WireCopy.billingInvoiceStatusOpen
+        case (.billingInvoiceStatus, "paid"): WireCopy.billingInvoiceStatusPaid
+        case (.billingInvoiceStatus, "uncollectible"): WireCopy.billingInvoiceStatusUncollectible
+        case (.billingInvoiceStatus, "void"): WireCopy.billingInvoiceStatusVoid
+        case (.messagingCarrier, "twilio"): WireCopy.messagingCarrierTwilio
+        case (.messagingCarrier, "sinch"): WireCopy.messagingCarrierSinch
+        case (.messagingCarrier, "telnyx"): WireCopy.messagingCarrierTelnyx
+        case (.messagingCredentialSource, "byok"): WireCopy.messagingCredentialSourceByok
+        case (.messagingCredentialSource, "managed"): WireCopy.messagingCredentialSourceManaged
         default: nil
         }
     }
@@ -77,6 +200,8 @@ enum WireTable {
     static func fallback(_ category: WireCategory) -> String? {
         switch category {
         case .transferReason: WireCopy.transferReasonFallback
+        case .deskTicketStatus: WireCopy.deskTicketStatusFallback
+        case .knowledgeDocumentStatus: WireCopy.knowledgeDocumentStatusFallback
         default: nil
         }
     }
@@ -105,6 +230,7 @@ enum WireTable {
         case "AI Voice session active...": WireCopy.placeholderAiVoiceSessionActive
         case "AI Outbound Voice session active...": WireCopy.placeholderAiOutboundVoiceSessionActive
         case "Voice session completed.": WireCopy.placeholderVoiceSessionCompleted
+        case "No answer, no conversation took place.": WireCopy.placeholderNoAnswerNoConversationTookPlace
         case "New manually added contact.": WireCopy.placeholderNewManuallyAddedContact
         case "Manual edit update.": WireCopy.placeholderManualEditUpdate
         case "Consultation": WireCopy.placeholderConsultation

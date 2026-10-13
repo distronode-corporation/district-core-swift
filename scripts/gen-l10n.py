@@ -93,6 +93,12 @@ def humanize(raw: str) -> str:
     return words[:1].upper() + words[1:]
 
 
+def literal(text: str) -> str:
+    """Contract text as catalog text: a brace is literal there (`http-{status}` is a
+    workflow reason code, not a placeholder), so it is doubled."""
+    return text.replace("{", "{{").replace("}", "}}")
+
+
 def swift_str(text: str) -> str:
     return '"' + L10N.escape_c_like(text, "swift") + '"'
 
@@ -160,7 +166,7 @@ def wire_entries(doc: dict):
         group = snake(name)
         for value in category["values"]:
             key = f"wire.{group}.{slug(value['value'])}"
-            en = value["en"] if value["en"] is not None else humanize(value["value"])
+            en = literal(value["en"] if value["en"] is not None else humanize(value["value"]))
             note = f"A label for the stored value `{value['value']}` of {name}. {category['description']}"
             if value["en"] is None:
                 note += " The service has no label for it; the English is the value as the website shows it."
@@ -169,14 +175,14 @@ def wire_entries(doc: dict):
             if "enLong" in value:
                 long_key = f"wire.{group}_long.{slug(value['value'])}"
                 entries[long_key] = entry(
-                    value["enLong"], "label", f"wire {group}", "T3",
+                    literal(value["enLong"]), "label", f"wire {group}", "T3",
                     f"The long name of the data region `{value['value']}`, naming its datacenter.",
                 )
                 longs.append((value["value"], long_key))
         if "fallback" in category:
             key = f"wire.{group}.fallback"
             entries[key] = entry(
-                category["fallback"]["en"], "label", f"wire {group}", "T3",
+                literal(category["fallback"]["en"]), "label", f"wire {group}", "T3",
                 f"The label for a value of {name} this build does not know, or none.",
             )
             fallbacks.append((name, key))
@@ -194,7 +200,7 @@ def wire_entries(doc: dict):
             continue
         key = f"wire.placeholder.{slug(value)}"
         entries[key] = entry(
-            value, "label", "wire placeholder", "T3",
+            literal(value), "label", "wire placeholder", "T3",
             f"Text the service stores or sends in English in place of a real value, in "
             f"{'; '.join(placeholder['fields'])}. Shown where that value is shown.",
         )
@@ -393,14 +399,14 @@ def accessor_test(cats: dict, error_table, wire) -> str:
     for name, value, key in labels:
         lines.append(
             f"            XCTAssertEqual(WireTable.label(.{name}, {swift_str(value.strip().lower())}), "
-            f"{swift_str(wire_cat.entries[key].en)})"
+            f"{swift_str(L10N.unbrace(wire_cat.entries[key].en))})"
         )
     for name, key in fallbacks:
-        lines.append(f"            XCTAssertEqual(WireTable.fallback(.{name}), {swift_str(wire_cat.entries[key].en)})")
+        lines.append(f"            XCTAssertEqual(WireTable.fallback(.{name}), {swift_str(L10N.unbrace(wire_cat.entries[key].en))})")
     for value, key in longs:
-        lines.append(f"            XCTAssertEqual(WireTable.regionLong({swift_str(value.lower())}), {swift_str(wire_cat.entries[key].en)})")
+        lines.append(f"            XCTAssertEqual(WireTable.regionLong({swift_str(value.lower())}), {swift_str(L10N.unbrace(wire_cat.entries[key].en))})")
     for value, key in placeholders:
-        lines.append(f"            XCTAssertEqual(WireTable.placeholder({swift_str(value)}), {swift_str(wire_cat.entries[key].en)})")
+        lines.append(f"            XCTAssertEqual(WireTable.placeholder({swift_str(value)}), {swift_str(L10N.unbrace(wire_cat.entries[key].en))})")
     lines.append("        }")
     lines.append("    }")
     lines.append("")

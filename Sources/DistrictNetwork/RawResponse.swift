@@ -1,3 +1,4 @@
+import DistrictModel
 import Foundation
 
 /// A 2xx body this client does not have a DTO for yet.
@@ -23,9 +24,30 @@ public struct RawResponse: Sendable, Equatable {
     /// should say so rather than assume.
     public let json: JSONValue?
 
-    init(statusCode: Int, body: Data) {
+    /// The `X-Distronode-Error-Code` header, the one header a failure body needs beside
+    /// it. ``ApiErrorNormalizer/apiError(statusCode:body:headerCode:)`` reads it when the
+    /// body names no code.
+    ///
+    /// ⚠️ ONE HEADER, NOT ALL OF THEM. This type is compared whole in tests, and the
+    /// others are the transport's business.
+    public let errorCodeHeader: String?
+
+    init(statusCode: Int, body: Data, errorCodeHeader: String? = nil) {
         self.statusCode = statusCode
         self.body = body
+        self.errorCodeHeader = errorCodeHeader
         json = JSONWire.decode(body)
+    }
+}
+
+extension RawResponse {
+    /// The response as ``ApiClient`` hands it on: the body, nil read as empty, and the
+    /// error-code header.
+    init(_ response: HTTPResponse) {
+        self.init(
+            statusCode: response.statusCode,
+            body: response.body ?? Data(),
+            errorCodeHeader: response.header(ApiErrorCode.header)
+        )
     }
 }

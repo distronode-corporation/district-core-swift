@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import DistrictNetwork
 import Foundation
@@ -205,7 +206,7 @@ public struct InboxRepository: Sendable {
         mediaUrls: [String] = []
     ) async -> Result<MessageDraft?, ApiError> {
         guard !body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return .failure(.http(status: 400, message: "A draft cannot be blank. Delete it instead."))
+            return .failure(.http(status: 400, message: InboxCopy.draftBlank))
         }
         let outcome = await client.send(
             DistrictEndpoints.saveDraft(
@@ -388,18 +389,18 @@ public enum MediaUploadLimits {
     /// The refusal to return without sending anything, or nil when the file is
     /// acceptable.
     ///
-    /// ⚠️ SHAPED AS AN ``ApiError/http(status:message:)`` WITH THE ROUTE'S OWN
+    /// ⚠️ SHAPED AS AN ``ApiError/http(status:message:code:)`` WITH THE ROUTE'S OWN
     /// STATUS so a caller has one failure path rather than two. The message is
     /// this client's, because the server never saw the request.
     public static func refusal(mimeType: String, byteCount: Int) -> ApiError? {
         guard allowedMimeTypes.contains(mimeType) else {
-            return .http(status: 400, message: "Attachments must be a JPEG, PNG, GIF or WebP image.")
+            return .http(status: 400, message: InboxCopy.attachmentType)
         }
         guard byteCount > 0 else {
-            return .http(status: 400, message: "That file is empty.")
+            return .http(status: 400, message: InboxCopy.attachmentEmpty)
         }
         guard byteCount <= maximumByteCount else {
-            return .http(status: 400, message: "Attachments must be 5 MB or smaller.")
+            return .http(status: 400, message: InboxCopy.attachmentSize)
         }
         return nil
     }

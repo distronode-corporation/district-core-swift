@@ -123,7 +123,10 @@ final class WorkspaceWriteRepositoryTests: XCTestCase {
             personality: nil,
             dgiEnabled: true
         )
-        XCTAssertEqual(forbidden.failureOnly, .http(status: 403, message: Self.studioSentence))
+        XCTAssertEqual(
+            forbidden.failureOnly,
+            .http(status: 403, message: Self.studioSentence, code: "dgi_requires_studio")
+        )
 
         let expired = RepositoryTransport(json: #"{"error":"Unauthorized"}"#, status: 401)
         let unauthorized = await repository(expired).savePersona(

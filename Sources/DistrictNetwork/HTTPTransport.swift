@@ -65,12 +65,15 @@ public struct HTTPResponse: Sendable, Equatable {
     /// `headers["Location"]` therefore works on a Mac and returns nil on Linux
     /// which would present as "the server sent no address" rather than as a
     /// platform difference.
+    ///
+    /// ⚠️ ONE EXPRESSION, NOT A `for`-`where` LOOP WITH A `return nil` AFTER IT. Once every
+    /// failed request read the error-code header here, that `return nil` came out covered
+    /// on one local run and uncovered on the next with the same tests (2026-10-13). The
+    /// loop's exit is a derived coverage counter, and at a 100% floor a line whose count
+    /// depends on the run is a red gate waiting to happen; this form has no such line.
     public func header(_ name: String) -> String? {
         let wanted = name.lowercased()
-        for (key, value) in headers where key.lowercased() == wanted {
-            return value
-        }
-        return nil
+        return headers.first { $0.key.lowercased() == wanted }?.value
     }
 }
 

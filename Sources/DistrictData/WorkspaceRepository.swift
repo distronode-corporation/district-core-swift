@@ -158,7 +158,9 @@ public struct WorkspaceRepository: Sendable {
     private static func classify(_ response: RawResponse) -> WorkspaceListError {
         let envelope = ApiErrorEnvelope.lenient(response.body)
         guard envelope?.code == ApiErrorCode.regionsDegraded else {
-            return .api(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            return .api(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
         let degraded = try? JSONDecoder().decode(WorkspaceListDegradedError.self, from: response.body)
         return .regionsDegraded(message: envelope?.error, regions: degraded?.degradedRegions ?? [])

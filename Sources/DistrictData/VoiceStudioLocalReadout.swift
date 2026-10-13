@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -115,7 +116,7 @@ public enum VoiceStudioLocalReadout {
         guard let legs else {
             return VoiceStudioResidencyView(inRegion: false, text: labels.leavesRegion, legsOut: [])
         }
-        let out = legs.filter { !$0.1.inRegion }.map { "\($0.0): \($0.1.text)" }
+        let out = legs.filter { !$0.1.inRegion }.map { VoiceStudioCopy.residencyLeg($0.0, $0.1.text) }
         return VoiceStudioResidencyView(
             inRegion: out.isEmpty,
             text: out.isEmpty ? labels.allInRegion : labels.leavesRegion,

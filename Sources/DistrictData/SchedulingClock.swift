@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -39,17 +40,18 @@ public struct SchedulingZonedParts: Equatable, Sendable {
 /// the bookings table render them on the web. The padded `09:05` variant served only
 /// the recordings table, which was retired with meeting recording (2026-10-03).
 ///
-/// ⚠️ THE MONTH NAMES ARE A TABLE RATHER THAN A `DateFormatter`. Four separate arrays
+/// ⚠️ THE MONTH NAMES ARE A TABLE RATHER THAN A `DateFormatter`, and the table is
+/// `DistrictL10n`'s (``L10nFormat/monthAbbreviation(_:locale:)``). Four separate arrays
 /// of them exist on the web and all four are the same English abbreviations; a
-/// locale-aware formatter here would render `sept.` under a French device locale while
-/// the web rendered `Sep`, on a surface whose French twin does not exist yet. When it
-/// does, this is the one place that changes.
+/// platform formatter would answer by the DEVICE's locale rather than the app's, and
+/// differently by OS version. In English the table is those abbreviations verbatim; in
+/// French it is CLDR fr-CA's, under the same language switch as every other string.
 public enum SchedulingClock {
-    /// ⚠️ `Jan`...`Dec`, matching all four of the web's copies verbatim.
-    public static let monthNames = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ]
+    /// ⚠️ `Jan`...`Dec` in English, matching all four of the web's copies verbatim, and
+    /// `janv.`...`déc.` in French. Computed, so it follows ``L10nRuntime/locale``.
+    public static var monthNames: [String] {
+        (1 ... 12).compactMap { L10nFormat.monthAbbreviation($0) }
+    }
 
     /// The wall-clock fields of `date` in `timezone`.
     ///
@@ -87,8 +89,7 @@ public enum SchedulingClock {
     /// indexing past the end of the table, which in Swift is a crash rather than the
     /// `undefined` the TypeScript would have shown.
     public static func monthName(_ month: Int) -> String? {
-        guard month >= 1, month <= monthNames.count else { return nil }
-        return monthNames[month - 1]
+        L10nFormat.monthAbbreviation(month)
     }
 
     /// ⚠️ `String(format:)` IS AVOIDED THROUGHOUT THIS MODULE. It is locale-sensitive

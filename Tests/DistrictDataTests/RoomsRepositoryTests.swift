@@ -94,7 +94,7 @@ final class RoomsRepositoryTests: XCTestCase {
         let result = await RoomsRepository(client: .repositoryTest(transport)).token(roomName: room)
 
         XCTAssertNil(result.successOnly)
-        guard case let .http(status, _)? = result.failureOnly else {
+        guard case let .http(status, _, _)? = result.failureOnly else {
             return XCTFail("a role refusal must stay an HTTP failure")
         }
         XCTAssertEqual(status, 403)

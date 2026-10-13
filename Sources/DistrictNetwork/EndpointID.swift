@@ -118,6 +118,10 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case registerPushToken
     case unregisterPushToken
 
+    /// The account's own settings: today only the language the server writes in
+    /// (`POST /api/settings` with `{profile:{locale}}`).
+    case saveLocale
+
     /// Live updates: the credential for the desktop's telemetry socket.
     ///
     /// ⚠️ NO KOTLIN COUNTERPART: a phone is woken by push, so neither Android nor the

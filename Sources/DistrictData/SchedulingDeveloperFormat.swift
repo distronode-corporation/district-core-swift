@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -6,14 +7,19 @@ public enum SchedulingDeveloperFormat {
     /// ⚠️ THE THREE TABS, IN THE WEB'S ORDER, WITH ITS `?tab=` IDS.
     public static let tabIds = ["keys", "apps", "webhooks"]
 
-    public static let tabLabels = ["API keys", "Connected apps", "Webhooks"]
+    /// The tabs' labels, in ``tabIds``' order and the active language.
+    public static var tabLabels: [String] {
+        [SchedulingCopy.developerTabKeys, SchedulingCopy.developerTabApps, SchedulingCopy.developerTabWebhooks]
+    }
 
     /// ⛔ THE LITERAL PLACEHOLDER, AND A REAL KEY MUST NEVER BE INTERPOLATED IN ITS
     /// PLACE. The configuration snippet is copyable and a copied snippet ends up in a
     /// file, a chat message and a screenshot; the web holds a minted key in a modal and
     /// drops it when the modal closes, precisely so it never reaches a document. See the
     /// ⛔ on ``SchedulingAdminRepository/createAPIKey(workspaceId:name:)``.
-    public static let mcpKeyPlaceholder = "<your API key>"
+    public static var mcpKeyPlaceholder: String {
+        SchedulingCopy.developerMcpKeyPlaceholder
+    }
 
     /// ⛔ THE FOUR FIELDS THAT CARRY THE BOOKER'S OWN DETAILS OUT OF THIS PLATFORM. They
     /// are off by default in the console for that reason, and a screen that lists a
@@ -57,14 +63,14 @@ public enum SchedulingDeveloperFormat {
     public static func deliveryOutcome(status: String, responseStatus: Int?) -> SchedulingStatusLabel {
         switch status {
         case "success":
-            return SchedulingStatusLabel(label: "Delivered", kind: .success)
+            return SchedulingStatusLabel(label: SchedulingCopy.developerDeliveryDelivered, kind: .success)
         case "pending":
-            return SchedulingStatusLabel(label: "Waiting", kind: .pending)
+            return SchedulingStatusLabel(label: SchedulingCopy.developerDeliveryWaiting, kind: .pending)
         case "failed":
             guard let code = responseStatus, code != 0 else {
-                return SchedulingStatusLabel(label: "No answer", kind: .error)
+                return SchedulingStatusLabel(label: SchedulingCopy.developerDeliveryNoAnswer, kind: .error)
             }
-            return SchedulingStatusLabel(label: "Rejected with \(code)", kind: .error)
+            return SchedulingStatusLabel(label: SchedulingCopy.developerDeliveryRejected(String(code)), kind: .error)
         default:
             return SchedulingStatusLabel(label: status, kind: .info)
         }
@@ -89,15 +95,18 @@ public enum SchedulingDeveloperFormat {
         absent: String = "\u{2014}"
     ) -> String {
         guard let value, !value.isEmpty else { return absent }
-        guard let date = WireInstant.parse(value) else { return "Unknown Date" }
+        let unknown = SchedulingCopy.developerStampUnknown
+        guard let date = WireInstant.parse(value) else { return unknown }
         let parts = SchedulingClock.parts(of: date, timezone: timezone)
-        guard let month = SchedulingClock.monthName(parts.month) else { return "Unknown Date" }
-        let suffix = parts.hour < 12 ? "AM" : "PM"
+        guard let month = SchedulingClock.monthName(parts.month) else { return unknown }
+        let suffix = L10nFormat.meridiem(hour: parts.hour)
         // ⚠️ 0 AND 12 BOTH RENDER AS 12, which is what a 12-hour clock does and what
         // `Intl` emits: midnight is `12:05 AM` and noon is `12:05 PM`.
         let rawHour = parts.hour % 12
         let hour = rawHour == 0 ? 12 : rawHour
         let minute = SchedulingClock.paddedTwo(parts.minute)
-        return "\(month) \(parts.day), \(parts.year), \(SchedulingClock.paddedTwo(hour)):\(minute) \(suffix)"
+        return SchedulingCopy.developerStamp(
+            month, String(parts.day), String(parts.year), SchedulingClock.paddedTwo(hour), minute, suffix
+        )
     }
 }

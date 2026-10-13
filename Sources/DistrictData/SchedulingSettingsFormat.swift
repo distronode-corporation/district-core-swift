@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -34,9 +35,15 @@ public enum SchedulingSettingsFormat {
     /// stale `?tab=recordings` falls back to the booking page on the web.
     public static let settingsTabIds = ["booking-page", "assistant", "profile", "notifications"]
 
-    public static let settingsTabLabels = [
-        "Booking page", "Booking assistant", "Your profile", "Your notifications",
-    ]
+    /// The tabs' labels, in ``settingsTabIds``' order and the active language.
+    public static var settingsTabLabels: [String] {
+        [
+            SchedulingCopy.settingsTabBookingPage,
+            SchedulingCopy.settingsTabAssistant,
+            SchedulingCopy.settingsTabProfile,
+            SchedulingCopy.settingsTabNotifications,
+        ]
+    }
 
     /// `12h` → `12-hour (2:30 pm)`.
     ///
@@ -45,8 +52,8 @@ public enum SchedulingSettingsFormat {
     /// is what the web shows.
     public static func timeFormatLabel(_ value: String) -> String {
         switch value {
-        case "12h": "12-hour (2:30 pm)"
-        case "24h": "24-hour (14:30)"
+        case "12h": SchedulingCopy.settingsTimeFormat12h
+        case "24h": SchedulingCopy.settingsTimeFormat24h
         default: value
         }
     }
@@ -73,9 +80,10 @@ public enum SchedulingSettingsFormat {
     /// ``SchedulingHoursFormat/displayDay(_:)`` and neither table may be used for the
     /// other's job.
     public static func weekStartLabel(_ value: Int) -> String {
-        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-        guard value >= 0, value < days.count else { return String(value) }
-        return days[value]
+        // `DistrictL10n`'s weekday table is Sunday-first like the wire, numbered from 1.
+        // The range test comes first so `value + 1` can never overflow.
+        guard (0 ..< 7).contains(value), let name = L10nFormat.weekdayName(value + 1) else { return String(value) }
+        return name
     }
 
     /// The language a visitor gets when we do not have theirs.
@@ -88,7 +96,7 @@ public enum SchedulingSettingsFormat {
         supported: [SchedulingLocaleOption]?
     ) -> String {
         let trimmed = code.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return "Not set" }
+        guard !trimmed.isEmpty else { return SchedulingCopy.settingsLocaleNotSet }
         guard let match = supported?.first(where: { $0.code == trimmed }) else { return trimmed }
         return match.name.isEmpty ? trimmed : match.name
     }
@@ -97,27 +105,51 @@ public enum SchedulingSettingsFormat {
     /// WHOSE meeting it is, one set fires when you are booked into somebody else's, the
     /// other when somebody books yours, which is why the headings are not "Email" and
     /// "Push".
-    public static let notificationGroups: [SchedulingNotificationGroup] = [
-        SchedulingNotificationGroup(
-            heading: "As an attendee",
-            description: "When you are the one being booked into somebody else's meeting.",
-            switches: [
-                SchedulingNotificationSwitch(field: "notify_confirmation", label: "A booking is confirmed"),
-                SchedulingNotificationSwitch(field: "notify_cancellation", label: "A booking is cancelled"),
-                SchedulingNotificationSwitch(field: "notify_reschedule", label: "A booking is moved"),
-                SchedulingNotificationSwitch(field: "notify_reminder", label: "A booking is coming up"),
-            ]
-        ),
-        SchedulingNotificationGroup(
-            heading: "As a host",
-            description: "When somebody books one of your event types.",
-            switches: [
-                SchedulingNotificationSwitch(field: "notify_host_booking", label: "Somebody books you"),
-                SchedulingNotificationSwitch(field: "notify_host_cancel", label: "Somebody cancels"),
-                SchedulingNotificationSwitch(field: "notify_host_reschedule", label: "Somebody moves their booking"),
-            ]
-        ),
-    ]
+    /// Computed, so the headings and labels follow ``L10nRuntime/locale``.
+    public static var notificationGroups: [SchedulingNotificationGroup] {
+        [
+            SchedulingNotificationGroup(
+                heading: SchedulingCopy.settingsNotifyAttendeeHeading,
+                description: SchedulingCopy.settingsNotifyAttendeeDescription,
+                switches: [
+                    SchedulingNotificationSwitch(
+                        field: "notify_confirmation",
+                        label: SchedulingCopy.settingsNotifyConfirmation
+                    ),
+                    SchedulingNotificationSwitch(
+                        field: "notify_cancellation",
+                        label: SchedulingCopy.settingsNotifyCancellation
+                    ),
+                    SchedulingNotificationSwitch(
+                        field: "notify_reschedule",
+                        label: SchedulingCopy.settingsNotifyReschedule
+                    ),
+                    SchedulingNotificationSwitch(
+                        field: "notify_reminder",
+                        label: SchedulingCopy.settingsNotifyReminder
+                    ),
+                ]
+            ),
+            SchedulingNotificationGroup(
+                heading: SchedulingCopy.settingsNotifyHostHeading,
+                description: SchedulingCopy.settingsNotifyHostDescription,
+                switches: [
+                    SchedulingNotificationSwitch(
+                        field: "notify_host_booking",
+                        label: SchedulingCopy.settingsNotifyHostBooking
+                    ),
+                    SchedulingNotificationSwitch(
+                        field: "notify_host_cancel",
+                        label: SchedulingCopy.settingsNotifyHostCancel
+                    ),
+                    SchedulingNotificationSwitch(
+                        field: "notify_host_reschedule",
+                        label: SchedulingCopy.settingsNotifyHostReschedule
+                    ),
+                ]
+            ),
+        ]
+    }
 
     /// The value of one notification switch on a profile.
     ///

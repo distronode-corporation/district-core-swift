@@ -100,6 +100,13 @@ extension EndpointTable {
                 .json("{}")
             ),
             EndpointExpectation(
+                .saveLocale,
+                DistrictEndpoints.saveLocale(.frCA),
+                .post,
+                "\(host)/api/settings",
+                .json(#"{"profile":{"locale":"fr"}}"#)
+            ),
+            EndpointExpectation(
                 .registerPushToken,
                 DistrictEndpoints.registerPushToken(token: "fcm-token"),
                 .post,

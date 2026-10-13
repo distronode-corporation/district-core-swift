@@ -42,14 +42,14 @@ final class SchedulingHandoffClientTests: XCTestCase {
     /// really does answer both, so both are pinned.
     func test_IOS_SCH_07_noBearerIsAnUnauthorized() async {
         let result = await mint(status: 401, body: #"{"error":"Unauthorized"}"#)
-        guard case let .failure(.api(.http(status, _))) = result
+        guard case let .failure(.api(.http(status, _, _))) = result
         else { return XCTFail("expected .http, got \(result)") }
         XCTAssertEqual(status, 401)
     }
 
     func test_IOS_SCH_08_aBearerThatDoesNotVerifyIsForbidden() async {
         let result = await mint(status: 403, body: #"{"error":"Forbidden"}"#)
-        guard case let .failure(.api(.http(status, _))) = result
+        guard case let .failure(.api(.http(status, _, _))) = result
         else { return XCTFail("expected .http, got \(result)") }
         XCTAssertEqual(status, 403)
     }
@@ -57,7 +57,7 @@ final class SchedulingHandoffClientTests: XCTestCase {
     func test_IOS_SCH_09_rateLimitAndContractStatusesSurvive() async {
         for expected in [429, 400] {
             let result = await mint(status: expected, body: #"{"error":"nope"}"#)
-            guard case let .failure(.api(.http(status, _))) = result else { return XCTFail("expected .http") }
+            guard case let .failure(.api(.http(status, _, _))) = result else { return XCTFail("expected .http") }
             XCTAssertEqual(status, expected)
         }
     }
@@ -211,11 +211,11 @@ final class SchedulingHandoffClientTests: XCTestCase {
     /// another code on a 400, keeps the ordinary mapping and its sentence.
     func test_IOS_SCH_22_theNonceCodesAreReadOnlyOnA400() async {
         let other = await mint(status: 409, body: #"{"error":"Not ready","code":"nonce_required"}"#)
-        XCTAssertEqual(other, .failure(.api(.http(status: 409, message: "Not ready"))))
+        XCTAssertEqual(other, .failure(.api(.http(status: 409, message: "Not ready", code: "nonce_required"))))
         let invalidElsewhere = await mint(status: 403, body: #"{"error":"No","code":"invalid_nonce"}"#)
-        XCTAssertEqual(invalidElsewhere, .failure(.api(.http(status: 403, message: "No"))))
+        XCTAssertEqual(invalidElsewhere, .failure(.api(.http(status: 403, message: "No", code: "invalid_nonce"))))
         let unknown = await mint(status: 400, body: #"{"error":"Bad","code":"something_else"}"#)
-        XCTAssertEqual(unknown, .failure(.api(.http(status: 400, message: "Bad"))))
+        XCTAssertEqual(unknown, .failure(.api(.http(status: 400, message: "Bad", code: "something_else"))))
     }
 
     func test_IOS_SCH_23_aTransportFailureIsAnApiFailure() async {

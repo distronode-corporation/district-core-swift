@@ -103,6 +103,12 @@ public enum TypedEndpoints {
         // shortcut.
         .registerPushToken,
         .unregisterPushToken,
+        // ── The account's own settings ───────────────────────────────────────
+        // ⚠️ DECODED AS THE SHARED ``SuccessResponse`` by `AccountSettingsRepository`.
+        // The route has no contract fixture yet; its fixtures arrive with the
+        // server's locale batch, and its wire shape is pinned by its `EndpointTable`
+        // row until then.
+        .saveLocale,
         .members,
         .addMember,
         .changeMemberRole,

@@ -98,7 +98,9 @@ public struct VoiceStudioRepository: Sendable {
             if envelope?.code == Self.modelUnavailableInRegion {
                 return .modelUnavailableInRegion(envelope?.error)
             }
-            return .failed(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            return .failed(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
         // ⛔ ENVELOPE-CHECKED LIKE EVERY OTHER WRITE: a route falling into its error branch
         // after the headers are written answers `{success:false}` with a 200.

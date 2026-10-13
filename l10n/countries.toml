@@ -1,0 +1,956 @@
+[meta]
+catalog = "countries"
+platform = "swift"
+apple = true
+
+[dial_region.code_1]
+en = "Canada and the United States"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +1 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_20]
+en = "Egypt"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +20 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_211]
+en = "South Sudan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +211 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_212]
+en = "Morocco"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +212 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_213]
+en = "Algeria"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +213 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_216]
+en = "Tunisia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +216 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_218]
+en = "Libya"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +218 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_220]
+en = "the Gambia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +220 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_221]
+en = "Senegal"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +221 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_233]
+en = "Ghana"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +233 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_234]
+en = "Nigeria"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +234 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_251]
+en = "Ethiopia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +251 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_254]
+en = "Kenya"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +254 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_255]
+en = "Tanzania"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +255 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_256]
+en = "Uganda"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +256 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_260]
+en = "Zambia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +260 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_263]
+en = "Zimbabwe"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +263 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_264]
+en = "Namibia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +264 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_265]
+en = "Malawi"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +265 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_267]
+en = "Botswana"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +267 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_268]
+en = "Eswatini"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +268 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_27]
+en = "South Africa"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +27 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_299]
+en = "Greenland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +299 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_30]
+en = "Greece"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +30 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_31]
+en = "the Netherlands"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +31 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_32]
+en = "Belgium"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +32 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_33]
+en = "France"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +33 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_34]
+en = "Spain"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +34 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_350]
+en = "Gibraltar"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +350 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_351]
+en = "Portugal"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +351 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_352]
+en = "Luxembourg"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +352 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_353]
+en = "Ireland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +353 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_354]
+en = "Iceland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +354 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_355]
+en = "Albania"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +355 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_356]
+en = "Malta"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +356 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_357]
+en = "Cyprus"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +357 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_358]
+en = "Finland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +358 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_359]
+en = "Bulgaria"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +359 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_36]
+en = "Hungary"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +36 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_370]
+en = "Lithuania"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +370 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_371]
+en = "Latvia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +371 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_372]
+en = "Estonia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +372 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_373]
+en = "Moldova"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +373 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_374]
+en = "Armenia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +374 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_375]
+en = "Belarus"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +375 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_376]
+en = "Andorra"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +376 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_377]
+en = "Monaco"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +377 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_378]
+en = "San Marino"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +378 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_380]
+en = "Ukraine"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +380 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_381]
+en = "Serbia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +381 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_382]
+en = "Montenegro"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +382 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_383]
+en = "Kosovo"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +383 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_385]
+en = "Croatia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +385 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_386]
+en = "Slovenia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +386 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_387]
+en = "Bosnia and Herzegovina"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +387 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_389]
+en = "North Macedonia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +389 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_39]
+en = "Italy"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +39 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_40]
+en = "Romania"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +40 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_41]
+en = "Switzerland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +41 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_420]
+en = "Czechia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +420 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_421]
+en = "Slovakia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +421 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_423]
+en = "Liechtenstein"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +423 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_43]
+en = "Austria"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +43 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_44]
+en = "the United Kingdom"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +44 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_45]
+en = "Denmark"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +45 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_46]
+en = "Sweden"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +46 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_47]
+en = "Norway"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +47 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_48]
+en = "Poland"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +48 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_49]
+en = "Germany"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +49 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_501]
+en = "Belize"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +501 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_502]
+en = "Guatemala"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +502 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_503]
+en = "El Salvador"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +503 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_504]
+en = "Honduras"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +504 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_505]
+en = "Nicaragua"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +505 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_506]
+en = "Costa Rica"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +506 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_507]
+en = "Panama"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +507 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_51]
+en = "Peru"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +51 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_52]
+en = "Mexico"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +52 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_53]
+en = "Cuba"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +53 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_54]
+en = "Argentina"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +54 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_55]
+en = "Brazil"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +55 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_56]
+en = "Chile"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +56 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_57]
+en = "Colombia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +57 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_58]
+en = "Venezuela"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +58 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_591]
+en = "Bolivia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +591 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_593]
+en = "Ecuador"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +593 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_595]
+en = "Paraguay"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +595 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_598]
+en = "Uruguay"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +598 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_60]
+en = "Malaysia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +60 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_61]
+en = "Australia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +61 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_62]
+en = "Indonesia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +62 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_63]
+en = "the Philippines"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +63 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_64]
+en = "New Zealand"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +64 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_65]
+en = "Singapore"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +65 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_66]
+en = "Thailand"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +66 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_7]
+en = "Russia or Kazakhstan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +7 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_81]
+en = "Japan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +81 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_82]
+en = "South Korea"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +82 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_84]
+en = "Vietnam"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +84 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_852]
+en = "Hong Kong"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +852 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_853]
+en = "Macao"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +853 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_855]
+en = "Cambodia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +855 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_856]
+en = "Laos"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +856 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_86]
+en = "China"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +86 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_880]
+en = "Bangladesh"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +880 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_886]
+en = "Taiwan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +886 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_90]
+en = "Turkey"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +90 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_91]
+en = "India"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +91 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_92]
+en = "Pakistan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +92 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_93]
+en = "Afghanistan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +93 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_94]
+en = "Sri Lanka"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +94 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_95]
+en = "Myanmar"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +95 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_960]
+en = "the Maldives"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +960 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_961]
+en = "Lebanon"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +961 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_962]
+en = "Jordan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +962 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_963]
+en = "Syria"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +963 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_964]
+en = "Iraq"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +964 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_965]
+en = "Kuwait"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +965 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_966]
+en = "Saudi Arabia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +966 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_967]
+en = "Yemen"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +967 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_968]
+en = "Oman"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +968 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_970]
+en = "Palestine"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +970 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_971]
+en = "the United Arab Emirates"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +971 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_972]
+en = "Israel"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +972 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_973]
+en = "Bahrain"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +973 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_974]
+en = "Qatar"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +974 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_975]
+en = "Bhutan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +975 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_976]
+en = "Mongolia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +976 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_977]
+en = "Nepal"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +977 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_98]
+en = "Iran"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +98 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_992]
+en = "Tajikistan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +992 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_993]
+en = "Turkmenistan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +993 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_994]
+en = "Azerbaijan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +994 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_995]
+en = "Georgia"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +995 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_996]
+en = "Kyrgyzstan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +996 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
+
+[dial_region.code_998]
+en = "Uzbekistan"
+ctx = "label"
+screen = "dialer"
+tier = "T1"
+note = "The place a phone number starting +998 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."

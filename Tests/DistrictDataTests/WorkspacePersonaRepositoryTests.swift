@@ -103,7 +103,7 @@ final class WorkspacePersonaRepositoryTests: XCTestCase {
         guard case let .failure(error) = result else {
             return XCTFail("expected a failure")
         }
-        XCTAssertEqual(error, .http(status: 403, message: "Voice Studio required"))
+        XCTAssertEqual(error, .http(status: 403, message: "Voice Studio required", code: "dgi_requires_studio"))
     }
 
     // MARK: - The preview

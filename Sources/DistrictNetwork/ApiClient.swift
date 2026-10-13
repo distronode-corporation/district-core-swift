@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -102,9 +103,13 @@ public struct ApiClient: Sendable {
         let outcome = await perform(descriptor, followRedirects: true)
         return outcome.flatMap { response in
             guard ApiErrorNormalizer.isSuccess(response.statusCode) else {
-                return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+                return .failure(ApiErrorNormalizer.apiError(
+                    statusCode: response.statusCode,
+                    body: response.body,
+                    headerCode: response.header(ApiErrorCode.header)
+                ))
             }
-            return .success(RawResponse(statusCode: response.statusCode, body: response.body ?? Data()))
+            return .success(RawResponse(response))
         }
     }
 
@@ -124,7 +129,7 @@ public struct ApiClient: Sendable {
     /// as a body it can read.
     public func sendUnmapped(_ descriptor: ApiRequestDescriptor) async -> Result<RawResponse, ApiError> {
         let outcome = await perform(descriptor, followRedirects: true)
-        return outcome.map { RawResponse(statusCode: $0.statusCode, body: $0.body ?? Data()) }
+        return outcome.map { RawResponse($0) }
     }
 
     /// Send a descriptor and decode its 2xx body into a DTO.
@@ -142,7 +147,11 @@ public struct ApiClient: Sendable {
         let outcome = await perform(descriptor, followRedirects: true)
         return outcome.flatMap { response in
             guard ApiErrorNormalizer.isSuccess(response.statusCode) else {
-                return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+                return .failure(ApiErrorNormalizer.apiError(
+                    statusCode: response.statusCode,
+                    body: response.body,
+                    headerCode: response.header(ApiErrorCode.header)
+                ))
             }
             let body = response.body ?? Data()
             do {
@@ -197,7 +206,14 @@ public struct ApiClient: Sendable {
             return .failure(.http(status: 401, message: nil))
         }
 
-        var headers = ["Authorization": "Bearer \(token)", "Accept": "application/json"]
+        // ⚠️ `Accept-Language` IS THE RESOLVED LANGUAGE (`en` until an app turns French
+        // on), NOT THE DEVICE'S LIST: the server answers in one of two languages, and
+        // the one it should pick is the one this app is showing.
+        var headers = [
+            "Authorization": "Bearer \(token)",
+            "Accept": "application/json",
+            "Accept-Language": L10nRuntime.locale.languageTag,
+        ]
         headers["Content-Type"] = contentType
 
         let request = HTTPRequest(method: descriptor.method, url: url, headers: headers, body: body)

@@ -43,7 +43,7 @@ final class OverviewSetupRepositoryTests: XCTestCase {
         )
 
         let raw = await repository(transport).districtSetup(workspaceId: "ws_member")
-        guard case .failure(.http(status: 403, _)) = raw else {
+        guard case .failure(.http(status: 403, _, _)) = raw else {
             return XCTFail("a member's read must arrive as the 403 it is, got \(raw)")
         }
         let needs = await repository(RepositoryTransport(

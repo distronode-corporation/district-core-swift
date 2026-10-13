@@ -122,7 +122,9 @@ public struct InboundCallRepository: Sendable {
             return refusal(response)
         }
         guard let decoded = try? JSONDecoder().decode(CallAnswerResponse.self, from: response.body) else {
-            return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            return .failure(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
         // ⛔ ENVELOPE-CHECKED. A required non-optional field rejects `{}`; it does
         // not reject a well-formed body that says `success: false`, which is what
@@ -149,7 +151,9 @@ public struct InboundCallRepository: Sendable {
             // for one. The screen owns the fallback.
             .success(.refused(message: ApiErrorEnvelope.lenient(response.body)?.message))
         default:
-            .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            .failure(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
     }
 

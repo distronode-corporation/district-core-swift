@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -92,9 +93,10 @@ public struct SchedulingOverrideRow: Equatable, Sendable {
 public enum SchedulingHoursFormat {
     /// ⚠️ Monday first, matching the grid the web draws. The wire is Sunday-first; see
     /// ``wireDay(_:)``.
-    public static let weekDayNames = [
-        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
-    ]
+    /// In the active language: `DistrictL10n`'s weekday table, read Monday first.
+    public static var weekDayNames: [String] {
+        [2, 3, 4, 5, 6, 7, 1].compactMap { L10nFormat.weekdayName($0) }
+    }
 
     /// Display index (0 = Monday) to wire `day_of_week` (0 = Sunday).
     ///
@@ -151,7 +153,7 @@ public enum SchedulingHoursFormat {
               let month = Int(pieces[1]), let day = Int(pieces[2]),
               let name = SchedulingClock.monthName(month)
         else { return value }
-        return "\(name) \(day), \(year)"
+        return SchedulingCopy.hoursOverrideDate(name, String(day), String(year))
     }
 
     /// `Sep 12, 2026`, `Sep 12 to Sep 14, 2026`, or both years when they differ.
@@ -164,7 +166,7 @@ public enum SchedulingHoursFormat {
             return formatOverrideDate(start)
         }
         guard start.prefix(4) == end.prefix(4) else {
-            return "\(formatOverrideDate(start)) to \(formatOverrideDate(end))"
+            return SchedulingCopy.hoursDateRange(formatOverrideDate(start), formatOverrideDate(end))
         }
         let from = formatOverrideDate(start)
         // ⚠️ THE YEAR IS STRIPPED ONLY IF IT IS THERE. `formatOverrideDate` returns the
@@ -173,7 +175,7 @@ public enum SchedulingHoursFormat {
         let trimmed = from.hasSuffix(", \(start.prefix(4))")
             ? String(from.dropLast(6))
             : from
-        return "\(trimmed) to \(formatOverrideDate(end))"
+        return SchedulingCopy.hoursDateRange(trimmed, formatOverrideDate(end))
     }
 
     /// `9:00 to 12:00`, `Out of office`, or `Unavailable`.
@@ -191,9 +193,9 @@ public enum SchedulingHoursFormat {
         let end = row.endTime ?? ""
         if row.isAvailable, !start.isEmpty, !end.isEmpty {
             let show = SchedulingOverviewSummary.displayTime
-            return "\(show(start)) to \(show(end))"
+            return SchedulingCopy.hoursTimeRange(show(start), show(end))
         }
-        return row.reason == "out_of_office" ? "Out of office" : "Unavailable"
+        return row.reason == "out_of_office" ? SchedulingCopy.hoursOutOfOffice : SchedulingCopy.hoursUnavailable
     }
 
     /// `2026-09-12` for today, in the operator's own zone.

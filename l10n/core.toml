@@ -1,0 +1,633 @@
+[meta]
+catalog = "core"
+platform = "swift"
+apple = true
+
+[desk.logo_empty]
+en = "That file is empty."
+ctx = "error"
+screen = "desk settings"
+tier = "T2"
+note = "Refusal shown before uploading a help desk logo, when the chosen file has no bytes. Mirrors the service's own refusal."
+
+[desk.logo_size]
+en = "Logos must be 512 KB or smaller."
+ctx = "error"
+screen = "desk settings"
+tier = "T2"
+note = "Refusal shown before uploading a help desk logo larger than 512 kilobytes. Use the French unit abbreviation (Ko)."
+
+[desk.logo_type]
+en = "Logos must be a PNG, JPEG or WebP image."
+ctx = "error"
+screen = "desk settings"
+tier = "T2"
+note = "Refusal shown before uploading a help desk logo that is not one of the three image formats. PNG, JPEG and WebP are format names."
+
+[desk.settings_empty]
+en = "At least one setting must be provided."
+ctx = "error"
+screen = "desk settings"
+tier = "T2"
+note = "Refusal shown when the help desk settings form is saved with nothing changed. Mirrors the service's own refusal."
+
+[inbox.attachment_empty]
+en = "That file is empty."
+ctx = "error"
+screen = "inbox compose"
+tier = "T2"
+note = "Refusal shown before sending a message attachment that has no bytes."
+
+[inbox.attachment_size]
+en = "Attachments must be 5 MB or smaller."
+ctx = "error"
+screen = "inbox compose"
+tier = "T2"
+note = "Refusal shown before sending a message attachment larger than 5 megabytes. Use the French unit abbreviation (Mo)."
+
+[inbox.attachment_type]
+en = "Attachments must be a JPEG, PNG, GIF or WebP image."
+ctx = "error"
+screen = "inbox compose"
+tier = "T2"
+note = "Refusal shown before sending a message attachment that is not one of the four image formats. The four are format names."
+
+[inbox.draft_blank]
+en = "A draft cannot be blank. Delete it instead."
+ctx = "error"
+screen = "inbox compose"
+tier = "T2"
+note = "Refusal shown when the operator saves an empty reply draft. The second sentence tells them to delete the draft rather than save it empty."
+
+[routing.field_caller_type]
+en = "Caller Type (business/consumer)"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field, in the field picker. The parenthesis lists the values the rule compares against; business and consumer are stored values typed by the operator, so keep them in English inside the parenthesis. Title case copies the web form."
+
+[routing.field_decision_maker]
+en = "Decision Maker (true/false)"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field: whether the caller is a decision maker. The parenthesis lists the values the rule compares against; true and false are stored values, so keep them in English."
+
+[routing.field_estimated_value]
+en = "Estimated Value"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field: the estimated value of the caller's business, in the field picker."
+
+[routing.field_industry]
+en = "Industry"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field: the caller's industry (business sector), in the field picker."
+
+[routing.field_line_type]
+en = "Line Type (mobile/landline/voip)"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field: the kind of phone line calling. The parenthesis lists the stored values the rule compares against (mobile, landline, voip); keep them in English."
+
+[routing.field_seniority]
+en = "Seniority (e.g. vp, c-suite)"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "A call routing rule's field: the caller's seniority. The parenthesis gives example stored values (vp, c-suite) the operator types; keep those in English."
+
+[routing.operator_contains]
+en = "Contains"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "How a call routing rule compares its field: the field's text contains the value."
+
+[routing.operator_equals]
+en = "Equals"
+ctx = "label"
+screen = "routing rules"
+tier = "T3"
+note = "How a call routing rule compares its field: the field's text is exactly the value."
+
+[scheduling.booking.date_time]
+en = "{month} {day}, {year}, {clock}"
+ctx = "format"
+screen = "scheduling bookings"
+tier = "T3"
+args = { month = "str", day = "str", year = "str", clock = "str" }
+note = "When a booking starts, in the bookings table, e.g. \"Sep 12, 2026, 9:05\". {month} is the abbreviated month name, {day} the day of the month, {year} four digits, {clock} the time of day. Reorder for French date order."
+
+[scheduling.booking.minutes]
+en = "{minutes} min"
+ctx = "label"
+screen = "scheduling event types"
+tier = "T3"
+args = { minutes = "int" }
+note = "A length in minutes (an event type's duration, a buffer), e.g. \"30 min\"."
+
+[scheduling.booking.minutes_not_set]
+en = "Not set"
+ctx = "label"
+screen = "scheduling event types"
+tier = "T3"
+note = "Shown in place of a length in minutes that the event type does not set."
+
+[scheduling.booking.status_cancelled]
+en = "Cancelled"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Status badge on a booking that was cancelled."
+
+[scheduling.booking.status_confirmed]
+en = "Confirmed"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Status badge on a booking that is confirmed."
+
+[scheduling.booking.status_rescheduled]
+en = "Rescheduled"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Status badge on a booking that was moved to another time."
+
+[scheduling.booking.view_all]
+en = "All"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Bookings list filter: every booking, whatever its status or date."
+
+[scheduling.booking.view_cancelled]
+en = "Cancelled"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Bookings list filter: the bookings that were cancelled."
+
+[scheduling.booking.view_past]
+en = "Past"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Bookings list filter: confirmed bookings that already happened."
+
+[scheduling.booking.view_upcoming]
+en = "Upcoming"
+ctx = "label"
+screen = "scheduling bookings"
+tier = "T3"
+note = "Bookings list filter: confirmed bookings still to come."
+
+[scheduling.calendar.conflicts_checked]
+en = "Checked"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "A connected calendar account's conflict setting: its events block booking times."
+
+[scheduling.calendar.conflicts_none]
+en = "None"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "A connected calendar account's conflict setting: none of its calendars block booking times."
+
+[scheduling.calendar.conflicts_not_checked]
+en = "Not checked"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "A connected calendar account's conflict setting: its events do not block booking times."
+
+[scheduling.calendar.destination_none]
+en = "No calendar in this account"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "Where new bookings are written: none of this calendar account's calendars receive them."
+
+[scheduling.calendar.destination_this_account]
+en = "This account"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "Where new bookings are written: this calendar account (which calendar in it is not known)."
+
+[scheduling.calendar.provider_apple]
+en = "Apple Calendar"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "The name of a calendar service a calendar account is connected through. Use Apple's own French name for its Calendar app."
+
+[scheduling.calendar.provider_caldav]
+en = "CalDAV"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+fixed = true
+note = "The name of a calendar protocol a calendar account is connected through. A technical name, never translated."
+
+[scheduling.calendar.provider_google]
+en = "Google Calendar"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+note = "The name of a calendar service a calendar account is connected through. Use Google's own French name for the product (Google Agenda)."
+
+[scheduling.calendar.provider_microsoft]
+en = "Microsoft 365"
+ctx = "label"
+screen = "scheduling calendars"
+tier = "T3"
+fixed = true
+note = "The name of a calendar service a calendar account is connected through. A product name, never translated."
+
+[scheduling.developer.delivery_delivered]
+en = "Delivered"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Status of one webhook delivery: the receiving server accepted it."
+
+[scheduling.developer.delivery_no_answer]
+en = "No answer"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Status of one webhook delivery: the receiving server never answered."
+
+[scheduling.developer.delivery_rejected]
+en = "Rejected with {code}"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+args = { code = "str" }
+note = "Status of one webhook delivery: the receiving server refused it. {code} is the HTTP status number it answered with, e.g. 500."
+
+[scheduling.developer.delivery_waiting]
+en = "Waiting"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Status of one webhook delivery: not attempted yet."
+
+[scheduling.developer.mcp_key_placeholder]
+en = "<your API key>"
+ctx = "placeholder"
+screen = "scheduling developer"
+tier = "T3"
+note = "Stands in for the operator's API key inside a configuration snippet they copy into an AI assistant. Keep the angle brackets."
+
+[scheduling.developer.stamp]
+en = "{month} {day}, {year}, {hour}:{minute} {meridiem}"
+ctx = "format"
+screen = "scheduling developer"
+tier = "T3"
+args = { month = "str", day = "str", year = "str", hour = "str", minute = "str", meridiem = "str" }
+note = "When an API key or webhook delivery was created or last used, e.g. \"Sep 12, 2026, 03:04 PM\". {month} is the abbreviated month, {hour} the two-digit hour on a 12-hour clock, {meridiem} AM or PM. French uses a 24-hour clock; the code will pass the French time pieces when French is on."
+
+[scheduling.developer.stamp_unknown]
+en = "Unknown Date"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Shown in place of a date the service sent in a form this app cannot read."
+
+[scheduling.developer.tab_apps]
+en = "Connected apps"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Tab on the scheduling developer screen: the third-party apps given access."
+
+[scheduling.developer.tab_keys]
+en = "API keys"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Tab on the scheduling developer screen: the operator's API keys."
+
+[scheduling.developer.tab_webhooks]
+en = "Webhooks"
+ctx = "label"
+screen = "scheduling developer"
+tier = "T3"
+note = "Tab on the scheduling developer screen: the webhook endpoints that receive booking events."
+
+[scheduling.hours.date_range]
+en = "{start} to {end}"
+ctx = "format"
+screen = "scheduling availability"
+tier = "T3"
+args = { start = "str", end = "str" }
+note = "A run of days off or changed hours, e.g. \"Aug 3 to Aug 7, 2026\". {start} and {end} are dates."
+
+[scheduling.hours.out_of_office]
+en = "Out of office"
+ctx = "label"
+screen = "scheduling availability"
+tier = "T3"
+note = "A date override on which the operator is away and takes no bookings."
+
+[scheduling.hours.override_date]
+en = "{month} {day}, {year}"
+ctx = "format"
+screen = "scheduling availability"
+tier = "T3"
+args = { month = "str", day = "str", year = "str" }
+note = "The date of an availability override, e.g. \"Aug 3, 2026\". {month} is the abbreviated month name. When a range stays inside one year, the code drops the \", {year}\" ending from its first date, so keep the year at the end, after a comma and a space, if French allows it."
+
+[scheduling.hours.time_range]
+en = "{start} to {end}"
+ctx = "format"
+screen = "scheduling availability"
+tier = "T3"
+args = { start = "str", end = "str" }
+note = "The hours on a date override, e.g. \"9:00 to 17:00\". {start} and {end} are times of day."
+
+[scheduling.hours.unavailable]
+en = "Unavailable"
+ctx = "label"
+screen = "scheduling availability"
+tier = "T3"
+note = "A date override on which the operator takes no bookings, for no stated reason."
+
+[scheduling.overview.booking]
+en = "Booking"
+ctx = "label"
+screen = "scheduling overview"
+tier = "T3"
+note = "The name shown for an upcoming booking whose event type is not known."
+
+[scheduling.overview.days_range]
+en = "{first} to {last}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { first = "str", last = "str" }
+note = "A run of three or more consecutive weekdays in the working hours summary, e.g. \"Mon to Fri\". {first} and {last} are abbreviated weekday names."
+
+[scheduling.overview.event_types]
+en.one = "{count} event type, {active} active"
+en.other = "{count} event types, {active} active"
+ctx = "label"
+screen = "scheduling overview"
+tier = "T3"
+args = { count = "int", active = "str" }
+note = "The overview's event types row, e.g. \"3 event types, 2 active\". {count} is how many event types there are, {active} how many are switched on. The web never makes \"active\" plural; French may agree it with the count of active ones only if it reads naturally."
+
+[scheduling.overview.hours_clause]
+en = "{days}, {hours}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { days = "str", hours = "str" }
+note = "One clause of the working hours summary, e.g. \"Mon to Fri, 9:00 to 17:00\". {days} names the days, {hours} the hours on them. Clauses are joined with semicolons."
+
+[scheduling.overview.month_day_clock]
+en = "{month} {day}, {clock}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { month = "str", day = "str", clock = "str" }
+note = "When the next booking starts, beyond tomorrow, e.g. \"Sep 12, 10:00\". {month} is the abbreviated month name, {clock} the time of day."
+
+[scheduling.overview.someone]
+en = "Someone"
+ctx = "label"
+screen = "scheduling overview"
+tier = "T3"
+note = "Who booked, when the booking carries neither a name nor an email address."
+
+[scheduling.overview.today]
+en = "Today {clock}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { clock = "str" }
+note = "When the next booking starts, if it is today, e.g. \"Today 14:30\". {clock} is the time of day."
+
+[scheduling.overview.tomorrow]
+en = "Tomorrow {clock}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { clock = "str" }
+note = "When the next booking starts, if it is tomorrow, e.g. \"Tomorrow 10:00\". {clock} is the time of day."
+
+[scheduling.overview.window]
+en = "{start} to {end}"
+ctx = "format"
+screen = "scheduling overview"
+tier = "T3"
+args = { start = "str", end = "str" }
+note = "One window of working hours in the summary, e.g. \"9:00 to 17:00\". {start} and {end} are times of day."
+
+[scheduling.settings.locale_not_set]
+en = "Not set"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Shown in place of the booking page language when the profile sets none."
+
+[scheduling.settings.notify_attendee_description]
+en = "When you are the one being booked into somebody else's meeting."
+ctx = "body"
+screen = "scheduling settings"
+tier = "T3"
+note = "Explains the first group of email notification switches: the ones about meetings other people book the operator into."
+
+[scheduling.settings.notify_attendee_heading]
+en = "As an attendee"
+ctx = "title"
+screen = "scheduling settings"
+tier = "T3"
+note = "Heading of the first group of email notification switches."
+
+[scheduling.settings.notify_cancellation]
+en = "A booking is cancelled"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when a booking I attend is cancelled."
+
+[scheduling.settings.notify_confirmation]
+en = "A booking is confirmed"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when a booking I attend is confirmed."
+
+[scheduling.settings.notify_host_booking]
+en = "Somebody books you"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when somebody books one of my event types."
+
+[scheduling.settings.notify_host_cancel]
+en = "Somebody cancels"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when somebody cancels a booking with me."
+
+[scheduling.settings.notify_host_description]
+en = "When somebody books one of your event types."
+ctx = "body"
+screen = "scheduling settings"
+tier = "T3"
+note = "Explains the second group of email notification switches: the ones about bookings made with the operator."
+
+[scheduling.settings.notify_host_heading]
+en = "As a host"
+ctx = "title"
+screen = "scheduling settings"
+tier = "T3"
+note = "Heading of the second group of email notification switches."
+
+[scheduling.settings.notify_host_reschedule]
+en = "Somebody moves their booking"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when somebody moves a booking with me to another time."
+
+[scheduling.settings.notify_reminder]
+en = "A booking is coming up"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: remind me before a booking I attend."
+
+[scheduling.settings.notify_reschedule]
+en = "A booking is moved"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Email notification switch: tell me when a booking I attend moves to another time."
+
+[scheduling.settings.tab_assistant]
+en = "Booking assistant"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Tab on the scheduling settings screen: the AI assistant that answers on the booking page."
+
+[scheduling.settings.tab_booking_page]
+en = "Booking page"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Tab on the scheduling settings screen: the public page customers book from."
+
+[scheduling.settings.tab_notifications]
+en = "Your notifications"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Tab on the scheduling settings screen: the operator's own email notification switches."
+
+[scheduling.settings.tab_profile]
+en = "Your profile"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Tab on the scheduling settings screen: the operator's own scheduling profile (name, timezone, language)."
+
+[scheduling.settings.time_format_12h]
+en = "12-hour (2:30 pm)"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Choice of clock for the booking page: a 12-hour clock, with an example time in the parenthesis."
+
+[scheduling.settings.time_format_24h]
+en = "24-hour (14:30)"
+ctx = "label"
+screen = "scheduling settings"
+tier = "T3"
+note = "Choice of clock for the booking page: a 24-hour clock, with an example time in the parenthesis. Keep the example in the clock's own form."
+
+[scheduling.team.role_agency]
+en = "Agency"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "A workspace member's role, as the scheduling team screen names it: the agency that runs the workspace (an administrator)."
+
+[scheduling.team.role_client]
+en = "Client"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "A workspace member's role, as the scheduling team screen names it: a member of the client business."
+
+[scheduling.team.role_removed]
+en = "Removed from the workspace"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "Shown in the role column for a scheduling host who is no longer a member of the workspace."
+
+[scheduling.team.role_viewer]
+en = "Viewer"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "A workspace member's role, as the scheduling team screen names it: read-only access."
+
+[scheduling.team.state_absent]
+en = "Not set up yet"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "Badge on a workspace member who has no scheduling account yet."
+
+[scheduling.team.state_archived]
+en = "Archived"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "Badge on a scheduling host whose account is archived and takes no bookings."
+
+[scheduling.team.state_host]
+en = "Host"
+ctx = "label"
+screen = "scheduling team"
+tier = "T3"
+note = "Badge on a member whose scheduling account takes bookings."
+
+[scheduling.team.stranded_many]
+en = "{names} are no longer in this workspace but still hold upcoming bookings, so the scheduler kept their accounts open. Reassign or cancel those bookings, then archive the accounts."
+ctx = "body"
+screen = "scheduling team"
+tier = "T2"
+args = { names = "str" }
+note = "Notice on the team screen about two or more people who left the workspace while still holding bookings. {names} is their names as a list (\"Ana, Ben and Chloé\")."
+
+[scheduling.team.stranded_one]
+en = "{name} is no longer in this workspace but still holds upcoming bookings, so the scheduler kept their account open. Reassign or cancel those bookings, then archive the account."
+ctx = "body"
+screen = "scheduling team"
+tier = "T2"
+args = { name = "str" }
+note = "Notice on the team screen about one person who left the workspace while still holding bookings. {name} is their name."
+
+[voice_studio.residency_leg]
+en = "{leg}: {place}"
+ctx = "format"
+screen = "voice studio"
+tier = "T1"
+args = { leg = "str", place = "str" }
+note = "One line in the Voice Studio residency notice naming a part of the voice chain that runs outside the workspace's region, e.g. \"Speech to text: United States\". {leg} and {place} come from the service, already in the reader's language."

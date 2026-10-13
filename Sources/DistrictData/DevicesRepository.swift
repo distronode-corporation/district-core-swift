@@ -75,7 +75,7 @@ public struct DevicesRepository: Sendable {
     /// happen either.
     ///
     /// ⚠️ A THROWN WRITE IS NOT "nothing to revoke": the route answers 500, and
-    /// that arrives here as ``ApiError/http(status:message:)``. The session may
+    /// that arrives here as ``ApiError/http(status:message:code:)``. The session may
     /// still be live, so a caller must not report success.
     ///
     /// ⚠️ REVOKES REFRESH TOKENS, NOT ACCESS TOKENS. A revoked device keeps

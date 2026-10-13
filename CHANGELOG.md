@@ -6,6 +6,72 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+The core's text, ready for Canadian French. A major release (see Changed): every English
+string and format the core produces is byte-identical to 6.0.0, every request carries one
+new header, and nothing is French until an app sets `L10nRuntime.locale`, which no 7.x app
+does.
+
+### Added
+
+- A new module, `DistrictL10n`, that every other module but `DistrictAuthCore` and
+  `DistrictLive` now depends on. It has no resources and uses no Foundation localization
+  API, so Linux and Darwin behave alike.
+  - `L10nLocale` (`en`, `frCA`), with `languageTag` (`en`, `fr-CA`) and `settingsValue`
+    (`en`, `fr`). `L10nRuntime.locale` is the language the core writes in: English until
+    the app sets it; `L10nRuntime.withLocale(_:_:)` and the task-local `scoped` override it
+    for a scope. `L10nRuntime.isFrenchComplete` is false until every entry has reviewed
+    French.
+  - `locale(fromPreferred:)` (call it as `DistrictL10n.locale(fromPreferred:)`): the first
+    tag whose language the core speaks decides, and any French (`fr-FR`, `fr-BE`, `fr-CH`)
+    is Canadian French; a list with neither gives English.
+  - `L10nFormat`: money (`money`, `isoAmount`, `moneyOrBare`, with `MoneyDisplay`), dates
+    and times in a named IANA zone (`date` with `DateStyle`, `time`, `dateTime`),
+    durations (`minutesSeconds`, and the wire's `callDuration`), numbers (`integer`,
+    `number`, `count`), percentages (`percent(ratio:)`), lists (`list`: `A, B and C`,
+    `A, B et C`) and the calendar's words (`monthAbbreviation`, `monthName`,
+    `weekdayName`, `weekdayAbbreviation`, `meridiem`). Hand-written tables, held byte for
+    byte to the website's `contracts/i18n/format-vectors.json` in both languages.
+  - `ApiErrorText.sentence(for:items:)`: the sentence for each of the 140 API error codes
+    in the active language, generated from `contracts/i18n/api-errors.json`, and
+    `ApiErrorText.header` (`X-Distronode-Error-Code`).
+  - `WireLabel.label(_:_:)`, `regionLongName(_:)` and `placeholder(_:)` with
+    `WireCategory`: labels for the enumerated values and the server's placeholder strings
+    in `contracts/i18n/wire-vocabulary.json`. An unknown value reads as a localized
+    generic label, never the value humanized.
+- The catalogs, `l10n/core.toml`, `l10n/countries.toml`, `l10n/api_errors.toml` and
+  `l10n/wire.toml` (432 entries, no French yet), and `scripts/gen-l10n.py`, which writes
+  the last two and every generated Swift file from them. The vendored catalog tools are in
+  `tools/l10n/`; CI fails on a stale generated file, a non-canonical catalog or a broken
+  French rule.
+- `ApiError.code`: the refusal's error code, from the body's `code` or else the
+  `X-Distronode-Error-Code` header (the body wins, as on the website), and
+  `ApiError.localizedMessage`: `message` in English, exactly as before; in French the
+  code's catalog sentence, or nil for the screen's own. `ApiErrorCode.header`.
+  `RawResponse.errorCodeHeader`, and `ApiErrorNormalizer.apiError(statusCode:body:headerCode:)`.
+- `AccountSettingsRepository.saveLocale(_:)` and `DistrictEndpoints.saveLocale(_:)`:
+  `POST /api/settings` with `{"profile":{"locale":"en"|"fr"}}`. Unused until the apps' 3.0.
+- Contracts: `contracts/i18n/` (`api-errors.json`, `wire-vocabulary.json`,
+  `format-vectors.json` and their README), copied unchanged from the service.
+
+### Changed
+
+- ⚠️ Source-breaking: `ApiError.http` gains a third associated value,
+  `http(status:message:code:)`. Constructing it without `code` still compiles (it defaults
+  to nil), but a pattern that binds two values (`case let .http(status, _)`) needs three,
+  and two errors that differ only by code are no longer equal. That makes this release a
+  major version.
+- Every request `ApiClient` and `NativeAuthClient` send carries `Accept-Language`: the
+  resolved language's tag, `en` until an app turns French on.
+- The core's display text comes from the catalogs, in the active language: the 136 calling
+  code places (`DialEntry.callingCodes`, now computed), the scheduling formatters' labels
+  and sentences, the help desk's and the inbox's own refusals, the routing rule
+  vocabularies' labels and the Voice Studio residency line. Tables that were stored
+  (`SchedulingClock.monthNames`, `SchedulingHoursFormat.weekDayNames`,
+  `SchedulingSettingsFormat.settingsTabLabels` and `notificationGroups`,
+  `SchedulingDeveloperFormat.tabLabels` and `mcpKeyPlaceholder`) are now computed
+  properties with the same English. The scheduling formatters' month, weekday and AM/PM
+  tables moved into `L10nFormat`.
+
 ## [6.0.0] - 2026-10-07
 
 The second factor after native Sign in with Apple. A major release (see Changed). Every

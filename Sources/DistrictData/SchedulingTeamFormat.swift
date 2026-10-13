@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -51,11 +52,14 @@ public struct SchedulingDistrictMember: Equatable, Sendable {
 
 /// The team screen's read half, ported from `team-format.ts`.
 public enum SchedulingTeamFormat {
-    static let districtRoleLabels = [
-        "agency": "Agency",
-        "client": "Client",
-        "viewer": "Viewer",
-    ]
+    /// Computed, so the labels follow ``L10nRuntime/locale``.
+    static var districtRoleLabels: [String: String] {
+        [
+            "agency": SchedulingCopy.teamRoleAgency,
+            "client": SchedulingCopy.teamRoleClient,
+            "viewer": SchedulingCopy.teamRoleViewer,
+        ]
+    }
 
     /// The local part of an address, or the whole thing when there is none.
     ///
@@ -130,9 +134,9 @@ public enum SchedulingTeamFormat {
     /// Host / Archived / Not set up yet.
     public static func memberStateLabel(_ state: SchedulingMemberRow.State) -> SchedulingStatusLabel {
         switch state {
-        case .host: SchedulingStatusLabel(label: "Host", kind: .success)
-        case .archived: SchedulingStatusLabel(label: "Archived", kind: .stopped)
-        case .absent: SchedulingStatusLabel(label: "Not set up yet", kind: .info)
+        case .host: SchedulingStatusLabel(label: SchedulingCopy.teamStateHost, kind: .success)
+        case .archived: SchedulingStatusLabel(label: SchedulingCopy.teamStateArchived, kind: .stopped)
+        case .absent: SchedulingStatusLabel(label: SchedulingCopy.teamStateAbsent, kind: .info)
         }
     }
 
@@ -142,7 +146,7 @@ public enum SchedulingTeamFormat {
     /// used. The operator should see the value the server actually sent, casing included,
     /// because that is what they would have to quote in a support request.
     public static func districtRoleLabel(_ role: String?) -> String {
-        guard let role else { return "Removed from the workspace" }
+        guard let role else { return SchedulingCopy.teamRoleRemoved }
         let normalized = role.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return districtRoleLabels[normalized] ?? role
     }
@@ -163,14 +167,9 @@ public enum SchedulingTeamFormat {
         let names = rows.map(\.name)
         guard let last = names.last else { return "" }
         if names.count == 1 {
-            return "\(last) is no longer in this workspace but still holds upcoming bookings, "
-                + "so the scheduler kept their account open. Reassign or cancel those bookings, "
-                + "then archive the account."
+            return SchedulingCopy.teamStrandedOne(last)
         }
-        let who = "\(names.dropLast().joined(separator: ", ")) and \(last)"
-        return "\(who) are no longer in this workspace but still hold upcoming bookings, "
-            + "so the scheduler kept their accounts open. Reassign or cancel those bookings, "
-            + "then archive the accounts."
+        return SchedulingCopy.teamStrandedMany(L10nFormat.list(names))
     }
 
     /// How many people are on a team.

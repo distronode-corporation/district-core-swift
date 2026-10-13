@@ -52,7 +52,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 name: "{error, code}: conversations' 500",
                 statusCode: 500,
                 body: #"{"error":"Something went wrong.","code":"INTERNAL_ERROR"}"#,
-                expected: .http(status: 500, message: "Something went wrong."),
+                expected: .http(status: 500, message: "Something went wrong.", code: "INTERNAL_ERROR"),
                 line: #line
             ),
         ]
@@ -71,21 +71,21 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 name: "error and code together: error wins",
                 statusCode: 503,
                 body: #"{"error":"One region did not answer.","code":"REGIONS_DEGRADED"}"#,
-                expected: .http(status: 503, message: "One region did not answer."),
+                expected: .http(status: 503, message: "One region did not answer.", code: "REGIONS_DEGRADED"),
                 line: #line
             ),
             Row(
                 name: "blank error beside a code: no message at all",
                 statusCode: 503,
                 body: #"{"error":"   ","code":"REGIONS_DEGRADED"}"#,
-                expected: .http(status: 503, message: nil),
+                expected: .http(status: 503, message: nil, code: "REGIONS_DEGRADED"),
                 line: #line
             ),
             Row(
                 name: "code alone: no message at all",
                 statusCode: 409,
                 body: #"{"code":"last_agency_member"}"#,
-                expected: .http(status: 409, message: nil),
+                expected: .http(status: 409, message: nil, code: "last_agency_member"),
                 line: #line
             ),
         ]
@@ -147,7 +147,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 expected: .http(
                     status: 503,
                     message: "Your workspaces could not be listed because one or more regions are "
-                        + "unreachable right now. This is not a change to your account."
+                        + "unreachable right now. This is not a change to your account.", code: "REGIONS_DEGRADED"
                 ),
                 line: #line
             ),
@@ -169,7 +169,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 expected: .http(
                     status: 402,
                     message: "This workspace's subscription is not active. Please update billing "
-                        + "to resume calls and messaging."
+                        + "to resume calls and messaging.", code: "subscription_inactive"
                 ),
                 line: #line
             ),
@@ -188,10 +188,9 @@ final class ApiErrorNormalizerTests: XCTestCase {
                 line: #line
             ),
             Row(
-                // ⚠️ THE SAME STATUS AND THE SAME SHAPE AS THE ROW ABOVE, and
-                // through this function the two are indistinguishable, `code`
-                // has nowhere to travel on `ApiError`. The recovery is pinned
-                // separately below.
+                // ⚠️ THE SAME STATUS AND THE SAME SHAPE AS THE ROW ABOVE, told apart
+                // only by the `code` that ``ApiError/code`` now carries. The
+                // recovery from the body is still pinned separately below.
                 name: "district-dial-dormant.json at 403",
                 statusCode: 403,
                 body: CapturedErrorBodies.dialDormant,
@@ -199,7 +198,7 @@ final class ApiErrorNormalizerTests: XCTestCase {
                     status: 403,
                     message: "This workspace has not sent anything for 100 days, so outbound "
                         + "calling and messaging are paused pending an account review. Request "
-                        + "reactivation from your dashboard and we will re-enable it."
+                        + "reactivation from your dashboard and we will re-enable it.", code: "workspace_dormant"
                 ),
                 line: #line
             ),

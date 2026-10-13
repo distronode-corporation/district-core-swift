@@ -32,6 +32,9 @@ swiftlint --strict                            # SwiftLint 0.65.1
 swift test --enable-code-coverage
 ci/coverage-gate.sh
 python3 scripts/check-public-hygiene.py
+python3 tools/l10n/l10n.py vendor --check --dest tools/l10n
+python3 scripts/gen-l10n.py --check
+python3 tools/l10n/frcheck.py all . --termbase '' --tm ''
 ```
 
 CI also greps the sources for Darwin-only imports, checks `Package.resolved` and counts
@@ -67,6 +70,15 @@ the service changes them; a pull request that edits one by hand will not be merg
 fixture looks wrong, or a model and the service disagree about a response, open an
 issue. A model change that needs a new or different fixture waits for the fixture to
 arrive from the service.
+
+**Display text lives in the catalogs.** Any text a screen can show (a label, a sentence,
+a refusal this client writes) is an entry in `l10n/core.toml`, with `ctx`, `screen`,
+`tier` and a `note` a translator can work from, and is reached through its generated
+accessor; `python3 scripts/gen-l10n.py` regenerates the Swift after an edit. Never build
+a sentence by joining pieces: one entry holds the whole sentence with its placeholders.
+Wire values, identifiers, log text and accessibility identifiers are not display text.
+Numbers, money, dates and lists go through `L10nFormat`, never a platform formatter.
+`contracts/i18n/` is a copy of the service's, like the other contract sets.
 
 **Test bundles must discover their tests.** CI counts the tests that ran and fails below
 the floor set in `.github/workflows/ci.yml` (1960). It sits a little below the current

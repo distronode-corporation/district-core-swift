@@ -93,7 +93,7 @@ public struct MessagingRepository: Sendable {
     /// PLACE THIS LAYER IS DELIBERATELY SIMPLER THAN THE KOTLIN ONE.
     /// `MessagingWriteOutcome.Unverifiable` exists there because that client's
     /// `FailureText` refuses to render ANY 5xx body verbatim, so the sentence would
-    /// be lost before a screen saw it. ``ApiError/http(status:message:)`` keeps both
+    /// be lost before a screen saw it. ``ApiError/http(status:message:code:)`` keeps both
     /// the status and the message, so a caller branches on
     /// ``ApiError/httpStatus`` == 502 and shows ``ApiError/message``. ⛔ If a
     /// `FailureText` equivalent is ever added to the App target, it must special-case

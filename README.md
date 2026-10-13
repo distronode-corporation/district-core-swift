@@ -56,7 +56,8 @@ FoundationNetworking on Linux).
 
 | Module | What it holds |
 | --- | --- |
-| `DistrictModel` | Codable DTOs for every response the apps decode, and the single normalised error type, `ApiError`. Depends on nothing. |
+| `DistrictL10n` | Every piece of display text the core produces, in English or Canadian French, generated from the catalogs in `l10n/`; the language switch (`L10nRuntime`); and the formats for money, dates, times, durations, numbers, percentages and lists (`L10nFormat`), held byte for byte to the website's. Also the API error code sentences (`ApiErrorText`) and the wire value labels (`WireLabel`). Depends on nothing. |
+| `DistrictModel` | Codable DTOs for every response the apps decode, and the single normalised error type, `ApiError`. Depends only on `DistrictL10n`. |
 | `DistrictAuthCore` | PKCE (S256), the Sign in with Apple nonce, token refresh coordination, revocation and sign-out. Token storage is the `TokenStore` protocol; each app implements it with the Keychain. |
 | `DistrictNetwork` | Every endpoint and path, the API client, error-envelope normalisation and the native sign-in exchanges. The HTTP transport is the `HTTPTransport` protocol, so libcurl and Darwin `URLSession` differences never reach feature code. |
 | `DistrictData` | Repositories and paging over `DistrictNetwork`. |
@@ -83,6 +84,25 @@ Lint, from the repository root:
 swiftformat --lint .       # SwiftFormat 0.63.0
 swiftlint --strict         # SwiftLint 0.65.1
 ```
+
+## Languages
+
+The core writes English, and Canadian French once an app turns it on by setting
+`L10nRuntime.locale` (to `DistrictL10n.locale(fromPreferred:)` of the device's preferred
+languages). Until then everything is English, and the French in the catalogs is empty.
+
+- The text is in four TOML catalogs under `l10n/`, in the format
+  [`tools/l10n/`](tools/l10n) reads: `core.toml` and `countries.toml` are written by
+  hand; `api_errors.toml` and `wire.toml` are generated from `contracts/i18n/`.
+- `python3 scripts/gen-l10n.py` writes those two catalogs, the Swift in
+  `Sources/DistrictL10n/Generated/` and the test that calls every accessor in both
+  languages. Never edit a generated file; change a catalog and run the script.
+  `python3 scripts/gen-l10n.py --check` is what CI runs.
+- `tools/l10n/` is a vendored copy (`SOURCE.toml` names the commit;
+  `python3 tools/l10n/l10n.py vendor --check --dest tools/l10n` verifies it).
+- Formats are not CLDR: `L10nFormat` is a set of tables tested against
+  `contracts/i18n/format-vectors.json`, so a customer reads the same bytes on every OS
+  version and on the website.
 
 ## The contract gate
 
@@ -115,8 +135,9 @@ every pull request, and uses no secrets:
   rule, the `Package.resolved` guard, `swift test`, a floor on the number of tests run,
   and the coverage floors.
 - **hygiene** (Linux): no em or en dashes, internal host names or GitLab URLs
-  ([`scripts/check-public-hygiene.py`](scripts/check-public-hygiene.py)), and the licence
-  files present.
+  ([`scripts/check-public-hygiene.py`](scripts/check-public-hygiene.py)), the licence
+  files present, the vendored catalog tools unmodified, every generated string file
+  current, and the French rules (`frcheck`).
 - **gitleaks** (Linux): the full git history, with [`.gitleaks.toml`](.gitleaks.toml).
 - **zizmor** (Linux): static analysis of the workflows.
 - **darwin** (macOS): `swift test`, then `xcodebuild` for generic iOS and generic macOS.

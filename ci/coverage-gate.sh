@@ -43,6 +43,7 @@ set -euo pipefail
 # No slack. It was a point below measured coverage until 2026-09-26, when the
 # last 23 uncovered lines were tested or deleted.
 FLOOR_TOTAL=100
+FLOOR_DistrictL10n=100
 FLOOR_DistrictModel=100
 FLOOR_DistrictAuthCore=100
 FLOOR_DistrictNetwork=100
@@ -54,7 +55,7 @@ FLOOR_DistrictLive=100
 # Package.swift without adding it here means it is built, possibly tested, and
 # NOT gated, so the list is duplicated deliberately and the script fails if a
 # name here has no files in the report.
-MODULES="DistrictModel DistrictAuthCore DistrictNetwork DistrictData DistrictCall DistrictLive"
+MODULES="DistrictL10n DistrictModel DistrictAuthCore DistrictNetwork DistrictData DistrictCall DistrictLive"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The package is the repository root, one level above this script.
@@ -101,6 +102,7 @@ echo "coverage export: $CODECOV_JSON"
 # `.percent`, so a module of two files is weighted by lines and not by file.
 MODULES="$MODULES" \
 FLOOR_TOTAL="$FLOOR_TOTAL" \
+FLOOR_DistrictL10n="$FLOOR_DistrictL10n" \
 FLOOR_DistrictModel="$FLOOR_DistrictModel" \
 FLOOR_DistrictAuthCore="$FLOOR_DistrictAuthCore" \
 FLOOR_DistrictNetwork="$FLOOR_DistrictNetwork" \

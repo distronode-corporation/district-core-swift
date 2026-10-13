@@ -23,7 +23,7 @@ public struct SchedulingHandoff: Sendable, Equatable {
 /// Why a hand-off mint failed.
 ///
 /// ⚠️ TWO 400s GET THEIR OWN CASES BECAUSE EACH HAS ITS OWN REMEDY, and an
-/// ``ApiError/http(status:message:)`` cannot carry the `code` that tells them apart.
+/// ``ApiError/http(status:message:code:)`` cannot carry the `code` that tells them apart.
 public enum SchedulingHandoffFailure: Error, Equatable, Sendable {
     /// 400 `nonce_required`: the server now refuses unbound mints. The message is the
     /// sentence to show ("Update the app to open the website from it."), nil when the
@@ -105,7 +105,9 @@ public struct SchedulingHandoffClient: Sendable {
         if raw.statusCode == 400, envelope?.code == ApiErrorCode.invalidNonce {
             return .invalidNonce
         }
-        return .api(ApiErrorNormalizer.apiError(statusCode: raw.statusCode, body: raw.body))
+        return .api(ApiErrorNormalizer.apiError(
+            statusCode: raw.statusCode, body: raw.body, headerCode: raw.errorCodeHeader
+        ))
     }
 
     /// ⛔ STRICT: MISSING KEYS AND UNKNOWN KEYS BOTH FAIL. A body that grew a field is

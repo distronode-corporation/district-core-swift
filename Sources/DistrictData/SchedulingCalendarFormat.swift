@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -11,12 +12,15 @@ import Foundation
 public enum SchedulingCalendarFormat {
     /// ⚠️ THE FOUR THE FORK KNOWS. Anything else falls through to its own raw value,
     /// which is a provider this build has not heard of rather than an error.
-    static let providerLabels = [
-        "google": "Google Calendar",
-        "microsoft": "Microsoft 365",
-        "caldav": "CalDAV",
-        "apple": "Apple Calendar",
-    ]
+    /// Computed, so the names follow ``L10nRuntime/locale``.
+    static var providerLabels: [String: String] {
+        [
+            "google": SchedulingCopy.calendarProviderGoogle,
+            "microsoft": SchedulingCopy.calendarProviderMicrosoft,
+            "caldav": SchedulingCopy.calendarProviderCaldav,
+            "apple": SchedulingCopy.calendarProviderApple,
+        ]
+    }
 
     public static func providerLabel(_ provider: String) -> String {
         providerLabels[provider] ?? provider
@@ -36,10 +40,12 @@ public enum SchedulingCalendarFormat {
         calendars: [SchedulingCalendarSelection]?
     ) -> String {
         guard let calendars else {
-            return connection.checkConflicts ? "Checked" : "Not checked"
+            return connection.checkConflicts
+                ? SchedulingCopy.calendarConflictsChecked
+                : SchedulingCopy.calendarConflictsNotChecked
         }
         let names = calendars.filter { $0.checkConflicts == true }.map(\.name)
-        return names.isEmpty ? "None" : names.joined(separator: ", ")
+        return names.isEmpty ? SchedulingCopy.calendarConflictsNone : names.joined(separator: ", ")
     }
 
     /// Where bookings are written.
@@ -55,6 +61,8 @@ public enum SchedulingCalendarFormat {
         if let chosen = calendars?.first(where: { $0.isDestination == true }) {
             return chosen.name
         }
-        return connection.isDestination ? "This account" : "No calendar in this account"
+        return connection.isDestination
+            ? SchedulingCopy.calendarDestinationThisAccount
+            : SchedulingCopy.calendarDestinationNone
     }
 }

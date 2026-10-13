@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -16,10 +17,10 @@ public enum SchedulingBookingView: String, Equatable, Sendable, CaseIterable {
     /// ⚠️ The filter control's labels, in the web's order.
     public var label: String {
         switch self {
-        case .upcoming: "Upcoming"
-        case .past: "Past"
-        case .cancelled: "Cancelled"
-        case .all: "All"
+        case .upcoming: SchedulingCopy.bookingViewUpcoming
+        case .past: SchedulingCopy.bookingViewPast
+        case .cancelled: SchedulingCopy.bookingViewCancelled
+        case .all: SchedulingCopy.bookingViewAll
         }
     }
 }
@@ -135,9 +136,9 @@ public enum SchedulingBookingFormat {
     /// replacing it would throw away the only information the row had.
     public static func statusLabel(_ status: String) -> SchedulingStatusLabel {
         switch status {
-        case "confirmed": SchedulingStatusLabel(label: "Confirmed", kind: .success)
-        case "cancelled": SchedulingStatusLabel(label: "Cancelled", kind: .error)
-        case "rescheduled": SchedulingStatusLabel(label: "Rescheduled", kind: .info)
+        case "confirmed": SchedulingStatusLabel(label: SchedulingCopy.bookingStatusConfirmed, kind: .success)
+        case "cancelled": SchedulingStatusLabel(label: SchedulingCopy.bookingStatusCancelled, kind: .error)
+        case "rescheduled": SchedulingStatusLabel(label: SchedulingCopy.bookingStatusRescheduled, kind: .info)
         default: SchedulingStatusLabel(label: status, kind: .info)
         }
     }
@@ -154,7 +155,7 @@ public enum SchedulingBookingFormat {
         guard let start = WireInstant.parse(startAt) else { return nil }
         let at = SchedulingClock.parts(of: start, timezone: timezone)
         guard let month = SchedulingClock.monthName(at.month) else { return nil }
-        return "\(month) \(at.day), \(at.year), \(SchedulingClock.clock(at))"
+        return SchedulingCopy.bookingDateTime(month, String(at.day), String(at.year), SchedulingClock.clock(at))
     }
 
     /// `30 min`, or `Not set`.
@@ -163,8 +164,8 @@ public enum SchedulingBookingFormat {
     /// EVENT-TYPES TABLE GETS ITS DURATION AND ITS INTERVAL COLUMNS. It lives here rather
     /// than in a ninth file because it is one function.
     public static func minutesLabel(_ minutes: Int?) -> String {
-        guard let minutes else { return "Not set" }
-        return "\(minutes) min"
+        guard let minutes else { return SchedulingCopy.bookingMinutesNotSet }
+        return SchedulingCopy.bookingMinutes(minutes)
     }
 
     /// The first attendee's email, trimmed, or empty.

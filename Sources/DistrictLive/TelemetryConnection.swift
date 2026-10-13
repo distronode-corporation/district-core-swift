@@ -466,7 +466,7 @@ public struct TelemetryConnection: Sendable, Equatable {
         switch error {
         case .transport:
             true
-        case let .http(status, _):
+        case let .http(status, _, _):
             status >= 500 || status == 429 || status == 401
         case .decoding:
             false

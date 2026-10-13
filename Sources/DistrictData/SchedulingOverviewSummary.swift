@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -80,7 +81,8 @@ public enum SchedulingOverviewSummary {
                 phrases.append((phrase, [index]))
             }
         }
-        return phrases.map { "\(daysPhrase($0.days)), \($0.phrase)" }.joined(separator: "; ")
+        return phrases.map { SchedulingCopy.overviewHoursClause(daysPhrase($0.days), $0.phrase) }
+            .joined(separator: "; ")
     }
 
     /// The event types a customer could actually book.
@@ -104,8 +106,7 @@ public enum SchedulingOverviewSummary {
     public static func summarizeEventTypes(_ items: [SchedulingEventType]) -> String? {
         guard !items.isEmpty else { return nil }
         let active = items.filter { $0.isActive != false }.count
-        let noun = items.count == 1 ? "event type" : "event types"
-        return "\(items.count) \(noun), \(active) active"
+        return SchedulingCopy.overviewEventTypes(items.count, L10nFormat.count(active))
     }
 
     /// `https://<host>/book/<slug>`.
@@ -141,13 +142,13 @@ public enum SchedulingOverviewSummary {
         let clock = SchedulingClock.clock(at)
         guard let delta = SchedulingClock.dayDelta(from: today, to: at) else { return nil }
         if delta == 0 {
-            return "Today \(clock)"
+            return SchedulingCopy.overviewToday(clock)
         }
         if delta == 1 {
-            return "Tomorrow \(clock)"
+            return SchedulingCopy.overviewTomorrow(clock)
         }
         guard let month = SchedulingClock.monthName(at.month) else { return nil }
-        return "\(month) \(at.day), \(clock)"
+        return SchedulingCopy.overviewMonthDayClock(month, String(at.day), clock)
     }
 
     /// The first attendee's name, then their email, then `Someone`.
@@ -164,7 +165,7 @@ public enum SchedulingOverviewSummary {
         if let email = first?.email?.trimmingCharacters(in: .whitespacesAndNewlines), !email.isEmpty {
             return email
         }
-        return "Someone"
+        return SchedulingCopy.overviewSomeone
     }
 
     /// The event type's display name, its slug, or `Booking`.
@@ -177,7 +178,7 @@ public enum SchedulingOverviewSummary {
         _ booking: SchedulingBooking,
         eventTypes: [SchedulingEventType]
     ) -> String {
-        guard let slug = booking.eventTypeSlug, !slug.isEmpty else { return "Booking" }
+        guard let slug = booking.eventTypeSlug, !slug.isEmpty else { return SchedulingCopy.overviewBooking }
         return eventTypes.first { $0.slug == slug }?.name ?? slug
     }
 
@@ -185,7 +186,10 @@ public enum SchedulingOverviewSummary {
 
     /// ⚠️ `Mon`...`Sun`. The DISPLAY order, which is Monday-first and is not the wire's
     /// Sunday-first `day_of_week`. ``displayIndex(_:)`` is the only conversion.
-    static let displayDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    /// In the active language: `DistrictL10n`'s weekday abbreviations, read Monday first.
+    static var displayDays: [String] {
+        [2, 3, 4, 5, 6, 7, 1].compactMap { L10nFormat.weekdayAbbreviation($0) }
+    }
 
     /// Wire (0 = Sunday) to display (0 = Monday).
     static func displayIndex(_ dayOfWeek: Int) -> Int {
@@ -197,10 +201,9 @@ public enum SchedulingOverviewSummary {
     /// ⚠️ THE SEPARATOR IS `, ` FOR ALL BUT THE LAST PAIR AND ` and ` BEFORE IT, with no
     /// Oxford comma, three windows read "a, b and c".
     static func windowsPhrase(_ windows: [(start: String, end: String)]) -> String {
-        let parts = windows.map { "\(displayTime($0.start)) to \(displayTime($0.end))" }
-        // One window or none: `joined()` is that window, or "".
-        guard parts.count > 1 else { return parts.joined() }
-        return "\(parts.dropLast().joined(separator: ", ")) and \(parts[parts.count - 1])"
+        let parts = windows.map { SchedulingCopy.overviewWindow(displayTime($0.start), displayTime($0.end)) }
+        // One window is itself and none is "", as the list format answers them.
+        return L10nFormat.list(parts)
     }
 
     /// `Mon to Fri`, or `Mon, Wed, Fri`.
@@ -216,9 +219,11 @@ public enum SchedulingOverviewSummary {
             offset == 0 || value == sorted[offset - 1] + 1
         }
         if sorted.count >= 3, consecutive {
-            return "\(displayDays[first]) to \(displayDays[last])"
+            let days = displayDays
+            return SchedulingCopy.overviewDaysRange(days[first], days[last])
         }
-        return sorted.map { displayDays[$0] }.joined(separator: ", ")
+        let days = displayDays
+        return sorted.map { days[$0] }.joined(separator: ", ")
     }
 
     /// `encodeURIComponent`, byte for byte: every UTF-8 byte outside the surviving set

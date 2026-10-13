@@ -230,7 +230,9 @@ public struct DialRepository: Sendable {
             return hangUpRefusal(response)
         }
         guard let decoded = try? JSONDecoder().decode(CallHangUpResponse.self, from: response.body) else {
-            return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            return .failure(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
         // ⛔ ENVELOPE-CHECKED LIKE EVERY OTHER WRITE. Both fields are required, so
         // `{}` never decodes, but a route falling into its error branch after the
@@ -258,7 +260,9 @@ public struct DialRepository: Sendable {
         case 409:
             .success(.notDirectCall)
         default:
-            .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            .failure(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
     }
 
@@ -267,7 +271,9 @@ public struct DialRepository: Sendable {
             return refusal(response)
         }
         guard let decoded = try? JSONDecoder().decode(DialResponse.self, from: response.body) else {
-            return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+            return .failure(ApiErrorNormalizer.apiError(
+                statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+            ))
         }
         // ⛔ ENVELOPE-CHECKED, AND HERE THAT IS NOT THE USUAL HYGIENE. Every
         // other route's `success:false` on a 200 means "we could not look"; this
@@ -298,6 +304,8 @@ public struct DialRepository: Sendable {
         if response.statusCode == 403, envelope?.success == false, envelope?.code == nil {
             return .success(.doNotCall(message: message))
         }
-        return .failure(ApiErrorNormalizer.apiError(statusCode: response.statusCode, body: response.body))
+        return .failure(ApiErrorNormalizer.apiError(
+            statusCode: response.statusCode, body: response.body, headerCode: response.errorCodeHeader
+        ))
     }
 }

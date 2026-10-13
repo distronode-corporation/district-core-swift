@@ -1,3 +1,4 @@
+import DistrictL10n
 import Foundation
 
 /// The raw body of a failed District API response, in whichever of the three
@@ -45,6 +46,9 @@ public struct ApiErrorEnvelope: Codable, Sendable {
 /// client has never seen must degrade to "some other error" rather than throw
 /// and take out the response it arrived in.
 public enum ApiErrorCode {
+    /// The response header that carries the code when the route left its body alone
+    /// (shared guards, and routes whose body is pinned by a fixture).
+    public static let header = ApiErrorText.header
     /// 409 when the address is already a member of the workspace.
     public static let memberExists = "member_exists"
     /// 409 refusing to leave a workspace with no administrator. Not a validation

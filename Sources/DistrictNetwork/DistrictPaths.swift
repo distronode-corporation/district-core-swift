@@ -468,6 +468,10 @@ enum DistrictPaths {
     /// per-device revoke is `devices/revoke`; the account-wide one is
     /// `revoke-all`, one level up. Inventing `devices/revoke-all` to make them
     /// look like a pair would 404.
+    /// ⛔ NOT UNDER `district`: the account's own settings (`User.displayName`,
+    /// `timezone`, `locale`) belong to the person, across every workspace they hold.
+    static let accountSettings = ["api", "settings"]
+
     private static let nativeAuth = ["api", "auth", "native"]
     static let nativeDevices = nativeAuth + ["devices"]
     static let nativeDevicesRevoke = nativeDevices + ["revoke"]

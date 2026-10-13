@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import DistrictNetwork
 import Foundation
@@ -153,7 +154,7 @@ public struct DeskRepository: Sendable {
         guard enabled != nil || notifyCustomersByEmail != nil || publicBrandName != nil else {
             // ⚠️ SHAPED AS THE ROUTE'S OWN 400 so a caller has one failure path rather
             // than two. The message is this client's, because the server never saw it.
-            return .failure(.http(status: 400, message: "At least one setting must be provided."))
+            return .failure(.http(status: 400, message: DeskCopy.settingsEmpty))
         }
         let descriptor = DistrictEndpoints.saveDeskSettings(
             workspaceId: workspaceId,
@@ -309,7 +310,7 @@ public struct DeskRepository: Sendable {
     /// One ticket and its whole thread.
     ///
     /// ⚠️ A TICKET THAT IS NOT THIS WORKSPACE'S IS A **404**, which arrives as
-    /// ``ApiError/http(status:message:)`` rather than as a nil, so a nil `ticket` on a
+    /// ``ApiError/http(status:message:code:)`` rather than as a nil, so a nil `ticket` on a
     /// 200 is contract drift and is reported as such.
     public func ticket(workspaceId: String, ticketId: String) async -> Result<DeskTicketDetail, ApiError> {
         let outcome = await client.send(
@@ -457,18 +458,18 @@ public enum DeskLogoLimits {
     /// ⚠️ "MIGHT BE". A nil here means only that the two checks this client can make
     /// passed, never that the upload will succeed.
     ///
-    /// ⚠️ SHAPED AS AN ``ApiError/http(status:message:)`` CARRYING THE ROUTE'S OWN
+    /// ⚠️ SHAPED AS AN ``ApiError/http(status:message:code:)`` CARRYING THE ROUTE'S OWN
     /// STATUS, 415 for the type and 413 for the size, so a caller has one failure
     /// path and the sentence it shows is the same one a real refusal would produce.
     public static func refusal(mimeType: String, byteCount: Int) -> ApiError? {
         guard allowedMimeTypes.contains(mimeType) else {
-            return .http(status: 415, message: "Logos must be a PNG, JPEG or WebP image.")
+            return .http(status: 415, message: DeskCopy.logoType)
         }
         guard byteCount > 0 else {
-            return .http(status: 400, message: "That file is empty.")
+            return .http(status: 400, message: DeskCopy.logoEmpty)
         }
         guard byteCount <= maximumByteCount else {
-            return .http(status: 413, message: "Logos must be 512 KB or smaller.")
+            return .http(status: 413, message: DeskCopy.logoSize)
         }
         return nil
     }

@@ -1,3 +1,4 @@
+import DistrictL10n
 import Foundation
 
 /// The two vocabularies a dynamic-persona rule matches on.
@@ -46,12 +47,12 @@ public enum RoutingRuleField: String, CaseIterable, Sendable, Equatable {
     /// ⚠️ on the type.
     public var label: String {
         switch self {
-        case .industry: "Industry"
-        case .estimatedValue: "Estimated Value"
-        case .callerType: "Caller Type (business/consumer)"
-        case .lineType: "Line Type (mobile/landline/voip)"
-        case .isDecisionMaker: "Decision Maker (true/false)"
-        case .seniority: "Seniority (e.g. vp, c-suite)"
+        case .industry: RoutingCopy.fieldIndustry
+        case .estimatedValue: RoutingCopy.fieldEstimatedValue
+        case .callerType: RoutingCopy.fieldCallerType
+        case .lineType: RoutingCopy.fieldLineType
+        case .isDecisionMaker: RoutingCopy.fieldDecisionMaker
+        case .seniority: RoutingCopy.fieldSeniority
         }
     }
 
@@ -76,8 +77,8 @@ public enum RoutingRuleOperator: String, CaseIterable, Sendable, Equatable {
 
     public var label: String {
         switch self {
-        case .contains: "Contains"
-        case .equals: "Equals"
+        case .contains: RoutingCopy.operatorContains
+        case .equals: RoutingCopy.operatorEquals
         }
     }
 

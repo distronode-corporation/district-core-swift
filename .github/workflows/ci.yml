@@ -170,11 +170,11 @@ jobs:
       # 2026-10-03; about 1759 after the recording removal, which deleted 71 tests with
       # the retired recording, storage, notetaker, booking notes and transcript surfaces
       # and added 2; about 1867 with the Voice Studio's 108; 2013 with the live
-      # transcript's 99): raise it when tests are added, and lower it only in the commit
-      # that deletes tests on purpose, saying so.
+      # transcript's 99; 2083 with the catalogs and DistrictL10n): raise it when tests are added, and
+      # lower it only in the commit that deletes tests on purpose, saying so.
       - name: Tests were discovered
         run: |
-          minimum=1980
+          minimum=2050
           executed=$(sed -n 's/.*Executed \([0-9]*\) test.*/\1/p' swift-test.log | sort -n | tail -1)
           echo "unit tests executed - ${executed:-0} (at least $minimum expected)"
           if [ -z "$executed" ] || [ "$executed" -lt "$minimum" ]; then
@@ -214,6 +214,28 @@ jobs:
 
       - name: Public hygiene (dashes, internal host names, GitLab URLs)
         run: python3 scripts/check-public-hygiene.py
+
+      # The strings DistrictL10n compiles are generated from l10n/*.toml and from
+      # contracts/i18n/ by scripts/gen-l10n.py, which runs the vendored tools/l10n/. Three
+      # checks, all Python and all in seconds: the vendored tools are the bytes their
+      # SOURCE.toml names; every generated file is what the catalogs produce now (the
+      # script also runs `l10n.py check` on the catalogs against Strings.swift, so a stale
+      # accessor or a non-canonical catalog fails here, before the slow jobs); and the
+      # French rules hold for whatever French the catalogs carry.
+      - name: The vendored l10n tools are unmodified
+        run: python3 tools/l10n/l10n.py vendor --check --dest tools/l10n
+
+      - name: The generated strings match their catalogs
+        run: |
+          python3 scripts/gen-l10n.py --check
+          python3 tools/l10n/l10n.py check l10n/core.toml l10n/countries.toml l10n/api_errors.toml l10n/wire.toml \
+            --gen swift:Sources/DistrictL10n/Generated/Strings.swift \
+            --opt runtime=external --opt access=package --opt int_fmt=L10nFormat.count
+
+      # No term base or memory here (they live with the translators); the rules that
+      # need only the catalog run in full.
+      - name: The French rules (frcheck)
+        run: python3 tools/l10n/frcheck.py all . --termbase '' --tm ''
 
       # The licence the README and every consumer rely on, and the NOTICE that carries
       # the copyright line and the trademark terms. Checked by content, because an empty

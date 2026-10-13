@@ -171,7 +171,7 @@ public struct SchedulingAdminRepository: Sendable {
     /// one answer, which is correct, both mean this member cannot do it now.
     static func error(forUnanswered error: ApiError) -> SchedulingAdminError {
         switch error {
-        case let .http(status, _):
+        case let .http(status, _, _):
             self.error(forStatus: status, code: "")
         case let .transport(reason):
             .transport(reason)

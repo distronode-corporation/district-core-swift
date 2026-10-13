@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import Foundation
 
@@ -384,6 +385,7 @@ public struct NativeAuthClient<
             headers: [
                 "Content-Type": "application/json; charset=utf-8",
                 "Accept": "application/json",
+                "Accept-Language": L10nRuntime.locale.languageTag,
             ],
             body: body
         )

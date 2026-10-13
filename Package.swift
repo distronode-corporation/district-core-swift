@@ -53,6 +53,7 @@ let package = Package(
         .macOS(.v14),
     ],
     products: [
+        .library(name: "DistrictL10n", targets: ["DistrictL10n"]),
         .library(name: "DistrictModel", targets: ["DistrictModel"]),
         .library(name: "DistrictAuthCore", targets: ["DistrictAuthCore"]),
         .library(name: "DistrictNetwork", targets: ["DistrictNetwork"]),
@@ -73,9 +74,29 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-crypto.git", exact: "5.0.0"),
     ],
     targets: [
-        // Codable DTOs and the single normalised error type. Depends on nothing.
+        // Every piece of display text the core produces, and the formats it writes
+        // numbers, money, dates and lists in, in English or Canadian French.
+        //
+        // ⛔ NO `Bundle.module` AND NO FOUNDATION LOCALIZATION API, SO LINUX BEHAVES AS
+        // DARWIN DOES. The strings are Swift generated from the catalogs in `l10n/` by
+        // `scripts/gen-l10n.py` (which runs the vendored `tools/l10n/l10n.py`), and
+        // the formats are hand-written tables held byte for byte to
+        // `contracts/i18n/format-vectors.json`. A platform formatter would answer
+        // differently by OS version, and a resource bundle is a second thing the
+        // apps would have to ship. CI fails when a generated file is stale.
+        //
+        // ⚠️ DEPENDS ON NOTHING, because every other module reads it: the model
+        // labels its vocabularies, the network sends `Accept-Language`, the
+        // formatters build their sentences.
+        .target(
+            name: "DistrictL10n",
+            swiftSettings: districtSwiftSettings
+        ),
+        // Codable DTOs and the single normalised error type. Depends only on the
+        // strings, for the labels of its vocabularies and the error sentences.
         .target(
             name: "DistrictModel",
+            dependencies: ["DistrictL10n"],
             swiftSettings: districtSwiftSettings
         ),
         // PKCE, token refresh coordination and sign-out. Pure logic; the token
@@ -99,13 +120,13 @@ let package = Package(
         // differences never reach feature code.
         .target(
             name: "DistrictNetwork",
-            dependencies: ["DistrictModel"],
+            dependencies: ["DistrictL10n", "DistrictModel"],
             swiftSettings: districtSwiftSettings
         ),
         // Repositories and paging over DistrictNetwork.
         .target(
             name: "DistrictData",
-            dependencies: ["DistrictModel", "DistrictNetwork"],
+            dependencies: ["DistrictL10n", "DistrictModel", "DistrictNetwork"],
             swiftSettings: districtSwiftSettings
         ),
         // Everything about a call that is not the media SDK and not the OS's own
@@ -129,7 +150,7 @@ let package = Package(
         // "used verbatim" rule about that credential pair is stated once.
         .target(
             name: "DistrictCall",
-            dependencies: ["DistrictModel"],
+            dependencies: ["DistrictL10n", "DistrictModel"],
             swiftSettings: districtSwiftSettings
         ),
         // The desktop's live updates: the telemetry socket's state machine and the
@@ -176,6 +197,14 @@ let package = Package(
         // ci/coverage-gate.sh requires every configured module to appear in the
         // coverage report precisely so a module that stops being exercised
         // fails loudly instead of reporting a comfortable total.
+        // ⚠️ READS `contracts/i18n/` FROM OUTSIDE THE PACKAGE, as the contract gate
+        // reads `contracts/mobile/`: the format vectors are the server's own output,
+        // and a copy compiled into the test would be a second source of truth.
+        .testTarget(
+            name: "DistrictL10nTests",
+            dependencies: ["DistrictL10n"],
+            swiftSettings: districtSwiftSettings
+        ),
         .testTarget(
             name: "DistrictModelTests",
             dependencies: ["DistrictModel"],

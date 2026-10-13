@@ -39,7 +39,10 @@
 # Xcode's; SourcePackages holds the app's remote package checkouts (the workflow
 # passes `-clonedSourcePackagesDirPath SourcePackages`). All are gitignored, but
 # --lint would still walk them and take minutes.
---exclude .build,**/.build,DerivedData,**/DerivedData,SourcePackages,*.xcodeproj
+# The Swift `scripts/gen-l10n.py` writes from the catalogs in l10n/ is excluded too: it is
+# checked byte for byte against the generator in CI instead, and a formatter that
+# rewrote it would make that check fail forever.
+--exclude .build,**/.build,DerivedData,**/DerivedData,SourcePackages,*.xcodeproj,Sources/DistrictL10n/Generated,Tests/DistrictL10nTests/Generated
 
 # ⚠️ `redundantInit` OFF. It rewrites `Foo.init(...)` to `Foo(...)`, which is
 # correct everywhere except when the initialiser is being referenced rather than

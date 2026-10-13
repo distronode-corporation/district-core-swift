@@ -15,7 +15,7 @@ import Foundation
 /// ⚠️ THE ONE DELIBERATE DIVERGENCE FROM KOTLIN IS THE MISSING-MESSAGE CASE, AND
 /// IT IS A DIFFERENCE IN WHERE THE FALLBACK LIVES RATHER THAN IN WHETHER THERE IS
 /// ONE. Kotlin substitutes `ApiErrorEnvelope.FALLBACK_MESSAGE` here, so its
-/// failure types can carry a non-null `String`; ``ApiError/http(status:message:)``
+/// failure types can carry a non-null `String`; ``ApiError/http(status:message:code:)``
 /// carries `String?` and its doc comment forbids inventing copy at this layer,
 /// because a fabricated sentence makes a contract regression indistinguishable
 /// from an ordinary error at every call site. The UI owns the fallback. Both
@@ -36,21 +36,36 @@ public enum ApiErrorNormalizer {
     ///
     /// - Parameters:
     ///   - statusCode: the HTTP status. Anything outside 200...299 is a server
-    ///     refusal and becomes ``ApiError/http(status:message:)``.
+    ///     refusal and becomes ``ApiError/http(status:message:code:)``.
     ///   - body: the raw response bytes, or nil when there was no body at all.
     ///     ⚠️ nil and empty are the same fact here and must stay that way: a
     ///     transport that returns `Data()` for a 204 and one that returns nil
     ///     would otherwise produce different errors for the same response.
+    ///   - headerCode: the `X-Distronode-Error-Code` response header, when the caller
+    ///     has the headers. ⚠️ THE BODY'S `code` WINS OVER IT, as on the website: a
+    ///     route that writes a code into its body is the specific answer, while the
+    ///     header may have been stamped by a shared guard wrapping it.
     ///
     /// - Returns: ``ApiError/decoding(_:)`` for a 2xx, which by construction
     ///   means the caller already failed to decode the declared contract, since
     ///   that is the only reason a success would reach this function, and
-    ///   ``ApiError/http(status:message:)`` for everything else.
-    public static func apiError(statusCode: Int, body: Data?) -> ApiError {
+    ///   ``ApiError/http(status:message:code:)`` for everything else.
+    public static func apiError(statusCode: Int, body: Data?, headerCode: String? = nil) -> ApiError {
         guard !isSuccess(statusCode) else {
             return .decoding(decodingReason(statusCode: statusCode, byteCount: body?.count ?? 0))
         }
-        return .http(status: statusCode, message: ApiErrorEnvelope.lenient(body)?.message)
+        let envelope = ApiErrorEnvelope.lenient(body)
+        return .http(
+            status: statusCode,
+            message: envelope?.message,
+            code: nonEmpty(envelope?.code) ?? nonEmpty(headerCode)
+        )
+    }
+
+    /// A blank code is no code: it names nothing a table could look up.
+    static func nonEmpty(_ code: String?) -> String? {
+        guard let code, !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return code
     }
 
     /// ⚠️ 2xx ONLY, NOT `< 400`. A 3xx that reaches this function is a redirect

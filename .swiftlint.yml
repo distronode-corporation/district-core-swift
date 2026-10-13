@@ -25,6 +25,12 @@ excluded:
   # .build holds checked-out dependency sources, whose style is not ours to
   # enforce.
   - .build
+  # Written by scripts/gen-l10n.py from the catalogs in l10n/ and held byte for byte
+  # to it by CI. Each file also opens with `swiftlint:disable all`; excluding the
+  # directories as well keeps `file_length` from counting a table of hundreds of
+  # strings.
+  - Sources/DistrictL10n/Generated
+  - Tests/DistrictL10nTests/Generated
 
 # ⚠️ Reported as errors, not warnings, because of --strict above: the two
 # numbers below are the same gate at two severities only when run without it.

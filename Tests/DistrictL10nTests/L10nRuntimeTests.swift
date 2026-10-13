@@ -144,7 +144,9 @@ final class L10nRuntimeTests: XCTestCase {
         XCTAssertNil(WireLabel.placeholder("Ana Gomez"))
         XCTAssertNil(WireLabel.placeholder("unknown"))
         XCTAssertNil(WireLabel.placeholder(nil))
-        XCTAssertNil(WireLabel.placeholder("No answer \u{2014} no conversation took place."))
+        let noAnswer = "No answer, no conversation took place."
+        XCTAssertEqual(WireLabel.placeholder(noAnswer), noAnswer)
+        XCTAssertEqual(WireLabel.placeholder("No answer \u{2014} no conversation took place."), noAnswer)
     }
 
     // MARK: - Lists and counts, which the vectors do not cover

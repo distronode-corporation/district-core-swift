@@ -1,3 +1,4 @@
+import DistrictL10n
 import Foundation
 
 /// One row of `GET /api/district/calls`, of `overview.recentCalls`, and of
@@ -194,18 +195,20 @@ public enum CallNarrative {
     /// Nothing was ever written, or what was written is a marker or a lifecycle
     /// status rather than a summary.
     ///
-    /// ⚠️ THE EM DASH IS SPELLED `\u{2014}` ON PURPOSE. It is the server's own
-    /// byte (from the LiveKit webhook) and the match is exact, so a
-    /// well-meant tidy of the punctuation would silently stop this entry
-    /// matching and put the sentence back on screen as an AI summary.
-    public static let placeholders: Set<String> = [
+    /// ⚠️ THE MATCH IS EXACT, AND A STORED ROW KEEPS THE SPELLING IT WAS WRITTEN
+    /// WITH. The LiveKit webhook's no-answer summary had an em dash and now has a
+    /// comma, and rows from before the change still hold the dash. Every earlier
+    /// spelling comes from the wire vocabulary's `aliases`
+    /// (``WireLabel/spellings(ofPlaceholders:)``), never a second literal here, so
+    /// the next respelling arrives with the contract.
+    public static let placeholders: Set<String> = WireLabel.spellings(ofPlaceholders: [
         "No summary available.",
         "direct:softphone",
         "AI Voice session active...",
         "AI Outbound Voice session active...",
         "Voice session completed.",
-        "No answer \u{2014} no conversation took place.",
-    ]
+        "No answer, no conversation took place.",
+    ])
 
     /// A summary was attempted for this call and the attempt failed.
     ///

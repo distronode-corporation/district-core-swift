@@ -231,6 +231,7 @@ enum WireTable {
         case "AI Outbound Voice session active...": WireCopy.placeholderAiOutboundVoiceSessionActive
         case "Voice session completed.": WireCopy.placeholderVoiceSessionCompleted
         case "No answer, no conversation took place.": WireCopy.placeholderNoAnswerNoConversationTookPlace
+        case "No answer \u{2014} no conversation took place.": WireCopy.placeholderNoAnswerNoConversationTookPlace
         case "New manually added contact.": WireCopy.placeholderNewManuallyAddedContact
         case "Manual edit update.": WireCopy.placeholderManualEditUpdate
         case "Consultation": WireCopy.placeholderConsultation
@@ -240,4 +241,10 @@ enum WireTable {
         default: nil
         }
     }
+
+    /// Each placeholder that has earlier spellings, to those spellings: rows the
+    /// service wrote before the change still hold them.
+    static let placeholderAliases: [String: [String]] = [
+        "No answer, no conversation took place.": ["No answer \u{2014} no conversation took place."],
+    ]
 }

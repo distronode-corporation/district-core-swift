@@ -6,6 +6,15 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/i18n/wire-vocabulary.json` from monorepo 46e1740: `WireCategory` has 31 cases,
+  up from 11 (Desk tickets, knowledge documents, workflows, numbers, meetings, message
+  delivery, contact research, billing and messaging accounts), with their labels, and
+  `WireLabel.placeholder` knows `"No answer, no conversation took place."`. A `switch` over
+  `WireCategory` without a `default` needs the new cases. No existing label changed, and
+  an unknown value of an existing category reads as before.
+
 ## [7.0.0-beta.1] - 2026-10-13
 
 The core's text, ready for Canadian French: every sentence the core writes comes from a

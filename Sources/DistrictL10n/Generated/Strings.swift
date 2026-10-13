@@ -1172,6 +1172,33 @@ package enum WireCopy {
     /// `wire.analytics_sentiment.positive_sentiment`
     package static var analyticsSentimentPositiveSentiment: String { L10nRuntime.locale == .frCA ? "Positive Sentiment" : "Positive Sentiment" }
 
+    /// `wire.billing_invoice_status.draft`
+    package static var billingInvoiceStatusDraft: String { L10nRuntime.locale == .frCA ? "Draft" : "Draft" }
+
+    /// `wire.billing_invoice_status.open`
+    package static var billingInvoiceStatusOpen: String { L10nRuntime.locale == .frCA ? "Open" : "Open" }
+
+    /// `wire.billing_invoice_status.paid`
+    package static var billingInvoiceStatusPaid: String { L10nRuntime.locale == .frCA ? "Paid" : "Paid" }
+
+    /// `wire.billing_invoice_status.uncollectible`
+    package static var billingInvoiceStatusUncollectible: String { L10nRuntime.locale == .frCA ? "Uncollectible" : "Uncollectible" }
+
+    /// `wire.billing_invoice_status.void`
+    package static var billingInvoiceStatusVoid: String { L10nRuntime.locale == .frCA ? "Void" : "Void" }
+
+    /// `wire.billing_subscription_status.active`
+    package static var billingSubscriptionStatusActive: String { L10nRuntime.locale == .frCA ? "Active" : "Active" }
+
+    /// `wire.billing_subscription_status.past_due`
+    package static var billingSubscriptionStatusPastDue: String { L10nRuntime.locale == .frCA ? "Payment past due" : "Payment past due" }
+
+    /// `wire.billing_subscription_status.trialing`
+    package static var billingSubscriptionStatusTrialing: String { L10nRuntime.locale == .frCA ? "Trial" : "Trial" }
+
+    /// `wire.billing_subscription_status.unpaid`
+    package static var billingSubscriptionStatusUnpaid: String { L10nRuntime.locale == .frCA ? "Unpaid" : "Unpaid" }
+
     /// `wire.call_direction.inbound`
     package static var callDirectionInbound: String { L10nRuntime.locale == .frCA ? "Inbound" : "Inbound" }
 
@@ -1214,6 +1241,45 @@ package enum WireCopy {
     /// `wire.call_type.outbound`
     package static var callTypeOutbound: String { L10nRuntime.locale == .frCA ? "Outbound" : "Outbound" }
 
+    /// `wire.contact_research_key.callerintel`
+    package static var contactResearchKeyCallerintel: String { L10nRuntime.locale == .frCA ? "CallerIntel" : "CallerIntel" }
+
+    /// `wire.contact_research_key.corepainpoints`
+    package static var contactResearchKeyCorepainpoints: String { L10nRuntime.locale == .frCA ? "Inferred CRM Key Challenges" : "Inferred CRM Key Challenges" }
+
+    /// `wire.contact_research_key.dynamicicebreakers`
+    package static var contactResearchKeyDynamicicebreakers: String { L10nRuntime.locale == .frCA ? "CTO/CEO Conversation Starters" : "CTO/CEO Conversation Starters" }
+
+    /// `wire.contact_research_key.estimatedvalue`
+    package static var contactResearchKeyEstimatedvalue: String { L10nRuntime.locale == .frCA ? "EstimatedValue" : "EstimatedValue" }
+
+    /// `wire.contact_research_key.executivesummary`
+    package static var contactResearchKeyExecutivesummary: String { L10nRuntime.locale == .frCA ? "Executive Dossier Summary" : "Executive Dossier Summary" }
+
+    /// `wire.contact_research_key.person`
+    package static var contactResearchKeyPerson: String { L10nRuntime.locale == .frCA ? "Person" : "Person" }
+
+    /// `wire.contact_research_key.recommendedgreeting`
+    package static var contactResearchKeyRecommendedgreeting: String { L10nRuntime.locale == .frCA ? "Suggested Receptionist Greeting" : "Suggested Receptionist Greeting" }
+
+    /// `wire.desk_ticket_source.manual`
+    package static var deskTicketSourceManual: String { L10nRuntime.locale == .frCA ? "Manual" : "Manual" }
+
+    /// `wire.desk_ticket_source.voice_call`
+    package static var deskTicketSourceVoiceCall: String { L10nRuntime.locale == .frCA ? "From a phone call" : "From a phone call" }
+
+    /// `wire.desk_ticket_status.fallback`
+    package static var deskTicketStatusFallback: String { L10nRuntime.locale == .frCA ? "Unknown" : "Unknown" }
+
+    /// `wire.desk_ticket_status.open`
+    package static var deskTicketStatusOpen: String { L10nRuntime.locale == .frCA ? "Open" : "Open" }
+
+    /// `wire.desk_ticket_status.resolved`
+    package static var deskTicketStatusResolved: String { L10nRuntime.locale == .frCA ? "Resolved" : "Resolved" }
+
+    /// `wire.desk_ticket_status.waiting`
+    package static var deskTicketStatusWaiting: String { L10nRuntime.locale == .frCA ? "Waiting" : "Waiting" }
+
     /// `wire.disposition.booked`
     package static var dispositionBooked: String { L10nRuntime.locale == .frCA ? "Booked" : "Booked" }
 
@@ -1253,6 +1319,33 @@ package enum WireCopy {
     /// `wire.generic.other`
     package static var genericOther: String { L10nRuntime.locale == .frCA ? "Other" : "Other" }
 
+    /// `wire.knowledge_document_status.failed`
+    package static var knowledgeDocumentStatusFailed: String { L10nRuntime.locale == .frCA ? "Failed" : "Failed" }
+
+    /// `wire.knowledge_document_status.fallback`
+    package static var knowledgeDocumentStatusFallback: String { L10nRuntime.locale == .frCA ? "Unknown" : "Unknown" }
+
+    /// `wire.knowledge_document_status.processing`
+    package static var knowledgeDocumentStatusProcessing: String { L10nRuntime.locale == .frCA ? "Indexing" : "Indexing" }
+
+    /// `wire.knowledge_document_status.ready`
+    package static var knowledgeDocumentStatusReady: String { L10nRuntime.locale == .frCA ? "Ready" : "Ready" }
+
+    /// `wire.line_type.landline`
+    package static var lineTypeLandline: String { L10nRuntime.locale == .frCA ? "Home or office line" : "Home or office line" }
+
+    /// `wire.line_type.mobile`
+    package static var lineTypeMobile: String { L10nRuntime.locale == .frCA ? "Mobile phone" : "Mobile phone" }
+
+    /// `wire.line_type.voip`
+    package static var lineTypeVoip: String { L10nRuntime.locale == .frCA ? "VoIP or hosted phone system" : "VoIP or hosted phone system" }
+
+    /// `wire.meeting_status.completed`
+    package static var meetingStatusCompleted: String { L10nRuntime.locale == .frCA ? "Completed" : "Completed" }
+
+    /// `wire.meeting_status.in_progress`
+    package static var meetingStatusInProgress: String { L10nRuntime.locale == .frCA ? "In Progress" : "In Progress" }
+
     /// `wire.member_role.agency`
     package static var memberRoleAgency: String { L10nRuntime.locale == .frCA ? "Administrator" : "Administrator" }
 
@@ -1261,6 +1354,66 @@ package enum WireCopy {
 
     /// `wire.member_role.viewer`
     package static var memberRoleViewer: String { L10nRuntime.locale == .frCA ? "Viewer" : "Viewer" }
+
+    /// `wire.message_delivery_status.delivered`
+    package static var messageDeliveryStatusDelivered: String { L10nRuntime.locale == .frCA ? "Delivered" : "Delivered" }
+
+    /// `wire.message_delivery_status.failed`
+    package static var messageDeliveryStatusFailed: String { L10nRuntime.locale == .frCA ? "Failed" : "Failed" }
+
+    /// `wire.message_delivery_status.queued`
+    package static var messageDeliveryStatusQueued: String { L10nRuntime.locale == .frCA ? "Sent" : "Sent" }
+
+    /// `wire.message_delivery_status.received`
+    package static var messageDeliveryStatusReceived: String { L10nRuntime.locale == .frCA ? "Received" : "Received" }
+
+    /// `wire.message_delivery_status.sent`
+    package static var messageDeliveryStatusSent: String { L10nRuntime.locale == .frCA ? "Sent" : "Sent" }
+
+    /// `wire.messaging_carrier.sinch`
+    package static var messagingCarrierSinch: String { L10nRuntime.locale == .frCA ? "Sinch" : "Sinch" }
+
+    /// `wire.messaging_carrier.telnyx`
+    package static var messagingCarrierTelnyx: String { L10nRuntime.locale == .frCA ? "Telnyx" : "Telnyx" }
+
+    /// `wire.messaging_carrier.twilio`
+    package static var messagingCarrierTwilio: String { L10nRuntime.locale == .frCA ? "Twilio" : "Twilio" }
+
+    /// `wire.messaging_credential_source.byok`
+    package static var messagingCredentialSourceByok: String { L10nRuntime.locale == .frCA ? "Bring Your Own Keys" : "Bring Your Own Keys" }
+
+    /// `wire.messaging_credential_source.managed`
+    package static var messagingCredentialSourceManaged: String { L10nRuntime.locale == .frCA ? "Managed Service" : "Managed Service" }
+
+    /// `wire.number_capability.mms`
+    package static var numberCapabilityMms: String { L10nRuntime.locale == .frCA ? "Mms" : "Mms" }
+
+    /// `wire.number_capability.sms`
+    package static var numberCapabilitySms: String { L10nRuntime.locale == .frCA ? "Sms" : "Sms" }
+
+    /// `wire.number_capability.voice`
+    package static var numberCapabilityVoice: String { L10nRuntime.locale == .frCA ? "Voice" : "Voice" }
+
+    /// `wire.number_provider.sinch`
+    package static var numberProviderSinch: String { L10nRuntime.locale == .frCA ? "Sinch" : "Sinch" }
+
+    /// `wire.number_provider.telnyx`
+    package static var numberProviderTelnyx: String { L10nRuntime.locale == .frCA ? "Telnyx" : "Telnyx" }
+
+    /// `wire.number_provider.twilio`
+    package static var numberProviderTwilio: String { L10nRuntime.locale == .frCA ? "Twilio" : "Twilio" }
+
+    /// `wire.number_provider.unknown`
+    package static var numberProviderUnknown: String { L10nRuntime.locale == .frCA ? "Unknown" : "Unknown" }
+
+    /// `wire.number_type.local`
+    package static var numberTypeLocal: String { L10nRuntime.locale == .frCA ? "Local" : "Local" }
+
+    /// `wire.number_type.mobile`
+    package static var numberTypeMobile: String { L10nRuntime.locale == .frCA ? "Mobile" : "Mobile" }
+
+    /// `wire.number_type.tollfree`
+    package static var numberTypeTollfree: String { L10nRuntime.locale == .frCA ? "Toll-Free" : "Toll-Free" }
 
     /// `wire.placeholder.ai_call_completed`
     package static var placeholderAiCallCompleted: String { L10nRuntime.locale == .frCA ? "AI call completed." : "AI call completed." }
@@ -1288,6 +1441,9 @@ package enum WireCopy {
 
     /// `wire.placeholder.new_manually_added_contact`
     package static var placeholderNewManuallyAddedContact: String { L10nRuntime.locale == .frCA ? "New manually added contact." : "New manually added contact." }
+
+    /// `wire.placeholder.no_answer_no_conversation_took_place`
+    package static var placeholderNoAnswerNoConversationTookPlace: String { L10nRuntime.locale == .frCA ? "No answer, no conversation took place." : "No answer, no conversation took place." }
 
     /// `wire.placeholder.no_summary_available`
     package static var placeholderNoSummaryAvailable: String { L10nRuntime.locale == .frCA ? "No summary available." : "No summary available." }
@@ -1331,6 +1487,18 @@ package enum WireCopy {
     /// `wire.region_long.us`
     package static var regionLongUs: String { L10nRuntime.locale == .frCA ? "United States (us-east4)" : "United States (us-east4)" }
 
+    /// `wire.research_status.complete`
+    package static var researchStatusComplete: String { L10nRuntime.locale == .frCA ? "Complete" : "Complete" }
+
+    /// `wire.research_status.crawling`
+    package static var researchStatusCrawling: String { L10nRuntime.locale == .frCA ? "Crawling web…" : "Crawling web…" }
+
+    /// `wire.research_status.failed`
+    package static var researchStatusFailed: String { L10nRuntime.locale == .frCA ? "Enrichment failed" : "Enrichment failed" }
+
+    /// `wire.research_status.pending`
+    package static var researchStatusPending: String { L10nRuntime.locale == .frCA ? "Pending queue" : "Pending queue" }
+
     /// `wire.sentiment.negative`
     package static var sentimentNegative: String { L10nRuntime.locale == .frCA ? "Friction" : "Friction" }
 
@@ -1343,6 +1511,9 @@ package enum WireCopy {
     /// `wire.transfer_reason.auth_error`
     package static var transferReasonAuthError: String { L10nRuntime.locale == .frCA ? "Transfer authorization error" : "Transfer authorization error" }
 
+    /// `wire.transfer_reason.caller_requested_human`
+    package static var transferReasonCallerRequestedHuman: String { L10nRuntime.locale == .frCA ? "Caller requested human" : "Caller requested human" }
+
     /// `wire.transfer_reason.error`
     package static var transferReasonError: String { L10nRuntime.locale == .frCA ? "Transfer failed" : "Transfer failed" }
 
@@ -1352,15 +1523,162 @@ package enum WireCopy {
     /// `wire.transfer_reason.no_answer`
     package static var transferReasonNoAnswer: String { L10nRuntime.locale == .frCA ? "Target didn't answer" : "Target didn't answer" }
 
+    /// `wire.transfer_reason.provider_unsupported`
+    package static var transferReasonProviderUnsupported: String { L10nRuntime.locale == .frCA ? "Transfer attempted but not connected" : "Transfer attempted but not connected" }
+
     /// `wire.transfer_reason.ring_timeout`
     package static var transferReasonRingTimeout: String { L10nRuntime.locale == .frCA ? "Target didn't answer (rang out)" : "Target didn't answer (rang out)" }
 
+    /// `wire.transfer_reason.room_not_found`
+    package static var transferReasonRoomNotFound: String { L10nRuntime.locale == .frCA ? "Transfer attempted but not connected" : "Transfer attempted but not connected" }
+
     /// `wire.transfer_reason.trunk_not_configured`
     package static var transferReasonTrunkNotConfigured: String { L10nRuntime.locale == .frCA ? "Transfer route not configured" : "Transfer route not configured" }
+
+    /// `wire.transfer_status.completed`
+    package static var transferStatusCompleted: String { L10nRuntime.locale == .frCA ? "Completed" : "Completed" }
 
     /// `wire.transfer_status.failed`
     package static var transferStatusFailed: String { L10nRuntime.locale == .frCA ? "Transfer failed" : "Transfer failed" }
 
     /// `wire.transfer_status.success`
     package static var transferStatusSuccess: String { L10nRuntime.locale == .frCA ? "Transferred" : "Transferred" }
+
+    /// `wire.workflow_action.add_crm_tag`
+    package static var workflowActionAddCrmTag: String { L10nRuntime.locale == .frCA ? "Add CRM Tag" : "Add CRM Tag" }
+
+    /// `wire.workflow_action.notify_ops`
+    package static var workflowActionNotifyOps: String { L10nRuntime.locale == .frCA ? "Notify Ops Webhook" : "Notify Ops Webhook" }
+
+    /// `wire.workflow_action.register_compliance_dnc`
+    package static var workflowActionRegisterComplianceDnc: String { L10nRuntime.locale == .frCA ? "Register Compliance DNC" : "Register Compliance DNC" }
+
+    /// `wire.workflow_action.remove_crm_tag`
+    package static var workflowActionRemoveCrmTag: String { L10nRuntime.locale == .frCA ? "Remove CRM Tag" : "Remove CRM Tag" }
+
+    /// `wire.workflow_action.send_email`
+    package static var workflowActionSendEmail: String { L10nRuntime.locale == .frCA ? "Send Email" : "Send Email" }
+
+    /// `wire.workflow_action.send_sms`
+    package static var workflowActionSendSms: String { L10nRuntime.locale == .frCA ? "Send SMS" : "Send SMS" }
+
+    /// `wire.workflow_action_outcome.failed`
+    package static var workflowActionOutcomeFailed: String { L10nRuntime.locale == .frCA ? "Failed" : "Failed" }
+
+    /// `wire.workflow_action_outcome.ok`
+    package static var workflowActionOutcomeOk: String { L10nRuntime.locale == .frCA ? "Ok" : "Ok" }
+
+    /// `wire.workflow_action_outcome.skipped`
+    package static var workflowActionOutcomeSkipped: String { L10nRuntime.locale == .frCA ? "Skipped" : "Skipped" }
+
+    /// `wire.workflow_action_reason.contact_not_found`
+    package static var workflowActionReasonContactNotFound: String { L10nRuntime.locale == .frCA ? "Contact not found" : "Contact not found" }
+
+    /// `wire.workflow_action_reason.dnc`
+    package static var workflowActionReasonDnc: String { L10nRuntime.locale == .frCA ? "Dnc" : "Dnc" }
+
+    /// `wire.workflow_action_reason.dormant`
+    package static var workflowActionReasonDormant: String { L10nRuntime.locale == .frCA ? "Dormant" : "Dormant" }
+
+    /// `wire.workflow_action_reason.empty_body`
+    package static var workflowActionReasonEmptyBody: String { L10nRuntime.locale == .frCA ? "Empty body" : "Empty body" }
+
+    /// `wire.workflow_action_reason.empty_subject`
+    package static var workflowActionReasonEmptySubject: String { L10nRuntime.locale == .frCA ? "Empty subject" : "Empty subject" }
+
+    /// `wire.workflow_action_reason.empty_tag`
+    package static var workflowActionReasonEmptyTag: String { L10nRuntime.locale == .frCA ? "Empty tag" : "Empty tag" }
+
+    /// `wire.workflow_action_reason.http_status`
+    package static var workflowActionReasonHttpStatus: String { L10nRuntime.locale == .frCA ? "Http {status}" : "Http {status}" }
+
+    /// `wire.workflow_action_reason.invalid_recipient`
+    package static var workflowActionReasonInvalidRecipient: String { L10nRuntime.locale == .frCA ? "Invalid recipient" : "Invalid recipient" }
+
+    /// `wire.workflow_action_reason.missing_webhook_url`
+    package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "Missing webhook url" : "Missing webhook url" }
+
+    /// `wire.workflow_action_reason.no_provider_credentials`
+    package static var workflowActionReasonNoProviderCredentials: String { L10nRuntime.locale == .frCA ? "No provider credentials" : "No provider credentials" }
+
+    /// `wire.workflow_action_reason.no_recipient`
+    package static var workflowActionReasonNoRecipient: String { L10nRuntime.locale == .frCA ? "No recipient" : "No recipient" }
+
+    /// `wire.workflow_action_reason.no_sending_number`
+    package static var workflowActionReasonNoSendingNumber: String { L10nRuntime.locale == .frCA ? "No sending number" : "No sending number" }
+
+    /// `wire.workflow_action_reason.postmark_missing`
+    package static var workflowActionReasonPostmarkMissing: String { L10nRuntime.locale == .frCA ? "Postmark missing" : "Postmark missing" }
+
+    /// `wire.workflow_action_reason.report_recipient_refused`
+    package static var workflowActionReasonReportRecipientRefused: String { L10nRuntime.locale == .frCA ? "Report recipient refused" : "Report recipient refused" }
+
+    /// `wire.workflow_action_reason.report_unavailable`
+    package static var workflowActionReasonReportUnavailable: String { L10nRuntime.locale == .frCA ? "Report unavailable" : "Report unavailable" }
+
+    /// `wire.workflow_action_reason.send_failed`
+    package static var workflowActionReasonSendFailed: String { L10nRuntime.locale == .frCA ? "Send failed" : "Send failed" }
+
+    /// `wire.workflow_action_reason.tag_already_present`
+    package static var workflowActionReasonTagAlreadyPresent: String { L10nRuntime.locale == .frCA ? "Tag already present" : "Tag already present" }
+
+    /// `wire.workflow_action_reason.tag_not_present`
+    package static var workflowActionReasonTagNotPresent: String { L10nRuntime.locale == .frCA ? "Tag not present" : "Tag not present" }
+
+    /// `wire.workflow_action_reason.unknown_action_type`
+    package static var workflowActionReasonUnknownActionType: String { L10nRuntime.locale == .frCA ? "Unknown action type" : "Unknown action type" }
+
+    /// `wire.workflow_run_status.failed`
+    package static var workflowRunStatusFailed: String { L10nRuntime.locale == .frCA ? "Failed" : "Failed" }
+
+    /// `wire.workflow_run_status.partial`
+    package static var workflowRunStatusPartial: String { L10nRuntime.locale == .frCA ? "Partly done" : "Partly done" }
+
+    /// `wire.workflow_run_status.skipped`
+    package static var workflowRunStatusSkipped: String { L10nRuntime.locale == .frCA ? "Nothing to do" : "Nothing to do" }
+
+    /// `wire.workflow_run_status.success`
+    package static var workflowRunStatusSuccess: String { L10nRuntime.locale == .frCA ? "Succeeded" : "Succeeded" }
+
+    /// `wire.workflow_trigger.booking_cancelled`
+    package static var workflowTriggerBookingCancelled: String { L10nRuntime.locale == .frCA ? "When a Booking Is Cancelled" : "When a Booking Is Cancelled" }
+
+    /// `wire.workflow_trigger.booking_created`
+    package static var workflowTriggerBookingCreated: String { L10nRuntime.locale == .frCA ? "When a Booking Is Made" : "When a Booking Is Made" }
+
+    /// `wire.workflow_trigger.booking_reminder`
+    package static var workflowTriggerBookingReminder: String { L10nRuntime.locale == .frCA ? "When a Booking Reminder Is Sent" : "When a Booking Reminder Is Sent" }
+
+    /// `wire.workflow_trigger.booking_rescheduled`
+    package static var workflowTriggerBookingRescheduled: String { L10nRuntime.locale == .frCA ? "When a Booking Is Rescheduled" : "When a Booking Is Rescheduled" }
+
+    /// `wire.workflow_trigger.call_ended`
+    package static var workflowTriggerCallEnded: String { L10nRuntime.locale == .frCA ? "When Any Call Ends (answered or not)" : "When Any Call Ends (answered or not)" }
+
+    /// `wire.workflow_trigger.call_ended_answered`
+    package static var workflowTriggerCallEndedAnswered: String { L10nRuntime.locale == .frCA ? "When an Answered Call Ends" : "When an Answered Call Ends" }
+
+    /// `wire.workflow_trigger.call_ended_unanswered`
+    package static var workflowTriggerCallEndedUnanswered: String { L10nRuntime.locale == .frCA ? "When a Call Goes Unanswered" : "When a Call Goes Unanswered" }
+
+    /// `wire.workflow_trigger.contact_created`
+    package static var workflowTriggerContactCreated: String { L10nRuntime.locale == .frCA ? "When New Contact Created" : "When New Contact Created" }
+
+    /// `wire.workflow_trigger.dnc_registered`
+    package static var workflowTriggerDncRegistered: String { L10nRuntime.locale == .frCA ? "When Contact Registered DNC" : "When Contact Registered DNC" }
+
+    /// `wire.workflow_trigger.intent_detected`
+    package static var workflowTriggerIntentDetected: String { L10nRuntime.locale == .frCA ? "When Specific Intent Detected" : "When Specific Intent Detected" }
+
+    /// `wire.workflow_trigger.negative_sentiment`
+    package static var workflowTriggerNegativeSentiment: String { L10nRuntime.locale == .frCA ? "When Call Sentiment is Negative" : "When Call Sentiment is Negative" }
+
+    /// `wire.workflow_trigger.neutral_sentiment`
+    package static var workflowTriggerNeutralSentiment: String { L10nRuntime.locale == .frCA ? "When Call Sentiment is Neutral" : "When Call Sentiment is Neutral" }
+
+    /// `wire.workflow_trigger.positive_sentiment`
+    package static var workflowTriggerPositiveSentiment: String { L10nRuntime.locale == .frCA ? "When Call Sentiment is Positive" : "When Call Sentiment is Positive" }
+
+    /// `wire.workflow_trigger.sms_received`
+    package static var workflowTriggerSmsReceived: String { L10nRuntime.locale == .frCA ? "When Inbound SMS Received" : "When Inbound SMS Received" }
 }

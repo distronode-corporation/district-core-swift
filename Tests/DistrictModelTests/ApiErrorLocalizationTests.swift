@@ -38,6 +38,33 @@ final class ApiErrorLocalizationTests: XCTestCase {
         }
     }
 
+    /// ⛔ A REFUSAL THIS CLIENT WROTE ITSELF IS SHOWN IN FRENCH AS IT IS: its message is
+    /// catalog text in the active language, and it has no code to look up.
+    func testFrenchShowsTheClientsOwnRefusal() {
+        L10nRuntime.withLocale(.frCA) {
+            for sentence in ClientRefusal.sentences {
+                XCTAssertEqual(ApiError.http(status: 400, message: sentence).localizedMessage, sentence)
+            }
+            // Eight refusals, seven sentences: the desk and the inbox both say "That file is empty."
+            XCTAssertEqual(ClientRefusal.sentences.count, 7)
+        }
+    }
+
+    /// Only a server's sentence with no code this build knows stays nil in French, the
+    /// screen supplying its own; a known code wins even beside a client-like sentence.
+    func testFrenchLeavesAServerSentenceWithNoKnownCodeToTheScreen() {
+        L10nRuntime.withLocale(.frCA) {
+            XCTAssertNil(ApiError.http(status: 500, message: "Something broke on our side.").localizedMessage)
+            XCTAssertNil(ApiError.http(status: 500, message: nil).localizedMessage)
+            XCTAssertNil(ApiError.http(status: 400, message: DeskCopy.logoEmpty, code: "not_a_code").localizedMessage)
+            XCTAssertEqual(
+                ApiError.http(status: 400, message: DeskCopy.logoEmpty, code: "unauthorized").localizedMessage,
+                ApiErrorText.sentence(for: "unauthorized")
+            )
+            XCTAssertNil(ApiError.decoding(DeskCopy.logoEmpty).localizedMessage)
+        }
+    }
+
     /// The vocabularies' labels come from the catalog and keep their English.
     func testRoutingRuleLabelsKeepTheirEnglish() {
         L10nRuntime.withLocale(.en) {

@@ -6,10 +6,38 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
-The core's text, ready for Canadian French. A major release (see Changed): every English
-string and format the core produces is byte-identical to 6.0.0, every request carries one
-new header, and nothing is French until an app sets `L10nRuntime.locale`, which no 7.x app
-does.
+## [7.0.0-beta.1] - 2026-10-13
+
+The core's text, ready for Canadian French: every sentence the core writes comes from a
+catalog. A major release (see Changed): every English string and format the core produces
+is byte-identical to 6.0.0, every request carries one new header, and nothing is French
+until an app sets `L10nRuntime.locale`, which no 7.x app does.
+
+### For the apps
+
+What the iOS and Mac apps absorb when they move to this version:
+
+- `ApiError.http` is `http(status:message:code:)`. Constructing it without `code` still
+  compiles; a pattern binding two values (`case let .http(a, b)`) needs a third, and an
+  error with a code no longer equals one without.
+- To show errors in the reader's language, read `localizedMessage` instead of `message`,
+  and show the screen's own sentence when it is nil. `ApiError.code` and
+  `ApiErrorCode.header` are new.
+- `import DistrictL10n`: set `L10nRuntime.locale` at launch and whenever the device
+  language changes, from `DistrictL10n.locale(fromPreferred:)`. Keep it `.en` until the
+  app's 3.0 turns French on.
+- `L10nFormat` (money, dates, times, durations, numbers, percentages, lists, the calendar's
+  words), `ApiErrorText` (the error code sentences) and `WireLabel` with `WireCategory`
+  (labels for statuses, roles, regions and the server's placeholders) are there for the
+  apps' own screens.
+- `AccountSettingsRepository.saveLocale(_:)` writes the language to the account; unused
+  until 3.0.
+- Every request sends `Accept-Language` (`en` until French is on).
+- `DialEntry.callingCodes`, `SchedulingClock.monthNames`,
+  `SchedulingHoursFormat.weekDayNames`, `SchedulingSettingsFormat.settingsTabLabels` and
+  `notificationGroups`, and `SchedulingDeveloperFormat.tabLabels` and `mcpKeyPlaceholder`
+  are computed rather than stored. Their English is the same and reading them compiles
+  unchanged.
 
 ### Added
 
@@ -46,7 +74,9 @@ does.
 - `ApiError.code`: the refusal's error code, from the body's `code` or else the
   `X-Distronode-Error-Code` header (the body wins, as on the website), and
   `ApiError.localizedMessage`: `message` in English, exactly as before; in French the
-  code's catalog sentence, or nil for the screen's own. `ApiErrorCode.header`.
+  code's catalog sentence, the core's own refusal as written (an empty file, a blank
+  draft: catalog text already in French), and nil only for a server's sentence with no
+  code this build knows, so the screen shows its own. `ApiErrorCode.header`.
   `RawResponse.errorCodeHeader`, and `ApiErrorNormalizer.apiError(statusCode:body:headerCode:)`.
 - `AccountSettingsRepository.saveLocale(_:)` and `DistrictEndpoints.saveLocale(_:)`:
   `POST /api/settings` with `{"profile":{"locale":"en"|"fr"}}`. Unused until the apps' 3.0.
@@ -348,7 +378,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/4.0.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.1...HEAD
+[7.0.0-beta.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.1
 [4.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/4.0.0
 [3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0
 [3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0

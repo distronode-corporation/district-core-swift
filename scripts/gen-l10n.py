@@ -467,6 +467,21 @@ def check_catalogs() -> list[str]:
     return [] if done.returncode == 0 else [f"l10n.py check:\n{done.stdout}{done.stderr}"]
 
 
+def check_client_refusals() -> list[str]:
+    """`ClientRefusal.sentences` must name exactly the core catalog's `error` entries: the
+    refusals this client writes itself, which `ApiError.localizedMessage` recognises."""
+    cat = L10N.load_catalog(CATALOGS / "core.toml")
+    wanted = {".".join(L10N.swift_name(e)) for e in cat.entries.values() if e.fields.get("ctx") == "error"}
+    source = (ROOT / "Sources" / "DistrictL10n" / "ClientRefusal.swift").read_text(encoding="utf-8")
+    listed = set(re.findall(r"^\s+([A-Z][A-Za-z]*Copy\.[a-z][A-Za-z0-9]*),$", source, re.MULTILINE))
+    problems = []
+    if wanted - listed:
+        problems.append(f"ClientRefusal.sentences lacks {', '.join(sorted(wanted - listed))}")
+    if listed - wanted:
+        problems.append(f"ClientRefusal.sentences names non-error entries {', '.join(sorted(listed - wanted))}")
+    return problems
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="fail if anything committed is stale")
@@ -483,6 +498,7 @@ def main(argv: list[str]) -> int:
     if args.check:
         problems = [f"{path.relative_to(ROOT)} is stale; run python3 scripts/gen-l10n.py" for path in stale]
         problems += check_catalogs()
+        problems += check_client_refusals()
         for problem in problems:
             print(f"gen-l10n: {problem}", file=sys.stderr)
         if not problems:

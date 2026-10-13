@@ -14,8 +14,8 @@ public enum ApiError: Error, Equatable, Sendable {
     /// `X-Distronode-Error-Code` header, and nil when the server named none.
     ///
     /// ⚠️ `code` DEFAULTS TO nil, AND A REFUSAL BUILT ON THIS SIDE (a file too large to
-    /// send, a blank draft) HAS NONE. Its `message` comes from the catalog, so it is in
-    /// the active language.
+    /// send, a blank draft) HAS NONE. Its `message` comes from the catalog (see
+    /// `ClientRefusal`), so it is in the active language.
     case http(status: Int, message: String?, code: String? = nil)
     /// The request never produced a response (DNS, TLS, timeout, offline).
     case transport(String)
@@ -62,15 +62,20 @@ public enum ApiError: Error, Equatable, Sendable {
     /// nil for a failure with no code this build knows, so the screen shows its own French
     /// sentence. Never the English wire text on a French screen.
     ///
-    /// ⚠️ A REFUSAL THIS CLIENT BUILT HAS NO CODE, SO IN FRENCH IT IS nil HERE TOO. Its
-    /// ``message`` is catalog text in the active language; a screen that wants that
-    /// specific reason reads it there.
+    /// ⚠️ A REFUSAL THIS CLIENT BUILT ITSELF (an empty file, a blank draft) HAS NO CODE
+    /// AND IS SHOWN AS IT IS: its ``message`` is catalog text, already in the active
+    /// language (``ClientRefusal``). Only a server's sentence with no code this build
+    /// knows is nil in French.
     public var localizedMessage: String? {
         switch L10nRuntime.locale {
         case .en:
-            message
+            return message
         case .frCA:
-            code.flatMap { ApiErrorText.sentence(for: $0) }
+            if let code {
+                return ApiErrorText.sentence(for: code)
+            }
+            guard case let .http(_, message?, _) = self, ClientRefusal.isOwn(message) else { return nil }
+            return message
         }
     }
 

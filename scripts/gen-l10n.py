@@ -100,7 +100,11 @@ def literal(text: str) -> str:
 
 
 def swift_str(text: str) -> str:
-    return '"' + L10N.escape_c_like(text, "swift") + '"'
+    # The dashes are spelled as escapes: this repository's dash rule forbids the
+    # characters in Sources/ and Tests/, and an earlier spelling the service still
+    # stores (a placeholder's `aliases`) holds one.
+    body = L10N.escape_c_like(text, "swift")
+    return '"' + body.replace("\u2014", "\\u{2014}").replace("\u2013", "\\u{2013}") + '"'
 
 
 def member(key: str, catalog) -> str:
@@ -159,9 +163,10 @@ def api_error_entries(doc: dict) -> tuple[dict, list[tuple[str, str, str | None]
 def wire_entries(doc: dict):
     """The catalog's entries by key; (category, value, key) per labelled value; (category,
     fallback key) per category with a fallback of its own; (region, long key) per region;
-    (placeholder text, key); and the categories in contract order."""
+    (placeholder text, key), one per spelling, the earlier ones (`aliases`) included;
+    (placeholder value, its aliases); and the categories in contract order."""
     entries: dict[str, dict] = {}
-    labels, fallbacks, longs, placeholders = [], [], [], []
+    labels, fallbacks, longs, placeholders, aliases = [], [], [], [], []
     for name, category in doc["categories"].items():
         group = snake(name)
         for value in category["values"]:
@@ -193,11 +198,10 @@ def wire_entries(doc: dict):
     )
     for placeholder in doc["placeholders"]:
         value = placeholder["value"]
-        # ⚠️ The one placeholder holding an em dash is left out: this repository's dash
-        # rule forbids the character in Sources/, and the generator writes it raw.
-        # `CallNarrative.placeholders` still recognises it (spelled as an escape).
-        if "\u2014" in value:
-            continue
+        # ⚠️ A placeholder whose CURRENT spelling held an em dash would put the character
+        # in the catalog, which the dash rule forbids. None does: the one that did (the
+        # no-answer summary) now has a comma, and its dashed spelling is an alias.
+        assert "\u2014" not in value, value
         key = f"wire.placeholder.{slug(value)}"
         entries[key] = entry(
             literal(value), "label", "wire placeholder", "T3",
@@ -205,7 +209,13 @@ def wire_entries(doc: dict):
             f"{'; '.join(placeholder['fields'])}. Shown where that value is shown.",
         )
         placeholders.append((value, key))
-    return entries, labels, fallbacks, longs, placeholders, list(doc["categories"])
+        # Rows the service wrote before a spelling changed still hold the old one: each
+        # alias is the same placeholder, with the same label.
+        for alias in placeholder.get("aliases", []):
+            placeholders.append((alias, key))
+        if placeholder.get("aliases"):
+            aliases.append((value, placeholder["aliases"]))
+    return entries, labels, fallbacks, longs, placeholders, aliases, list(doc["categories"])
 
 
 def render_catalog(name: str, entries: dict, previous: Path) -> str:
@@ -256,7 +266,7 @@ def api_error_table(table, cat) -> str:
     return "\n".join(lines) + "\n"
 
 
-def wire_table(labels, fallbacks, longs, placeholders, categories, cat) -> str:
+def wire_table(labels, fallbacks, longs, placeholders, aliases, categories, cat) -> str:
     lines = [HEADER.format(source="contracts/i18n/wire-vocabulary.json"), "// swiftlint:disable all", ""]
     lines.append("/// An enumerated wire value a screen shows, by the field it arrives in.")
     lines.append("/// `contracts/i18n/wire-vocabulary.json` describes each one.")
@@ -304,6 +314,13 @@ def wire_table(labels, fallbacks, longs, placeholders, categories, cat) -> str:
     lines.append("        default: nil")
     lines.append("        }")
     lines.append("    }")
+    lines.append("")
+    lines.append("    /// Each placeholder that has earlier spellings, to those spellings: rows the")
+    lines.append("    /// service wrote before the change still hold them.")
+    lines.append("    static let placeholderAliases: [String: [String]] = [")
+    for value, spellings in aliases:
+        lines.append(f"        {swift_str(value)}: [{', '.join(swift_str(a) for a in spellings)}],")
+    lines.append("    ]")
     lines.append("}")
     return "\n".join(lines) + "\n"
 
@@ -347,7 +364,7 @@ def call(entry, values: dict) -> str:
 
 
 def accessor_test(cats: dict, error_table, wire) -> str:
-    labels, fallbacks, longs, placeholders, categories = wire
+    labels, fallbacks, longs, placeholders, aliases, categories = wire
     lines = [HEADER.format(source="the catalogs in l10n/ and contracts/i18n/"), "// swiftlint:disable all", ""]
     lines.append("@testable import DistrictL10n")
     lines.append("import XCTest")
@@ -407,6 +424,8 @@ def accessor_test(cats: dict, error_table, wire) -> str:
         lines.append(f"            XCTAssertEqual(WireTable.regionLong({swift_str(value.lower())}), {swift_str(L10N.unbrace(wire_cat.entries[key].en))})")
     for value, key in placeholders:
         lines.append(f"            XCTAssertEqual(WireTable.placeholder({swift_str(value)}), {swift_str(L10N.unbrace(wire_cat.entries[key].en))})")
+    for value, spellings in aliases:
+        lines.append(f"            XCTAssertEqual(WireTable.placeholderAliases[{swift_str(value)}], [{', '.join(swift_str(a) for a in spellings)}])")
     lines.append("        }")
     lines.append("    }")
     lines.append("")
@@ -436,7 +455,7 @@ def outputs() -> dict[Path, str]:
     errors_doc = json.loads((CONTRACTS / "api-errors.json").read_text(encoding="utf-8"))
     wire_doc = json.loads((CONTRACTS / "wire-vocabulary.json").read_text(encoding="utf-8"))
     errors, error_table = api_error_entries(errors_doc)
-    wire, labels, fallbacks, longs, placeholders, categories = wire_entries(wire_doc)
+    wire, labels, fallbacks, longs, placeholders, aliases, categories = wire_entries(wire_doc)
 
     files: dict[Path, str] = {}
     files[CATALOGS / "api_errors.toml"] = render_catalog("api_errors", errors, CATALOGS / "api_errors.toml")
@@ -455,9 +474,9 @@ def outputs() -> dict[Path, str]:
             staged.append(copy)
         files[STRINGS] = gen_swift(staged)
         files[GENERATED / "ApiErrorTable.swift"] = api_error_table(error_table, cats["api_errors"])
-        files[GENERATED / "WireTable.swift"] = wire_table(labels, fallbacks, longs, placeholders, categories, cats["wire"])
+        files[GENERATED / "WireTable.swift"] = wire_table(labels, fallbacks, longs, placeholders, aliases, categories, cats["wire"])
         files[TESTS / "AccessorTests.swift"] = accessor_test(
-            cats, error_table, (labels, fallbacks, longs, placeholders, categories)
+            cats, error_table, (labels, fallbacks, longs, placeholders, aliases, categories)
         )
     return files
 

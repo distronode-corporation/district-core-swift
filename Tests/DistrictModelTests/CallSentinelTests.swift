@@ -1,3 +1,4 @@
+import DistrictL10n
 import DistrictModel
 import XCTest
 
@@ -92,11 +93,29 @@ final class CallSentinelTests: XCTestCase {
         XCTAssertEqual(CallNarrative.summary("Voice session completed."), .absent)
     }
 
-    /// ⛔ THE EM DASH IS THE SERVER'S BYTE, U+2014, AND THE MATCH IS EXACT. Spelled
-    /// with an escape in both the source and this test so that neither can be
-    /// "tidied" into a hyphen without the other failing.
-    func testTheNoAnswerSentenceMatchesTheServersEmDash() {
+    /// ⛔ BOTH SPELLINGS OF THE NO-ANSWER SENTENCE ARE ABSENT. The webhook writes it
+    /// with a comma now (livekit/route.ts), and rows written before the change still
+    /// hold the em dash, U+2014, spelled here as an escape. The match is exact, so a
+    /// hyphen or a missing alias would put the sentence on screen as an AI summary.
+    func testTheNoAnswerSentenceMatchesTheServersCurrentSpelling() {
+        XCTAssertEqual(CallNarrative.summary("No answer, no conversation took place."), .absent)
+    }
+
+    func testTheNoAnswerSentenceMatchesTheEarlierEmDashSpelling() {
         XCTAssertEqual(CallNarrative.summary("No answer \u{2014} no conversation took place."), .absent)
+    }
+
+    /// ⚠️ THE EARLIER SPELLING COMES FROM THE CONTRACT, not from a literal in
+    /// `CallNarrative`: every alias the vocabulary lists for a set member is in the
+    /// set, and the no-answer sentence is a vocabulary placeholder, so a respelling
+    /// upstream cannot leave the set holding a value the vocabulary no longer knows.
+    func testThePlaceholderSetCarriesTheVocabularysAliases() {
+        let current = "No answer, no conversation took place."
+        XCTAssertNotNil(WireLabel.placeholder(current))
+        let spellings = WireLabel.spellings(ofPlaceholders: [current])
+        XCTAssertEqual(spellings, [current, "No answer \u{2014} no conversation took place."])
+        XCTAssertTrue(spellings.isSubset(of: CallNarrative.placeholders))
+        XCTAssertEqual(WireLabel.spellings(ofPlaceholders: CallNarrative.placeholders), CallNarrative.placeholders)
     }
 
     /// ⛔ A FAILED SUMMARISER IS NOT AN ABSENT SUMMARY. Folding these into `.absent`
@@ -110,7 +129,7 @@ final class CallSentinelTests: XCTestCase {
     /// ⚠️ THE TWO SETS MUST NOT OVERLAP, or the order of the checks in `summary(_:)`
     /// would silently decide which answer a caller got.
     func testThePlaceholderAndFailureSetsAreDisjoint() {
-        XCTAssertEqual(CallNarrative.placeholders.count, 6)
+        XCTAssertEqual(CallNarrative.placeholders.count, 7)
         XCTAssertEqual(CallNarrative.failures.count, 2)
         XCTAssertTrue(CallNarrative.placeholders.isDisjoint(with: CallNarrative.failures))
     }

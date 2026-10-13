@@ -39,9 +39,18 @@ public enum WireLabel {
     /// real value (`Unknown`, `No summary available.`), or nil for any other text, which
     /// is real data and is shown as it is.
     ///
-    /// ⚠️ EXACT MATCH, as the service writes it. `"No answer \u{2014} no conversation
-    /// took place."` is not in the table: `CallNarrative` already keeps it off screen.
+    /// ⚠️ EXACT MATCH, as the service writes it, in its current spelling or an earlier
+    /// one the vocabulary lists under `aliases`: `"No answer \u{2014} no conversation
+    /// took place."` is the earlier spelling of `"No answer, no conversation took
+    /// place."`, stored rows still hold it, and both get the one label.
     public static func placeholder(_ text: String?) -> String? {
         text.flatMap(WireTable.placeholder)
+    }
+
+    /// `values` with every earlier spelling the vocabulary lists for each of them, for a
+    /// set that has to recognise a placeholder however a stored row spells it. A value
+    /// that is not a vocabulary placeholder passes through on its own.
+    public static func spellings(ofPlaceholders values: Set<String>) -> Set<String> {
+        values.union(values.flatMap { WireTable.placeholderAliases[$0] ?? [] })
     }
 }

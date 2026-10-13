@@ -1434,12 +1434,14 @@ final class GeneratedAccessorTests: XCTestCase {
             XCTAssertEqual(WireTable.placeholder("AI Outbound Voice session active..."), "AI Outbound Voice session active...")
             XCTAssertEqual(WireTable.placeholder("Voice session completed."), "Voice session completed.")
             XCTAssertEqual(WireTable.placeholder("No answer, no conversation took place."), "No answer, no conversation took place.")
+            XCTAssertEqual(WireTable.placeholder("No answer \u{2014} no conversation took place."), "No answer, no conversation took place.")
             XCTAssertEqual(WireTable.placeholder("New manually added contact."), "New manually added contact.")
             XCTAssertEqual(WireTable.placeholder("Manual edit update."), "Manual edit update.")
             XCTAssertEqual(WireTable.placeholder("Consultation"), "Consultation")
             XCTAssertEqual(WireTable.placeholder("Distronode Support"), "Distronode Support")
             XCTAssertEqual(WireTable.placeholder("You"), "You")
             XCTAssertEqual(WireTable.placeholder("Free"), "Free")
+            XCTAssertEqual(WireTable.placeholderAliases["No answer, no conversation took place."], ["No answer \u{2014} no conversation took place."])
         }
     }
 

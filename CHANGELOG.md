@@ -15,6 +15,15 @@ All notable changes to this package are recorded here. The format is based on
   `WireCategory` without a `default` needs the new cases. No existing label changed, and
   an unknown value of an existing category reads as before.
 
+### Fixed
+
+- `CallNarrative` treats the no-answer summary as absent in both spellings: the comma the
+  LiveKit webhook writes now (`"No answer, no conversation took place."`) and the em dash
+  that rows written before the change still hold. Without it, a new unanswered call showed
+  the sentence as its AI summary. `WireLabel.placeholder` labels both spellings, and the
+  new `WireLabel.spellings(ofPlaceholders:)` adds a placeholder's earlier spellings from
+  the vocabulary's `aliases`. `CallNarrative.placeholders` has 7 members, up from 6.
+
 ## [7.0.0-beta.1] - 2026-10-13
 
 The core's text, ready for Canadian French: every sentence the core writes comes from a

@@ -89,6 +89,11 @@ public enum SchedulingDeveloperFormat {
     /// where the column wants a word: `Never` for a key that has not been used, `Not tried
     /// yet` for a delivery that has not run. Those are per-column on purpose and are not
     /// interchangeable.
+    ///
+    /// ⛔ FRENCH HAS NO TWELVE-HOUR CLOCK: `12 sept. 2026, 15 h 04`, and `9 h` on the hour,
+    /// as the website's French `formatDateTime` writes it. The catalog sentence keeps
+    /// `{meridiem}` so both languages take the same pieces; French passes it empty, and an
+    /// empty minute on the hour, and the spaces they leave at the end are trimmed.
     public static func stamp(
         _ value: String?,
         timezone: String,
@@ -99,6 +104,13 @@ public enum SchedulingDeveloperFormat {
         guard let date = WireInstant.parse(value) else { return unknown }
         let parts = SchedulingClock.parts(of: date, timezone: timezone)
         guard let month = SchedulingClock.monthName(parts.month) else { return unknown }
+        let day = L10nFormat.dayOfMonth(parts.day)
+        let year = String(parts.year)
+        if L10nRuntime.locale == .frCA {
+            let minute = parts.minute == 0 ? "" : SchedulingClock.paddedTwo(parts.minute)
+            return SchedulingCopy.developerStamp(month, day, year, String(parts.hour), minute, "")
+                .trimmingCharacters(in: .whitespaces)
+        }
         let suffix = L10nFormat.meridiem(hour: parts.hour)
         // ⚠️ 0 AND 12 BOTH RENDER AS 12, which is what a 12-hour clock does and what
         // `Intl` emits: midnight is `12:05 AM` and noon is `12:05 PM`.
@@ -106,7 +118,7 @@ public enum SchedulingDeveloperFormat {
         let hour = rawHour == 0 ? 12 : rawHour
         let minute = SchedulingClock.paddedTwo(parts.minute)
         return SchedulingCopy.developerStamp(
-            month, String(parts.day), String(parts.year), SchedulingClock.paddedTwo(hour), minute, suffix
+            month, day, year, SchedulingClock.paddedTwo(hour), minute, suffix
         )
     }
 }

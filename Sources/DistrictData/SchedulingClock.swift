@@ -80,8 +80,14 @@ public enum SchedulingClock {
 
     /// `9:05`, UNPADDED hour, padded minute. The register, the bookings table and the
     /// reschedule slot list.
+    ///
+    /// ⚠️ FRENCH READS `9 h 05`, and `9 h` on the hour, as the website writes every time
+    /// of day in French (``L10nFormat``'s `time`). English keeps the 24-hour `9:05`.
     public static func clock(_ parts: SchedulingZonedParts) -> String {
-        "\(parts.hour):\(paddedTwo(parts.minute))"
+        switch L10nRuntime.locale {
+        case .en: "\(parts.hour):\(paddedTwo(parts.minute))"
+        case .frCA: L10nFormat.frenchClock(hour: parts.hour, minute: parts.minute)
+        }
     }
 
     /// ⚠️ THE MONTH NAME FOR A 1-BASED MONTH, OR nil. A `month` outside 1...12 is a

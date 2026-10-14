@@ -155,7 +155,9 @@ public enum SchedulingBookingFormat {
         guard let start = WireInstant.parse(startAt) else { return nil }
         let at = SchedulingClock.parts(of: start, timezone: timezone)
         guard let month = SchedulingClock.monthName(at.month) else { return nil }
-        return SchedulingCopy.bookingDateTime(month, String(at.day), String(at.year), SchedulingClock.clock(at))
+        return SchedulingCopy.bookingDateTime(
+            month, L10nFormat.dayOfMonth(at.day), String(at.year), SchedulingClock.clock(at)
+        )
     }
 
     /// `30 min`, or `Not set`.

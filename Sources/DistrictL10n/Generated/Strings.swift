@@ -1290,7 +1290,7 @@ package enum WireCopy {
     package static var deskTicketSourceVoiceCall: String { L10nRuntime.locale == .frCA ? "Depuis un appel téléphonique" : "From a phone call" }
 
     /// `wire.desk_ticket_status.fallback`
-    package static var deskTicketStatusFallback: String { L10nRuntime.locale == .frCA ? "Inconnu" : "Unknown" }
+    package static var deskTicketStatusFallback: String { L10nRuntime.locale == .frCA ? "Inconnue" : "Unknown" }
 
     /// `wire.desk_ticket_status.open`
     package static var deskTicketStatusOpen: String { L10nRuntime.locale == .frCA ? "Ouverte" : "Open" }

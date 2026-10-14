@@ -1011,7 +1011,7 @@ final class GeneratedAccessorTests: XCTestCase {
             XCTAssertEqual(WireCopy.contactResearchKeyRecommendedgreeting, "Accueil suggéré pour la réceptionniste")
             XCTAssertEqual(WireCopy.deskTicketSourceManual, "Saisie manuelle")
             XCTAssertEqual(WireCopy.deskTicketSourceVoiceCall, "Depuis un appel téléphonique")
-            XCTAssertEqual(WireCopy.deskTicketStatusFallback, "Inconnu")
+            XCTAssertEqual(WireCopy.deskTicketStatusFallback, "Inconnue")
             XCTAssertEqual(WireCopy.deskTicketStatusOpen, "Ouverte")
             XCTAssertEqual(WireCopy.deskTicketStatusResolved, "Réglée")
             XCTAssertEqual(WireCopy.deskTicketStatusWaiting, "En attente")

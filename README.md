@@ -12,10 +12,15 @@ Consumers:
 
 - [District AI for iOS](https://github.com/distronode-corporation/district-ios)
   (iPhone and iPad)
-- [District AI for macOS](https://github.com/distronode-corporation/district-macos)
+- [District AI for Mac](https://github.com/distronode-corporation/district-macos)
 
-This package was extracted from district-ios at `0b2354b`, with its history. Links:
-[CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md)
+This package was extracted from district-ios at `0b2354b`, with its history. 6.0.0 is the
+current release; the 7.0.0 betas are work in progress.
+
+Links: [project page](https://www.distronode.com/open-source/district-core-swift) ·
+[GitLab mirror](https://gitlab.com/distronode-corporation/district-core-swift) (read-only
+mirror; issues and pull requests live on GitHub) · [CHANGELOG](CHANGELOG.md) ·
+[CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md)
 
 The District AI service the package talks to is not open source; signing in needs a
 District AI account. Without one you can still build the package and run every test.
@@ -33,7 +38,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "3.1.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "6.0.0"),
 ],
 ```
 
@@ -46,7 +51,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 3.1.0
+    exactVersion: 6.0.0
 ```
 
 ## Modules
@@ -89,7 +94,7 @@ swiftlint --strict         # SwiftLint 0.65.1
 
 The core writes English, and Canadian French once an app turns it on by setting
 `L10nRuntime.locale` (to `DistrictL10n.locale(fromPreferred:)` of the device's preferred
-languages). Until then everything is English, and the French in the catalogs is empty.
+languages). Until then everything is English, and no released app turns French on.
 
 - The text is in four TOML catalogs under `l10n/`, in the format
   [`tools/l10n/`](tools/l10n) reads: `core.toml` and `countries.toml` are written by
@@ -113,7 +118,7 @@ desktop clients' additions.
 
 `ContractFixtureTests` runs every mobile fixture that has a Swift model through a strict
 gate: no `null` outside a reviewed allow-list, decode, re-encode, and the re-encoded keys
-must equal the fixture's at every level. It asserts the exact number of fixtures (157)
+must equal the fixture's at every level. It asserts the exact number of fixtures (187)
 and an explicit list of fixtures that have no model yet, so a missing directory or a
 newly added fixture is a failure rather than a silent pass. Set `DISTRICT_CONTRACTS_DIR`
 to read the fixtures from somewhere else.
@@ -134,7 +139,8 @@ every pull request, and uses no secrets:
 - **verify** (Linux, `swift:6.2.4`): SwiftFormat, SwiftLint, the Foundation-only import
   rule, the `Package.resolved` guard, `swift test`, a floor on the number of tests run,
   and the coverage floors.
-- **hygiene** (Linux): no em or en dashes, internal host names or GitLab URLs
+- **hygiene** (Linux): no em or en dashes, internal host names or GitLab URLs other than
+  this repository's own mirror
   ([`scripts/check-public-hygiene.py`](scripts/check-public-hygiene.py)), the licence
   files present, the vendored catalog tools unmodified, every generated string file
   current, and the French rules (`frcheck`).

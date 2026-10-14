@@ -86,8 +86,9 @@ count and is a ratchet: a change that adds many tests may raise it, and a change
 deletes tests on purpose lowers it in the same commit and says why.
 
 **Public hygiene.** No em or en dashes (use commas, periods or parentheses), no internal
-host names and no GitLab URLs, anywhere outside `contracts/`. A string that must hold a
-dash at run time spells it as an escape (`"\u{2014}"`).
+host names and no GitLab URL but this repository's own mirror, anywhere outside
+`contracts/`. A string that must hold a dash at run time spells it as an escape
+(`"\u{2014}"`).
 
 ## Pull requests
 

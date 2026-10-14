@@ -34,6 +34,10 @@ All notable changes to this package are recorded here. The format is based on
   `WireLabel.placeholder` knows `"No answer, no conversation took place."`. A `switch` over
   `WireCategory` without a `default` needs the new cases. No existing label changed, and
   an unknown value of an existing category reads as before.
+- The catalogs carry their reviewed Canadian French (fr-CA): 562 entries across
+  `l10n/core.toml`, `countries.toml`, `api_errors.toml` and `wire.toml`, so
+  `L10nRuntime.isFrenchComplete` is true. The language shown stays the app's choice
+  (`L10nRuntime.locale`), and the apps keep French off.
 
 ### Fixed
 

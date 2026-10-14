@@ -233,9 +233,11 @@ jobs:
             --opt runtime=external --opt access=package --opt int_fmt=L10nFormat.count
 
       # No term base or memory here (they live with the translators); the rules that
-      # need only the catalog run in full.
+      # need only the catalog run in full. The api_error screen is exempt from the
+      # Apple store rules: those sentences are the service's own, as the website words
+      # them in French, and their English already names the dashboard and the browser.
       - name: The French rules (frcheck)
-        run: python3 tools/l10n/frcheck.py all . --termbase '' --tm ''
+        run: python3 tools/l10n/frcheck.py all . --termbase '' --tm '' --allow-screen api_error
 
       # The licence the README and every consumer rely on, and the NOTICE that carries
       # the copyright line and the trademark terms. Checked by content, because an empty

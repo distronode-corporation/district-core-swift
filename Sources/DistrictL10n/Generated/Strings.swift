@@ -1163,6 +1163,27 @@ package enum VoiceStudioCopy {
 }
 
 package enum WireCopy {
+    /// `wire.a2p_campaign_type.customer_care`
+    package static var a2pCampaignTypeCustomerCare: String { L10nRuntime.locale == .frCA ? "Customer Care" : "Customer Care" }
+
+    /// `wire.a2p_campaign_type.low_volume`
+    package static var a2pCampaignTypeLowVolume: String { L10nRuntime.locale == .frCA ? "Low Volume Mixed (Under 15k msgs/mo)" : "Low Volume Mixed (Under 15k msgs/mo)" }
+
+    /// `wire.a2p_campaign_type.marketing`
+    package static var a2pCampaignTypeMarketing: String { L10nRuntime.locale == .frCA ? "Marketing / Promotions" : "Marketing / Promotions" }
+
+    /// `wire.a2p_campaign_type.v_2fa`
+    package static var a2pCampaignTypeV2fa: String { L10nRuntime.locale == .frCA ? "2FA / OTP Alerts" : "2FA / OTP Alerts" }
+
+    /// `wire.a2p_registration_status.failed`
+    package static var a2pRegistrationStatusFailed: String { L10nRuntime.locale == .frCA ? "FAILED" : "FAILED" }
+
+    /// `wire.a2p_registration_status.in_progress`
+    package static var a2pRegistrationStatusInProgress: String { L10nRuntime.locale == .frCA ? "IN PROGRESS" : "IN PROGRESS" }
+
+    /// `wire.a2p_registration_status.verified`
+    package static var a2pRegistrationStatusVerified: String { L10nRuntime.locale == .frCA ? "VERIFIED" : "VERIFIED" }
+
     /// `wire.analytics_sentiment.friction_sentiment`
     package static var analyticsSentimentFrictionSentiment: String { L10nRuntime.locale == .frCA ? "Friction Sentiment" : "Friction Sentiment" }
 
@@ -1406,6 +1427,21 @@ package enum WireCopy {
     /// `wire.number_provider.unknown`
     package static var numberProviderUnknown: String { L10nRuntime.locale == .frCA ? "Unknown" : "Unknown" }
 
+    /// `wire.number_status.active`
+    package static var numberStatusActive: String { L10nRuntime.locale == .frCA ? "Active" : "Active" }
+
+    /// `wire.number_status.fallback`
+    package static var numberStatusFallback: String { L10nRuntime.locale == .frCA ? "Active" : "Active" }
+
+    /// `wire.number_status.pending_verification`
+    package static var numberStatusPendingVerification: String { L10nRuntime.locale == .frCA ? "Pending verification" : "Pending verification" }
+
+    /// `wire.number_status.released`
+    package static var numberStatusReleased: String { L10nRuntime.locale == .frCA ? "Released" : "Released" }
+
+    /// `wire.number_status.suspended`
+    package static var numberStatusSuspended: String { L10nRuntime.locale == .frCA ? "Suspended" : "Suspended" }
+
     /// `wire.number_type.local`
     package static var numberTypeLocal: String { L10nRuntime.locale == .frCA ? "Local" : "Local" }
 
@@ -1499,6 +1535,33 @@ package enum WireCopy {
     /// `wire.research_status.pending`
     package static var researchStatusPending: String { L10nRuntime.locale == .frCA ? "Pending queue" : "Pending queue" }
 
+    /// `wire.scheduling_host_role.optional`
+    package static var schedulingHostRoleOptional: String { L10nRuntime.locale == .frCA ? "Optional" : "Optional" }
+
+    /// `wire.scheduling_host_role.required`
+    package static var schedulingHostRoleRequired: String { L10nRuntime.locale == .frCA ? "Required" : "Required" }
+
+    /// `wire.scheduling_host_role.rotation`
+    package static var schedulingHostRoleRotation: String { L10nRuntime.locale == .frCA ? "Rotation" : "Rotation" }
+
+    /// `wire.scheduling_question_type.checkbox`
+    package static var schedulingQuestionTypeCheckbox: String { L10nRuntime.locale == .frCA ? "Checkbox" : "Checkbox" }
+
+    /// `wire.scheduling_question_type.select`
+    package static var schedulingQuestionTypeSelect: String { L10nRuntime.locale == .frCA ? "Select" : "Select" }
+
+    /// `wire.scheduling_question_type.text`
+    package static var schedulingQuestionTypeText: String { L10nRuntime.locale == .frCA ? "Text" : "Text" }
+
+    /// `wire.scheduling_webhook_delivery_status.failed`
+    package static var schedulingWebhookDeliveryStatusFailed: String { L10nRuntime.locale == .frCA ? "Failed" : "Failed" }
+
+    /// `wire.scheduling_webhook_delivery_status.pending`
+    package static var schedulingWebhookDeliveryStatusPending: String { L10nRuntime.locale == .frCA ? "Waiting" : "Waiting" }
+
+    /// `wire.scheduling_webhook_delivery_status.success`
+    package static var schedulingWebhookDeliveryStatusSuccess: String { L10nRuntime.locale == .frCA ? "Delivered" : "Delivered" }
+
     /// `wire.sentiment.negative`
     package static var sentimentNegative: String { L10nRuntime.locale == .frCA ? "Friction" : "Friction" }
 
@@ -1507,6 +1570,21 @@ package enum WireCopy {
 
     /// `wire.sentiment.positive`
     package static var sentimentPositive: String { L10nRuntime.locale == .frCA ? "Positive" : "Positive" }
+
+    /// `wire.sip_trunk_status.active`
+    package static var sipTrunkStatusActive: String { L10nRuntime.locale == .frCA ? "Active" : "Active" }
+
+    /// `wire.toll_free_verification_status.in_review`
+    package static var tollFreeVerificationStatusInReview: String { L10nRuntime.locale == .frCA ? "IN REVIEW" : "IN REVIEW" }
+
+    /// `wire.toll_free_verification_status.pending_review`
+    package static var tollFreeVerificationStatusPendingReview: String { L10nRuntime.locale == .frCA ? "PENDING REVIEW" : "PENDING REVIEW" }
+
+    /// `wire.toll_free_verification_status.twilio_approved`
+    package static var tollFreeVerificationStatusTwilioApproved: String { L10nRuntime.locale == .frCA ? "TWILIO APPROVED" : "TWILIO APPROVED" }
+
+    /// `wire.toll_free_verification_status.twilio_rejected`
+    package static var tollFreeVerificationStatusTwilioRejected: String { L10nRuntime.locale == .frCA ? "TWILIO REJECTED" : "TWILIO REJECTED" }
 
     /// `wire.transfer_reason.auth_error`
     package static var transferReasonAuthError: String { L10nRuntime.locale == .frCA ? "Transfer authorization error" : "Transfer authorization error" }

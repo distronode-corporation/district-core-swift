@@ -6,7 +6,27 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- `AccountSettingsResponse` (`GET /api/settings`: the profile with its stored `locale`, nil
+  for "never chosen", and the first workspace's plan and region), read by the new
+  `AccountSettingsRepository.loadSettings()` through `DistrictEndpoints.accountSettings()`
+  and the new `EndpointID.accountSettings`. `saveLocale` now decodes the route's answer as
+  `AccountSettingsSaveResponse`; its result is unchanged.
+- An optional `currency` on `BillingSubscription` and `BillingInvoice`, ahead of the server
+  sending it. Today's bodies omit it and decode as before.
+- Twenty-one contract fixtures from monorepo 49019be80, all gated by the strict decoder:
+  number configure, release, lookup and provider status, SIP trunks, Verify, A2P and
+  toll-free verification, contact blocking, account settings, and the persona options in
+  French.
+
 ### Changed
+
+- `contracts/i18n/wire-vocabulary.json` from monorepo 49019be80: `WireCategory` has 39
+  cases, up from 31 (number status, A2P campaign type and registration status, toll-free
+  verification status, SIP trunk status, scheduling webhook delivery status, host roles and
+  question types), with their labels. A `switch` over `WireCategory` without a `default`
+  needs the new cases. No existing label changed.
 
 - `contracts/i18n/wire-vocabulary.json` from monorepo 46e1740: `WireCategory` has 31 cases,
   up from 11 (Desk tickets, knowledge documents, workflows, numbers, meetings, message

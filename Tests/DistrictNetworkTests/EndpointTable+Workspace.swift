@@ -100,6 +100,12 @@ extension EndpointTable {
                 .json("{}")
             ),
             EndpointExpectation(
+                .accountSettings,
+                DistrictEndpoints.accountSettings(),
+                .get,
+                "\(host)/api/settings"
+            ),
+            EndpointExpectation(
                 .saveLocale,
                 DistrictEndpoints.saveLocale(.frCA),
                 .post,

@@ -3,6 +3,12 @@ import Foundation
 
 /// The signed-in person's own settings, the same for every workspace they hold.
 public extension DistrictEndpoints {
+    /// Read the person's settings, including the language the server writes in
+    /// (nil when they never chose). See ``AccountSettingsResponse``.
+    static func accountSettings() -> ApiRequestDescriptor {
+        ApiRequestDescriptor(.accountSettings, .get, DistrictPaths.accountSettings)
+    }
+
     /// Tell the server which language to write to this person in: email, Voice Studio
     /// and any other server text.
     ///

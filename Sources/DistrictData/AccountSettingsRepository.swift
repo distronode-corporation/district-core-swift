@@ -16,11 +16,20 @@ public struct AccountSettingsRepository: Sendable {
         self.client = client
     }
 
+    /// The person's settings, including the language the server writes to them in.
+    ///
+    /// ⚠️ NO ENVELOPE FLAG: the route answers a bare object (`{profile, subscription,
+    /// region}`) on success and `{error, code}` with a 500 on failure, so there is no
+    /// `success` to affirm.
+    public func loadSettings() async -> Result<AccountSettingsResponse, ApiError> {
+        await client.send(DistrictEndpoints.accountSettings(), as: AccountSettingsResponse.self)
+    }
+
     /// Store `locale` as the language the server writes to this person in.
     public func saveLocale(_ locale: L10nLocale) async -> Result<Void, ApiError> {
-        let outcome = await client.send(DistrictEndpoints.saveLocale(locale), as: SuccessResponse.self)
+        let outcome = await client.send(DistrictEndpoints.saveLocale(locale), as: AccountSettingsSaveResponse.self)
         return outcome
-            .flatMap { ResponseEnvelope.affirm("AccountSettingsResponse", $0.success, $0) }
+            .flatMap { ResponseEnvelope.affirm("AccountSettingsSaveResponse", $0.success, $0) }
             .map { _ in }
     }
 }

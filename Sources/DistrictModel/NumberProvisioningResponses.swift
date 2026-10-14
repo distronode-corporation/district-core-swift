@@ -12,10 +12,11 @@ import Foundation
 //
 // ⚠️ THE READ PAIR IS IN `NumberResponses.swift` and stays there: ``AvailableNumber``,
 // ``NumberSearchResponse``, ``ListedNumber`` and ``OwnedNumbersResponse`` are pinned
-// by three shared contract fixtures. Nothing here has a fixture, the shared corpus
-// mirrors the Android client and that client has no provisioning surface, so
-// ⛔ `ContractManifest.expectedFixtureCount` MUST NOT MOVE. What pins these shapes is
-// the route source, quoted per type below, and `NumberProvisioningRepositoryTests`.
+// by three shared contract fixtures. Of the types here, ``ProviderStatusResponse`` and
+// ``NumberReleaseResponse`` are fixture-gated (`district-provider-status*.json`,
+// `district-number-release*.json`, gated in `ImplementedFixtures+CarrierAndAccount.swift`).
+// The regulatory registration types have no fixture: what pins them is the route
+// source, quoted per type below, and `NumberProvisioningRepositoryTests`.
 //
 // ⚠️ EVERY TIMESTAMP IS AN ISO-8601 **STRING**, not an instant, matching every other
 // DTO in this module: `DistrictModel` owns no date parsing, and a `Date` here would

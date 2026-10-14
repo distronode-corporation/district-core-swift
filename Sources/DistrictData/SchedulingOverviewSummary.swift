@@ -27,9 +27,15 @@ public enum SchedulingOverviewSummary {
     /// ⚠️ A VALUE WITH NO COLON COMES BACK UNCHANGED, matching the TypeScript's
     /// `minute === undefined` guard: it is not a time this function understands and
     /// mangling it would hide that.
+    ///
+    /// ⚠️ FRENCH READS `9 h` AND `13 h 30` when both halves are numbers, as
+    /// ``SchedulingClock/clock(_:)`` does; anything else keeps the English shape.
     public static func displayTime(_ value: String) -> String {
         let pieces = value.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
         guard pieces.count == 2 else { return value }
+        if L10nRuntime.locale == .frCA, let hour = Int(pieces[0]), let minute = Int(pieces[1]) {
+            return L10nFormat.frenchClock(hour: hour, minute: minute)
+        }
         let hour = Int(pieces[0]).map(String.init) ?? String(pieces[0])
         return "\(hour):\(pieces[1])"
     }
@@ -148,7 +154,7 @@ public enum SchedulingOverviewSummary {
             return SchedulingCopy.overviewTomorrow(clock)
         }
         guard let month = SchedulingClock.monthName(at.month) else { return nil }
-        return SchedulingCopy.overviewMonthDayClock(month, String(at.day), clock)
+        return SchedulingCopy.overviewMonthDayClock(month, L10nFormat.dayOfMonth(at.day), clock)
     }
 
     /// The first attendee's name, then their email, then `Someone`.

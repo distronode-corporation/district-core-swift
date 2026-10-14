@@ -43,8 +43,7 @@ public extension L10nFormat {
             let month = style == .medium
                 ? Tables.monthAbbreviationsFr[parts.month - 1]
                 : Tables.monthNamesFr[parts.month - 1]
-            let day = parts.day == 1 ? "1er" : String(parts.day)
-            let text = "\(day) \(month) \(parts.year)"
+            let text = "\(dayOfMonth(parts.day, locale: .frCA)) \(month) \(parts.year)"
             return style == .full ? Tables.weekdayNamesFr[parts.weekday - 1] + " " + text : text
         }
     }
@@ -65,8 +64,27 @@ public extension L10nFormat {
             let hour = parts.hour % 12 == 0 ? 12 : parts.hour % 12
             return "\(hour):\(twoDigits(parts.minute)) " + (parts.hour < 12 ? "a.m." : "p.m.")
         case .frCA:
-            return parts.minute == 0 ? "\(parts.hour) h" : "\(parts.hour) h \(twoDigits(parts.minute))"
+            return frenchClock(hour: parts.hour, minute: parts.minute)
         }
+    }
+
+    /// The day of the month as a date writes it: `1`...`31`, and in French `1er` for the
+    /// first (`1er août`).
+    ///
+    /// ⛔ EVERY DAY NUMBER THE CORE PRINTS GOES THROUGH HERE, including the scheduling
+    /// formatters that fill a catalog's `{day}` themselves. A bare `String(day)` there
+    /// reads `1 août`, which the glossary and the website both refuse.
+    static func dayOfMonth(_ day: Int, locale: L10nLocale = L10nRuntime.locale) -> String {
+        locale == .frCA && day == 1 ? "1er" : String(day)
+    }
+
+    /// A French time of day from its two fields: `15 h 04`, `0 h 05`, and `9 h` on the
+    /// hour, the OQLF's 24-hour form that ``time(_:timezone:locale:)`` writes.
+    ///
+    /// ⚠️ FRENCH ONLY. English has two clocks on two surfaces (the website's
+    /// `3:04 p.m.` and the scheduling tables' `15:04`), and each caller keeps its own.
+    static func frenchClock(hour: Int, minute: Int) -> String {
+        minute == 0 ? "\(hour) h" : "\(hour) h \(twoDigits(minute))"
     }
 
     /// The medium date and the time together, the website's `formatDateTime`:

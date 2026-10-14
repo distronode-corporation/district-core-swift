@@ -153,14 +153,19 @@ public enum SchedulingHoursFormat {
               let month = Int(pieces[1]), let day = Int(pieces[2]),
               let name = SchedulingClock.monthName(month)
         else { return value }
-        return SchedulingCopy.hoursOverrideDate(name, String(day), String(year))
+        return SchedulingCopy.hoursOverrideDate(name, L10nFormat.dayOfMonth(day), String(year))
     }
 
-    /// `Sep 12, 2026`, `Sep 12 to Sep 14, 2026`, or both years when they differ.
+    /// `Sep 12, 2026`, `Sep 12 to Sep 14, 2026`, or both years when they differ. French:
+    /// `12 sept. à 14 sept. 2026`.
     ///
     /// ⚠️ THE FIRST YEAR IS DROPPED ONLY WHEN BOTH ENDS SHARE ONE, which is the source's
     /// behaviour and reads correctly: a span inside one year says the year once, at the
     /// end, and a span across New Year says it twice because it has to.
+    ///
+    /// ⚠️ THE YEAR'S TAIL IS THE LANGUAGE'S: `, 2026` in English and ` 2026` in French,
+    /// whose date has no comma. Looking for the English tail alone kept both years in
+    /// every French range.
     public static func formatOverrideDates(start: String, end: String) -> String {
         if start == end {
             return formatOverrideDate(start)
@@ -172,9 +177,8 @@ public enum SchedulingHoursFormat {
         // ⚠️ THE YEAR IS STRIPPED ONLY IF IT IS THERE. `formatOverrideDate` returns the
         // input unchanged for a malformed date, and that value has no `, YYYY` tail to
         // remove, so this must not assume the shape it just asked for.
-        let trimmed = from.hasSuffix(", \(start.prefix(4))")
-            ? String(from.dropLast(6))
-            : from
+        let tail = (L10nRuntime.locale == .frCA ? " " : ", ") + start.prefix(4)
+        let trimmed = from.hasSuffix(tail) ? String(from.dropLast(tail.count)) : from
         return SchedulingCopy.hoursDateRange(trimmed, formatOverrideDate(end))
     }
 

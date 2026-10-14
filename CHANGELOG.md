@@ -6,6 +6,12 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.0-beta.2] - 2026-10-14
+
+The catalogs in Canadian French, for testing French in the iOS and Mac apps, and the
+scheduling formatters' French dates and times. English is byte-identical to
+7.0.0-beta.1, and nothing is French until an app sets `L10nRuntime.locale`.
+
 ### Added
 
 - `AccountSettingsResponse` (`GET /api/settings`: the profile with its stored `locale`, nil
@@ -34,13 +40,29 @@ All notable changes to this package are recorded here. The format is based on
   `WireLabel.placeholder` knows `"No answer, no conversation took place."`. A `switch` over
   `WireCategory` without a `default` needs the new cases. No existing label changed, and
   an unknown value of an existing category reads as before.
-- The catalogs carry their reviewed Canadian French (fr-CA): 562 entries across
+- The catalogs carry their reviewed Canadian French (fr-CA, #20): 562 entries across
   `l10n/core.toml`, `countries.toml`, `api_errors.toml` and `wire.toml`, so
   `L10nRuntime.isFrenchComplete` is true. The language shown stays the app's choice
   (`L10nRuntime.locale`), and the apps keep French off.
 
 ### Fixed
 
+- The scheduling formatters write French dates and times the way the website does
+  (`contracts/i18n/format-vectors.json`), where they filled the French sentence with the
+  English pieces. English output is unchanged.
+  - The first of a month is `1er` (`1er août 2026`, not `1 août 2026`) in
+    `SchedulingHoursFormat.formatOverrideDate`, `SchedulingBookingFormat.bookingDateTime`,
+    `SchedulingOverviewSummary.bookingWhen` and `SchedulingDeveloperFormat.stamp`.
+  - The developer stamp is 24-hour with no meridiem: `12 sept. 2026, 15 h 04`, and
+    `9 h` on the hour, not `12 sept. 2026, 03 h 04 PM`.
+  - `SchedulingClock.clock` and `SchedulingOverviewSummary.displayTime` read `9 h 05`
+    and `9 h` rather than `9:05` and `9:00`, so the bookings table, the register and the
+    working hours windows do too.
+  - `SchedulingHoursFormat.formatOverrideDates` says the year once in a French range
+    inside one year (`24 déc. à 26 déc. 2026`); it looked for the English
+    `, 2026` and kept both years.
+  - New: `L10nFormat.dayOfMonth(_:locale:)` and `L10nFormat.frenchClock(hour:minute:)`,
+    which `L10nFormat.date` and `time` now share with them.
 - `CallNarrative` treats the no-answer summary as absent in both spellings: the comma the
   LiveKit webhook writes now (`"No answer, no conversation took place."`) and the em dash
   that rows written before the change still hold. Without it, a new unanswered call showed
@@ -420,7 +442,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.2...HEAD
+[7.0.0-beta.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.2
 [7.0.0-beta.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.1
 [4.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/4.0.0
 [3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0

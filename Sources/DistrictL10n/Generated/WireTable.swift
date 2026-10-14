@@ -35,6 +35,14 @@ public enum WireCategory: String, CaseIterable, Sendable {
     case billingInvoiceStatus
     case messagingCarrier
     case messagingCredentialSource
+    case numberStatus
+    case a2pCampaignType
+    case a2pRegistrationStatus
+    case tollFreeVerificationStatus
+    case sipTrunkStatus
+    case schedulingWebhookDeliveryStatus
+    case schedulingHostRole
+    case schedulingQuestionType
 }
 
 /// Wire value to its catalog label.
@@ -192,6 +200,31 @@ enum WireTable {
         case (.messagingCarrier, "telnyx"): WireCopy.messagingCarrierTelnyx
         case (.messagingCredentialSource, "byok"): WireCopy.messagingCredentialSourceByok
         case (.messagingCredentialSource, "managed"): WireCopy.messagingCredentialSourceManaged
+        case (.numberStatus, "active"): WireCopy.numberStatusActive
+        case (.numberStatus, "released"): WireCopy.numberStatusReleased
+        case (.numberStatus, "suspended"): WireCopy.numberStatusSuspended
+        case (.numberStatus, "pending_verification"): WireCopy.numberStatusPendingVerification
+        case (.a2pCampaignType, "low_volume"): WireCopy.a2pCampaignTypeLowVolume
+        case (.a2pCampaignType, "customer_care"): WireCopy.a2pCampaignTypeCustomerCare
+        case (.a2pCampaignType, "marketing"): WireCopy.a2pCampaignTypeMarketing
+        case (.a2pCampaignType, "2fa"): WireCopy.a2pCampaignTypeV2fa
+        case (.a2pRegistrationStatus, "in_progress"): WireCopy.a2pRegistrationStatusInProgress
+        case (.a2pRegistrationStatus, "verified"): WireCopy.a2pRegistrationStatusVerified
+        case (.a2pRegistrationStatus, "failed"): WireCopy.a2pRegistrationStatusFailed
+        case (.tollFreeVerificationStatus, "pending_review"): WireCopy.tollFreeVerificationStatusPendingReview
+        case (.tollFreeVerificationStatus, "in_review"): WireCopy.tollFreeVerificationStatusInReview
+        case (.tollFreeVerificationStatus, "twilio_approved"): WireCopy.tollFreeVerificationStatusTwilioApproved
+        case (.tollFreeVerificationStatus, "twilio_rejected"): WireCopy.tollFreeVerificationStatusTwilioRejected
+        case (.sipTrunkStatus, "active"): WireCopy.sipTrunkStatusActive
+        case (.schedulingWebhookDeliveryStatus, "success"): WireCopy.schedulingWebhookDeliveryStatusSuccess
+        case (.schedulingWebhookDeliveryStatus, "pending"): WireCopy.schedulingWebhookDeliveryStatusPending
+        case (.schedulingWebhookDeliveryStatus, "failed"): WireCopy.schedulingWebhookDeliveryStatusFailed
+        case (.schedulingHostRole, "required"): WireCopy.schedulingHostRoleRequired
+        case (.schedulingHostRole, "rotation"): WireCopy.schedulingHostRoleRotation
+        case (.schedulingHostRole, "optional"): WireCopy.schedulingHostRoleOptional
+        case (.schedulingQuestionType, "text"): WireCopy.schedulingQuestionTypeText
+        case (.schedulingQuestionType, "select"): WireCopy.schedulingQuestionTypeSelect
+        case (.schedulingQuestionType, "checkbox"): WireCopy.schedulingQuestionTypeCheckbox
         default: nil
         }
     }
@@ -202,6 +235,7 @@ enum WireTable {
         case .transferReason: WireCopy.transferReasonFallback
         case .deskTicketStatus: WireCopy.deskTicketStatusFallback
         case .knowledgeDocumentStatus: WireCopy.knowledgeDocumentStatusFallback
+        case .numberStatus: WireCopy.numberStatusFallback
         default: nil
         }
     }

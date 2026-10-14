@@ -11,11 +11,11 @@ import Foundation
 // That is the opposite of almost every other write on this surface, where the answer is
 // a bare `{success:true}` and the truth is re-read.
 //
-// ⚠️ NONE OF THESE HAS A CONTRACT FIXTURE. The shared contract corpus mirrors the
-// Android client and that client has no carrier-account surface, so
-// ⛔ `ContractManifest.expectedFixtureCount` MUST NOT MOVE for them. What pins
-// the shapes is the route source, quoted per type, and
-// `CarrierAccountRepositoryTests`.
+// ⚠️ EVERY ONE OF THESE IS FIXTURE-GATED (`district-sip-trunk*.json`,
+// `district-verify*.json`, `district-a2p-registration.json`,
+// `district-tfv-submission.json`, `district-number-lookup*.json`), in
+// `ImplementedFixtures+CarrierAndAccount.swift`. The route source, quoted per type, and
+// `CarrierAccountRepositoryTests` pin the rules the bytes cannot.
 //
 // ⚠️ A `//` HEADER RATHER THAN A `///` ONE: SwiftFormat's `docComments` rule rejects a
 // doc comment attached to no declaration.

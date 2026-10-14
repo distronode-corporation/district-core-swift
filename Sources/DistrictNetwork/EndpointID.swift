@@ -118,8 +118,11 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case registerPushToken
     case unregisterPushToken
 
-    /// The account's own settings: today only the language the server writes in
-    /// (`POST /api/settings` with `{profile:{locale}}`).
+    /// The account's own settings (`GET /api/settings`): the profile, including the
+    /// stored language, and the first workspace's plan and region.
+    case accountSettings
+    /// The language the server writes in (`POST /api/settings` with
+    /// `{profile:{locale}}`), the only setting this client writes.
     case saveLocale
 
     /// Live updates: the credential for the desktop's telemetry socket.
@@ -330,9 +333,8 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // inbox search and both desk families, these raw values are still spelled as
     // Kotlin function names so the parity diff against the Android client's
     // `HttpDistrictApi` keeps working the day that client catches up.
-    // ⛔ AND NONE HAS A CONTRACT FIXTURE, so `ContractManifest.expectedFixtureCount`
-    // MUST NOT MOVE for them: it is asserted exactly against the files on disk, and
-    // the shared corpus mirrors the Android client.
+    // ⚠️ TEN OF THEM HAVE CONTRACT FIXTURES (see ``TypedEndpoints/numbers``); the
+    // regulatory registration family has none.
     case providerStatus
     case numberRequirements
     case numberRegistrations

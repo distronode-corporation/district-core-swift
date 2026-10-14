@@ -65,4 +65,9 @@ public extension StrictDecodeVerifier {
         .merging(liveTranscript) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")
         }
+        // ⚠️ `AllowedExplicitNulls+CarrierAndAccount.swift`, the carrier-account, blocking
+        // and account settings fixtures.
+        .merging(carrierAndAccount) { _, _ in
+            preconditionFailure("a fixture appears in both allowed-null tables")
+        }
 }

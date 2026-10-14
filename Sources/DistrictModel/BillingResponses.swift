@@ -278,6 +278,11 @@ public struct BillingSubscription: Codable, Sendable {
     public let overageRate: Double?
     /// ⛔ Absent, not null, when no coupon applies. See the type doc.
     public let discount: BillingDiscount?
+    /// Stripe's ISO 4217 code for ``amount``, lower-case as Stripe writes it (`cad`,
+    /// `usd`). ⚠️ Optional and ABSENT on today's server: the field is modelled ahead of
+    /// the route sending it, so a later server push needs no client release. A screen
+    /// with no code keeps today's formatting.
+    public let currency: String?
 
     /// ⚠️ TWO SNAKE_CASE KEYS FROM STRIPE'S OWN VOCABULARY, PASSED THROUGH
     /// UNTOUCHED BY THE ROUTE. They are spelled out here rather than handled with
@@ -293,6 +298,7 @@ public struct BillingSubscription: Codable, Sendable {
         case includedMinutes
         case overageRate
         case discount
+        case currency
     }
 }
 
@@ -343,6 +349,10 @@ public struct BillingInvoice: Codable, Sendable {
     public let hostedInvoiceUrl: String?
     /// ⛔ Null until the invoice is finalised. See the type doc.
     public let invoicePdf: String?
+    /// Stripe's ISO 4217 code for the three amounts, lower-case as Stripe writes it.
+    /// ⚠️ Optional and ABSENT on today's server, modelled ahead of the route sending it.
+    /// See ``BillingSubscription/currency``.
+    public let currency: String?
 
     /// ⚠️ FOUR SNAKE_CASE KEYS, STRIPE'S OWN, PASSED THROUGH BY THE ROUTE. See
     /// ``BillingSubscription/CodingKeys`` for why they are spelled out.
@@ -355,5 +365,6 @@ public struct BillingInvoice: Codable, Sendable {
         case created
         case hostedInvoiceUrl = "hosted_invoice_url"
         case invoicePdf = "invoice_pdf"
+        case currency
     }
 }

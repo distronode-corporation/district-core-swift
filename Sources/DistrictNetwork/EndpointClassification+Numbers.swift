@@ -39,13 +39,11 @@ public extension TypedEndpoints {
     /// unusual on a surface where almost every write answers a bare `{success:true}` and
     /// the truth is read back.
     ///
-    /// ⚠️ ALL SIXTEEN HAVE **NO CONTRACT FIXTURE**, which is a property of the corpus
-    /// rather than a lowered bar: the shared corpus mirrors the Android client and that
-    /// client has no provisioning surface.
-    /// ⛔ SO `ContractManifest.expectedFixtureCount` MUST NOT MOVE FOR THEM. It is
-    /// asserted EXACTLY against the files on disk and nothing is on disk; bumping it
-    /// to "account for" these would red the fixture suite. What pins the shapes is the
-    /// route source, quoted per DTO, plus `NumberProvisioningRepositoryTests` and
+    /// ⚠️ TEN OF THE SIXTEEN ARE FIXTURE-GATED (provider status, configure,
+    /// release, lookup, SIP, Verify, A2P and toll-free verification, in
+    /// `ImplementedFixtures+CarrierAndAccount.swift`). The regulatory requirements,
+    /// registrations and documents have no fixture: what pins them is the route
+    /// source, quoted per DTO, plus `NumberProvisioningRepositoryTests` and
     /// `CarrierAccountRepositoryTests`.
     ///
     /// ⚠️ ITS OWN FILE RATHER THAN SIXTEEN MORE LINES IN `EndpointClassification.swift`,

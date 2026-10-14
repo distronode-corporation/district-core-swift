@@ -6,6 +6,43 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.0-beta.3] - 2026-10-14
+
+The contracts from monorepo 43eed5fd6, whose French the catalogs copy verbatim, French
+billing amounts that name their currency, and a webhook editor that offers only the
+booking events. English is byte-identical to 7.0.0-beta.2.
+
+### Added
+
+- `BillingMoneyFormat.price(cents:currency:locale:)` in DistrictData, and `price(cents:)` on
+  `BillingSubscription` and `BillingInvoice`, which pass their own `currency`. French names
+  the currency when the service sends one (`249,00 $ CA` for `cad`, `249,00 $ US` for `usd`,
+  held to `contracts/i18n/format-vectors.json`) and writes `249,00 $` when it does not.
+  English is the apps' price today, `$249.00`, whatever the currency: a currency-aware
+  English price is not part of v3.
+- `SchedulingWebhookEvent.offered`: the four booking events a webhook editor offers, the
+  web portal's `WEBHOOK_EVENTS`. `SchedulingDeveloperFormat.webhookEventsToSave(ticked:stored:)`
+  sends the ticked ones in the fork's order and keeps every event the webhook already has
+  that the form does not offer.
+
+### Changed
+
+- A webhook editor offers `booking.created`, `booking.cancelled`, `booking.rescheduled` and
+  `booking.reminder` only. `recording.completed`, `transcript.ready` and `notes.ready` would
+  never fire: nothing is recorded, and the fork's transcripts and notes come only from a
+  recording. They stay in `SchedulingWebhookEvent` (`allCases` is still the fork's seven),
+  so a webhook already subscribed to one keeps it when saved. An editor that lists
+  `allCases` should list `offered`.
+- `contracts/` from monorepo 43eed5fd6: `i18n/api-errors.json` (ten French sentences),
+  `i18n/wire-vocabulary.json` (the French of funnelStage `Total Dials` and of
+  deskTicketStatus) and `mobile/district-billing.json` (`currency` on every subscription and
+  invoice, which the strict gate now decodes).
+- The catalogs' French follows the contract's, verbatim: eleven `api_error` sentences
+  (« transporteur », « prospects », « notre équipe de soutien », « demande/projet de
+  soutien », « Web », « offerte »), `Total Dials` « Appels composés au total », and the
+  Desk ticket statuses masculine for a « billet » (« Ouvert », « Réglé », and « Inconnu »
+  for an unknown one). `api_error.no_sending_number` keeps its Apple OS word.
+
 ## [7.0.0-beta.2] - 2026-10-14
 
 The catalogs in Canadian French, for testing French in the iOS and Mac apps, and the
@@ -442,7 +479,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.2...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.3...HEAD
+[7.0.0-beta.3]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.3
 [7.0.0-beta.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.2
 [7.0.0-beta.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.1
 [4.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/4.0.0

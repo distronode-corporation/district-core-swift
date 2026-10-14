@@ -159,6 +159,19 @@ final class SchedulingAdminDeveloperTests: XCTestCase {
         XCTAssertNil(SchedulingWebhookEvent(rawValue: "booking.updated"))
     }
 
+    /// ⛔ AN EDITOR OFFERS THE WEB PORTAL'S FOUR, spelled out rather than derived, for the
+    /// reason the test above gives. The three recording events stay in the vocabulary (a
+    /// webhook subscribed to one keeps it) but are never offered: nothing is recorded.
+    func testAnEditorOffersOnlyThePortalsFourBookingEvents() {
+        XCTAssertEqual(
+            SchedulingWebhookEvent.offered.map(\.rawValue),
+            ["booking.created", "booking.cancelled", "booking.rescheduled", "booking.reminder"]
+        )
+        for event in [SchedulingWebhookEvent.recordingCompleted, .transcriptReady, .notesReady] {
+            XCTAssertFalse(SchedulingWebhookEvent.offered.contains(event), event.rawValue)
+        }
+    }
+
     /// ⛔ `fields` NULL MEANS "THE FORK'S DEFAULT SET", NOT "NO FIELDS". A webhook
     /// created before field selection existed has no list and the fork substitutes
     /// its own at delivery time, so a screen rendering nil as every box unticked

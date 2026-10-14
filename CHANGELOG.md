@@ -462,7 +462,7 @@ on 1.0.0.
 - `PushTokenKind` gained a case, so an exhaustive `switch` over it outside this
   package needs a `.desktop` arm.
 
-## [1.0.0]
+## [1.0.0] - 2026-10-03
 
 ### Added
 

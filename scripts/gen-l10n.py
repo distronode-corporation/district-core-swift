@@ -107,9 +107,16 @@ def swift_str(text: str) -> str:
     return '"' + body.replace("\u2014", "\\u{2014}").replace("\u2013", "\\u{2013}") + '"'
 
 
+def swift_ref(entry) -> str:
+    """`Enum.member` for an entry, without the selector's argument labels that
+    `swift_name` appends: a call site and a listing name the member alone."""
+    enum, base, _ = L10N.swift_selector(entry)
+    return f"{enum}.{base}"
+
+
 def member(key: str, catalog) -> str:
     """The Swift accessor of `key`, `Enum.member`."""
-    return ".".join(L10N.swift_name(catalog.entries[key]))
+    return swift_ref(catalog.entries[key])
 
 
 # Catalogs from the contracts.
@@ -356,7 +363,7 @@ def expected(entry, locale: str, lang: str, forms, values: dict) -> str:
 
 
 def call(entry, values: dict) -> str:
-    name = ".".join(L10N.swift_name(entry))
+    name = swift_ref(entry)
     if not entry.args:
         return name
     args = [str(values[n]) if kind == "int" else swift_str(values[n]) for n, kind in entry.args.items()]
@@ -496,7 +503,7 @@ def check_client_refusals() -> list[str]:
     """`ClientRefusal.sentences` must name exactly the core catalog's `error` entries: the
     refusals this client writes itself, which `ApiError.localizedMessage` recognises."""
     cat = L10N.load_catalog(CATALOGS / "core.toml")
-    wanted = {".".join(L10N.swift_name(e)) for e in cat.entries.values() if e.fields.get("ctx") == "error"}
+    wanted = {swift_ref(e) for e in cat.entries.values() if e.fields.get("ctx") == "error"}
     source = (ROOT / "Sources" / "DistrictL10n" / "ClientRefusal.swift").read_text(encoding="utf-8")
     listed = set(re.findall(r"^\s+([A-Z][A-Za-z]*Copy\.[a-z][A-Za-z0-9]*),$", source, re.MULTILINE))
     problems = []

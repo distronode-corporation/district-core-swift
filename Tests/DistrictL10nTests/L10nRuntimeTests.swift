@@ -58,11 +58,12 @@ final class L10nRuntimeTests: XCTestCase {
         L10nRuntime.withLocale(.en) {
             XCTAssertEqual(L10nRuntime.locale, .en)
         }
-        XCTAssertEqual(DeskCopy.logoEmpty, "That file is empty.")
+        XCTAssertEqual(DeskCopy.logoEmpty, "Ce fichier est vide.")
     }
 
-    func testFrenchIsNotCompleteYet() {
-        XCTAssertFalse(L10nRuntime.isFrenchComplete)
+    /// Every entry has reviewed French. The apps still decide when French is shown.
+    func testFrenchIsComplete() {
+        XCTAssertTrue(L10nRuntime.isFrenchComplete)
     }
 
     // MARK: - The error code table
@@ -226,8 +227,8 @@ final class L10nRuntimeTests: XCTestCase {
     // MARK: - French, end to end
 
     /// ⛔ THE FRENCH SMOKE TEST: everything the core formats follows the scoped language,
-    /// with no locale passed anywhere, and the catalog text stays English until its
-    /// French lands (``L10nRuntime/isFrenchComplete`` is false).
+    /// with no locale passed anywhere, and the catalog text is the French
+    /// (``L10nRuntime/isFrenchComplete`` is true).
     func testFrenchFollowsTheRuntimeWithNoLocalePassed() {
         let instant = Date(timeIntervalSince1970: 1_790_000_000)
         L10nRuntime.withLocale(.frCA) {
@@ -238,9 +239,15 @@ final class L10nRuntimeTests: XCTestCase {
             XCTAssertEqual(L10nFormat.number(1204.25), "1\u{00A0}204,25")
             XCTAssertEqual(L10nFormat.list(["A", "B", "C"]), "A, B et C")
             XCTAssertEqual(L10nFormat.monthAbbreviation(12), "d\u{E9}c.")
-            XCTAssertEqual(SchedulingCopy.overviewEventTypes(1204, "3"), "1\u{00A0}204 event types, 3 active")
-            XCTAssertEqual(ApiErrorText.sentence(for: "unauthorized"), "Please sign in to continue.")
-            XCTAssertEqual(WireLabel.label(.callStatus, "queued"), "Other")
+            XCTAssertEqual(
+                SchedulingCopy.overviewEventTypes(1204, "3"),
+                "1\u{00A0}204 types de rendez-vous, actifs\u{00A0}: 3"
+            )
+            XCTAssertEqual(
+                ApiErrorText.sentence(for: "unauthorized"),
+                "Veuillez vous connecter pour continuer."
+            )
+            XCTAssertEqual(WireLabel.label(.callStatus, "queued"), "Autre")
         }
         L10nRuntime.withLocale(.en) {
             XCTAssertEqual(L10nFormat.money(minorUnits: 24900, currency: "cad"), "CA$249.00")

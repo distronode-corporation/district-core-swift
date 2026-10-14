@@ -239,8 +239,14 @@ final class L10nRuntimeTests: XCTestCase {
             XCTAssertEqual(L10nFormat.number(1204.25), "1\u{00A0}204,25")
             XCTAssertEqual(L10nFormat.list(["A", "B", "C"]), "A, B et C")
             XCTAssertEqual(L10nFormat.monthAbbreviation(12), "d\u{E9}c.")
-            XCTAssertEqual(SchedulingCopy.overviewEventTypes(1204, "3"), "1\u{00A0}204 types de rendez-vous, actifs\u{00A0}: 3")
-            XCTAssertEqual(ApiErrorText.sentence(for: "unauthorized"), "Veuillez vous connecter pour continuer.")
+            XCTAssertEqual(
+                SchedulingCopy.overviewEventTypes(1204, "3"),
+                "1\u{00A0}204 types de rendez-vous, actifs\u{00A0}: 3"
+            )
+            XCTAssertEqual(
+                ApiErrorText.sentence(for: "unauthorized"),
+                "Veuillez vous connecter pour continuer."
+            )
             XCTAssertEqual(WireLabel.label(.callStatus, "queued"), "Autre")
         }
         L10nRuntime.withLocale(.en) {

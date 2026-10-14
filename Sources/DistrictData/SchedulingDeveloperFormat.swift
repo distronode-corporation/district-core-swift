@@ -39,6 +39,29 @@ public enum SchedulingDeveloperFormat {
         personalDataWebhookFields.contains(field)
     }
 
+    /// The events a webhook editor sends on save: the offered events ticked, in the
+    /// fork's order, then each event the webhook already carries that the form does not
+    /// offer, in its stored order.
+    ///
+    /// ⛔ A SAVE NEVER UNSUBSCRIBES WHAT THE FORM CANNOT SHOW. A webhook subscribed to
+    /// `notes.ready` before the editor stopped offering it has no box for it, so nobody
+    /// could have unticked it; it is sent back as stored, and the fork accepts it.
+    ///
+    /// ⚠️ A NAME THE FORK DOES NOT KNOW IS STILL LEFT OUT, as before: sending it back is a
+    /// hard 400 (`unknown event: <name>`) on the patch, so the screen names those itself
+    /// before saving.
+    public static func webhookEventsToSave(ticked: Set<SchedulingWebhookEvent>, stored: [String] = []) -> [String] {
+        let offered = SchedulingWebhookEvent.offered
+        var events = offered.filter(ticked.contains).map(\.rawValue)
+        for name in stored {
+            guard let event = SchedulingWebhookEvent(rawValue: name), !offered.contains(event) else { continue }
+            if !events.contains(name) {
+                events.append(name)
+            }
+        }
+        return events
+    }
+
     /// `https://<host>/mcp`, or empty when the host is not known yet.
     ///
     /// ⚠️ EMPTY RATHER THAN A GUESS. A tenancy still provisioning has no public host, and

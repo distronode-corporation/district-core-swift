@@ -2,11 +2,11 @@ import DistrictModel
 import Foundation
 import XCTest
 
-/// `currency` on a subscription and an invoice, modelled before the server sends it.
+/// `currency` on a subscription and an invoice.
 ///
-/// ⚠️ NO FIXTURE CARRIES THE KEY YET, so the strict gate proves only the absent branch
-/// (`district-billing.json` still round-trips). These decode the present branch from
-/// literal bytes, the shape the route will send once it forwards Stripe's field.
+/// ⚠️ `district-billing.json` carries `usd` on every row since monorepo 43eed5fd6, so the
+/// strict gate proves the present branch; these also decode `cad` from literal bytes, and
+/// the absent branch a server from before then still sends.
 final class BillingCurrencyTests: XCTestCase {
     private let subscription = #"""
     {"id":"sub_1","status":"active","current_period_end":1756909800,
@@ -30,7 +30,7 @@ final class BillingCurrencyTests: XCTestCase {
         XCTAssertEqual(decoded.total, 24900)
     }
 
-    /// Today's server omits the key, and that must stay a nil rather than a failure.
+    /// An older server omits the key, and that must stay a nil rather than a failure.
     func testAnAbsentCurrencyDecodesAsNil() throws {
         let bare = subscription.replacingOccurrences(of: #","currency":"cad""#, with: "")
         XCTAssertNotEqual(bare, subscription, "the key was not removed, so this proves nothing")

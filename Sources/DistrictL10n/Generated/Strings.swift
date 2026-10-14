@@ -50,7 +50,7 @@ package enum ApiErrorCapsCopy {
     package static var regionsDegradedWithoutList: String { L10nRuntime.locale == .frCA ? "Vos espaces de travail n'ont pas tous pu être listés, car certaines régions sont injoignables en ce moment. Rien n'a changé dans votre compte." : "Your workspaces could not all be listed because some regions are unreachable right now. Nothing about your account has changed." }
 
     /// `api_error_caps.trust_bundles_not_approved`
-    package static var trustBundlesNotApproved: String { L10nRuntime.locale == .frCA ? "L'inscription de cet espace de travail auprès de l'opérateur n'est pas encore approuvée. Cette étape doit d'abord être terminée." : "This workspace's carrier registration has not been approved yet. That has to finish first." }
+    package static var trustBundlesNotApproved: String { L10nRuntime.locale == .frCA ? "L'inscription de cet espace de travail auprès du transporteur n'est pas encore approuvée. Cette étape doit d'abord être terminée." : "This workspace's carrier registration has not been approved yet. That has to finish first." }
 
     /// `api_error_caps.validation_error`
     package static var validationError: String { L10nRuntime.locale == .frCA ? "Une partie de ce que vous avez saisi n'est pas valide. Vérifiez, puis réessayez." : "Some of what you entered is not valid. Please check it and try again." }
@@ -106,13 +106,13 @@ package enum ApiErrorCopy {
     package static var callPredatesFeature: String { L10nRuntime.locale == .frCA ? "Cet appel a commencé avant l'existence de cette fonction, elle n'est donc pas offerte pour lui." : "That call started before this feature existed, so it is not available on it." }
 
     /// `api_error.carrier_error`
-    package static var carrierError: String { L10nRuntime.locale == .frCA ? "L'opérateur n'a pas pu effectuer cette opération. Réessayez ou communiquez avec l'assistance." : "The carrier could not complete that. Please try again or contact support." }
+    package static var carrierError: String { L10nRuntime.locale == .frCA ? "Le transporteur n'a pas pu effectuer cette opération. Réessayez ou communiquez avec notre équipe de soutien." : "The carrier could not complete that. Please try again or contact support." }
 
     /// `api_error.carrier_funding`
-    package static var carrierFunding: String { L10nRuntime.locale == .frCA ? "Le compte auprès de l'opérateur n'a pas pu financer cet achat. Communiquez avec l'assistance." : "The carrier account could not fund that purchase. Contact support." }
+    package static var carrierFunding: String { L10nRuntime.locale == .frCA ? "Le compte auprès du transporteur n'a pas pu financer cet achat. Communiquez avec notre équipe de soutien." : "The carrier account could not fund that purchase. Contact support." }
 
     /// `api_error.carrier_rejected`
-    package static var carrierRejected: String { L10nRuntime.locale == .frCA ? "L'opérateur a refusé cette inscription. Corrigez les éléments indiqués, puis soumettez de nouveau." : "The carrier refused this registration. Fix the items listed and submit again." }
+    package static var carrierRejected: String { L10nRuntime.locale == .frCA ? "Le transporteur a refusé cette inscription. Corrigez les éléments indiqués, puis soumettez de nouveau." : "The carrier refused this registration. Fix the items listed and submit again." }
 
     /// `api_error.checkout_setup_in_progress`
     package static var checkoutSetupInProgress: String { L10nRuntime.locale == .frCA ? "Votre forfait est déjà payé. Terminez la configuration de votre réceptionniste depuis votre tableau de bord avant d'acheter un autre forfait." : "Your plan is already paid for. Finish setting up your receptionist from your dashboard before buying another plan." }
@@ -133,10 +133,10 @@ package enum ApiErrorCopy {
     package static var demoLinesBusy: String { L10nRuntime.locale == .frCA ? "Toutes les lignes de démonstration sont occupées en ce moment. Réessayez dans quelques minutes." : "Every demo line is busy right now. Please try again in a few minutes." }
 
     /// `api_error.dgi_requires_studio`
-    package static var dgiRequiresStudio: String { L10nRuntime.locale == .frCA ? "L'enrichissement des pistes est inclus avec Voice Studio. Passez à ce forfait pour l'activer." : "Lead enrichment is included with Voice Studio. Upgrade to turn it on." }
+    package static var dgiRequiresStudio: String { L10nRuntime.locale == .frCA ? "L'enrichissement des prospects est inclus avec Voice Studio. Passez à ce forfait pour l'activer." : "Lead enrichment is included with Voice Studio. Upgrade to turn it on." }
 
     /// `api_error.direct_dial_disabled`
-    package static var directDialDisabled: String { L10nRuntime.locale == .frCA ? "La composition directe n'est pas encore disponible pour cet espace de travail. Communiquez avec l'assistance pour vous renseigner." : "Direct dialling is not available for this workspace yet. Contact support to ask about it." }
+    package static var directDialDisabled: String { L10nRuntime.locale == .frCA ? "La composition directe n'est pas encore offerte pour cet espace de travail. Communiquez avec notre équipe de soutien pour vous renseigner." : "Direct dialling is not available for this workspace yet. Contact support to ask about it." }
 
     /// `api_error.disclosure_required_in_region`
     package static var disclosureRequiredInRegion: String { L10nRuntime.locale == .frCA ? "Dans cette région, les appelants doivent être informés qu'ils parlent avec une assistante automatisée. Ce paramètre ne peut donc pas être désactivé." : "Callers in this region must be told they are speaking with an automated assistant, so this setting cannot be turned off." }
@@ -204,7 +204,7 @@ package enum ApiErrorCopy {
     package static var invalidRequest: String { L10nRuntime.locale == .frCA ? "Cette requête n'est pas valide. Vérifiez les renseignements, puis réessayez." : "That request was not valid. Please check the details and try again." }
 
     /// `api_error.jira_not_connected`
-    package static var jiraNotConnected: String { L10nRuntime.locale == .frCA ? "Aucun projet d'assistance n'est connecté à cet espace de travail." : "No support project is connected to this workspace." }
+    package static var jiraNotConnected: String { L10nRuntime.locale == .frCA ? "Aucun projet de soutien n'est connecté à cet espace de travail." : "No support project is connected to this workspace." }
 
     /// `api_error.language_unavailable`
     package static var languageUnavailable: String { L10nRuntime.locale == .frCA ? "Cette langue n'est pas encore offerte pour cet espace de travail. Choisissez une autre langue." : "This language is not available for this workspace yet. Choose another language." }
@@ -216,7 +216,7 @@ package enum ApiErrorCopy {
     package static var mailboxNotFound: String { L10nRuntime.locale == .frCA ? "Aucune boîte de réception n'est connectée à cet espace de travail." : "No mailbox is connected to this workspace." }
 
     /// `api_error.managed_billing_required`
-    package static var managedBillingRequired: String { L10nRuntime.locale == .frCA ? "La facturation gérée auprès des opérateurs n'est pas activée pour cet espace de travail. Communiquez avec l'assistance pour passer à un forfait géré." : "Managed carrier billing is not enabled for this workspace. Contact support to switch to a managed plan." }
+    package static var managedBillingRequired: String { L10nRuntime.locale == .frCA ? "La facturation gérée auprès des transporteurs n'est pas activée pour cet espace de travail. Communiquez avec notre équipe de soutien pour passer à un forfait géré." : "Managed carrier billing is not enabled for this workspace. Contact support to switch to a managed plan." }
 
     /// `api_error.media_not_found`
     package static var mediaNotFound: String { L10nRuntime.locale == .frCA ? "Ce fichier est introuvable." : "That file could not be found." }
@@ -243,7 +243,7 @@ package enum ApiErrorCopy {
     package static var modelUnavailableInRegion: String { L10nRuntime.locale == .frCA ? "Ce moteur vocal n'est pas offert aux espaces de travail de cette région. Choisissez un autre moteur." : "This voice engine is not available for workspaces in this region. Choose another engine." }
 
     /// `api_error.no_password`
-    package static var noPassword: String { L10nRuntime.locale == .frCA ? "Ce compte se connecte avec Google ou Microsoft et n'a aucun mot de passe à ressaisir. Définissez d'abord un mot de passe sur le web." : "This account signs in with Google or Microsoft and has no password to re-enter. Set a password on the web first." }
+    package static var noPassword: String { L10nRuntime.locale == .frCA ? "Ce compte se connecte avec Google ou Microsoft et n'a aucun mot de passe à ressaisir. Définissez d'abord un mot de passe sur le Web." : "This account signs in with Google or Microsoft and has no password to re-enter. Set a password on the web first." }
 
     /// `api_error.no_sending_number`
     package static var noSendingNumber: String { L10nRuntime.locale == .frCA ? "Cet espace de travail n'a pas encore de numéro pour les textos. Ajoutez-en un ou achetez-en un dans les réglages de messagerie." : "This workspace has no texting number yet. Add or buy one in Messaging settings." }
@@ -354,7 +354,7 @@ package enum ApiErrorCopy {
     package static var sessionExpired: String { L10nRuntime.locale == .frCA ? "Votre session a expiré. Veuillez vous reconnecter." : "Your session has expired. Please sign in again." }
 
     /// `api_error.setup_not_available`
-    package static var setupNotAvailable: String { L10nRuntime.locale == .frCA ? "La configuration guidée n'est pas disponible pour cet espace de travail." : "Guided setup is not available for this workspace." }
+    package static var setupNotAvailable: String { L10nRuntime.locale == .frCA ? "La configuration guidée n'est pas offerte pour cet espace de travail." : "Guided setup is not available for this workspace." }
 
     /// `api_error.sip_provider_required`
     package static var sipProviderRequired: String { L10nRuntime.locale == .frCA ? "Cela exige un fournisseur compatible SIP, c'est-à-dire Twilio ou Telnyx sur cet espace de travail." : "That needs a SIP-capable provider, which means Twilio or Telnyx on this workspace." }
@@ -384,7 +384,7 @@ package enum ApiErrorCopy {
     package static var ticketNotClosable: String { L10nRuntime.locale == .frCA ? "Cette demande ne peut pas être fermée ici. Répondez pour nous dire qu'elle est réglée et nous la fermerons." : "This request cannot be closed from here. Reply to let us know it is resolved and we will close it." }
 
     /// `api_error.ticket_not_found`
-    package static var ticketNotFound: String { L10nRuntime.locale == .frCA ? "Cette demande d'assistance est introuvable." : "That support request could not be found." }
+    package static var ticketNotFound: String { L10nRuntime.locale == .frCA ? "Cette demande de soutien est introuvable." : "That support request could not be found." }
 
     /// `api_error.ticket_opening`
     package static var ticketOpening: String { L10nRuntime.locale == .frCA ? "Cette demande est encore en cours d'ouverture. Veuillez réessayer dans un moment." : "This request is still being opened. Please try again in a moment." }
@@ -1290,13 +1290,13 @@ package enum WireCopy {
     package static var deskTicketSourceVoiceCall: String { L10nRuntime.locale == .frCA ? "Depuis un appel téléphonique" : "From a phone call" }
 
     /// `wire.desk_ticket_status.fallback`
-    package static var deskTicketStatusFallback: String { L10nRuntime.locale == .frCA ? "Inconnue" : "Unknown" }
+    package static var deskTicketStatusFallback: String { L10nRuntime.locale == .frCA ? "Inconnu" : "Unknown" }
 
     /// `wire.desk_ticket_status.open`
-    package static var deskTicketStatusOpen: String { L10nRuntime.locale == .frCA ? "Ouverte" : "Open" }
+    package static var deskTicketStatusOpen: String { L10nRuntime.locale == .frCA ? "Ouvert" : "Open" }
 
     /// `wire.desk_ticket_status.resolved`
-    package static var deskTicketStatusResolved: String { L10nRuntime.locale == .frCA ? "Réglée" : "Resolved" }
+    package static var deskTicketStatusResolved: String { L10nRuntime.locale == .frCA ? "Réglé" : "Resolved" }
 
     /// `wire.desk_ticket_status.waiting`
     package static var deskTicketStatusWaiting: String { L10nRuntime.locale == .frCA ? "En attente" : "Waiting" }
@@ -1335,7 +1335,7 @@ package enum WireCopy {
     package static var funnelStageSuccessfulLeads: String { L10nRuntime.locale == .frCA ? "Clients potentiels obtenus" : "Successful Leads" }
 
     /// `wire.funnel_stage.total_dials`
-    package static var funnelStageTotalDials: String { L10nRuntime.locale == .frCA ? "Composions totales" : "Total Dials" }
+    package static var funnelStageTotalDials: String { L10nRuntime.locale == .frCA ? "Appels composés au total" : "Total Dials" }
 
     /// `wire.generic.other`
     package static var genericOther: String { L10nRuntime.locale == .frCA ? "Autre" : "Other" }

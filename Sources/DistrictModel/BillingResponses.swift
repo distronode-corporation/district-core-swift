@@ -279,9 +279,9 @@ public struct BillingSubscription: Codable, Sendable {
     /// ⛔ Absent, not null, when no coupon applies. See the type doc.
     public let discount: BillingDiscount?
     /// Stripe's ISO 4217 code for ``amount``, lower-case as Stripe writes it (`cad`,
-    /// `usd`). ⚠️ Optional and ABSENT on today's server: the field is modelled ahead of
-    /// the route sending it, so a later server push needs no client release. A screen
-    /// with no code keeps today's formatting.
+    /// `usd`). ⚠️ Optional: the route sends it since monorepo 43eed5fd6, and a server
+    /// from before then omits it. A screen with no code keeps today's formatting; French
+    /// names a code it has (`BillingMoneyFormat` in DistrictData).
     public let currency: String?
 
     /// ⚠️ TWO SNAKE_CASE KEYS FROM STRIPE'S OWN VOCABULARY, PASSED THROUGH
@@ -350,8 +350,8 @@ public struct BillingInvoice: Codable, Sendable {
     /// ⛔ Null until the invoice is finalised. See the type doc.
     public let invoicePdf: String?
     /// Stripe's ISO 4217 code for the three amounts, lower-case as Stripe writes it.
-    /// ⚠️ Optional and ABSENT on today's server, modelled ahead of the route sending it.
-    /// See ``BillingSubscription/currency``.
+    /// ⚠️ Optional: a server from before monorepo 43eed5fd6 omits it. See
+    /// ``BillingSubscription/currency``.
     public let currency: String?
 
     /// ⚠️ FOUR SNAKE_CASE KEYS, STRIPE'S OWN, PASSED THROUGH BY THE ROUTE. See

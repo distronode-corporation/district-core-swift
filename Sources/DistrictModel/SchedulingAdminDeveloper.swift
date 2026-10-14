@@ -112,15 +112,20 @@ public struct SchedulingOAuthConnection: Codable, Equatable, Sendable {
     }
 }
 
-/// The seven events a webhook may subscribe to.
+/// The seven events the fork accepts on a webhook, of which an editor offers four
+/// (``offered``).
 ///
 /// ⛔ A CLOSED SET AT THE FAR END, AND A NAME THIS ENUM GETS WRONG IS A HARD
 /// **400** (`unknown event: <name>`) ON CREATE **AND** ON PATCH, not an ignored
 /// key. Copied from `validWebhookEvents` in the fork's `webhook_handler.go`, which
-/// `webhooks.create`'s `z.enum` and `WEBHOOK_EVENTS` in `developer-format.ts` also
-/// copy. ⚠️ Three hand-kept copies of one list is deliberate: deriving any of them
-/// from another needs a cast that hides a divergence, and a divergence here is a
-/// refusal the customer cannot act on.
+/// `webhooks.create`'s `z.enum` also copies. ⚠️ Hand-kept copies of one list are
+/// deliberate: deriving any of them from another needs a cast that hides a
+/// divergence, and a divergence here is a refusal the customer cannot act on.
+///
+/// ⛔ `allCases` IS WHAT THE FORK ACCEPTS, NOT WHAT A FORM OFFERS. An editor lists
+/// ``offered``. The three cases after the booking ones stay so that a webhook
+/// already subscribed to one of them still names an event the fork knows, and
+/// keeps it when saved: the fork accepts it on a patch.
 ///
 /// ⛔ THIS TYPE IS FOR THE REQUEST SIDE ONLY AND ``SchedulingWebhook/events`` IS
 /// DELIBERATELY `[String]`. The RESPONSE schema types the array `z.string()` with
@@ -136,6 +141,17 @@ public enum SchedulingWebhookEvent: String, Codable, Equatable, Sendable, CaseIt
     case recordingCompleted = "recording.completed"
     case transcriptReady = "transcript.ready"
     case notesReady = "notes.ready"
+
+    /// The four events an editor offers, in the fork's order: the web portal's
+    /// `WEBHOOK_EVENTS` in `developer-format.ts`.
+    ///
+    /// ⛔ NOT `recording.completed`, `transcript.ready` OR `notes.ready`. No call or
+    /// meeting is recorded anywhere, and the fork's transcripts and notes come only
+    /// from its notetaker, which runs only on a recording, so a tick for any of them
+    /// would subscribe to an event that never fires.
+    public static let offered: [SchedulingWebhookEvent] = [
+        .bookingCreated, .bookingCancelled, .bookingRescheduled, .bookingReminder,
+    ]
 }
 
 /// One configured webhook.

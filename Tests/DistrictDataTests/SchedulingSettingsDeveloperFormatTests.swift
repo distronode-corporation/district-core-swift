@@ -142,14 +142,51 @@ final class SchedulingSettingsDeveloperFormatTests: XCTestCase {
         XCTAssertEqual(Developer.mcpKeyPlaceholder, "<your API key>")
     }
 
-    /// ⚠️ THE EDITOR LISTS `allCases`, SO THE DECLARATION ORDER IS THE SCREEN'S ORDER.
-    func testTheSevenWebhookEventsAreInTheWebsOrder() {
+    /// ⚠️ THE EDITOR LISTS `offered`, THE WEB'S FOUR IN THE WEB'S ORDER. `allCases` is
+    /// the fork's seven, which is what it accepts, not what the form offers.
+    func testTheFourOfferedWebhookEventsAreInTheWebsOrder() {
         XCTAssertEqual(
-            SchedulingWebhookEvent.allCases.map(\.rawValue),
-            [
-                "booking.created", "booking.cancelled", "booking.rescheduled", "booking.reminder",
-                "recording.completed", "transcript.ready", "notes.ready",
-            ]
+            SchedulingWebhookEvent.offered.map(\.rawValue),
+            ["booking.created", "booking.cancelled", "booking.rescheduled", "booking.reminder"]
+        )
+    }
+
+    /// The ticks go out in the fork's order, never in tick order, and a new webhook has
+    /// nothing stored to keep.
+    func testASaveSendsTheTickedEventsInTheForksOrder() {
+        XCTAssertEqual(
+            Developer.webhookEventsToSave(ticked: [.bookingReminder, .bookingCreated]),
+            ["booking.created", "booking.reminder"]
+        )
+        XCTAssertEqual(Developer.webhookEventsToSave(ticked: []), [])
+    }
+
+    /// ⛔ A WEBHOOK ALREADY SUBSCRIBED TO AN EVENT THE FORM NO LONGER OFFERS KEEPS IT. There
+    /// is no box for `notes.ready`, so nobody could have unticked it, and the fork still
+    /// accepts it on a patch.
+    func testASaveKeepsAStoredEventTheFormDoesNotOffer() {
+        let stored = ["notes.ready", "booking.created", "recording.completed"]
+        XCTAssertEqual(
+            Developer.webhookEventsToSave(ticked: [.bookingCreated, .bookingCancelled], stored: stored),
+            ["booking.created", "booking.cancelled", "notes.ready", "recording.completed"]
+        )
+        // Unticking an offered event still unsubscribes it; the unoffered one stays.
+        XCTAssertEqual(
+            Developer.webhookEventsToSave(ticked: [], stored: stored),
+            ["notes.ready", "recording.completed"]
+        )
+    }
+
+    /// ⚠️ A NAME THE FORK DOES NOT KNOW IS LEFT OUT, as before (a patch carrying it is a
+    /// 400), a stored name is sent once, and an unoffered tick with nothing stored behind
+    /// it is not sent: the form has no box for it.
+    func testASaveLeavesOutUnknownNamesAndDuplicates() {
+        XCTAssertEqual(
+            Developer.webhookEventsToSave(
+                ticked: [.bookingCreated, .transcriptReady],
+                stored: ["booking.updated", "notes.ready", "notes.ready", "booking.created"]
+            ),
+            ["booking.created", "notes.ready"]
         )
     }
 

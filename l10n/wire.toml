@@ -383,26 +383,26 @@ note = "A label for the stored value `voice-call` of deskTicketSource. `source` 
 
 [wire.desk_ticket_status.fallback]
 en = "Unknown"
-fr = "Inconnue"
+fr = "Inconnu"
 ctx = "label"
 screen = "wire desk_ticket_status"
 tier = "T3"
 state = "reviewed"
-fr_variant = "contract fallback for a ticket status (feminine, as wire-vocabulary.json)"
 note = "The label for a value of deskTicketStatus this build does not know, or none."
 
 [wire.desk_ticket_status.open]
 en = "Open"
-fr = "Ouverte"
+fr = "Ouvert"
 ctx = "label"
 screen = "wire desk_ticket_status"
 tier = "T3"
 state = "reviewed"
+fr_variant = "Desk ticket status: a « billet », masculine (contract deskTicketStatus); the unit's base « Ouverte » serves invoices (« facture »)"
 note = "A label for the stored value `open` of deskTicketStatus. `status` on a Desk ticket (GET /api/district/desk/tickets, /tickets/{id})."
 
 [wire.desk_ticket_status.resolved]
 en = "Resolved"
-fr = "Réglée"
+fr = "Réglé"
 ctx = "label"
 screen = "wire desk_ticket_status"
 tier = "T3"
@@ -519,7 +519,7 @@ note = "A label for the stored value `Successful Leads` of funnelStage. `funnelD
 
 [wire.funnel_stage.total_dials]
 en = "Total Dials"
-fr = "Composions totales"
+fr = "Appels composés au total"
 ctx = "label"
 screen = "wire funnel_stage"
 tier = "T3"

@@ -41,6 +41,8 @@ What 7.0.0 brings over 6.0.0:
 - `scripts/check-public-hygiene.py` allows this repository's own GitLab mirror URL, and no
   other GitLab URL.
 - CHANGELOG: the date of 1.0.0.
+- CI checks that every catalog has its reviewed French (`l10n.py check --require fr-CA`),
+  one catalog per call.
 
 ## [7.0.0-beta.3] - 2026-10-14
 

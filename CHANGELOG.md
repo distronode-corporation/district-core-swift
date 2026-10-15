@@ -14,6 +14,20 @@ Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15), and the rin
 over either needs the new arm; the only consumer of both is District AI for Mac, updated in
 its 3.0.1, and district-ios switches over neither.
 
+### Changed
+
+- ⛔ The scheduling hand-off never mints UNBOUND (S33; Sean, GitLab #2 note 4022232351).
+  `SchedulingHandoffFlow` used to fall back to a mint with no `nonce` when leg 1 did not
+  call back within the clock, failed visibly, or the state was unusable; while any build
+  could do that, the server could not switch `HANDOFF_REQUIRE_NONCE` on. Those paths now
+  end as the new `SchedulingHandoffOutcome.noCallback` and send nothing; the app shows a
+  notice and the person presses again. `SchedulingHandoffClient.mint(workspaceId:next:nonce:)`
+  takes a required `nonce: String`, so no caller can mint without one. The callback clock
+  is 30 s (was 10 s), since running out now costs a retry rather than an unbound page.
+  ⚠️ Source-breaking for an app: an exhaustive `switch` over `SchedulingHandoffOutcome`
+  needs the `.noCallback` arm (district-macos and district-ios both switch over it), and
+  a call to `mint` without a nonce no longer compiles (neither app calls it).
+
 ### Added
 
 - The ring cancel (`docs/ring_cancel_contract.md` in the service repository): when a ring the

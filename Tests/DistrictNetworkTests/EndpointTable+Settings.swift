@@ -176,12 +176,13 @@ extension EndpointTable {
             // nil pair so the route's own default fires; an explicit null is a value
             // zod would not default over. Same decision as `registerPushToken`'s
             // `kind`, and the row pins the dropped-key shape rather than the sent one.
+            // ⛔ The nonce is always there (7.0.1, S33).
             EndpointExpectation(
                 .schedulingHandoff,
-                DistrictEndpoints.schedulingHandoff(workspaceId: "ws_1"),
+                DistrictEndpoints.schedulingHandoff(workspaceId: "ws_1", nonce: "n_1"),
                 .post,
                 "\(host)/api/district/scheduling/handoff",
-                .json(#"{"workspaceId":"ws_1"}"#)
+                .json(#"{"nonce":"n_1","workspaceId":"ws_1"}"#)
             ),
         ]
     }

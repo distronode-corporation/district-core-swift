@@ -70,15 +70,17 @@ public struct SchedulingHandoffClient: Sendable {
         client.pageURL(DistrictPaths.schedulingHandoffStart, query: [ApiQueryItem("state", state)])
     }
 
-    /// Leg 2: mint the code, bound to `nonce` when there is one.
+    /// Leg 2: mint the code, bound to `nonce`, the value leg 1's callback delivered.
     ///
-    /// ⛔ nil SENDS NO `nonce` KEY AT ALL, which is the unbound flow every installed
-    /// build already uses and the server accepts until `HANDOFF_REQUIRE_NONCE` is on.
-    /// The response body is the same two keys either way.
+    /// ⛔ THE NONCE IS REQUIRED, AND THAT IS THE WHOLE OF S33's CLIENT HALF (7.0.1). Until
+    /// 7.0.0 a nil nonce sent no key and minted an UNBOUND code, the fallback when leg 1
+    /// did not call back; any build that could still do that kept the server from
+    /// switching `HANDOFF_REQUIRE_NONCE` on (Sean, GitLab #2 note 4022232351). There is
+    /// no way left to mint without one.
     public func mint(
         workspaceId: String,
         next: String? = nil,
-        nonce: String? = nil
+        nonce: String
     ) async -> Result<SchedulingHandoff, SchedulingHandoffFailure> {
         let descriptor = DistrictEndpoints.schedulingHandoff(workspaceId: workspaceId, next: next, nonce: nonce)
         let outcome = await client.sendUnmapped(descriptor)

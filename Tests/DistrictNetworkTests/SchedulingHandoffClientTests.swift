@@ -20,7 +20,7 @@ final class SchedulingHandoffClientTests: XCTestCase {
     }
 
     private func mint(status: Int, body: String) async -> Result<SchedulingHandoff, SchedulingHandoffFailure> {
-        await client(status: status, body: body).mint(workspaceId: "ws-1")
+        await client(status: status, body: body).mint(workspaceId: "ws-1", nonce: Self.nonce)
     }
 
     // MARK: - The happy path
@@ -175,16 +175,16 @@ final class SchedulingHandoffClientTests: XCTestCase {
         )
     }
 
-    /// ⛔ THE UNBOUND PATH SENDS NO `nonce` KEY AT ALL: not null, not empty. That body is
-    /// byte for byte what every installed build sends today.
-    func test_IOS_SCH_18_theUnboundMintSendsNoNonceKey() async throws {
+    /// ⛔ EVERY MINT CARRIES ITS NONCE (7.0.1): there is no unbound mint left to send, so
+    /// the server can require one.
+    func test_IOS_SCH_18_everyMintCarriesItsNonce() async throws {
         let transport = TestTransport(json: Self.minted)
         let client = SchedulingHandoffClient(client: .test(transport))
-        _ = await client.mint(workspaceId: "ws_1")
+        _ = await client.mint(workspaceId: "ws_1", nonce: Self.nonce)
 
         let raw = try XCTUnwrap(transport.lastRequest?.body)
-        XCTAssertEqual(String(bytes: raw, encoding: .utf8), #"{"workspaceId":"ws_1"}"#)
-        XCTAssertFalse(try body(of: transport).keys.contains("nonce"))
+        XCTAssertEqual(String(bytes: raw, encoding: .utf8), #"{"nonce":"\#(Self.nonce)","workspaceId":"ws_1"}"#)
+        XCTAssertTrue(try body(of: transport).keys.contains("nonce"))
     }
 
     /// ⛔ `nonce_required` CARRIES THE SENTENCE THE USER SEES, copied from the spec's
@@ -220,7 +220,7 @@ final class SchedulingHandoffClientTests: XCTestCase {
 
     func test_IOS_SCH_23_aTransportFailureIsAnApiFailure() async {
         let client = SchedulingHandoffClient(client: .test(TestTransport(throwing: TransportStub.offline)))
-        let result = await client.mint(workspaceId: "ws_1")
+        let result = await client.mint(workspaceId: "ws_1", nonce: Self.nonce)
         guard case .failure(.api(.transport)) = result else { return XCTFail("expected .transport, got \(result)") }
     }
 

@@ -103,7 +103,7 @@ public extension DistrictEndpoints {
     static func schedulingHandoff(
         workspaceId: String,
         next: String? = nil,
-        nonce: String? = nil
+        nonce: String
     ) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .schedulingHandoff,
@@ -112,7 +112,9 @@ public extension DistrictEndpoints {
             body: .json(.object([
                 ("workspaceId", .string(workspaceId)),
                 ("next", .optional(next)),
-                ("nonce", .optional(nonce)),
+                // ⛔ ALWAYS SENT (7.0.1): there is no unbound mint any more, so the
+                // server can switch `HANDOFF_REQUIRE_NONCE` on.
+                ("nonce", .string(nonce)),
             ]))
         )
     }

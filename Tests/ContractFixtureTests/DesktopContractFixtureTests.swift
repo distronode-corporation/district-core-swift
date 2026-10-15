@@ -11,12 +11,12 @@ import XCTest
 /// server adds is a red test here until somebody decides what decodes it, and a path
 /// that resolved to the wrong directory is red rather than a pass over nothing.
 ///
-/// ⚠️ TWELVE GO THROUGH THE STRICT GATE (no unlisted null, decode, re-encode, equal
-/// key sets at every level). The thirteenth, the scheduling hand-off, has no Codable
+/// ⚠️ THIRTEEN GO THROUGH THE STRICT GATE (no unlisted null, decode, re-encode, equal
+/// key sets at every level). The fourteenth, the scheduling hand-off, has no Codable
 /// DTO by design: `SchedulingHandoffClient` decodes it by hand and refuses a missing
 /// or an extra key itself, so it is run through exactly that decoder.
 final class DesktopContractFixtureTests: XCTestCase {
-    static let expectedFixtureCount = 13
+    static let expectedFixtureCount = 14
 
     /// Each fixture and what verifies it.
     private static let verifiers: [String: @Sendable () throws -> Void] = [
@@ -29,6 +29,7 @@ final class DesktopContractFixtureTests: XCTestCase {
         "telemetry-event-call-ended-row.json": { try envelope("telemetry-event-call-ended-row.json") },
         "telemetry-event-call-ended.json": { try envelope("telemetry-event-call-ended.json") },
         "telemetry-event-call-ringing.json": { try envelope("telemetry-event-call-ringing.json") },
+        "telemetry-event-call-ring-cancelled.json": { try envelope("telemetry-event-call-ring-cancelled.json") },
         "telemetry-event-call-started-sinch.json": { try envelope("telemetry-event-call-started-sinch.json") },
         "telemetry-event-call-started.json": { try envelope("telemetry-event-call-started.json") },
         "telemetry-event-call-updated.json": { try envelope("telemetry-event-call-updated.json") },
@@ -59,7 +60,7 @@ final class DesktopContractFixtureTests: XCTestCase {
 
     // MARK: - The guards
 
-    func testTheDesktopDirectoryIsPopulatedWithExactlyThirteenFixtures() throws {
+    func testTheDesktopDirectoryIsPopulatedWithExactlyFourteenFixtures() throws {
         let names = try DesktopContractFixtures.allFixtureNames()
         XCTAssertEqual(
             names.count,
@@ -112,6 +113,16 @@ final class DesktopContractFixtureTests: XCTestCase {
         XCTAssertEqual(ringing.data.objectValue.map { Set($0.keys) }, ["callId", "userIds"])
     }
 
+    /// ⛔ THE RING CANCEL CARRIES IDS AND A REASON ONLY (3.0.1, `docs/ring_cancel_contract.md`).
+    func testTheRingCancelCarriesTheCallAndAReason() throws {
+        let cancelled = try Self.envelope("telemetry-event-call-ring-cancelled.json")
+        XCTAssertEqual(cancelled.eventType, .callRingCancelled)
+        XCTAssertEqual(cancelled.workspaceId, "ws_desktop_contract")
+        XCTAssertEqual(cancelled.callId, "call_desktop_contract")
+        XCTAssertEqual(cancelled.ringCancelReason, .answered)
+        XCTAssertEqual(cancelled.data.objectValue.map { Set($0.keys) }, ["callId", "reason"])
+    }
+
     func testEveryCallEventShapeCarriesItsStatus() throws {
         XCTAssertEqual(try Self.envelope("telemetry-event-call-updated.json").callStatus, "ringing")
         XCTAssertEqual(try Self.envelope("telemetry-event-call-started.json").callStatus, "in-progress")
@@ -130,7 +141,7 @@ final class DesktopContractFixtureTests: XCTestCase {
                 false
             }
         })
-        // ⚠️ THE SEVEN WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
+        // ⚠️ THE EIGHT WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
         // not relayed, and their frames are checked by `TranscriptFrameTests`.
         XCTAssertEqual(Set(types), Set(TelemetryEventType.known.filter { !$0.isTranscript }))
     }

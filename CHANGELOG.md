@@ -8,10 +8,28 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [7.0.1]
 
-Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15). Nothing is removed or
-renamed; both additions are new API, so an app moves to 7.0.1 with a one-line pin.
+Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15), and the ring cancel every
+3.0.1 app reads. Nothing is removed or renamed. ⚠️ Two public enums gain a case
+(`TelemetryEventType.callRingCancelled`, `DesktopRingEnd.cancelled`), so an exhaustive `switch`
+over either needs the new arm; the only consumer of both is District AI for Mac, updated in
+its 3.0.1, and district-ios switches over neither.
 
 ### Added
+
+- The ring cancel (`docs/ring_cancel_contract.md` in the service repository): when a ring the
+  server started ends (answered on some device, timed out, the caller hung up, or withdrawn),
+  the telemetry socket carries `call_ring_cancelled` `{callId, reason}` and the Apple alert
+  rows get a background push `{type: "call_ring_cancelled", workspaceId, callId, reason}`.
+  - `TelemetryEventType.callRingCancelled` and `TelemetryEnvelope.ringCancelReason`.
+  - `RingCancelReason` (`answered`, `timeout`, `call_ended`, `withdrawn`; any other value,
+    or none, is `withdrawn`).
+  - `RingCancel.parse(_:)` and `parse(userInfo:)` for the push. `PushPayload.parse` still
+    drops the type: it is never tapped.
+  - `DesktopRingGate` stops a ring still ringing for that call with
+    `DesktopRingEnd.cancelled(reason)`. A call this device answered was cleared from the gate
+    at the press, so the cancel it also receives changes nothing.
+  - The contract fixture `contracts/desktop/telemetry-event-call-ring-cancelled.json`
+    (14 desktop fixtures).
 
 - `CallJoinGate` (`DistrictCall`): whether a call's join is still on its way, for the
   microphone command that must not race it. The SDK reports a room connected before it
@@ -26,7 +44,8 @@ renamed; both additions are new API, so an app moves to 7.0.1 with a one-line pi
   wire, and the write of its successor, without starting one. For an app about to quit: a
   quit between the server's rotation and the store's write left the spent token on disk
   with the marker naming it, and the next launch could only report an interrupted refresh
-  (the person signed out by pressing Quit).
+  (the person signed out by pressing Quit). A successor the store refused earlier is
+  written one last time too.
 
 ## [7.0.0] - 2026-10-14
 

@@ -58,9 +58,9 @@ final class TelemetryResponsesTests: XCTestCase {
 
     func testEveryKnownEventTypeRoundTripsByName() throws {
         let names = [
-            "call_started", "call_updated", "call_ended", "call_ringing", "tool_outcome", "message_received",
-            "message_sent", "transcript_snapshot", "transcript_segment", "transcript_ended", "transcript_retracted",
-            "transcript_error",
+            "call_started", "call_updated", "call_ended", "call_ringing", "call_ring_cancelled", "tool_outcome",
+            "message_received", "message_sent", "transcript_snapshot", "transcript_segment", "transcript_ended",
+            "transcript_retracted", "transcript_error",
         ]
         XCTAssertEqual(TelemetryEventType.known.map(\.wire), names)
         XCTAssertEqual(TelemetryEventType.known.filter(\.isTranscript).map(\.wire), names.filter {

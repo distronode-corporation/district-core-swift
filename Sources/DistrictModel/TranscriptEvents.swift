@@ -419,8 +419,8 @@ extension TelemetryEnvelope {
             decodeData(TranscriptRetractedData.self).map(TranscriptEvent.retracted)
         case .transcriptError:
             decodeData(TranscriptErrorData.self).map(TranscriptEvent.error)
-        case .callStarted, .callUpdated, .callEnded, .callRinging, .toolOutcome, .messageReceived, .messageSent,
-             .unknown:
+        case .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome,
+             .messageReceived, .messageSent, .unknown:
             nil
         }
         guard let event, event.version == TranscriptClientOp.version else { return nil }

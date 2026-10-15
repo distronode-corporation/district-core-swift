@@ -19,6 +19,10 @@ public enum DesktopRingEnd: Sendable, Equatable {
     case timedOut
     /// The app silenced it: answered, declined, signed out, or about to sleep.
     case cleared
+    /// The server ended the ring (`call_ring_cancelled`), for this reason. ⛔ Word it by the
+    /// reason: answered elsewhere for ``RingCancelReason/answered``, the caller hanging up
+    /// only for ``RingCancelReason/callEnded``, a missed call otherwise.
+    case cancelled(RingCancelReason)
 }
 
 /// What the gate asks the app to do.
@@ -52,6 +56,11 @@ public enum DesktopRingCommand: Sendable, Equatable {
 ///   whole ring, with `call_updated` events arriving as its live transcript grows.
 ///   Ending on "not ringing" would end every ring at the first transcript line. An
 ///   update with no status says nothing about it;
+/// - `call_ring_cancelled` arrives for the call: the server ended the ring (answered on a
+///   device, timed out, the caller hung up, or withdrawn). ⛔ IT ENDS ONLY A RING THAT IS
+///   STILL RINGING HERE: a call this Mac answered was cleared from the gate at the press
+///   (``clear()``), so the cancel every rung device receives, this one included, finds no
+///   ring and changes nothing;
 /// - ``ringTimeoutMilliseconds`` pass with nobody answering. ⛔ That is the longest
 ///   the server holds a caller for an answer, and the ring deliberately does not end
 ///   sooner: ending first would take Answer away while the server would still have
@@ -86,6 +95,8 @@ public struct DesktopRingGate: Sendable, Equatable {
             return ringing(envelope, now: now)
         case .callEnded:
             return end(envelope, reason: .callEnded)
+        case .callRingCancelled:
+            return end(envelope, reason: .cancelled(envelope.ringCancelReason))
         case .callUpdated:
             guard let status = envelope.callStatus, !Self.answerableStatuses.contains(status) else { return [] }
             return end(envelope, reason: .noLongerAnswerable(status: status))

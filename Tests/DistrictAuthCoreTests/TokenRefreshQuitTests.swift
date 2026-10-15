@@ -70,6 +70,25 @@ final class TokenRefreshQuitTests: XCTestCase {
         await expectEqual(["refresh-1"]) { await client.presented }
         await expectEqual("refresh-2") { await store.session?.refreshToken }
     }
+
+    /// ⛔ A SUCCESSOR THE KEYCHAIN REFUSED IS WRITTEN AT QUIT, so the next launch does not
+    /// find the spent predecessor and its marker.
+    func testASuccessorTheStoreRefusedIsWrittenBeforeTheQuit() async {
+        let store = SpyTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let client = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2))])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: client, now: { AuthFixtures.now })
+        let outcome = await coordinator.accessToken()
+        XCTAssertEqual(outcome, .available("access-2"))
+        await expectEqual("refresh-1") { await store.session?.refreshToken }
+        await expectEqual("refresh-1") { await store.pending }
+
+        await coordinator.finishRefreshInFlight()
+
+        await expectEqual("refresh-2") { await store.session?.refreshToken }
+        await expectNil { await store.pending }
+        await expectEqual(["refresh-1"]) { await client.presented }
+    }
 }
 
 /// A one-way flag a test can read across tasks.

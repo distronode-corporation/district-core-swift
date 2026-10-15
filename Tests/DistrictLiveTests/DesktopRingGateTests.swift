@@ -146,4 +146,47 @@ final class DesktopRingGateTests: XCTestCase {
         // A new ring can start once the last one is over.
         XCTAssertEqual(gate.handle(ringing(call: "call_2"), atMilliseconds: t0).count, 2)
     }
+
+    // MARK: - call_ring_cancelled (3.0.1)
+
+    private func cancelled(_ reason: String?, call: String = "call_1") -> TelemetryEnvelope {
+        var data: [String: WireJSON] = ["callId": .string(call)]
+        if let reason {
+            data["reason"] = .string(reason)
+        }
+        return event(.callRingCancelled, call: call, data: .object(data))
+    }
+
+    /// ⛔ THE SERVER'S CANCEL STOPS THE RING, CARRYING ITS REASON, so the app words it:
+    /// answered elsewhere, the caller hung up, or missed.
+    func testTheServersCancelStopsTheRingWithItsReason() {
+        for (wire, reason) in [
+            ("answered", RingCancelReason.answered),
+            ("timeout", .timeout),
+            ("call_ended", .callEnded),
+            ("withdrawn", .withdrawn),
+            ("parked", .withdrawn),
+            (nil, .withdrawn),
+        ] as [(String?, RingCancelReason)] {
+            var gate = ringingGate()
+            XCTAssertEqual(
+                gate.handle(cancelled(wire), atMilliseconds: t0 + 1000),
+                [.stopRinging(workspaceId: "ws_1", callId: "call_1", reason: .cancelled(reason))],
+                "\(wire ?? "nil")"
+            )
+            XCTAssertNil(gate.ring)
+        }
+    }
+
+    /// ⛔ A CANCEL FOR ANOTHER CALL NEVER STOPS THIS ONE, and a cancel after this Mac answered
+    /// (the press clears the gate) changes nothing: the answering device ignores it.
+    func testACancelForAnotherCallOrAfterTheAnswerChangesNothing() {
+        var gate = ringingGate()
+        XCTAssertEqual(gate.handle(cancelled("answered", call: "call_2"), atMilliseconds: t0), [])
+        XCTAssertNotNil(gate.ring)
+        _ = gate.clear()
+        XCTAssertEqual(gate.handle(cancelled("answered"), atMilliseconds: t0 + 500), [])
+        XCTAssertEqual(gate.handle(cancelled("answered"), atMilliseconds: t0 + 900), [])
+        XCTAssertNil(gate.ring)
+    }
 }

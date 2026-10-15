@@ -97,6 +97,11 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     /// `call_ringing`: a call is ringing for members on their desktops. The data
     /// is `{callId, userIds}`, ids only. See `DistrictLive.DesktopRingGate`.
     case callRinging
+    /// `call_ring_cancelled`: a ring the server started is over (answered on some device,
+    /// timed out, the caller hung up, or withdrawn). The data is `{callId, reason}`, see
+    /// ``RingCancelReason``. ⛔ NOT a `call_ended`: it only silences a ring, and a device
+    /// that answered the call ignores it (contract `docs/ring_cancel_contract.md`, 3.0.1).
+    case callRingCancelled
     /// `tool_outcome`: an action the assistant took during a call succeeded or
     /// failed. The data is `{tool, result, provider?, reason?}`.
     case toolOutcome
@@ -122,14 +127,15 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     /// A name this client does not know, kept as it was sent.
     case unknown(String)
 
-    /// The twelve names this client knows, for a table-driven test.
+    /// The thirteen names this client knows, for a table-driven test.
     ///
     /// ⚠️ THE FIVE `transcript_*` NAMES REACH ONLY A SOCKET THAT SUBSCRIBED TO THAT CALL
     /// (`transcript.subscribe`, see ``TranscriptClientOp``). The server never relays them
     /// to the whole workspace, so a client that never subscribes never sees one.
     public static let known: [TelemetryEventType] = [
-        .callStarted, .callUpdated, .callEnded, .callRinging, .toolOutcome, .messageReceived, .messageSent,
-        .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted, .transcriptError,
+        .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome, .messageReceived,
+        .messageSent, .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted,
+        .transcriptError,
     ]
 
     /// Whether this is one of the five `transcript_*` events, which belong to one call's
@@ -138,8 +144,8 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
         switch self {
         case .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted, .transcriptError:
             true
-        case .callStarted, .callUpdated, .callEnded, .callRinging, .toolOutcome, .messageReceived, .messageSent,
-             .unknown:
+        case .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome,
+             .messageReceived, .messageSent, .unknown:
             false
         }
     }
@@ -156,6 +162,7 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
         case .callUpdated: "call_updated"
         case .callEnded: "call_ended"
         case .callRinging: "call_ringing"
+        case .callRingCancelled: "call_ring_cancelled"
         case .toolOutcome: "tool_outcome"
         case .messageReceived: "message_received"
         case .messageSent: "message_sent"
@@ -180,7 +187,7 @@ extension TelemetryEventType: Codable {
     }
 }
 
-/// One frame from the live telemetry socket (`/ws/telemetry`). Pinned by the nine
+/// One frame from the live telemetry socket (`/ws/telemetry`). Pinned by the ten
 /// `contracts/desktop/telemetry-event-*.json` fixtures.
 ///
 /// ⛔ AN EVENT IS A HINT, DELIVERED AT MOST ONCE AND ONLY WHILE THE SOCKET IS OPEN.
@@ -238,6 +245,14 @@ public struct TelemetryEnvelope: Codable, Sendable, Equatable {
     /// failing the list, so one bad id cannot stop the right desktop ringing.
     public var ringingUserIds: [String]? {
         data["userIds"]?.arrayValue?.compactMap(\.stringValue)
+    }
+
+    /// Why a `call_ring_cancelled` event ended the ring, read from `data.reason`.
+    ///
+    /// ⚠️ NEVER NIL AND NEVER A DECODE FAILURE: a missing, non-string or unknown reason
+    /// reads as ``RingCancelReason/withdrawn``, as the contract requires.
+    public var ringCancelReason: RingCancelReason {
+        RingCancelReason(wire: data["reason"]?.stringValue)
     }
 }
 

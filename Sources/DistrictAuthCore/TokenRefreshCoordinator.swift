@@ -159,12 +159,22 @@ public actor TokenRefreshCoordinator {
     /// unexpectedly" on the next launch). The app awaits this, bounded by its own
     /// deadline, before it lets the process go.
     ///
+    /// ⛔ AND A SUCCESSOR THE STORE REFUSED EARLIER IS WRITTEN ONE LAST TIME. After a
+    /// failed write the successor lives only in ``unpersistedSession``, the disk holds the
+    /// spent predecessor and the marker naming it, and a process exit loses the session
+    /// exactly as a quit mid-refresh does. One more attempt costs nothing when the
+    /// keychain has come back.
+    ///
     /// ⚠️ IT NEVER STARTS A REFRESH, unlike ``accessToken()``: asking for a token at
-    /// quit would open the very window this closes. With nothing in flight it returns
-    /// at once.
+    /// quit would open the very window this closes. With nothing in flight and nothing
+    /// unwritten it returns at once.
     public func finishRefreshInFlight() async {
-        guard let task = inFlight else { return }
-        _ = await task.value
+        if let task = inFlight {
+            _ = await task.value
+        }
+        if let rescued = unpersistedSession {
+            await repersistRescuedSession(rescued)
+        }
     }
 
     /// Discard the cached access token if it is still the one the caller used.

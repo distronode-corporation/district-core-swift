@@ -34,7 +34,8 @@ ci/coverage-gate.sh
 python3 scripts/check-public-hygiene.py
 python3 tools/l10n/l10n.py vendor --check --dest tools/l10n
 python3 scripts/gen-l10n.py --check
-python3 tools/l10n/frcheck.py all . --termbase '' --tm ''
+python3 tools/l10n/frcheck.py all . --termbase '' --tm '' --allow-screen api_error
+python3 scripts/check-fr-signoff.py --self-test
 ```
 
 CI also greps the sources for Darwin-only imports, checks `Package.resolved` and counts
@@ -106,6 +107,15 @@ Changes to public API are noted in [CHANGELOG.md](CHANGELOG.md) under `Unrelease
 
 Contributors do not cut releases. A maintainer tags a version (`1.0.0`, no `v`), following
 Semantic Versioning: a source-breaking change to a public type is a major version.
+
+The French is signed off per release. `i18n/fr-CA/signoff.json` names who signed it off,
+the release and commit the catalogs were read at, and the SHA-256 of every catalog in
+`l10n/`; `python3 scripts/check-fr-signoff.py` fails, naming each catalog, when one
+differs, is missing or is not listed. It runs on the tag build
+(`.github/workflows/release-guard.yml`), never on pull requests, because catalogs change
+between releases. A release whose catalogs changed (French, or English the French
+follows) needs the manager's review of the French and a new `signoff.json` before it is
+tagged.
 
 ## Reporting bugs and asking questions
 

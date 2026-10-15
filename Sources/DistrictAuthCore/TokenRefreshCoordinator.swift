@@ -146,6 +146,27 @@ public actor TokenRefreshCoordinator {
         _ = await adoptRotated(tokens, deviceId: deviceId)
     }
 
+    /// Wait for a refresh already on the wire, and for the write of its successor,
+    /// without starting one.
+    ///
+    /// ⛔ FOR A PROCESS ABOUT TO EXIT, AND IT IS THE ONLY WAY TO CLOSE FAILURE MODE 3
+    /// ON A QUIT. The server rotates the moment it answers, and the successor reaches
+    /// the store only inside the refresh task (``adoptRotated(_:deviceId:)``). A quit
+    /// that lands in that gap leaves the spent predecessor on disk with the marker
+    /// naming it, so the next launch reports ``ReauthReason/interruptedRefresh`` and
+    /// the person signs in again for having pressed Quit (District AI for Mac 3.0.0,
+    /// 2026-10-15: rotated at 14:29:02Z, quit at 14:29:05Z, "Your session ended
+    /// unexpectedly" on the next launch). The app awaits this, bounded by its own
+    /// deadline, before it lets the process go.
+    ///
+    /// ⚠️ IT NEVER STARTS A REFRESH, unlike ``accessToken()``: asking for a token at
+    /// quit would open the very window this closes. With nothing in flight it returns
+    /// at once.
+    public func finishRefreshInFlight() async {
+        guard let task = inFlight else { return }
+        _ = await task.value
+    }
+
     /// Discard the cached access token if it is still the one the caller used.
     ///
     /// ⛔ WITHOUT THIS, A SERVER-SIDE REVOCATION STRANDS THE APP FOR UP TO THE

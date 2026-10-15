@@ -6,6 +6,28 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.1]
+
+Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15). Nothing is removed or
+renamed; both additions are new API, so an app moves to 7.0.1 with a one-line pin.
+
+### Added
+
+- `CallJoinGate` (`DistrictCall`): whether a call's join is still on its way, for the
+  microphone command that must not race it. The SDK reports a room connected before it
+  publishes the microphone the join asked for, and both reducers answer `.connected` with
+  an unmute; an unmute reaching the SDK in that gap found no microphone publication and
+  published a second track (two microphone tracks on every answered Mac call, and the
+  join's own publish then timed out waiting for its first audio frame). The engine asks
+  `admitsMute(_:)` before every mute command: an unmute while the join is out is dropped
+  (the join publishes the microphone live), a mute waits for the join and goes through only
+  if it succeeded.
+- `TokenRefreshCoordinator.finishRefreshInFlight()`: waits for a refresh already on the
+  wire, and the write of its successor, without starting one. For an app about to quit: a
+  quit between the server's rotation and the store's write left the spent token on disk
+  with the marker naming it, and the next launch could only report an interrupted refresh
+  (the person signed out by pressing Quit).
+
 ## [7.0.0] - 2026-10-14
 
 The core of District AI 3.0 for iPhone, iPad and Mac: every sentence the core writes in

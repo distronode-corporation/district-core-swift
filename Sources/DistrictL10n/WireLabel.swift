@@ -28,6 +28,18 @@ public enum WireLabel {
         return WireCopy.genericOther
     }
 
+    /// The vocabulary's label of `value` in `category`, in the active language, or nil when
+    /// the vocabulary does not list it. Matched as ``label(_:_:)`` matches.
+    ///
+    /// ⚠️ FOR AN ENGLISH SCREEN THAT SHOWS THE PORTAL'S WORD (`Completed`, not `completed`)
+    /// and keeps an unlisted value as sent rather than « Autre » or a fallback sentence
+    /// (District AI 3.0.1). A French screen takes ``label(_:_:)``, which never shows an
+    /// English wire word.
+    public static func knownLabel(_ category: WireCategory, _ value: String?) -> String? {
+        let key = (value ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return WireTable.label(category, key)
+    }
+
     /// A region's long name, naming its datacenter: `Canada (Montreal)`. An unknown id is
     /// upper-cased, as ``label(_:_:)`` does.
     public static func regionLongName(_ value: String?) -> String {

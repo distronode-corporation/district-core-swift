@@ -40,6 +40,10 @@ its 3.0.1, and district-ios switches over neither.
   `admitsMute(_:)` before every mute command: an unmute while the join is out is dropped
   (the join publishes the microphone live), a mute waits for the join and goes through only
   if it succeeded.
+- `WireLabel.knownLabel(_:_:)` (`DistrictL10n`): the vocabulary's label of a value in the
+  active language, or nil when the vocabulary does not list it. For an English screen that
+  shows the portal's word (`Completed`, not `completed`) and keeps an unlisted value as
+  sent; a French screen keeps `label(_:_:)`.
 - `TokenRefreshCoordinator.finishRefreshInFlight()`: waits for a refresh already on the
   wire, and the write of its successor, without starting one. For an app about to quit: a
   quit between the server's rotation and the store's write left the spent token on disk

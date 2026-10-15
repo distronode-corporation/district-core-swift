@@ -215,11 +215,12 @@ note = "Bookings list filter: every booking, whatever its status or date."
 
 [scheduling.booking.view_cancelled]
 en = "Cancelled"
-fr = "Annulé"
+fr = "Annulés"
 ctx = "label"
 screen = "scheduling bookings"
 tier = "T3"
 state = "reviewed"
+fr_variant = "bookings filter (plural rendez-vous), beside Passés"
 note = "Bookings list filter: the bookings that were cancelled."
 
 [scheduling.booking.view_past]
@@ -715,7 +716,7 @@ note = "Choice of clock for the booking page: a 24-hour clock, with an example t
 
 [scheduling.team.role_agency]
 en = "Agency"
-fr = "Agence"
+fr = "Administrateur"
 ctx = "label"
 screen = "scheduling team"
 tier = "T3"
@@ -724,12 +725,11 @@ note = "A workspace member's role, as the scheduling team screen names it: the a
 
 [scheduling.team.role_client]
 en = "Client"
-fr = "Client"
+fr = "Membre"
 ctx = "label"
 screen = "scheduling team"
 tier = "T3"
 state = "reviewed"
-same_ok = true
 note = "A workspace member's role, as the scheduling team screen names it: a member of the client business."
 
 [scheduling.team.role_removed]

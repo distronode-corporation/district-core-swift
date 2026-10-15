@@ -929,7 +929,7 @@ package enum SchedulingCopy {
     package static var bookingViewAll: String { L10nRuntime.locale == .frCA ? "Tout" : "All" }
 
     /// `scheduling.booking.view_cancelled`
-    package static var bookingViewCancelled: String { L10nRuntime.locale == .frCA ? "Annulé" : "Cancelled" }
+    package static var bookingViewCancelled: String { L10nRuntime.locale == .frCA ? "Annulés" : "Cancelled" }
 
     /// `scheduling.booking.view_past`
     package static var bookingViewPast: String { L10nRuntime.locale == .frCA ? "Passés" : "Past" }
@@ -1124,10 +1124,10 @@ package enum SchedulingCopy {
     package static var settingsTimeFormat24h: String { L10nRuntime.locale == .frCA ? "24 heures (14:30)" : "24-hour (14:30)" }
 
     /// `scheduling.team.role_agency`
-    package static var teamRoleAgency: String { L10nRuntime.locale == .frCA ? "Agence" : "Agency" }
+    package static var teamRoleAgency: String { L10nRuntime.locale == .frCA ? "Administrateur" : "Agency" }
 
     /// `scheduling.team.role_client`
-    package static var teamRoleClient: String { L10nRuntime.locale == .frCA ? "Client" : "Client" }
+    package static var teamRoleClient: String { L10nRuntime.locale == .frCA ? "Membre" : "Client" }
 
     /// `scheduling.team.role_removed`
     package static var teamRoleRemoved: String { L10nRuntime.locale == .frCA ? "Retiré de l'espace de travail" : "Removed from the workspace" }

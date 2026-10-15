@@ -14,8 +14,8 @@ Consumers:
   (iPhone and iPad)
 - [District AI for Mac](https://github.com/distronode-corporation/district-macos)
 
-This package was extracted from district-ios at `0b2354b`, with its history. 6.0.0 is the
-current release; the 7.0.0 betas are work in progress.
+This package was extracted from district-ios at `0b2354b`, with its history. 7.0.0 is the
+current release.
 
 Links: [project page](https://www.distronode.com/open-source/district-core-swift) ·
 [GitLab mirror](https://gitlab.com/distronode-corporation/district-core-swift) (read-only
@@ -38,7 +38,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "6.0.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "7.0.0"),
 ],
 ```
 
@@ -51,7 +51,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 6.0.0
+    exactVersion: 7.0.0
 ```
 
 ## Modules
@@ -94,7 +94,7 @@ swiftlint --strict         # SwiftLint 0.65.1
 
 The core writes English, and Canadian French once an app turns it on by setting
 `L10nRuntime.locale` (to `DistrictL10n.locale(fromPreferred:)` of the device's preferred
-languages). Until then everything is English, and no released app turns French on.
+languages). Until an app sets it, everything is English.
 
 - The text is in four TOML catalogs under `l10n/`, in the format
   [`tools/l10n/`](tools/l10n) reads: `core.toml` and `countries.toml` are written by

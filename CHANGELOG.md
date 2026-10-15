@@ -6,6 +6,44 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-10-14
+
+The core of District AI 3.0 for iPhone, iPad and Mac: every sentence the core writes in
+English and reviewed Canadian French. It is the three 7.0.0 betas below, and these
+changes since 7.0.0-beta.3.
+
+What 7.0.0 brings over 6.0.0:
+
+- **Languages.** `DistrictL10n`: every sentence the core writes comes from a catalog, in
+  English and reviewed Canadian French, and the app chooses which
+  (`L10nRuntime.locale`). The service's error codes (`ApiErrorText`), stored values
+  (`WireLabel`, 39 categories) and formats (`L10nFormat`: money, dates, times,
+  durations, numbers) read as the service writes them, held to `contracts/i18n/`. English
+  is byte-identical to 6.0.0.
+- **Requests** send `Accept-Language`, and `ApiError.http` carries the service's error
+  code (`http(status:message:code:)`); `localizedMessage` reads it in the reader's
+  language.
+- **Account settings**: `AccountSettingsRepository` reads the account's stored language
+  and writes it (`saveLocale`).
+- **Billing**: `price(cents:)` on subscriptions and invoices names the currency in French
+  (`249,00 $ CA`); English stays `$249.00`.
+- **Webhooks**: an editor offers the four booking events, as the web portal does, and a
+  save keeps the events a webhook already has.
+- **Contracts** from monorepo 43eed5fd6: 187 mobile fixtures.
+- Breaking, for the apps: `ApiError.http` has a third value, `WireCategory` new cases,
+  and several stored lists are computed; 7.0.0-beta.1 lists what the apps absorb.
+
+### Changed
+
+- The catalogs carry the v3.0 reviewed French.
+- README: 7.0.0 is the current release and the examples pin it; the GitLab mirror and
+  project page links; the contract gate's 187 fixtures.
+- `scripts/check-public-hygiene.py` allows this repository's own GitLab mirror URL, and no
+  other GitLab URL.
+- CHANGELOG: the date of 1.0.0.
+- CI checks that every catalog has its reviewed French (`l10n.py check --require fr-CA`),
+  one catalog per call.
+
 ## [7.0.0-beta.3] - 2026-10-14
 
 The contracts from monorepo 43eed5fd6, whose French the catalogs copy verbatim, French
@@ -462,7 +500,7 @@ on 1.0.0.
 - `PushTokenKind` gained a case, so an exhaustive `switch` over it outside this
   package needs a `.desktop` arm.
 
-## [1.0.0]
+## [1.0.0] - 2026-10-03
 
 ### Added
 

@@ -29,7 +29,8 @@ final class SchedulingFrenchSmokeTests: XCTestCase {
         L10nRuntime.withLocale(.frCA) {
             XCTAssertEqual(SchedulingBookingFormat.minutesLabel(1204), "1\u{00A0}204 min")
             XCTAssertEqual(SchedulingBookingView.upcoming.label, "\u{C0} venir")
-            XCTAssertEqual(SchedulingTeamFormat.districtRoleLabel("agency"), "Agence")
+            XCTAssertEqual(SchedulingTeamFormat.districtRoleLabel("agency"), "Administrateur")
+            XCTAssertEqual(SchedulingTeamFormat.districtRoleLabel("client"), "Membre")
         }
     }
 }

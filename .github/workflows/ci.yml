@@ -232,6 +232,14 @@ jobs:
             --gen swift:Sources/DistrictL10n/Generated/Strings.swift \
             --opt runtime=external --opt access=package --opt int_fmt=L10nFormat.count
 
+      # Every entry has reviewed French. One catalog per call, so a key defined in two
+      # catalogs is never refused as a duplicate by this check.
+      - name: Every catalog has its reviewed French
+        run: |
+          for catalog in l10n/*.toml; do
+            python3 tools/l10n/l10n.py check "$catalog" --require fr-CA
+          done
+
       # No term base or memory here (they live with the translators); the rules that
       # need only the catalog run in full. The api_error screen is exempt from the
       # Apple store rules: those sentences are the service's own, as the website words

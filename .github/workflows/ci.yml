@@ -247,6 +247,11 @@ jobs:
       - name: The French rules (frcheck)
         run: python3 tools/l10n/frcheck.py all . --termbase '' --tm '' --allow-screen api_error
 
+      # The French sign-off check itself runs on the tag build only (release-guard.yml):
+      # catalogs change between releases. Its self-test reads no catalog, so it runs here.
+      - name: The French sign-off check still catches what it claims to
+        run: python3 scripts/check-fr-signoff.py --self-test
+
       # The licence the README and every consumer rely on, and the NOTICE that carries
       # the copyright line and the trademark terms. Checked by content, because an empty
       # or replaced file passes an existence check.

@@ -341,6 +341,9 @@ package enum ApiErrorCopy {
     /// `api_error.sending_domain_missing`
     package static var sendingDomainMissing: String { L10nRuntime.locale == .frCA ? "Aucun domaine d'envoi n'est connecté à cet espace de travail." : "No sending domain is connected to this workspace." }
 
+    /// `api_error.sending_domain_provider_changed`
+    package static var sendingDomainProviderChanged: String { L10nRuntime.locale == .frCA ? "Ce domaine d'envoi a été configuré avec un autre fournisseur de courriel. Retirez-le, puis connectez-le de nouveau pour obtenir les nouvelles entrées DNS." : "This sending domain was set up with a different email provider. Remove it and connect it again to get the new DNS records." }
+
     /// `api_error.server_error`
     package static var serverError: String { L10nRuntime.locale == .frCA ? "Une erreur est survenue de notre côté. Veuillez réessayer." : "Something went wrong on our side. Please try again." }
 

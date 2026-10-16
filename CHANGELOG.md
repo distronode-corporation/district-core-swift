@@ -6,6 +6,16 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/i18n/api-errors.json` from monorepo b48ce94d4, byte for byte: the new code
+  `sending_domain_provider_changed` (English and French), which the monorepo's
+  `drift:app_contracts` was red on. Its catalog entry `api_error.sending_domain_provider_changed`
+  and accessor are generated (`scripts/gen-l10n.py`). ⚠️ Its French is NOT the contract's
+  verbatim: the contract says « les nouveaux enregistrements DNS », which frcheck's ban on
+  « enregistrement » outside a denial refuses (an error, which cannot be waived), so the
+  catalog says « les nouvelles entrées DNS ».
+
 ## [7.0.1]
 
 Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15), and the ring cancel every

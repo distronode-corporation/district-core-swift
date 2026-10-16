@@ -110,6 +110,7 @@ enum ApiErrorTable {
         case "messaging_provider_not_configured": return ApiErrorCopy.messagingProviderNotConfigured
         case "no_sending_number": return ApiErrorCopy.noSendingNumber
         case "sending_domain_missing": return ApiErrorCopy.sendingDomainMissing
+        case "sending_domain_provider_changed": return ApiErrorCopy.sendingDomainProviderChanged
         case "whatsapp_unsupported": return ApiErrorCopy.whatsappUnsupported
         case "verify_not_enabled": return ApiErrorCopy.verifyNotEnabled
         case "TRUST_BUNDLES_NOT_APPROVED": return ApiErrorCapsCopy.trustBundlesNotApproved

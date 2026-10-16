@@ -6,6 +6,65 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.1]
+
+Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15), and the ring cancel every
+3.0.1 app reads. Nothing is removed or renamed. ⚠️ Two public enums gain a case
+(`TelemetryEventType.callRingCancelled`, `DesktopRingEnd.cancelled`), so an exhaustive `switch`
+over either needs the new arm; the only consumer of both is District AI for Mac, updated in
+its 3.0.1, and district-ios switches over neither.
+
+### Changed
+
+- ⛔ The scheduling hand-off never mints UNBOUND (S33; Sean, GitLab #2 note 4022232351).
+  `SchedulingHandoffFlow` used to fall back to a mint with no `nonce` when leg 1 did not
+  call back within the clock, failed visibly, or the state was unusable; while any build
+  could do that, the server could not switch `HANDOFF_REQUIRE_NONCE` on. Those paths now
+  end as the new `SchedulingHandoffOutcome.noCallback` and send nothing; the app shows a
+  notice and the person presses again. `SchedulingHandoffClient.mint(workspaceId:next:nonce:)`
+  takes a required `nonce: String`, so no caller can mint without one. The callback clock
+  is 30 s (was 10 s), since running out now costs a retry rather than an unbound page.
+  ⚠️ Source-breaking for an app: an exhaustive `switch` over `SchedulingHandoffOutcome`
+  needs the `.noCallback` arm (district-macos and district-ios both switch over it), and
+  a call to `mint` without a nonce no longer compiles (neither app calls it).
+
+### Added
+
+- The ring cancel (`docs/ring_cancel_contract.md` in the service repository): when a ring the
+  server started ends (answered on some device, timed out, the caller hung up, or withdrawn),
+  the telemetry socket carries `call_ring_cancelled` `{callId, reason}` and the Apple alert
+  rows get a background push `{type: "call_ring_cancelled", workspaceId, callId, reason}`.
+  - `TelemetryEventType.callRingCancelled` and `TelemetryEnvelope.ringCancelReason`.
+  - `RingCancelReason` (`answered`, `timeout`, `call_ended`, `withdrawn`; any other value,
+    or none, is `withdrawn`).
+  - `RingCancel.parse(_:)` and `parse(userInfo:)` for the push. `PushPayload.parse` still
+    drops the type: it is never tapped.
+  - `DesktopRingGate` stops a ring still ringing for that call with
+    `DesktopRingEnd.cancelled(reason)`. A call this device answered was cleared from the gate
+    at the press, so the cancel it also receives changes nothing.
+  - The contract fixture `contracts/desktop/telemetry-event-call-ring-cancelled.json`
+    (14 desktop fixtures).
+
+- `CallJoinGate` (`DistrictCall`): whether a call's join is still on its way, for the
+  microphone command that must not race it. The SDK reports a room connected before it
+  publishes the microphone the join asked for, and both reducers answer `.connected` with
+  an unmute; an unmute reaching the SDK in that gap found no microphone publication and
+  published a second track (two microphone tracks on every answered Mac call, and the
+  join's own publish then timed out waiting for its first audio frame). The engine asks
+  `admitsMute(_:)` before every mute command: an unmute while the join is out is dropped
+  (the join publishes the microphone live), a mute waits for the join and goes through only
+  if it succeeded.
+- `WireLabel.knownLabel(_:_:)` (`DistrictL10n`): the vocabulary's label of a value in the
+  active language, or nil when the vocabulary does not list it. For an English screen that
+  shows the portal's word (`Completed`, not `completed`) and keeps an unlisted value as
+  sent; a French screen keeps `label(_:_:)`.
+- `TokenRefreshCoordinator.finishRefreshInFlight()`: waits for a refresh already on the
+  wire, and the write of its successor, without starting one. For an app about to quit: a
+  quit between the server's rotation and the store's write left the spent token on disk
+  with the marker naming it, and the next launch could only report an interrupted refresh
+  (the person signed out by pressing Quit). A successor the store refused earlier is
+  written one last time too.
+
 ## [7.0.0] - 2026-10-14
 
 The core of District AI 3.0 for iPhone, iPad and Mac: every sentence the core writes in

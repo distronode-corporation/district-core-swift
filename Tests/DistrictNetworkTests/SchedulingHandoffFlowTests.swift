@@ -99,7 +99,7 @@ final class SchedulingHandoffFlowTests: XCTestCase {
     // MARK: - Dropped callbacks
 
     /// ⛔ A CALLBACK CARRYING ANOTHER STATE IS DROPPED AND SPENDS NOTHING. The hand-off
-    /// keeps waiting, and when its clock runs out it falls back WITHOUT that nonce.
+    /// keeps waiting, and when its clock runs out it ends with no mint at all.
     func test_S33_03_aMismatchedStateIsDropped() async {
         let transport = Self.mintedTransport()
         let log = LogLines()
@@ -112,9 +112,10 @@ final class SchedulingHandoffFlowTests: XCTestCase {
         XCTAssertTrue(transport.recorded.isEmpty, "a dropped callback must not mint")
         gate.fire()
 
-        guard case .minted = await run.value else { return XCTFail("expected the fallback mint") }
-        XCTAssertEqual(Self.noncePresent(in: transport), false)
-        XCTAssertEqual(log.lines, ["handoff callback dropped", "handoff path=unbound-fallback"])
+        let outcome = await run.value
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty, "nothing is minted without a callback")
+        XCTAssertEqual(log.lines, ["handoff callback dropped", "handoff path=no-callback"])
         assertNoSecrets(log)
     }
 
@@ -141,8 +142,10 @@ final class SchedulingHandoffFlowTests: XCTestCase {
         await flow.receive(Self.callback(nonce: "short"))
         XCTAssertTrue(transport.recorded.isEmpty)
         await flow.legOneFailed(state: Self.state)
-        _ = await run.value
-        XCTAssertEqual(log.lines, ["handoff callback dropped", "handoff path=unbound-fallback"])
+        let outcome = await run.value
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty)
+        XCTAssertEqual(log.lines, ["handoff callback dropped", "handoff path=no-callback"])
     }
 
     /// ⚠️ A CALLBACK AFTER THE HAND-OFF MOVED ON IS LATE, NOT A SECOND HAND-OFF.
@@ -152,31 +155,36 @@ final class SchedulingHandoffFlowTests: XCTestCase {
         let flow = Self.flow(transport, log: log, sleep: Holds.never)
         _ = await flow.run(workspaceId: "ws_1") { _, _ in }
         await flow.receive(Self.callback())
-        XCTAssertEqual(transport.recorded.count, 1)
-        XCTAssertEqual(log.lines, ["handoff path=unbound-fallback", "handoff callback dropped"])
+        XCTAssertTrue(transport.recorded.isEmpty, "a late callback mints nothing either")
+        XCTAssertEqual(log.lines, ["handoff path=no-callback", "handoff callback dropped"])
     }
 
-    // MARK: - The fallback
+    // MARK: - No callback: no mint (7.0.1)
 
-    /// ⛔ NO CALLBACK BEFORE THE CLOCK RUNS OUT: TODAY'S UNBOUND FLOW, NO `nonce` KEY.
-    /// This is what a server without leg 1 produces, and why any release order is safe.
-    func test_S33_07_theTimeoutFallsBackUnbound() async throws {
+    /// ⛔ NO CALLBACK BEFORE THE CLOCK RUNS OUT: THE HAND-OFF ENDS AND NOTHING IS MINTED.
+    /// Until 7.0.1 this minted unbound (no `nonce` key), which kept the server from
+    /// requiring the nonce.
+    func test_S33_07_theTimeoutEndsWithoutAMint() async {
         let transport = Self.mintedTransport()
         let log = LogLines()
         let flow = Self.flow(transport, log: log, sleep: Holds.never)
         let opened = Opened()
         let outcome = await flow.run(workspaceId: "ws_1", open: opened.record)
 
-        guard case .minted = outcome else { return XCTFail("expected the fallback mint, got \(outcome)") }
-        let raw = try XCTUnwrap(transport.lastRequest?.body)
-        XCTAssertEqual(String(bytes: raw, encoding: .utf8), #"{"workspaceId":"ws_1"}"#)
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty, "no request, so none can lack a nonce")
         let leg1 = await opened.urls
-        XCTAssertEqual(leg1.count, 1, "leg 1 is still opened before the fallback")
-        XCTAssertEqual(log.lines, ["handoff path=unbound-fallback"])
+        XCTAssertEqual(leg1.count, 1, "leg 1 was opened")
+        XCTAssertEqual(log.lines, ["handoff path=no-callback"])
+    }
+
+    /// The clock is the documented 30 s, inside the nonce cookie's 300 s.
+    func test_S33_07b_theCallbackClockIsThirtySeconds() {
+        XCTAssertEqual(SchedulingHandoffFlow.callbackTimeout, .seconds(30))
     }
 
     /// The timeout reached while the flow is parked waiting, rather than during `open`.
-    func test_S33_08_theTimeoutWhileWaitingFallsBack() async {
+    func test_S33_08_theTimeoutWhileWaitingEndsWithoutAMint() async {
         let transport = Self.mintedTransport()
         let log = LogLines()
         let gate = SleepGate()
@@ -185,21 +193,23 @@ final class SchedulingHandoffFlowTests: XCTestCase {
         let run = Task { await flow.run(workspaceId: "ws_1", open: opened.record) }
         await Self.untilWaiting(flow)
         gate.fire()
-        guard case .minted = await run.value else { return XCTFail("expected the fallback mint") }
-        XCTAssertEqual(Self.noncePresent(in: transport), false)
+        let outcome = await run.value
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty)
     }
 
-    /// ⚠️ LEG 1 FAILING VISIBLY FALLS BACK AT ONCE, without waiting out the clock.
-    func test_S33_09_aFailedLegOneFallsBackNow() async {
+    /// ⚠️ LEG 1 FAILING VISIBLY ENDS THE HAND-OFF AT ONCE, without waiting out the clock,
+    /// and mints nothing.
+    func test_S33_09_aFailedLegOneEndsNow() async {
         let transport = Self.mintedTransport()
         let log = LogLines()
         let flow = Self.flow(transport, log: log)
         let outcome = await flow.run(workspaceId: "ws_1") { _, state in
             await flow.legOneFailed(state: state)
         }
-        guard case .minted = outcome else { return XCTFail("expected the fallback mint, got \(outcome)") }
-        XCTAssertEqual(Self.noncePresent(in: transport), false)
-        XCTAssertEqual(log.lines, ["handoff path=unbound-fallback"])
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty)
+        XCTAssertEqual(log.lines, ["handoff path=no-callback"])
     }
 
     /// ⛔ AN EVENT FROM AN OLD SHEET CANNOT ANSWER A NEWER HAND-OFF.
@@ -217,17 +227,17 @@ final class SchedulingHandoffFlowTests: XCTestCase {
     }
 
     /// ⚠️ A STATE THE SERVER WOULD REFUSE NEVER OPENS A PAGE THAT ANSWERS 400; the
-    /// hand-off goes straight to the unbound mint.
-    func test_S33_11_anUnusableStateFallsBackWithoutOpening() async {
+    /// hand-off ends at once, and mints nothing.
+    func test_S33_11_anUnusableStateEndsWithoutOpening() async {
         let transport = Self.mintedTransport()
         let log = LogLines()
         let flow = Self.flow(transport, log: log, state: "short")
         let opened = Opened()
         let outcome = await flow.run(workspaceId: "ws_1", open: opened.record)
-        guard case .minted = outcome else { return XCTFail("expected the fallback mint, got \(outcome)") }
+        XCTAssertEqual(outcome, .noCallback)
         let leg1 = await opened.urls
         XCTAssertTrue(leg1.isEmpty)
-        XCTAssertEqual(Self.noncePresent(in: transport), false)
+        XCTAssertTrue(transport.recorded.isEmpty)
     }
 
     // MARK: - Abandon and single flight
@@ -307,9 +317,36 @@ final class SchedulingHandoffFlowTests: XCTestCase {
             #"{"error":"Update the app to open the website from it.","code":"nonce_required"}"#,
             status: 400
         )
-        let flow = Self.flow(transport, log: LogLines(), sleep: Holds.never)
-        let outcome = await flow.run(workspaceId: "ws_1") { _, _ in }
+        let flow = Self.flow(transport, log: LogLines())
+        let outcome = await flow.run(workspaceId: "ws_1") { _, _ in
+            await flow.receive(Self.callback())
+        }
         XCTAssertEqual(outcome, .failed(.nonceRequired(message: "Update the app to open the website from it.")))
+    }
+
+    /// ⛔ EVERY MINT THIS FLOW SENDS CARRIES THE CALLBACK'S NONCE, across every way a
+    /// hand-off can end: no request it makes ever lacks one (S33, 7.0.1).
+    func test_S33_17_noRequestEverLacksANonce() async throws {
+        let transport = Self.mintedTransport()
+        let log = LogLines()
+        // ⚠️ TWO FLOWS OVER ONE TRANSPORT: a clock that fires at once races any event `open`
+        // delivers, so only the timeout run uses it; the others' clock never fires.
+        let flow = Self.flow(transport, log: log)
+        let clockless = Self.flow(transport, log: log, sleep: Holds.never)
+        let bound = await flow.run(workspaceId: "ws_1") { _, _ in await flow.receive(Self.callback()) }
+        let timedOut = await clockless.run(workspaceId: "ws_1") { _, _ in }
+        let failed = await flow.run(workspaceId: "ws_1") { _, state in await flow.legOneFailed(state: state) }
+        let closed = await flow.run(workspaceId: "ws_1") { _, state in await flow.browserClosed(state: state) }
+
+        guard case .minted = bound else { return XCTFail("expected a bound mint, got \(bound)") }
+        XCTAssertEqual([timedOut, failed, closed], [.noCallback, .noCallback, .abandoned])
+        XCTAssertEqual(transport.recorded.count, 1)
+        for recorded in transport.recorded {
+            let raw = try XCTUnwrap(recorded.request.body)
+            guard case let .object(fields)? = JSONWire.decode(raw) else { return XCTFail("not a JSON object") }
+            XCTAssertEqual(fields["nonce"], .string(Self.nonce))
+        }
+        assertNoSecrets(log)
     }
 
     // MARK: - Helpers

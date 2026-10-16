@@ -15,11 +15,16 @@ public enum SchedulingHandoffOutcome: Equatable, Sendable {
 
     /// The user closed the leg-1 browser before any callback. Nothing was minted.
     case abandoned
+
+    /// Leg 1 never called back: the clock ran out, leg 1 visibly failed, or this build
+    /// could not make a usable state. ⛔ NOTHING WAS MINTED, and nothing unbound ever is
+    /// (7.0.1). The caller shows a notice the person can act on by pressing again.
+    case noCallback
 }
 
 /// One scheduling hand-off at a time, across its three legs.
 ///
-/// ⛔ THE BOUND FLOW, WITH A FALLBACK THAT KEEPS ANY RELEASE ORDER SAFE.
+/// ⛔ THE BOUND FLOW, AND ONLY THE BOUND FLOW.
 /// 1. Open `/dashboard/handoff/start?state=S` in the browser. The server sets the
 ///    nonce cookie in that browser and redirects to `districtai://handoff?state=S&nonce=N`.
 /// 2. On a callback carrying THIS state, mint with `nonce: N`.
@@ -27,10 +32,10 @@ public enum SchedulingHandoffOutcome: Equatable, Sendable {
 ///    only if the cookie is there.
 ///
 /// If no matching callback arrives within ``callbackTimeout``, or leg 1 visibly
-/// fails, the hand-off falls back to the unbound mint (no `nonce` key at all), which
-/// is what every installed build does today and what the server accepts until
-/// `HANDOFF_REQUIRE_NONCE` is switched on. A server without leg 1 therefore costs a
-/// wait, never a broken button.
+/// fails, the hand-off ends as ``SchedulingHandoffOutcome/noCallback`` and NOTHING IS
+/// MINTED. ⛔ UNTIL 7.0.1 IT FELL BACK TO AN UNBOUND MINT (no `nonce` key), and while
+/// any build could do that the server could not switch `HANDOFF_REQUIRE_NONCE` on (S33;
+/// Sean, GitLab #2 note 4022232351). The server has served leg 1 since 2026-10-02.
 ///
 /// ⛔ A CALLBACK IS SPENT ONLY AGAINST THE STATE THIS FLOW GENERATED FOR THE HAND-OFF
 /// IN FLIGHT. Any app can register `districtai://`, so a callback with another state,
@@ -45,13 +50,14 @@ public enum SchedulingHandoffOutcome: Equatable, Sendable {
 /// all arrive through the other methods during that suspension, and the actor makes
 /// them one ordered stream with the timeout.
 public actor SchedulingHandoffFlow {
-    /// How long leg 1 has to call back before the unbound fallback.
+    /// How long leg 1 has to call back before the hand-off ends as ``SchedulingHandoffOutcome/noCallback``.
     ///
     /// ⚠️ IT INCLUDES THE USER'S OWN TIME ON THE "Open in District AI?" PROMPT that
     /// `SFSafariViewController` may show for the redirect. Ten seconds is long enough
-    /// for a person to answer it and short enough that a server without leg 1 does not
-    /// look like a dead button.
-    public static let callbackTimeout: Duration = .seconds(10)
+    /// ⚠️ 30 SECONDS SINCE 7.0.1 (10 before): with no fallback, a person still reading
+    /// the browser's prompt when the clock runs out now gets a notice instead of a page,
+    /// so the clock allows for reading it. Well inside the nonce cookie's 300 s.
+    public static let callbackTimeout: Duration = .seconds(30)
 
     public typealias Sleep = @Sendable (Duration) async throws -> Void
 
@@ -63,7 +69,7 @@ public actor SchedulingHandoffFlow {
 
     private enum Resolution: Equatable {
         case bound(nonce: String)
-        case fallback
+        case noCallback
         case abandoned
     }
 
@@ -89,8 +95,9 @@ public actor SchedulingHandoffFlow {
 
     /// - Parameters:
     ///   - newState: a fresh leg-1 state per hand-off. The app passes `PKCE.newState`
-    ///     (32 random bytes, base64url); a value the server would refuse falls back to
-    ///     the unbound flow rather than opening a page that answers 400.
+    ///     (32 random bytes, base64url); a value the server would refuse ends the
+    ///     hand-off as ``SchedulingHandoffOutcome/noCallback`` rather than opening a page
+    ///     that answers 400.
     ///   - sleep: the timeout's clock. ⚠️ Injectable only so a test can fire or hold it.
     ///   - log: one line per hand-off naming the path. Never given a nonce or a state.
     public init(
@@ -118,9 +125,10 @@ public actor SchedulingHandoffFlow {
         case let .bound(nonce):
             log("handoff path=bound")
             return await SchedulingHandoffOutcome(client.mint(workspaceId: workspaceId, next: next, nonce: nonce))
-        case .fallback:
-            log("handoff path=unbound-fallback")
-            return await SchedulingHandoffOutcome(client.mint(workspaceId: workspaceId, next: next))
+        case .noCallback:
+            // ⛔ NO MINT. See the type note.
+            log("handoff path=no-callback")
+            return .noCallback
         case .abandoned:
             log("handoff path=abandoned")
             return .abandoned
@@ -139,10 +147,10 @@ public actor SchedulingHandoffFlow {
         log("handoff callback dropped")
     }
 
-    /// Leg 1 rendered a page instead of redirecting, or did not load at all. Falls
-    /// back now rather than at the timeout.
+    /// Leg 1 rendered a page instead of redirecting, or did not load at all. Ends the
+    /// hand-off as ``SchedulingHandoffOutcome/noCallback`` now rather than at the timeout.
     public func legOneFailed(state: String) {
-        resolve(state, .fallback)
+        resolve(state, .noCallback)
     }
 
     /// The leg-1 browser went away before any callback: the user closed it. Nothing
@@ -163,7 +171,7 @@ public actor SchedulingHandoffFlow {
     private func legOne(open: Open) async -> Resolution {
         let state = newState()
         guard SchedulingHandoffCallback.isValidState(state), let url = client.startURL(state: state) else {
-            return .fallback
+            return .noCallback
         }
         pending = Pending(state: state)
         // ⚠️ THE TASK INHERITS THIS ACTOR, so the resolve below is a plain call in
@@ -175,7 +183,7 @@ public actor SchedulingHandoffFlow {
             } catch {
                 return
             }
-            resolve(state, .fallback)
+            resolve(state, .noCallback)
         }
         await open(url, state)
         let resolution = await answer()

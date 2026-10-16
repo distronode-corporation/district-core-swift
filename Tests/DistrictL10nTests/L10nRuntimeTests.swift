@@ -132,6 +132,20 @@ final class L10nRuntimeTests: XCTestCase {
         XCTAssertEqual(WireLabel.label(.region, " mena "), "MENA")
     }
 
+    /// 3.0.1: the vocabulary's label when it lists the value, nil otherwise, so an English
+    /// screen shows `Completed` and keeps an unlisted value as sent.
+    func testAKnownLabelIsTheVocabularysOrNothing() {
+        XCTAssertEqual(WireLabel.knownLabel(.callStatus, " Completed "), "Completed")
+        XCTAssertEqual(WireLabel.knownLabel(.numberProvider, "twilio"), WireLabel.label(.numberProvider, "twilio"))
+        XCTAssertNil(WireLabel.knownLabel(.callStatus, "queued"))
+        XCTAssertNil(WireLabel.knownLabel(.transferReason, "carrier_gone"), "no fallback sentence")
+        XCTAssertNil(WireLabel.knownLabel(.region, "mena"), "no upper-casing")
+        XCTAssertNil(WireLabel.knownLabel(.callStatus, nil))
+        L10nRuntime.withLocale(.frCA) {
+            XCTAssertEqual(WireLabel.knownLabel(.callStatus, "completed"), "Terminé")
+        }
+    }
+
     func testARegionLongName() {
         XCTAssertEqual(WireLabel.regionLongName("ca"), "Canada (Montreal)")
         XCTAssertEqual(WireLabel.regionLongName(" EU"), "Europe (Frankfurt)")

@@ -14,7 +14,18 @@ All notable changes to this package are recorded here. The format is based on
   and accessor are generated (`scripts/gen-l10n.py`). ⚠️ Its French is NOT the contract's
   verbatim: the contract says « les nouveaux enregistrements DNS », which frcheck's ban on
   « enregistrement » outside a denial refuses (an error, which cannot be waived), so the
-  catalog says « les nouvelles entrées DNS ».
+  catalog says « les nouvelles entrées DNS », the words the service's French is moving to.
+- `contracts/i18n/wire-vocabulary.json` and `format-vectors.json` from monorepo ecf098046,
+  byte for byte. New labels, generated into `l10n/wire.toml` with the fixture's French: the
+  workflow skip reasons `email-misconfigured` (« Courriel mal configuré ») and `ses-missing`
+  (« SES non configuré »), the number status `in-use` ("Active", « Actif »), and the portal's
+  headings for three research keys, `estimatedValue` "DGI Evaluation" (« Évaluation DGI »),
+  `person` "Contact Profile" (« Profil du contact ») and `callerIntel` "Caller intelligence"
+  (« Renseignements sur l'appelant »), which read as the key itself before.
+- A length in French no longer breaks between the minutes and the seconds:
+  `L10nFormat.minutesSeconds` writes « 1 min 5 s », a no-break space (U+00A0)
+  between each number and its unit and between the two parts, as the format vectors now say.
+  It was « 1 min 5 s ».
 
 ## [7.0.1]
 

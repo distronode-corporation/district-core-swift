@@ -139,6 +139,7 @@ enum WireTable {
         case (.workflowActionReason, "contact-not-found"): WireCopy.workflowActionReasonContactNotFound
         case (.workflowActionReason, "dnc"): WireCopy.workflowActionReasonDnc
         case (.workflowActionReason, "dormant"): WireCopy.workflowActionReasonDormant
+        case (.workflowActionReason, "email-misconfigured"): WireCopy.workflowActionReasonEmailMisconfigured
         case (.workflowActionReason, "empty-body"): WireCopy.workflowActionReasonEmptyBody
         case (.workflowActionReason, "empty-subject"): WireCopy.workflowActionReasonEmptySubject
         case (.workflowActionReason, "empty-tag"): WireCopy.workflowActionReasonEmptyTag
@@ -152,6 +153,7 @@ enum WireTable {
         case (.workflowActionReason, "report-recipient-refused"): WireCopy.workflowActionReasonReportRecipientRefused
         case (.workflowActionReason, "report-unavailable"): WireCopy.workflowActionReasonReportUnavailable
         case (.workflowActionReason, "send-failed"): WireCopy.workflowActionReasonSendFailed
+        case (.workflowActionReason, "ses-missing"): WireCopy.workflowActionReasonSesMissing
         case (.workflowActionReason, "tag-already-present"): WireCopy.workflowActionReasonTagAlreadyPresent
         case (.workflowActionReason, "tag-not-present"): WireCopy.workflowActionReasonTagNotPresent
         case (.workflowActionReason, "unknown-action-type"): WireCopy.workflowActionReasonUnknownActionType
@@ -204,6 +206,7 @@ enum WireTable {
         case (.numberStatus, "released"): WireCopy.numberStatusReleased
         case (.numberStatus, "suspended"): WireCopy.numberStatusSuspended
         case (.numberStatus, "pending_verification"): WireCopy.numberStatusPendingVerification
+        case (.numberStatus, "in-use"): WireCopy.numberStatusInUse
         case (.a2pCampaignType, "low_volume"): WireCopy.a2pCampaignTypeLowVolume
         case (.a2pCampaignType, "customer_care"): WireCopy.a2pCampaignTypeCustomerCare
         case (.a2pCampaignType, "marketing"): WireCopy.a2pCampaignTypeMarketing

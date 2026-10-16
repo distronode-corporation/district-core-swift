@@ -248,7 +248,7 @@ final class L10nRuntimeTests: XCTestCase {
         L10nRuntime.withLocale(.frCA) {
             XCTAssertEqual(L10nFormat.money(minorUnits: 24900, currency: "cad"), "249,00\u{00A0}$\u{00A0}CA")
             XCTAssertEqual(L10nFormat.dateTime(instant, timezone: "America/Toronto"), "21 sept. 2026, 10 h 13")
-            XCTAssertEqual(L10nFormat.minutesSeconds(65), "1\u{00A0}min 5\u{00A0}s")
+            XCTAssertEqual(L10nFormat.minutesSeconds(65), "1\u{00A0}min\u{00A0}5\u{00A0}s")
             XCTAssertEqual(L10nFormat.percent(ratio: 0.38), "38\u{00A0}%")
             XCTAssertEqual(L10nFormat.number(1204.25), "1\u{00A0}204,25")
             XCTAssertEqual(L10nFormat.list(["A", "B", "C"]), "A, B et C")

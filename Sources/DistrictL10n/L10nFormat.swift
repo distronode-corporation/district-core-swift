@@ -101,17 +101,22 @@ public enum L10nFormat {
 
     /// A length of time in minutes and seconds, in the reader's language: `1m 5s`,
     /// `1 min 5 s`. Whole minutes drop the seconds, under a minute reads seconds alone,
-    /// and a missing, zero or negative length reads `0m` / `0 min`.
+    /// and a missing, zero or negative length reads `0m` / `0 min`. French never breaks a
+    /// length: a no-break space sits between each number and its unit and between the
+    /// minutes and the seconds.
     public static func minutesSeconds(_ seconds: Int?, locale: L10nLocale = L10nRuntime.locale) -> String {
         let minutes: (Int) -> String
         let secondsText: (Int) -> String
+        let between: String
         switch locale {
         case .en:
             minutes = { integer($0, locale: .en) + "m" }
             secondsText = { integer($0, locale: .en) + "s" }
+            between = " "
         case .frCA:
             minutes = { integer($0, locale: .frCA) + nbsp + "min" }
             secondsText = { integer($0, locale: .frCA) + nbsp + "s" }
+            between = nbsp
         }
         guard let seconds, seconds > 0 else { return minutes(0) }
         let whole = seconds / 60
@@ -119,7 +124,7 @@ public enum L10nFormat {
         if whole == 0 {
             return secondsText(rest)
         }
-        return rest == 0 ? minutes(whole) : minutes(whole) + " " + secondsText(rest)
+        return rest == 0 ? minutes(whole) : minutes(whole) + between + secondsText(rest)
     }
 
     /// The `duration` string the API sends on a call row (`1m 5s`, `0s`).

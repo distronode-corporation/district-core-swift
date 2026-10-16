@@ -6,6 +6,28 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/i18n/api-errors.json` from monorepo b48ce94d4, byte for byte: the new code
+  `sending_domain_provider_changed` (English and French), which the monorepo's
+  `drift:app_contracts` was red on. Its catalog entry `api_error.sending_domain_provider_changed`
+  and accessor are generated (`scripts/gen-l10n.py`). ⚠️ Its French is NOT the contract's
+  verbatim: the contract says « les nouveaux enregistrements DNS », which frcheck's ban on
+  « enregistrement » outside a denial refuses (an error, which cannot be waived), so the
+  catalog says « les nouvelles entrées DNS », the words the service's French is moving to.
+- `contracts/i18n/wire-vocabulary.json` and `format-vectors.json` from monorepo ecf098046,
+  byte for byte. New labels, generated into `l10n/wire.toml` with the fixture's French: the
+  workflow skip reasons `email-misconfigured` (« Courriel mal configuré ») and `ses-missing`
+  (« SES non configuré »; the English "SES missing" keeps the initialism in capitals, as
+  District AI for Android writes it), the number status `in-use` ("Active", « Actif »), and the portal's
+  headings for three research keys, `estimatedValue` "DGI Evaluation" (« Évaluation DGI »),
+  `person` "Contact Profile" (« Profil du contact ») and `callerIntel` "Caller intelligence"
+  (« Renseignements sur l'appelant »), which read as the key itself before.
+- A length in French no longer breaks between the minutes and the seconds:
+  `L10nFormat.minutesSeconds` writes « 1 min 5 s », a no-break space (U+00A0)
+  between each number and its unit and between the two parts, as the format vectors now say.
+  It was « 1 min 5 s ».
+
 ## [7.0.1]
 
 Fixes found in the District AI for Mac 3.0.0 ring test (2026-10-15), and the ring cancel every

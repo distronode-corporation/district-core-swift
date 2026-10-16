@@ -341,6 +341,9 @@ package enum ApiErrorCopy {
     /// `api_error.sending_domain_missing`
     package static var sendingDomainMissing: String { L10nRuntime.locale == .frCA ? "Aucun domaine d'envoi n'est connecté à cet espace de travail." : "No sending domain is connected to this workspace." }
 
+    /// `api_error.sending_domain_provider_changed`
+    package static var sendingDomainProviderChanged: String { L10nRuntime.locale == .frCA ? "Ce domaine d'envoi a été configuré avec un autre fournisseur de courriel. Retirez-le, puis connectez-le de nouveau pour obtenir les nouvelles entrées DNS." : "This sending domain was set up with a different email provider. Remove it and connect it again to get the new DNS records." }
+
     /// `api_error.server_error`
     package static var serverError: String { L10nRuntime.locale == .frCA ? "Une erreur est survenue de notre côté. Veuillez réessayer." : "Something went wrong on our side. Please try again." }
 
@@ -1263,7 +1266,7 @@ package enum WireCopy {
     package static var callTypeOutbound: String { L10nRuntime.locale == .frCA ? "Sortant" : "Outbound" }
 
     /// `wire.contact_research_key.callerintel`
-    package static var contactResearchKeyCallerintel: String { L10nRuntime.locale == .frCA ? "Profil de l'appelant" : "CallerIntel" }
+    package static var contactResearchKeyCallerintel: String { L10nRuntime.locale == .frCA ? "Renseignements sur l'appelant" : "Caller intelligence" }
 
     /// `wire.contact_research_key.corepainpoints`
     package static var contactResearchKeyCorepainpoints: String { L10nRuntime.locale == .frCA ? "Enjeux CRM déduits" : "Inferred CRM Key Challenges" }
@@ -1272,13 +1275,13 @@ package enum WireCopy {
     package static var contactResearchKeyDynamicicebreakers: String { L10nRuntime.locale == .frCA ? "Amorces de conversation pour la direction" : "CTO/CEO Conversation Starters" }
 
     /// `wire.contact_research_key.estimatedvalue`
-    package static var contactResearchKeyEstimatedvalue: String { L10nRuntime.locale == .frCA ? "Valeur estimée" : "EstimatedValue" }
+    package static var contactResearchKeyEstimatedvalue: String { L10nRuntime.locale == .frCA ? "Évaluation DGI" : "DGI Evaluation" }
 
     /// `wire.contact_research_key.executivesummary`
     package static var contactResearchKeyExecutivesummary: String { L10nRuntime.locale == .frCA ? "Résumé du dossier" : "Executive Dossier Summary" }
 
     /// `wire.contact_research_key.person`
-    package static var contactResearchKeyPerson: String { L10nRuntime.locale == .frCA ? "Identité" : "Person" }
+    package static var contactResearchKeyPerson: String { L10nRuntime.locale == .frCA ? "Profil du contact" : "Contact Profile" }
 
     /// `wire.contact_research_key.recommendedgreeting`
     package static var contactResearchKeyRecommendedgreeting: String { L10nRuntime.locale == .frCA ? "Accueil suggéré pour la réceptionniste" : "Suggested Receptionist Greeting" }
@@ -1432,6 +1435,9 @@ package enum WireCopy {
 
     /// `wire.number_status.fallback`
     package static var numberStatusFallback: String { L10nRuntime.locale == .frCA ? "Actif" : "Active" }
+
+    /// `wire.number_status.in_use`
+    package static var numberStatusInUse: String { L10nRuntime.locale == .frCA ? "Actif" : "Active" }
 
     /// `wire.number_status.pending_verification`
     package static var numberStatusPendingVerification: String { L10nRuntime.locale == .frCA ? "Vérification en attente" : "Pending verification" }
@@ -1658,6 +1664,9 @@ package enum WireCopy {
     /// `wire.workflow_action_reason.dormant`
     package static var workflowActionReasonDormant: String { L10nRuntime.locale == .frCA ? "Inactif" : "Dormant" }
 
+    /// `wire.workflow_action_reason.email_misconfigured`
+    package static var workflowActionReasonEmailMisconfigured: String { L10nRuntime.locale == .frCA ? "Courriel mal configuré" : "Email misconfigured" }
+
     /// `wire.workflow_action_reason.empty_body`
     package static var workflowActionReasonEmptyBody: String { L10nRuntime.locale == .frCA ? "Message vide" : "Empty body" }
 
@@ -1696,6 +1705,9 @@ package enum WireCopy {
 
     /// `wire.workflow_action_reason.send_failed`
     package static var workflowActionReasonSendFailed: String { L10nRuntime.locale == .frCA ? "Échec d'envoi" : "Send failed" }
+
+    /// `wire.workflow_action_reason.ses_missing`
+    package static var workflowActionReasonSesMissing: String { L10nRuntime.locale == .frCA ? "SES non configuré" : "SES missing" }
 
     /// `wire.workflow_action_reason.tag_already_present`
     package static var workflowActionReasonTagAlreadyPresent: String { L10nRuntime.locale == .frCA ? "Étiquette déjà présente" : "Tag already present" }

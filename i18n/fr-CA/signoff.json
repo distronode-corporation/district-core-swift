@@ -1,11 +1,11 @@
 {
-  "signed_off_by": "xhigh manager review (monorepo docs/i18n_fr_ca_signoff_v3.md)",
-  "release": "7.0.0",
-  "commit": "1292c25e24f4b7724b64dd6a4942a649d0f49edc",
+  "signed_off_by": "v3 manager (Opus 5.5 xhigh), final French review, 2026-10-16",
+  "release": "7.0.2",
+  "commit": "a68c9fb28c124cb20ed36570509a4a2d8d3340cd",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "1138a60ea38facf17d3be7bbb576edf70b32a03867834bb3fe50179bbfc4589b"
+      "sha256": "5f9286474eb287700fa867bbf44cb2944695c50561169ecf96d582944a9b1b74"
     },
     {
       "path": "l10n/core.toml",
@@ -17,7 +17,7 @@
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "637fd7e2dae22beb297cc7c0fdad5977bf36b037cca872a98b5c57cbde855f84"
+      "sha256": "61ff6d584d8c12ff8eb781cb15520d039129da3f0ae899e26b1afc2afd0969af"
     }
   ]
 }

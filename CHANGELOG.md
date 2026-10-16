@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.2]
+
 ### Changed
 
 - `contracts/i18n/api-errors.json` from monorepo b48ce94d4, byte for byte: the new code

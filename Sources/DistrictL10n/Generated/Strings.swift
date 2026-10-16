@@ -1707,7 +1707,7 @@ package enum WireCopy {
     package static var workflowActionReasonSendFailed: String { L10nRuntime.locale == .frCA ? "Échec d'envoi" : "Send failed" }
 
     /// `wire.workflow_action_reason.ses_missing`
-    package static var workflowActionReasonSesMissing: String { L10nRuntime.locale == .frCA ? "SES non configuré" : "Ses missing" }
+    package static var workflowActionReasonSesMissing: String { L10nRuntime.locale == .frCA ? "SES non configuré" : "SES missing" }
 
     /// `wire.workflow_action_reason.tag_already_present`
     package static var workflowActionReasonTagAlreadyPresent: String { L10nRuntime.locale == .frCA ? "Étiquette déjà présente" : "Tag already present" }

@@ -2,7 +2,7 @@
 // swiftlint:disable all
 
 /// True when every entry has French; until then the French branch carries the English.
-package let FR_COMPLETE: Bool = false
+package let FR_COMPLETE: Bool = true
 
 package enum ApiErrorCapsCopy {
     /// `api_error_caps.email_not_verified`
@@ -468,7 +468,7 @@ package enum ApiErrorCopy {
     package static var transferLineTypeUnknown: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu confirmer qu'il s'agit d'une ligne locale. Ce numéro ne peut donc pas encore être transféré." : "We could not confirm that this is a local line, so it cannot be transferred in yet." }
 
     /// `api_error.transfer_managed_only`
-    package static var transferManagedOnly: String { L10nRuntime.locale == .frCA ? "Le transfert d'un numéro existant est offert aux espaces de travail qui utilisent notre service téléphonique géré." : "Bringing your existing number is available to workspaces on our managed phone service." }
+    package static var transferManagedOnly: String { L10nRuntime.locale == .frCA ? "Le transfert d'un numéro existant est accessible aux espaces de travail qui utilisent notre service téléphonique géré." : "Bringing your existing number is available to workspaces on our managed phone service." }
 
     /// `api_error.transfer_mobile_unsupported`
     package static var transferMobileUnsupported: String { L10nRuntime.locale == .frCA ? "Les numéros de cellulaire ne peuvent pas encore être transférés. Seuls les numéros locaux peuvent l'être." : "Mobile numbers cannot be transferred in yet. Only local numbers can." }
@@ -1833,10 +1833,10 @@ package enum WireCopy {
     package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook url" }
 
     /// `wire.workflow_action_reason.no_devices`
-    package static var workflowActionReasonNoDevices: String { L10nRuntime.locale == .frCA ? "No devices" : "No devices" }
+    package static var workflowActionReasonNoDevices: String { L10nRuntime.locale == .frCA ? "Aucun membre de l'équipe n'a l'application sur un appareil qui peut recevoir des notifications" : "No team member has the app on a device that can receive notifications" }
 
     /// `wire.workflow_action_reason.no_message`
-    package static var workflowActionReasonNoMessage: String { L10nRuntime.locale == .frCA ? "No message" : "No message" }
+    package static var workflowActionReasonNoMessage: String { L10nRuntime.locale == .frCA ? "La notification de l'équipe ne fonctionne qu'avec le déclencheur d'un message pris pendant un appel" : "Notifying the team works only with the trigger for a message taken during a call" }
 
     /// `wire.workflow_action_reason.no_provider_credentials`
     package static var workflowActionReasonNoProviderCredentials: String { L10nRuntime.locale == .frCA ? "Aucun identifiant de fournisseur" : "No provider credentials" }
@@ -1851,10 +1851,10 @@ package enum WireCopy {
     package static var workflowActionReasonPostmarkMissing: String { L10nRuntime.locale == .frCA ? "Postmark non configuré" : "Postmark missing" }
 
     /// `wire.workflow_action_reason.push_lookup_failed`
-    package static var workflowActionReasonPushLookupFailed: String { L10nRuntime.locale == .frCA ? "Push lookup failed" : "Push lookup failed" }
+    package static var workflowActionReasonPushLookupFailed: String { L10nRuntime.locale == .frCA ? "La liste des appareils de l'équipe n'a pas pu être lue" : "The list of team devices could not be read" }
 
     /// `wire.workflow_action_reason.push_not_delivered`
-    package static var workflowActionReasonPushNotDelivered: String { L10nRuntime.locale == .frCA ? "Push not delivered" : "Push not delivered" }
+    package static var workflowActionReasonPushNotDelivered: String { L10nRuntime.locale == .frCA ? "Aucun appareil n'a accepté la notification" : "No device accepted the notification" }
 
     /// `wire.workflow_action_reason.recipient_not_member`
     package static var workflowActionReasonRecipientNotMember: String { L10nRuntime.locale == .frCA ? "La personne à qui envoyer le texto n'est plus membre de cet espace de travail" : "The person to text is no longer a member of this workspace" }
@@ -1875,7 +1875,7 @@ package enum WireCopy {
     package static var workflowActionReasonSesMissing: String { L10nRuntime.locale == .frCA ? "SES non configuré" : "SES missing" }
 
     /// `wire.workflow_action_reason.signing_unavailable`
-    package static var workflowActionReasonSigningUnavailable: String { L10nRuntime.locale == .frCA ? "Signing unavailable" : "Signing unavailable" }
+    package static var workflowActionReasonSigningUnavailable: String { L10nRuntime.locale == .frCA ? "Non envoyé\u{00A0}: le secret de signature des webhooks n'a pas pu être lu" : "Not sent: the webhook signing secret could not be read" }
 
     /// `wire.workflow_action_reason.tag_already_present`
     package static var workflowActionReasonTagAlreadyPresent: String { L10nRuntime.locale == .frCA ? "Étiquette déjà présente" : "Tag already present" }

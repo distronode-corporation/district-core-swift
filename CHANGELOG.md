@@ -9,11 +9,20 @@ All notable changes to this package are recorded here. The format is based on
 ### Changed
 
 - `contracts/mobile/district-voice-studio.json`, `contracts/i18n/api-errors.json` and
-  `contracts/i18n/wire-vocabulary.json` from monorepo 38f0f356, byte for byte: the Claude Haiku
-  5.5 brain entry, 44 new error codes (`knowledge_url_*`, `member_phone_*`, `transfer_*`,
-  `workflow_*`), the portal's disposition labels, and new workflow triggers, an action and
-  reason codes. Their catalog entries and accessors are generated (`scripts/gen-l10n.py`),
-  with the contract's French as drafts for the sign-off.
+  `contracts/i18n/wire-vocabulary.json` from monorepo ac4071d14, byte for byte: the Claude
+  Haiku 5.5 brain entry, 44 new error codes (`knowledge_url_*`, `member_phone_*`,
+  `transfer_*`, `workflow_*`), the portal's disposition labels, and new workflow triggers, an
+  action and reason codes. Five of those reason codes (`no-devices`, `no-message`,
+  `push-lookup-failed`, `push-not-delivered`, `signing-unavailable`) now have a label of their
+  own in English and French, where they read as the code itself before ("No devices"). Their
+  catalog entries and accessors are generated (`scripts/gen-l10n.py`), and the 61 new French
+  entries are reviewed, each as the contract words it. The contract's French for the
+  dispositions `booked` and `voicemail` is now « Rendez-vous pris » and « Boîte vocale », the
+  words this catalog already had.
+- `api_error.transfer_managed_only` says « est accessible aux espaces de travail », not
+  « est offert »: frcheck's STORE-APPLE rule reads an affirmative « offert » as an offer the
+  English lacks. The service's French changed to the same words, and the entry's `fr_variant`
+  records why.
 
 ## [7.0.2]
 

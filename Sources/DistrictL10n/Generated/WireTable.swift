@@ -115,6 +115,8 @@ enum WireTable {
         case (.workflowTrigger, "negative_sentiment"): WireCopy.workflowTriggerNegativeSentiment
         case (.workflowTrigger, "positive_sentiment"): WireCopy.workflowTriggerPositiveSentiment
         case (.workflowTrigger, "neutral_sentiment"): WireCopy.workflowTriggerNeutralSentiment
+        case (.workflowTrigger, "call_triaged"): WireCopy.workflowTriggerCallTriaged
+        case (.workflowTrigger, "message_taken"): WireCopy.workflowTriggerMessageTaken
         case (.workflowTrigger, "intent_detected"): WireCopy.workflowTriggerIntentDetected
         case (.workflowTrigger, "sms_received"): WireCopy.workflowTriggerSmsReceived
         case (.workflowTrigger, "contact_created"): WireCopy.workflowTriggerContactCreated
@@ -133,6 +135,7 @@ enum WireTable {
         case (.workflowAction, "remove_crm_tag"): WireCopy.workflowActionRemoveCrmTag
         case (.workflowAction, "register_compliance_dnc"): WireCopy.workflowActionRegisterComplianceDnc
         case (.workflowAction, "notify_ops"): WireCopy.workflowActionNotifyOps
+        case (.workflowAction, "notify_member_push"): WireCopy.workflowActionNotifyMemberPush
         case (.workflowActionOutcome, "ok"): WireCopy.workflowActionOutcomeOk
         case (.workflowActionOutcome, "skipped"): WireCopy.workflowActionOutcomeSkipped
         case (.workflowActionOutcome, "failed"): WireCopy.workflowActionOutcomeFailed
@@ -143,17 +146,28 @@ enum WireTable {
         case (.workflowActionReason, "empty-body"): WireCopy.workflowActionReasonEmptyBody
         case (.workflowActionReason, "empty-subject"): WireCopy.workflowActionReasonEmptySubject
         case (.workflowActionReason, "empty-tag"): WireCopy.workflowActionReasonEmptyTag
+        case (.workflowActionReason, "fallback-email"): WireCopy.workflowActionReasonFallbackEmail
+        case (.workflowActionReason, "fallback-email-push"): WireCopy.workflowActionReasonFallbackEmailPush
+        case (.workflowActionReason, "fallback-failed"): WireCopy.workflowActionReasonFallbackFailed
+        case (.workflowActionReason, "fallback-push"): WireCopy.workflowActionReasonFallbackPush
         case (.workflowActionReason, "http-{status}"): WireCopy.workflowActionReasonHttpStatus
         case (.workflowActionReason, "invalid-recipient"): WireCopy.workflowActionReasonInvalidRecipient
         case (.workflowActionReason, "missing-webhook-url"): WireCopy.workflowActionReasonMissingWebhookUrl
+        case (.workflowActionReason, "no-devices"): WireCopy.workflowActionReasonNoDevices
+        case (.workflowActionReason, "no-message"): WireCopy.workflowActionReasonNoMessage
         case (.workflowActionReason, "no-provider-credentials"): WireCopy.workflowActionReasonNoProviderCredentials
         case (.workflowActionReason, "no-recipient"): WireCopy.workflowActionReasonNoRecipient
         case (.workflowActionReason, "no-sending-number"): WireCopy.workflowActionReasonNoSendingNumber
         case (.workflowActionReason, "postmark-missing"): WireCopy.workflowActionReasonPostmarkMissing
+        case (.workflowActionReason, "push-lookup-failed"): WireCopy.workflowActionReasonPushLookupFailed
+        case (.workflowActionReason, "push-not-delivered"): WireCopy.workflowActionReasonPushNotDelivered
+        case (.workflowActionReason, "recipient-not-member"): WireCopy.workflowActionReasonRecipientNotMember
+        case (.workflowActionReason, "recipient-number-held"): WireCopy.workflowActionReasonRecipientNumberHeld
         case (.workflowActionReason, "report-recipient-refused"): WireCopy.workflowActionReasonReportRecipientRefused
         case (.workflowActionReason, "report-unavailable"): WireCopy.workflowActionReasonReportUnavailable
         case (.workflowActionReason, "send-failed"): WireCopy.workflowActionReasonSendFailed
         case (.workflowActionReason, "ses-missing"): WireCopy.workflowActionReasonSesMissing
+        case (.workflowActionReason, "signing-unavailable"): WireCopy.workflowActionReasonSigningUnavailable
         case (.workflowActionReason, "tag-already-present"): WireCopy.workflowActionReasonTagAlreadyPresent
         case (.workflowActionReason, "tag-not-present"): WireCopy.workflowActionReasonTagNotPresent
         case (.workflowActionReason, "unknown-action-type"): WireCopy.workflowActionReasonUnknownActionType

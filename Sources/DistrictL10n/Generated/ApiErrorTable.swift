@@ -65,6 +65,11 @@ enum ApiErrorTable {
         case "invalid_multipart": return ApiErrorCopy.invalidMultipart
         case "attachment_unsupported": return ApiErrorCopy.attachmentUnsupported
         case "message_too_long": return ApiErrorCopy.messageTooLong
+        case "workflow_conditions_invalid": return ApiErrorCopy.workflowConditionsInvalid
+        case "workflow_conditions_not_allowed": return ApiErrorCopy.workflowConditionsNotAllowed
+        case "workflow_action_needs_message": return ApiErrorCopy.workflowActionNeedsMessage
+        case "workflow_sms_recipient_invalid": return ApiErrorCopy.workflowSmsRecipientInvalid
+        case "workflow_sms_recipient_not_member": return ApiErrorCopy.workflowSmsRecipientNotMember
         case "rate_limited": return ApiErrorCopy.rateLimited
         case "subscription_inactive": return ApiErrorCopy.subscriptionInactive
         case "overage_cap_reached": return ApiErrorCopy.overageCapReached
@@ -119,9 +124,40 @@ enum ApiErrorTable {
         case "carrier_funding": return ApiErrorCopy.carrierFunding
         case "provider_credentials_rejected": return ApiErrorCopy.providerCredentialsRejected
         case "emergency_acknowledgement_required": return ApiErrorCopy.emergencyAcknowledgementRequired
+        case "transfer_managed_only": return ApiErrorCopy.transferManagedOnly
+        case "transfer_region_unsupported": return ApiErrorCopy.transferRegionUnsupported
+        case "transfer_country_unsupported": return ApiErrorCopy.transferCountryUnsupported
+        case "transfer_number_country_mismatch": return ApiErrorCopy.transferNumberCountryMismatch
+        case "transfer_toll_free_unsupported": return ApiErrorCopy.transferTollFreeUnsupported
+        case "transfer_mobile_unsupported": return ApiErrorCopy.transferMobileUnsupported
+        case "transfer_line_type_unknown": return ApiErrorCopy.transferLineTypeUnknown
+        case "transfer_refused_by_provider": return ApiErrorCopy.transferRefusedByProvider
+        case "transfer_not_found": return ApiErrorCopy.transferNotFound
+        case "transfer_already_exists": return ApiErrorCopy.transferAlreadyExists
+        case "transfer_number_unavailable": return ApiErrorCopy.transferNumberUnavailable
+        case "transfer_number_already_held": return ApiErrorCopy.transferNumberAlreadyHeld
+        case "transfer_not_editable": return ApiErrorCopy.transferNotEditable
+        case "transfer_incomplete": return ApiErrorCopy.transferIncomplete
+        case "transfer_signature_required": return ApiErrorCopy.transferSignatureRequired
+        case "transfer_emergency_acknowledgement_required": return ApiErrorCopy.transferEmergencyAcknowledgementRequired
+        case "transfer_document_limit": return ApiErrorCopy.transferDocumentLimit
+        case "transfer_submit_in_progress": return ApiErrorCopy.transferSubmitInProgress
+        case "transfer_resubmit_unsupported": return ApiErrorCopy.transferResubmitUnsupported
+        case "transfer_cancel_refused": return ApiErrorCopy.transferCancelRefused
+        case "transfer_not_cancellable": return ApiErrorCopy.transferNotCancellable
+        case "transfer_release_confirmation_required": return ApiErrorCopy.transferReleaseConfirmationRequired
         case "auto_dial_country_not_permitted": return ApiErrorCopy.autoDialCountryNotPermitted
         case "auto_dial_outside_hours": return ApiErrorCopy.autoDialOutsideHours
         case "auto_dial_contact_opted_out": return ApiErrorCopy.autoDialContactOptedOut
+        case "member_phone_invalid": return ApiErrorCopy.memberPhoneInvalid
+        case "member_phone_too_many_codes": return ApiErrorCopy.memberPhoneTooManyCodes
+        case "member_phone_resend_too_soon": return ApiErrorCopy.memberPhoneResendTooSoon
+        case "member_phone_code_wrong": return ApiErrorCopy.memberPhoneCodeWrong
+        case "member_phone_code_expired": return ApiErrorCopy.memberPhoneCodeExpired
+        case "member_phone_too_many_attempts": return ApiErrorCopy.memberPhoneTooManyAttempts
+        case "member_phone_cannot_text": return ApiErrorCopy.memberPhoneCannotText
+        case "member_phone_opted_out": return ApiErrorCopy.memberPhoneOptedOut
+        case "member_phone_business_number": return ApiErrorCopy.memberPhoneBusinessNumber
         case "call_not_in_progress": return ApiErrorCopy.callNotInProgress
         case "call_has_no_room": return ApiErrorCopy.callHasNoRoom
         case "call_not_direct_dial": return ApiErrorCopy.callNotDirectDial
@@ -152,6 +188,14 @@ enum ApiErrorTable {
         case "password_policy": return ApiErrorCopy.passwordPolicy
         case "stripe_test_mode_refused": return ApiErrorCopy.stripeTestModeRefused
         case "workspace_elsewhere": return ApiErrorCopy.workspaceElsewhere
+        case "knowledge_url_invalid": return ApiErrorCopy.knowledgeUrlInvalid
+        case "knowledge_url_blocked": return ApiErrorCopy.knowledgeUrlBlocked
+        case "knowledge_url_unreachable": return ApiErrorCopy.knowledgeUrlUnreachable
+        case "knowledge_url_timeout": return ApiErrorCopy.knowledgeUrlTimeout
+        case "knowledge_url_too_large": return ApiErrorCopy.knowledgeUrlTooLarge
+        case "knowledge_url_unsupported_type": return ApiErrorCopy.knowledgeUrlUnsupportedType
+        case "knowledge_url_pdf_unsupported": return ApiErrorCopy.knowledgeUrlPdfUnsupported
+        case "knowledge_url_empty": return ApiErrorCopy.knowledgeUrlEmpty
         default: return nil
         }
     }

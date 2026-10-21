@@ -6,6 +6,15 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/mobile/district-voice-studio.json`, `contracts/i18n/api-errors.json` and
+  `contracts/i18n/wire-vocabulary.json` from monorepo 38f0f356, byte for byte: the Claude Haiku
+  5.5 brain entry, 44 new error codes (`knowledge_url_*`, `member_phone_*`, `transfer_*`,
+  `workflow_*`), the portal's disposition labels, and new workflow triggers, an action and
+  reason codes. Their catalog entries and accessors are generated (`scripts/gen-l10n.py`),
+  with the contract's French as drafts for the sign-off.
+
 ## [7.0.2]
 
 ### Changed

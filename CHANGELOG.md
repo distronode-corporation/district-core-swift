@@ -6,6 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.0.3]
+
+The shared core for District AI for iPhone, iPad and Mac 3.0.3. Nothing public is added,
+removed or renamed.
+
 ### Changed
 
 - `contracts/mobile/district-voice-studio.json`, `contracts/i18n/api-errors.json` and

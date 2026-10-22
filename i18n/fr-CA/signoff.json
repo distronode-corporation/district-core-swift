@@ -1,11 +1,11 @@
 {
-  "signed_off_by": "v3 manager (Opus 5.5 xhigh), final French review, 2026-10-16",
-  "release": "7.0.2",
-  "commit": "a68c9fb28c124cb20ed36570509a4a2d8d3340cd",
+  "signed_off_by": "iMac manager distronode-com-bf (Opus 5.5), French review of the 7.0.2..7.0.3 catalog diff (api_errors, wire: 61 entries), 2026-10-22",
+  "release": "7.0.3",
+  "commit": "3a93cda349336305f59fcba5d9d3ef1b2af2ffe3",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "5f9286474eb287700fa867bbf44cb2944695c50561169ecf96d582944a9b1b74"
+      "sha256": "de8adc292e27c83b834960fd172412305977a1d0cfd06f84031ddf14fb9def62"
     },
     {
       "path": "l10n/core.toml",
@@ -17,7 +17,7 @@
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "61ff6d584d8c12ff8eb781cb15520d039129da3f0ae899e26b1afc2afd0969af"
+      "sha256": "9a9b803e07f8c9ca2374b497bd38cfc6dd5cc6f6bd5d7cd7d4509b620d0abe3c"
     }
   ]
 }

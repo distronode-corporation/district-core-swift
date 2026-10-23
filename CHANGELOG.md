@@ -6,6 +6,15 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- `SchedulingWallClock`, a working-hours time field's two directions: `fieldText(_:)` shows a
+  stored `HH:MM` as « 9 h », « 9 h 30 » or « 17 h » in French (unchanged `09:00` in English),
+  and `wireValue(_:)` turns a typed `9 h`, `9 h 30`, `9h30`, `9:30` or `09:30` into the
+  zero-padded `HH:MM` the scheduler requires, or nil for garbage or a clock outside
+  00:00...23:59. The apps' Edit working hours sheet showed the wire value « 09:00 » on a
+  French screen. Tested in `SchedulingWallClockTests`.
+
 ## [7.0.3]
 
 The shared core for District AI for iPhone, iPad and Mac 3.0.3. Nothing public is added,

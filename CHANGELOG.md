@@ -6,6 +6,11 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [7.1.0]
+
+The shared core for District AI for iPhone, iPad and Mac after 3.0.3. One public type is
+added; nothing is removed or renamed.
+
 ### Added
 
 - `SchedulingWallClock`, a working-hours time field's two directions: `fieldText(_:)` shows a

@@ -44,9 +44,15 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case callTranscript
     case dial
     case answerCall
+    /// ⛔ SENT ONLY WHEN A PERSON DECLINES, never on a timeout, a withdrawal or a
+    /// missing session. See ``DistrictEndpoints/declineCall(callId:workspaceId:)``.
+    case declineCall
     /// ⚠️ THE THIRD ROUTE IN THE DIAL/ANSWER FAMILY AND THE ONLY ONE THAT IS SAFE
     /// TO SEND TWICE. See ``DistrictEndpoints/hangUpCall(callId:workspaceId:)``.
     case hangUpCall
+    /// One supervisor line into a live call's agent. ⛔ Never retried. See
+    /// ``DistrictEndpoints/whisper(workspaceId:callId:text:)``.
+    case whisper
 
     // Rooms + meetings
     case roomToken
@@ -87,6 +93,11 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// ⚠️ ITS ROLES ARE `["agency","client"]`, matching `markRead`/`sendMessage`
     /// rather than `timeline`. Gate it where the writes are gated.
     case messageThread
+    /// One message id exchanged for its sender's display name, and nothing else.
+    ///
+    /// ⛔ THE ONE DISTRICT READ A NOTIFY-READ TOKEN AUTHENTICATES. See
+    /// ``DistrictEndpoints/messageSender(workspaceId:id:)`` and ``notifyToken``.
+    case messageSender
     case sendMessage
     case markRead
     case uploadMedia
@@ -117,6 +128,9 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case revokeAllDevices
     case registerPushToken
     case unregisterPushToken
+    /// The long-lived credential a notification extension spends on ``messageSender``.
+    /// See ``DistrictEndpoints/notifyToken()``.
+    case notifyToken
 
     /// The account's own settings (`GET /api/settings`): the profile, including the
     /// stored language, and the first workspace's plan and region.

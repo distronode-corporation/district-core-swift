@@ -266,6 +266,12 @@ enum DistrictPaths {
         messages + [id]
     }
 
+    /// ⛔ THE SAME PUSH-SUPPLIED ID AS ``messageThreadTarget(_:)``, so a function for
+    /// the same reason: `messages/{id}/sender`, one segment per element.
+    static func messageSender(_ id: String) -> [String] {
+        messages + [id, "sender"]
+    }
+
     /// ⛔ FULL-CONTENT SEARCH, AND IT IS NOT ``conversations`` FILTERED. The route
     /// queries the whole `Message` table for the workspace (body AND email subject,
     /// case-insensitive), so a match in a thread that fell outside the conversation
@@ -476,4 +482,6 @@ enum DistrictPaths {
     static let nativeDevices = nativeAuth + ["devices"]
     static let nativeDevicesRevoke = nativeDevices + ["revoke"]
     static let nativeRevokeAll = nativeAuth + ["revoke-all"]
+    /// ⚠️ A SIBLING OF `revoke-all`, under the same public prefix and bearer.
+    static let nativeNotifyToken = nativeAuth + ["notify-token"]
 }

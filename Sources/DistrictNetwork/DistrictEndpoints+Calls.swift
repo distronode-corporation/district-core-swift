@@ -114,6 +114,58 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// Tell the server a PERSON on this device declined a ringing call.
+    ///
+    /// ⛔ SENT ONLY ON A HUMAN DECLINE, AND NEVER ON A TIMEOUT, A WITHDRAWAL OR A
+    /// MISSING SESSION. The server records the decliner; once every member it rang
+    /// has declined it ends the ring early with `reason: "declined"` and the agent
+    /// takes a message instead of waiting out the rendezvous. A request sent for a
+    /// ring nobody looked at would tell the caller a person refused them. The only
+    /// producer is `IncomingCallCommand.requestDecline(workspace:call:)` (in
+    /// `DistrictCall`), which the reducer emits on a decline press and nowhere else.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. A repeat is harmless server-side (the route is
+    /// idempotent and fails open), but a retry loop outliving the ring would be a
+    /// request about a call that is no longer ringing anybody.
+    ///
+    /// ⚠️ 404 `call_not_found` IS "the call is already over", the ordinary race on a
+    /// ringing screen, and nothing a screen should report.
+    static func declineCall(callId: String, workspaceId: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .declineCall,
+            .post,
+            DistrictPaths.callDecline(callId),
+            body: .json(.object([("workspaceId", .string(workspaceId))]))
+        )
+    }
+
+    /// Send one supervisor line to the agent on a live call.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. The route publishes a reliable LiveKit data
+    /// packet and only then answers, so a 5xx or a dropped response may follow a
+    /// line the agent already acted on, and a retry would say it twice.
+    ///
+    /// ⚠️ THE LINE ARRIVES AS AN INSTRUCTION TO THE AGENT, NOT AS SPEECH TO THE
+    /// CALLER, so canned lines are written in the third person ("The owner will call
+    /// them back today."). ⚠️ The route refuses an empty line and one over 2000
+    /// characters with 400 `invalid_request`; a call not in progress is 400 or 409
+    /// `call_not_in_progress`, and roles are `["agency","client"]`.
+    ///
+    /// - Parameter callId: the `Call.id` (as in ``callDetail(workspaceId:callId:)``),
+    ///   ⛔ sent in the BODY: there is no per-call whisper path.
+    static func whisper(workspaceId: String, callId: String, text: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .whisper,
+            .post,
+            DistrictPaths.callsWhisper,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("callId", .string(callId)),
+                ("whisper", .string(text)),
+            ]))
+        )
+    }
+
     /// Tell the SERVER to end a direct softphone call, carrier leg included.
     ///
     /// ⛔ WITHOUT THIS THE APP CANNOT HANG UP, AND THE FAILURE IS A BILL RATHER

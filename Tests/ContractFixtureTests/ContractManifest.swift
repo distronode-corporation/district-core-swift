@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 187
+    static let expectedFixtureCount = 190
 
     /// Fixtures with no Swift DTO yet.
     ///

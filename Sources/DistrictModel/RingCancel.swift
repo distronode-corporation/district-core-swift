@@ -20,7 +20,7 @@ public enum RingCancelReason: Sendable, Equatable, CaseIterable {
     /// The server stopped ringing for its own reason.
     case withdrawn
     /// Every member the server rang declined, so the ring ended early and the agent takes
-    /// a message (7.2.0; `calls/{id}/decline`). ⚠️ A client older than 7.2.0 reads it as
+    /// a message (8.0.0; `calls/{id}/decline`). ⚠️ A client older than 8.0.0 reads it as
     /// ``withdrawn``, which is why the server could add it.
     case declined
 

@@ -55,7 +55,7 @@ final class IncomingCallControllerTests: XCTestCase {
     }
 
     func testAPersonsDeclineAddsExactlyTheDeclineRequest() {
-        // ⛔ THE RULE SINCE 7.2.0, ASSERTED AS A DIFFERENCE RATHER THAN A LIST. A
+        // ⛔ THE RULE SINCE 8.0.0, ASSERTED AS A DIFFERENCE RATHER THAN A LIST. A
         // decline ends the ring exactly as a timeout does and then adds ONE command,
         // the request, LAST, so the ring is gone locally before any round trip.
         var declined = IncomingCallController.inRinging()

@@ -25,7 +25,7 @@ final class RingCancelTests: XCTestCase {
         XCTAssertEqual(RingCancelReason(wire: nil), .withdrawn)
     }
 
-    /// ⛔ `declined` (7.2.0) READS AS ITSELF, and a client older than 7.2.0 reads it as
+    /// ⛔ `declined` (8.0.0) READS AS ITSELF, and a client older than 8.0.0 reads it as
     /// `withdrawn` through the rule above, which is what let the server add it.
     func testADeclineReadsAsItsOwnReason() {
         XCTAssertEqual(RingCancelReason(wire: "declined"), .declined)

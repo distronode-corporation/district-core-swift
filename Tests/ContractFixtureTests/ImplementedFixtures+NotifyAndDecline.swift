@@ -9,7 +9,7 @@ import Foundation
 extension ImplementedFixtures {
     // MARK: - A person's decline, and a lock screen's sender name
 
-    /// ⛔ THREE FILES ARRIVED WITH THEIR ROUTES (7.2.0), so
+    /// ⛔ THREE FILES ARRIVED WITH THEIR ROUTES (8.0.0), so
     /// ``ContractManifest/expectedFixtureCount`` moves by three here and none of them
     /// visits ``ContractManifest/unimplemented``: each landed with its DTO and the
     /// repository that decodes it.

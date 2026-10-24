@@ -210,7 +210,7 @@ public enum IncomingCallCommand: Sendable, Equatable {
 /// ⛔ **A PERSON'S DECLINE IS SENT TO THE SERVER; A TIMEOUT, A WITHDRAWAL AND A
 /// MISSING SESSION ARE NOT.** `POST /api/district/actions/ring-app` blocks on a
 /// Redis rendezvous for about 25 seconds, and when it expires the agent takes a
-/// message. Until 7.2.0 a decline sent nothing either, so a refusal and a phone in a
+/// message. Until 8.0.0 a decline sent nothing either, so a refusal and a phone in a
 /// pocket looked the same from outside. Sean reversed that on 2026-10-24 (GitLab #2,
 /// note 4083623386): someone who presses Decline wants the caller looked after now,
 /// not after the rest of the ring, so a decline in ``IncomingCallPhase/ringing``

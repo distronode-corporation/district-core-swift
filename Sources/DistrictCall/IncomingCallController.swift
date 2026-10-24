@@ -52,8 +52,8 @@ public struct IncomingCallState: Sendable, Equatable {
     /// ⛔ IT IS WHAT DECIDES WHETHER AN EXIT DISCONNECTS, AND IT IS NOT THE SAME
     /// QUESTION AS ``media``. `media` appears only once the room is joined, so a
     /// join that was issued and then FAILED would leave an engine holding a
-    /// socket that nothing ever told to let go. ⚠️ It is also what keeps a
-    /// decline and a timeout emitting byte-identical command lists: neither has
+    /// socket that nothing ever told to let go. ⚠️ It is also why a ringing call
+    /// that ends (declined, timed out or withdrawn) emits no disconnect: none has
     /// ever issued a connect.
     public internal(set) var engineAttached = false
 
@@ -111,7 +111,23 @@ public enum IncomingCallEvent: Sendable, Equatable {
     /// The answer route refused.
     case answerRejected(IncomingAnswerRejection)
 
+    /// A PERSON declined: the ringing screen's button, the notification's, or the OS's
+    /// own end-call affordance (lock screen, watch, headset, car) while it rings.
+    ///
+    /// ⛔ ONLY A HUMAN ACT MAY FEED THIS, because while ringing it emits
+    /// ``IncomingCallCommand/requestDecline(workspace:call:)``. A path with nobody
+    /// behind it feeds ``withdrawnLocally`` instead.
     case declinePressed
+
+    /// The app took the ring away itself, with no person behind it: the live session
+    /// stopped (sleep, quit, a setting switched off) or the session gate found nobody
+    /// signed in.
+    ///
+    /// ⛔ ENDS THE CALL EXACTLY AS ``declinePressed`` DOES AND SENDS NOTHING. It is the
+    /// event the apps' `withdraw` and `endForNoSession` paths feed; they used
+    /// ``declinePressed`` until declines were reported to the server, and would now tell
+    /// the caller a person refused them.
+    case withdrawnLocally
 
     /// The local ring bound elapsed. ⚠️ Sent by whatever owns the clock; see
     /// ``IncomingCallState/ringHasExpired(atMilliseconds:)``.
@@ -160,9 +176,19 @@ public enum IncomingCallCommand: Sendable, Equatable {
 
     /// `POST /api/district/calls/{callId}/answer?workspaceId=`.
     ///
-    /// ⛔ EMITTED EXACTLY ONCE PER CALL, AND ON NO OTHER PATH. ⛔ NOTHING IS SENT
-    /// ON A DECLINE OR A TIMEOUT, see ``IncomingCallController``.
+    /// ⛔ EMITTED EXACTLY ONCE PER CALL, AND ON NO OTHER PATH.
     case requestAnswer(workspace: WorkspaceID, call: CallID)
+
+    /// `POST /api/district/calls/{callId}/decline` with `{workspaceId}`.
+    ///
+    /// ⛔ EMITTED ONLY WHEN A PERSON DECLINES A RINGING CALL
+    /// (``IncomingCallEvent/declinePressed`` in ``IncomingCallPhase/ringing``), at most
+    /// once per call, and LAST, after the ring is already gone locally. A timeout, a
+    /// withdrawal and a missing session emit nothing. See ``IncomingCallController``.
+    ///
+    /// ⛔ FIRE AND FORGET, NEVER RETRIED: the local ring has ended whatever the answer,
+    /// and the route fails open.
+    case requestDecline(workspace: WorkspaceID, call: CallID)
 
     /// Tell the OS the call is connected.
     ///
@@ -181,16 +207,22 @@ public enum IncomingCallCommand: Sendable, Equatable {
 
 /// The inbound state machine: ring, answer, decline, time out.
 ///
-/// ⛔ **NOTHING IS SENT TO THE SERVER ON A DECLINE OR A TIMEOUT, AND THAT IS A
-/// PRIVACY PROPERTY RATHER THAN AN OMISSION.** `POST
-/// /api/district/actions/ring-app` blocks on a Redis rendezvous for about 25
-/// seconds and falls back to PSTN when it expires, so the server already has
-/// everything it needs from the ABSENCE of an answer. Reporting a decline would
-/// make a deliberate refusal distinguishable from a phone in a pocket, to the
-/// agent, and through it to the caller, and there is no version of that
-/// distinction the product wants. The two must be indistinguishable from outside,
-/// so they emit identical command lists and differ only in a local
-/// ``CallEndReason`` this device never transmits.
+/// ⛔ **A PERSON'S DECLINE IS SENT TO THE SERVER; A TIMEOUT, A WITHDRAWAL AND A
+/// MISSING SESSION ARE NOT.** `POST /api/district/actions/ring-app` blocks on a
+/// Redis rendezvous for about 25 seconds, and when it expires the agent takes a
+/// message. Until 7.2.0 a decline sent nothing either, so a refusal and a phone in a
+/// pocket looked the same from outside. Sean reversed that on 2026-10-24 (GitLab #2,
+/// note 4083623386): someone who presses Decline wants the caller looked after now,
+/// not after the rest of the ring, so a decline in ``IncomingCallPhase/ringing``
+/// emits ``IncomingCallCommand/requestDecline(workspace:call:)``, and once every
+/// member the server rang has declined it ends the ring and the agent takes a
+/// message straight away. What stays unreported is every ending with no person
+/// behind it: a ring that timed out, one the app withdrew itself
+/// (``IncomingCallEvent/withdrawnLocally``) and one ended because nobody was signed
+/// in. Reporting any of those would tell the caller a person refused them when
+/// nobody saw the call, so they emit no request and differ from each other only in
+/// a local ``CallEndReason`` this device never transmits. That is why
+/// ``IncomingCallEvent/declinePressed`` may only be fed by a human act.
 ///
 /// ⛔ **THE RING IS BOUNDED LOCALLY AND THE BOUND IS LONGER THAN THE SERVER'S ON
 /// PURPOSE.** The rendezvous expires at 25s; this waits 30. Timing out FIRST
@@ -201,8 +233,9 @@ public enum IncomingCallCommand: Sendable, Equatable {
 /// not queued, not allowed to replace. One engine owns the device's audio focus,
 /// and a replacement would tear down a conversation the user is having in order to
 /// ring them about another. The dropped call still reaches the server's timeout
-/// and falls back to PSTN, which is the correct outcome for a person who is
-/// already on the phone.
+/// and the agent takes a message, which is the correct outcome for a person who is
+/// already on the phone. ⚠️ Nothing is sent for it: being on another call is not a
+/// decline.
 ///
 /// ⛔ **THE ANSWER SIGNAL IS OUR OWN MEDIA COMING UP, NOT A PARTICIPANT
 /// APPEARING**, which is the whole reason this is not ``SoftphoneSession``. An
@@ -267,11 +300,16 @@ public struct IncomingCallController: Sendable, Equatable {
         case .answerPressed:
             answer(state)
         case .declinePressed:
+            decline(state)
+        case .withdrawnLocally:
+            // ⛔ THE DECLINE'S LOCAL ENDING WITHOUT ITS REQUEST. Nobody pressed
+            // anything, so nothing may tell the server somebody did. The local
+            // reason stays `.declined`, which is what these paths recorded before
+            // the request existed and which this device never transmits.
             end(state, .declined)
         case .ringTimedOut:
-            // ⛔ THE SAME PATH AS A DECLINE, NOT MERELY THE SAME BEHAVIOUR TODAY.
-            // See the type note: sharing the exit is what guarantees the two stay
-            // indistinguishable from outside.
+            // ⛔ THE SHARED EXIT AND NOTHING MORE. See the type note: a phone in a
+            // pocket is not a person refusing the call.
             end(state, .ringTimedOut)
         case .hangUpPressed:
             end(state, .hungUpLocally)
@@ -294,6 +332,21 @@ public struct IncomingCallController: Sendable, Equatable {
         return (next, [.stopRinging, .requestAnswer(workspace: workspace, call: call)])
     }
 
+    /// A person declined a ringing call: the shared exit, then the request.
+    ///
+    /// ⛔ THE REQUEST GOES LAST, so an app performing the list in order has already
+    /// stopped the ring and reported the end before it reaches the round trip, which it
+    /// spawns rather than awaits, as it does the answer. ⚠️ `workspaceID` and `callID`
+    /// are always set in ``IncomingCallPhase/ringing`` (only `reduceIdle` enters it, and
+    /// it sets both); the guard is the same unwrap ``answer(_:)`` makes.
+    private static func decline(
+        _ state: IncomingCallState
+    ) -> (state: IncomingCallState, commands: [IncomingCallCommand]) {
+        let ended = end(state, .declined)
+        guard let workspace = state.workspaceID, let call = state.callID else { return ended }
+        return (ended.state, ended.commands + [.requestDecline(workspace: workspace, call: call)])
+    }
+
     private static func reduceAnswering(
         _ state: IncomingCallState,
         _ event: IncomingCallEvent
@@ -307,7 +360,7 @@ public struct IncomingCallController: Sendable, Equatable {
             return end(state, rejection.endReason)
         case let .engine(engineEvent):
             return reduceAnsweringEngine(state, engineEvent)
-        case .declinePressed, .hangUpPressed:
+        case .declinePressed, .withdrawnLocally, .hangUpPressed:
             return end(state, .hungUpLocally)
         case .answerPressed:
             // ⛔ A SECOND ANSWER IS DROPPED. The notification's button, the
@@ -353,7 +406,7 @@ public struct IncomingCallController: Sendable, Equatable {
         _ event: IncomingCallEvent
     ) -> (state: IncomingCallState, commands: [IncomingCallCommand]) {
         switch event {
-        case .hangUpPressed, .declinePressed:
+        case .hangUpPressed, .declinePressed, .withdrawnLocally:
             return end(state, .hungUpLocally)
         case let .engine(engineEvent):
             return reduceInCallEngine(state, engineEvent)

@@ -3,12 +3,12 @@ import XCTest
 
 /// The inbound state machine: ring, answer, decline, time out.
 ///
-/// ⛔ THE MOST IMPORTANT ASSERTIONS IN THIS FILE ARE THAT **NOTHING IS SENT** ON A
-/// DECLINE AND ON A TIMEOUT. `actions/ring-app` blocks on a Redis rendezvous for
-/// about 25 seconds and falls back to PSTN when it expires, so the server already
-/// has everything it needs from the ABSENCE of an answer. Reporting a decline
-/// would make a deliberate refusal distinguishable from a phone in a pocket, and
-/// there is no version of that distinction the product wants.
+/// ⛔ THE MOST IMPORTANT ASSERTIONS IN THIS FILE ARE WHAT IS SENT WHEN A RING ENDS
+/// UNANSWERED. A person's decline adds exactly one request,
+/// ``IncomingCallCommand/requestDecline(workspace:call:)``, so the server can end the
+/// ring and let the agent take a message (Sean's decision, 2026-10-24, GitLab #2 note
+/// 4083623386). A timeout, a withdrawal and a missing session add NOTHING: none has a
+/// person behind it, and reporting one would tell the caller somebody refused them.
 final class IncomingCallControllerTests: XCTestCase {
     func testAPushRingsTheOSAndTheNotificationShadeTogether() {
         var controller = IncomingCallController()
@@ -28,8 +28,8 @@ final class IncomingCallControllerTests: XCTestCase {
     func testASecondPushWhileOneIsLiveIsDroppedNotQueuedAndNotAReplacement() {
         // ⛔ ONE ENGINE, ONE AUDIO FOCUS. A replacement would tear down a
         // conversation the user is having in order to ring them about another;
-        // the dropped call still reaches the server's timeout and falls back to
-        // PSTN, which is the right outcome for someone already on the phone.
+        // the dropped call still reaches the server's timeout and the agent takes a
+        // message, which is the right outcome for someone already on the phone.
         var controller = IncomingCallController.inRinging()
         let commands = controller.handle(
             .ringing(workspace: testWorkspace, call: CallID("CA2"), atMilliseconds: testRingStart + 1)
@@ -40,22 +40,104 @@ final class IncomingCallControllerTests: XCTestCase {
         XCTAssertEqual(testRingStart, controller.state.ringStartedAtMilliseconds)
     }
 
-    func testDecliningAndTimingOutEmitByteIdenticalCommandLists() {
-        // ⛔ THE PRIVACY PROPERTY, ASSERTED RATHER THAN DESCRIBED. An unanswered
-        // ring and a declined one must look identical from outside. The local
-        // reason differs so the phone's own screen can be honest; nothing this
-        // device transmits does.
+    /// The ending every unanswered ring shares, with nothing sent.
+    private static let quietEnding: [IncomingCallCommand] = [.stopRinging, .reportCallEnded]
+
+    private static func sendsSomething(_ commands: [IncomingCallCommand]) -> Bool {
+        commands.contains { command in
+            switch command {
+            case .requestAnswer, .requestDecline:
+                true
+            default:
+                false
+            }
+        }
+    }
+
+    func testAPersonsDeclineAddsExactlyTheDeclineRequest() {
+        // ⛔ THE RULE SINCE 7.2.0, ASSERTED AS A DIFFERENCE RATHER THAN A LIST. A
+        // decline ends the ring exactly as a timeout does and then adds ONE command,
+        // the request, LAST, so the ring is gone locally before any round trip.
         var declined = IncomingCallController.inRinging()
         var timedOut = IncomingCallController.inRinging()
 
         let declineCommands = declined.handle(.declinePressed)
         let timeoutCommands = timedOut.handle(.ringTimedOut)
 
-        XCTAssertEqual(declineCommands, timeoutCommands)
-        XCTAssertEqual([.stopRinging, .reportCallEnded], declineCommands)
-        XCTAssertFalse(declineCommands.contains(.requestAnswer(workspace: testWorkspace, call: testCall)))
+        XCTAssertEqual(timeoutCommands + [.requestDecline(workspace: testWorkspace, call: testCall)], declineCommands)
+        XCTAssertEqual(
+            [.stopRinging, .reportCallEnded, .requestDecline(workspace: testWorkspace, call: testCall)],
+            declineCommands
+        )
         XCTAssertEqual(.ended(.declined), declined.state.phase)
-        XCTAssertEqual(.ended(.ringTimedOut), timedOut.state.phase)
+    }
+
+    func testATimeoutSendsNothing() {
+        // ⛔ A PHONE IN A POCKET IS NOT A PERSON REFUSING THE CALL. The server's own
+        // rendezvous expiry does the work.
+        var controller = IncomingCallController.inRinging()
+
+        let commands = controller.handle(.ringTimedOut)
+
+        XCTAssertEqual(Self.quietEnding, commands)
+        XCTAssertFalse(Self.sendsSomething(commands))
+        XCTAssertEqual(.ended(.ringTimedOut), controller.state.phase)
+    }
+
+    func testAWithdrawalSendsNothing() {
+        // ⛔ THE MAC'S `withdraw` (the live session stopped: sleep, quit, the setting
+        // switched off) used to feed `.declinePressed`. Nobody pressed anything, so it
+        // feeds `.withdrawnLocally`, which ends the ring the same way and sends nothing.
+        // Its summary is skipped straight after, as the app does.
+        var controller = IncomingCallController.inRinging()
+
+        let commands = controller.handle(.withdrawnLocally)
+        let dismissed = controller.handle(.dismissed)
+
+        XCTAssertEqual(Self.quietEnding, commands)
+        XCTAssertEqual([], dismissed)
+        XCTAssertEqual(.idle, controller.state.phase)
+    }
+
+    func testANoSessionEndingSendsNothingInAnyPhase() {
+        // ⛔ BOTH APPS' `endForNoSession` (the session gate found nobody signed in)
+        // feed `.withdrawnLocally` in whatever phase the call is in. While ringing it
+        // ends like a decline; after the press like a hang-up, closing a socket only if
+        // a join was issued. In no phase does it send a request.
+        let ringingOrAnswering: [IncomingCallController] = [.inRinging(), .inAnswering()]
+        let joined: [IncomingCallController] = [.inJoining(), .inCall()]
+        for start in ringingOrAnswering + joined {
+            var controller = start
+            let commands = controller.handle(.withdrawnLocally)
+            let expected = joined.contains(start) ? Self.quietEnding + [.engine(.disconnect)] : Self.quietEnding
+            XCTAssertEqual(expected, commands, "from \(start.state.phase)")
+            XCTAssertFalse(Self.sendsSomething(commands), "from \(start.state.phase)")
+            XCTAssertEqual(
+                start.state.phase == .ringing ? .ended(.declined) : .ended(.hungUpLocally),
+                controller.state.phase
+            )
+        }
+    }
+
+    func testADeclineAfterTheAnswerPressSendsNoDeclineRequest() {
+        // ⚠️ ONCE ANSWER IS PRESSED THE SERVER HAS THE ANSWER, so a decline from here
+        // is a hang-up of a call being joined, not a refusal of a ring.
+        var controller = IncomingCallController.inAnswering()
+
+        let commands = controller.handle(.declinePressed)
+
+        XCTAssertEqual(Self.quietEnding, commands)
+        XCTAssertEqual(.ended(.hungUpLocally), controller.state.phase)
+    }
+
+    func testTheDeclineRequestIsEmittedAtMostOncePerCall() {
+        // ⚠️ The ringing screen, the notification and CallKit can all deliver a
+        // decline; the first ends the ring and every later one is absorbed.
+        var controller = IncomingCallController.inRinging()
+        controller.handle(.declinePressed)
+
+        XCTAssertEqual([], controller.handle(.declinePressed))
+        XCTAssertEqual([], controller.handle(.withdrawnLocally))
     }
 
     func testTheRingNotificationGoesAwayAtThePressBeforeTheRoundTrip() {

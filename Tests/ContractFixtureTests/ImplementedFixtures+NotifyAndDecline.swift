@@ -25,6 +25,9 @@ extension ImplementedFixtures {
     static var notifyAndDecline: [ImplementedFixture] {
         [
             gate("district-call-decline.json", SuccessResponse.self),
+            // ⚠️ 8.1.0, the Live Activity token registration: one more file, the
+            // same shared envelope.
+            gate("district-call-live-activity.json", SuccessResponse.self),
             gate("district-message-sender.json", MessageSenderResponse.self),
             gate("district-notify-token.json", NotifyTokenResponse.self),
         ]

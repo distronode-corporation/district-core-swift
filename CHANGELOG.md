@@ -6,6 +6,31 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.1.0]
+
+The Live Activity for District AI for iPhone 3.2.0: the app hands the server each Live
+Activity push token for a call, so the activity on the Lock Screen, the Dynamic Island and the
+Apple Watch Smart Stack keeps updating while the app sleeps. Nothing is removed or renamed.
+⚠️ `EndpointID` gains a case, which would break an exhaustive `switch` over it; neither
+district-ios nor district-macos switches over `EndpointID` or names any of its cases (their
+sources at `main`, district-ios 2142846 and district-macos b8323d6, mention the type only in
+two comments each), so this is a minor version, as 7.0.1 judged the same question.
+
+### Added
+
+- `DistrictEndpoints.registerLiveActivity(workspaceId:callId:token:)`
+  (`POST /api/district/calls/{id}/live-activity` with `{workspaceId, token}`) and
+  `CallsRepository.registerLiveActivity(workspaceId:callId:token:)`, decoding
+  `SuccessResponse`. Never retried: ActivityKit hands over each rotated token, and each is
+  sent once.
+- `EndpointID.registerLiveActivity`, typed from its first commit (`TypedEndpoints.liveCall`).
+  The endpoint total is 125 and the typed count 123.
+- `contracts/mobile/district-call-live-activity.json`, from the service's contract, gated in
+  `ContractFixtureTests` (`ContractManifest.expectedFixtureCount` is 191).
+- `contracts/i18n/api-errors.json` from the service (#41), with its two new codes generated
+  into `l10n/api_errors.toml` and the `ApiErrorTable`: `engine_unavailable` and
+  `workflow_member_push_roles_invalid`, each in English and Canadian French.
+
 ## [8.0.0]
 
 The shared core for the Apple Watch round 2 of District AI for iPhone, iPad and Mac: a

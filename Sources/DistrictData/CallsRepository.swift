@@ -168,6 +168,30 @@ public struct CallsRepository: Sendable {
             .map { _ in () }
     }
 
+    /// Register one Live Activity push token for a call, so the server can update the
+    /// activity while the app is asleep.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. ActivityKit's `pushTokenUpdates` hands over each
+    /// new token, and each is sent once. A failure costs only server updates: the app
+    /// still updates and ends the activity locally while it is awake.
+    ///
+    /// ⚠️ 404 `call_not_found` is the call ending first, and nothing to show anyone.
+    ///
+    /// - Parameter token: the push token as lowercase hex.
+    public func registerLiveActivity(
+        workspaceId: String,
+        callId: String,
+        token: String
+    ) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.registerLiveActivity(workspaceId: workspaceId, callId: callId, token: token),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("LiveActivityResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
     /// One page, because the filtering happens afterwards.
     ///
     /// ⚠️ SMALL ON PURPOSE. The server has no `direction` filter, so the whole

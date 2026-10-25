@@ -60,6 +60,14 @@ extension EndpointTable {
                 "\(host)/api/district/calls/call_1/live-activity",
                 .json(#"{"token":"ab01","workspaceId":"ws_1"}"#)
             ),
+            // ⚠️ NO CALL: the start token is the user's, under `live-activity/`.
+            EndpointExpectation(
+                .registerLiveActivityStartToken,
+                DistrictEndpoints.registerLiveActivityStartToken(workspaceId: "ws_1", token: "cd02"),
+                .post,
+                "\(host)/api/district/live-activity/start-token",
+                .json(#"{"token":"cd02","workspaceId":"ws_1"}"#)
+            ),
         ]
     }
 

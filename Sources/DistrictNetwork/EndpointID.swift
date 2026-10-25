@@ -57,6 +57,10 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// the activity. ⛔ Never retried. See
     /// ``DistrictEndpoints/registerLiveActivity(workspaceId:callId:token:)``.
     case registerLiveActivity
+    /// The device's Live Activity push-to-start token, so the server can start the call's
+    /// activity on a ring. ⛔ Never retried. See
+    /// ``DistrictEndpoints/registerLiveActivityStartToken(workspaceId:token:)``.
+    case registerLiveActivityStartToken
 
     // Rooms + meetings
     case roomToken

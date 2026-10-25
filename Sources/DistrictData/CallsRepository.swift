@@ -192,6 +192,21 @@ public struct CallsRepository: Sendable {
             .map { _ in () }
     }
 
+    /// Register this device's Live Activity push-to-start token, so a ring can start the call's
+    /// activity while the app is not running.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. A failure costs only the server-started activity; the
+    /// app still starts one itself when a ring reaches it in front.
+    public func registerLiveActivityStartToken(workspaceId: String, token: String) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.registerLiveActivityStartToken(workspaceId: workspaceId, token: token),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("LiveActivityStartTokenResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
     /// One page, because the filtering happens afterwards.
     ///
     /// ⚠️ SMALL ON PURPOSE. The server has no `direction` filter, so the whole

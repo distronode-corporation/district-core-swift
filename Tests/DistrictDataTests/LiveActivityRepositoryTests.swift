@@ -4,7 +4,8 @@ import DistrictNetwork
 import Foundation
 import XCTest
 
-/// A Live Activity's push token, handed to the server for one call.
+/// A Live Activity's push token, handed to the server for one call, and the device's
+/// push-to-start token, handed over for none.
 ///
 /// ⛔ NO TEST HERE EXPECTS A SECOND REQUEST, and none may be added. ActivityKit hands over
 /// each new token and each is sent once; a retry loop would outlive the call. Each test
@@ -61,5 +62,42 @@ final class LiveActivityRepositoryTests: XCTestCase {
             .registerLiveActivity(workspaceId: "ws_1", callId: "call_1", token: "0a1b2c")
 
         XCTAssertEqual(result.failureOnly, .decoding("LiveActivityResponse did not affirm success=true"))
+    }
+
+    // MARK: - The push-to-start token
+
+    /// ⚠️ NO CALL ANYWHERE: the token is the user's, and the workspace only routes it.
+    func testAStartTokenPostsTheWorkspaceAndTokenToItsOwnRoute() async {
+        let transport = RepositoryTransport(json: #"{"success":true}"#)
+
+        let result = await CallsRepository(client: .repositoryTest(transport))
+            .registerLiveActivityStartToken(workspaceId: "ws_1", token: "9f00")
+
+        XCTAssertNotNil(result.successOnly)
+        XCTAssertEqual(transport.requests.first?.method, .post)
+        XCTAssertEqual(transport.requestedURLs, ["https://www.distronode.com/api/district/live-activity/start-token"])
+        XCTAssertEqual(transport.bodies, [#"{"token":"9f00","workspaceId":"ws_1"}"#])
+    }
+
+    func testAStartTokenRefusalIsOneRequestWithItsCode() async {
+        let transport = RepositoryTransport(
+            json: #"{"success":false,"error":"Missing parameters","code":"invalid_request"}"#,
+            status: 400
+        )
+
+        let result = await CallsRepository(client: .repositoryTest(transport))
+            .registerLiveActivityStartToken(workspaceId: "ws_1", token: "")
+
+        XCTAssertEqual(result.failureOnly?.code, "invalid_request")
+        XCTAssertEqual(transport.requests.count, 1)
+    }
+
+    func testAStartTokenThatDoesNotAffirmSuccessIsADecodeFailure() async {
+        let transport = RepositoryTransport(json: #"{"success":false}"#)
+
+        let result = await CallsRepository(client: .repositoryTest(transport))
+            .registerLiveActivityStartToken(workspaceId: "ws_1", token: "9f00")
+
+        XCTAssertEqual(result.failureOnly, .decoding("LiveActivityStartTokenResponse did not affirm success=true"))
     }
 }

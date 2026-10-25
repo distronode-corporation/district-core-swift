@@ -192,6 +192,29 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// Hand the server this device's Live Activity push-to-start token, so a ring can start
+    /// the call's activity with no app running (iOS 18 and later).
+    ///
+    /// ⚠️ THE TOKEN IS THE USER'S, NOT THE WORKSPACE'S. The workspace only routes the request
+    /// to the right cell and authorises it (roles `["agency","client"]`); the server keeps up
+    /// to five tokens per user for 30 days, refreshed on every write, and fails open.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. ActivityKit hands over a new token when it rotates one,
+    /// and the app sends it again when it goes stale; a retry loop adds nothing.
+    ///
+    /// - Parameter token: the push-to-start token as lowercase hex.
+    static func registerLiveActivityStartToken(workspaceId: String, token: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .registerLiveActivityStartToken,
+            .post,
+            DistrictPaths.liveActivityStartToken,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("token", .string(token)),
+            ]))
+        )
+    }
+
     /// Tell the SERVER to end a direct softphone call, carrier leg included.
     ///
     /// ⛔ WITHOUT THIS THE APP CANNOT HANG UP, AND THE FAILURE IS A BILL RATHER

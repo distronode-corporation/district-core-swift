@@ -1,7 +1,7 @@
 import Foundation
 
-/// The two routes a person uses to act on a call they are not in: declining a ring,
-/// and whispering to the agent on a live call.
+/// The routes a person uses to act on a call they are not in: declining a ring,
+/// whispering to the agent on a live call, and registering a Live Activity for it.
 ///
 /// ⚠️ A SIBLING FILE BECAUSE `DistrictPaths.swift` SITS AT SwiftLint's 500-LINE
 /// `file_length`, the reason `DistrictPaths+Numbers.swift` exists. ``DistrictPaths/calls``
@@ -18,4 +18,10 @@ extension DistrictPaths {
     /// ⛔ NO ID IN THE PATH, UNLIKE EVERY OTHER PER-CALL WRITE. The call travels in the
     /// BODY (`callId`), so `calls/{id}/whisper` would 404.
     static let callsWhisper = calls + ["whisper"]
+
+    /// ⛔ A FUNCTION, LIKE ``callDecline(_:)``: `calls/{id}/live-activity`, the id as
+    /// one segment, and the hyphen is part of the route.
+    static func callLiveActivity(_ callId: String) -> [String] {
+        calls + [callId, "live-activity"]
+    }
 }

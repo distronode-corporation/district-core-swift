@@ -146,6 +146,8 @@ enum DistrictPaths {
     static let districtSetup = district + ["setup"]
     static let analytics = district + ["analytics"]
     static let calls = district + ["calls"]
+    /// ⚠️ NOT UNDER `calls`: a push-to-start token is the USER's, for no call yet.
+    static let liveActivityStartToken = district + ["live-activity", "start-token"]
 
     /// ⛔ THE ROOM-JOIN TOKEN LIVES UNDER `calls`, AND THAT IS THE SERVER'S PATH
     /// RATHER THAN A MISFILING TO CORRECT. `/api/district/rooms/token` does not

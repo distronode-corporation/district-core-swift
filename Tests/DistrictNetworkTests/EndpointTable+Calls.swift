@@ -51,6 +51,23 @@ extension EndpointTable {
                 .get,
                 "\(host)/api/district/calls/call_1/transcript?workspaceId=ws_1"
             ),
+            // ⚠️ IN `telephony()` BY RIGHT, HERE FOR ITS LINE BUDGET. The call in the
+            // path (hyphenated route), the workspace and the hex token in the body.
+            EndpointExpectation(
+                .registerLiveActivity,
+                DistrictEndpoints.registerLiveActivity(workspaceId: "ws_1", callId: "call_1", token: "ab01"),
+                .post,
+                "\(host)/api/district/calls/call_1/live-activity",
+                .json(#"{"token":"ab01","workspaceId":"ws_1"}"#)
+            ),
+            // ⚠️ NO CALL: the start token is the user's, under `live-activity/`.
+            EndpointExpectation(
+                .registerLiveActivityStartToken,
+                DistrictEndpoints.registerLiveActivityStartToken(workspaceId: "ws_1", token: "cd02"),
+                .post,
+                "\(host)/api/district/live-activity/start-token",
+                .json(#"{"token":"cd02","workspaceId":"ws_1"}"#)
+            ),
         ]
     }
 

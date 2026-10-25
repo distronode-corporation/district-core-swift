@@ -166,6 +166,55 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// Hand the server one Live Activity push token for a call, so it can update the
+    /// activity on the Lock Screen, the Dynamic Island and the watch while the app sleeps.
+    ///
+    /// ⚠️ THE APP STARTS THE ACTIVITY ITSELF; there is no push-to-start. The server keeps
+    /// each `<userId>:<token>` for three hours and fails open, so a 200 is not a promise
+    /// that updates will arrive, and the activity must read correctly without them.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. ActivityKit hands over a new token whenever it
+    /// rotates one, and each is sent once; a retry loop would outlive the call.
+    ///
+    /// ⚠️ 404 `call_not_found` IS "the call is already over", the same race as the
+    /// decline. Roles are `["agency","client"]`.
+    ///
+    /// - Parameter token: the activity's push token as lowercase hex, as APNs wants it.
+    static func registerLiveActivity(workspaceId: String, callId: String, token: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .registerLiveActivity,
+            .post,
+            DistrictPaths.callLiveActivity(callId),
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("token", .string(token)),
+            ]))
+        )
+    }
+
+    /// Hand the server this device's Live Activity push-to-start token, so a ring can start
+    /// the call's activity with no app running (iOS 18 and later).
+    ///
+    /// ⚠️ THE TOKEN IS THE USER'S, NOT THE WORKSPACE'S. The workspace only routes the request
+    /// to the right cell and authorises it (roles `["agency","client"]`); the server keeps up
+    /// to five tokens per user for 30 days, refreshed on every write, and fails open.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. ActivityKit hands over a new token when it rotates one,
+    /// and the app sends it again when it goes stale; a retry loop adds nothing.
+    ///
+    /// - Parameter token: the push-to-start token as lowercase hex.
+    static func registerLiveActivityStartToken(workspaceId: String, token: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .registerLiveActivityStartToken,
+            .post,
+            DistrictPaths.liveActivityStartToken,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("token", .string(token)),
+            ]))
+        )
+    }
+
     /// Tell the SERVER to end a direct softphone call, carrier leg included.
     ///
     /// ⛔ WITHOUT THIS THE APP CANNOT HANG UP, AND THE FAILURE IS A BILL RATHER

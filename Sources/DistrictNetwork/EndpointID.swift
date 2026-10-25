@@ -53,6 +53,14 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// One supervisor line into a live call's agent. ⛔ Never retried. See
     /// ``DistrictEndpoints/whisper(workspaceId:callId:text:)``.
     case whisper
+    /// One Live Activity push token for a call, handed to the server so it can update
+    /// the activity. ⛔ Never retried. See
+    /// ``DistrictEndpoints/registerLiveActivity(workspaceId:callId:token:)``.
+    case registerLiveActivity
+    /// The device's Live Activity push-to-start token, so the server can start the call's
+    /// activity on a ring. ⛔ Never retried. See
+    /// ``DistrictEndpoints/registerLiveActivityStartToken(workspaceId:token:)``.
+    case registerLiveActivityStartToken
 
     // Rooms + meetings
     case roomToken

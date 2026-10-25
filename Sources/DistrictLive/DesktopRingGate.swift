@@ -57,7 +57,7 @@ public enum DesktopRingCommand: Sendable, Equatable {
 ///   Ending on "not ringing" would end every ring at the first transcript line. An
 ///   update with no status says nothing about it;
 /// - `call_ring_cancelled` arrives for the call: the server ended the ring (answered on a
-///   device, timed out, the caller hung up, or withdrawn). ⛔ IT ENDS ONLY A RING THAT IS
+///   device, timed out, the caller hung up, declined, or withdrawn). ⛔ IT ENDS ONLY A RING THAT IS
 ///   STILL RINGING HERE: a call this Mac answered was cleared from the gate at the press
 ///   (``clear()``), so the cancel every rung device receives, this one included, finds no
 ///   ring and changes nothing;
@@ -67,9 +67,10 @@ public enum DesktopRingCommand: Sendable, Equatable {
 ///   taken it, which turns a slow hand into a missed call;
 /// - the app clears it (``clear()``).
 ///
-/// ⛔ NOTHING IS SENT TO THE SERVER WHEN A RING ENDS WITHOUT AN ANSWER, for the
-/// reason `DistrictCall.IncomingCallController` gives: a decline and a ring nobody
-/// heard must look the same from outside.
+/// ⛔ NOTHING IS SENT TO THE SERVER WHEN THE GATE ENDS A RING, for the reason
+/// `DistrictCall.IncomingCallController` gives: a ring nobody heard must not read as a
+/// person refusing the call. Only a person's decline is reported, and that is the
+/// controller's `requestDecline`, never this gate's.
 public struct DesktopRingGate: Sendable, Equatable {
     /// The longest the server holds a caller for an answer (30 s, also the longest
     /// ring a workspace may choose).

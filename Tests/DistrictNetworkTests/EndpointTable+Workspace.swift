@@ -99,6 +99,15 @@ extension EndpointTable {
                 "\(host)/api/auth/native/revoke-all",
                 .json("{}")
             ),
+            // ⚠️ A SIBLING OF `revoke-all` under the native prefix, and `{}` for the
+            // same reason: the route takes no parameters.
+            EndpointExpectation(
+                .notifyToken,
+                DistrictEndpoints.notifyToken(),
+                .post,
+                "\(host)/api/auth/native/notify-token",
+                .json("{}")
+            ),
             EndpointExpectation(
                 .accountSettings,
                 DistrictEndpoints.accountSettings(),

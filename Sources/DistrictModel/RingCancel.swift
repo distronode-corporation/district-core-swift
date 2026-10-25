@@ -4,8 +4,9 @@ import Foundation
 ///
 /// ⛔ THE WORDING FOLLOWS THE REASON, AND ONLY ``callEnded`` MAY SAY THE CALLER HUNG UP.
 /// ``answered`` is "answered on another device"; ``timeout`` and ``withdrawn`` are a missed
-/// call. A screen that said "the caller hung up" for an answer taken elsewhere would tell the
-/// person something that did not happen.
+/// call; ``declined`` is "declined" (every member rang declined, or this person declined on
+/// another of their devices). A screen that said "the caller hung up" for an answer taken
+/// elsewhere would tell the person something that did not happen.
 ///
 /// ⚠️ OPEN TO THE SERVER: any other value, or none, reads as ``withdrawn`` and never fails a
 /// decode (the contract's rule).
@@ -18,6 +19,10 @@ public enum RingCancelReason: Sendable, Equatable, CaseIterable {
     case callEnded
     /// The server stopped ringing for its own reason.
     case withdrawn
+    /// Every member the server rang declined, so the ring ended early and the agent takes
+    /// a message (8.0.0; `calls/{id}/decline`). ⚠️ A client older than 8.0.0 reads it as
+    /// ``withdrawn``, which is why the server could add it.
+    case declined
 
     /// Read a wire value. ⚠️ Unknown or absent is ``withdrawn``.
     public init(wire: String?) {
@@ -31,6 +36,7 @@ public enum RingCancelReason: Sendable, Equatable, CaseIterable {
         case .timeout: "timeout"
         case .callEnded: "call_ended"
         case .withdrawn: "withdrawn"
+        case .declined: "declined"
         }
     }
 }

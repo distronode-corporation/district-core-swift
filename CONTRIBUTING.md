@@ -82,7 +82,7 @@ Numbers, money, dates and lists go through `L10nFormat`, never a platform format
 `contracts/i18n/` is a copy of the service's, like the other contract sets.
 
 **Test bundles must discover their tests.** CI counts the tests that ran and fails below
-the floor set in `.github/workflows/ci.yml` (1960). It sits a little below the current
+the floor set in `.github/workflows/ci.yml` (2050). It sits a little below the current
 count and is a ratchet: a change that adds many tests may raise it, and a change that
 deletes tests on purpose lowers it in the same commit and says why.
 

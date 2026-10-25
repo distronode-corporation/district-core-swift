@@ -150,6 +150,9 @@ package enum ApiErrorCopy {
     /// `api_error.emergency_number`
     package static var emergencyNumber: String { L10nRuntime.locale == .frCA ? "Les numéros d'urgence ne peuvent pas être composés depuis cette application. Utilisez le composeur de votre téléphone." : "Emergency numbers cannot be dialled from this app. Use your phone's own dialer." }
 
+    /// `api_error.engine_unavailable`
+    package static var engineUnavailable: String { L10nRuntime.locale == .frCA ? "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisissez un autre moteur." : "This voice engine is not available for this workspace yet. Choose another engine." }
+
     /// `api_error.eu_vat_required`
     package static var euVatRequired: String { L10nRuntime.locale == .frCA ? "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation." : "In the European Union we sell to businesses only. Enter your VAT number and we invoice you under the reverse-charge rule." }
 
@@ -544,6 +547,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.workflow_conditions_not_allowed`
     package static var workflowConditionsNotAllowed: String { L10nRuntime.locale == .frCA ? "Les conditions ne peuvent s'ajouter qu'à un flux qui s'exécute après un appel." : "Conditions can only be added to a workflow that runs after a call." }
+
+    /// `api_error.workflow_member_push_roles_invalid`
+    package static var workflowMemberPushRolesInvalid: String { L10nRuntime.locale == .frCA ? "Choisissez qui reçoit la notification\u{00A0}: les administrateurs, les membres ou les deux." : "Choose who gets the notification: administrators, members, or both." }
 
     /// `api_error.workflow_sms_recipient_invalid`
     package static var workflowSmsRecipientInvalid: String { L10nRuntime.locale == .frCA ? "Un texto ne peut être envoyé qu'à l'appelant, au propriétaire ou à un membre de l'équipe." : "A text can be sent to the caller, the owner or a team member only." }

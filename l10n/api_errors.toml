@@ -282,6 +282,15 @@ tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `emergency_number`, in place of the service's own English."
 
+[api_error.engine_unavailable]
+en = "This voice engine is not available for this workspace yet. Choose another engine."
+fr = "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisissez un autre moteur."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `engine_unavailable`, in place of the service's own English."
+
 [api_error.eu_vat_required]
 en = "In the European Union we sell to businesses only. Enter your VAT number and we invoice you under the reverse-charge rule."
 fr = "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation."
@@ -1464,6 +1473,15 @@ screen = "api_error"
 tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `workflow_conditions_not_allowed`, in place of the service's own English."
+
+[api_error.workflow_member_push_roles_invalid]
+en = "Choose who gets the notification: administrators, members, or both."
+fr = "Choisissez qui reçoit la notification\u00A0: les administrateurs, les membres ou les deux."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `workflow_member_push_roles_invalid`, in place of the service's own English."
 
 [api_error.workflow_sms_recipient_invalid]
 en = "A text can be sent to the caller, the owner or a team member only."

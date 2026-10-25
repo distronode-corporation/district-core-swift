@@ -73,6 +73,24 @@ extension EndpointTable {
             // ⛔ ONE SEGMENT FROM `dial` AND GOVERNED BY THE OPPOSITE RULE: this one
             // is idempotent and is deliberately sent on endings that may have sent
             // it already. See ``DistrictEndpoints/hangUpCall(callId:workspaceId:)``.
+            // ⛔ SENT ONLY ON A PERSON'S DECLINE; the call is in the path and the
+            // workspace in the body, exactly like `answer`.
+            EndpointExpectation(
+                .declineCall,
+                DistrictEndpoints.declineCall(callId: "call_1", workspaceId: "ws_1"),
+                .post,
+                "\(host)/api/district/calls/call_1/decline",
+                .json(#"{"workspaceId":"ws_1"}"#)
+            ),
+            // ⛔ NO ID IN THE PATH: the call travels in the body as `callId`, and the
+            // line under the key `whisper`.
+            EndpointExpectation(
+                .whisper,
+                DistrictEndpoints.whisper(workspaceId: "ws_1", callId: "call_1", text: "Ask what the call is about."),
+                .post,
+                "\(host)/api/district/calls/whisper",
+                .json(#"{"callId":"call_1","whisper":"Ask what the call is about.","workspaceId":"ws_1"}"#)
+            ),
             EndpointExpectation(
                 .hangUpCall,
                 DistrictEndpoints.hangUpCall(callId: "call_1", workspaceId: "ws_1"),

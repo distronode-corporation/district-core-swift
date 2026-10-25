@@ -143,6 +143,31 @@ public struct CallsRepository: Sendable {
             .map(\.transcript)
     }
 
+    /// Send one supervisor line to the agent on a live call.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. The route publishes the line to the room before
+    /// it answers, so a lost response may follow a line the agent already acted on, and
+    /// a second send would say it twice. A failure is shown to the person, who decides.
+    ///
+    /// ⚠️ THE FAILURES A SCREEN NAMES ARRIVE AS ``ApiError/http(status:message:code:)``
+    /// with the server's `code`: `call_not_in_progress` (400 or 409, the call ended),
+    /// `call_not_found` (404), `call_predates_feature` (400), `service_unavailable` and
+    /// `service_not_configured` (503), and 403 for a viewer, whose screen should offer no
+    /// whisper in the first place (roles are `["agency","client"]`).
+    ///
+    /// - Parameter text: one line, 1...2000 characters (the route refuses anything
+    ///   else with 400 `invalid_request`), in the third person: it reaches the agent as
+    ///   an instruction, not the caller as speech.
+    public func whisper(workspaceId: String, callId: String, text: String) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.whisper(workspaceId: workspaceId, callId: callId, text: text),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("WhisperResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
     /// One page, because the filtering happens afterwards.
     ///
     /// ⚠️ SMALL ON PURPOSE. The server has no `direction` filter, so the whole

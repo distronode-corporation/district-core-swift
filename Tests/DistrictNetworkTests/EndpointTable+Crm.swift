@@ -140,6 +140,14 @@ extension EndpointTable {
                 .get,
                 "\(host)/api/district/messages/msg_1?workspaceId=ws_1"
             ),
+            // ⛔ THE ONE ROUTE A NOTIFY-READ TOKEN AUTHENTICATES, and the id is a
+            // segment ahead of the literal `sender`, like `calls/{id}/answer`.
+            EndpointExpectation(
+                .messageSender,
+                DistrictEndpoints.messageSender(workspaceId: "ws_1", id: "msg_1"),
+                .get,
+                "\(host)/api/district/messages/msg_1/sender?workspaceId=ws_1"
+            ),
         ]
     }
 

@@ -117,6 +117,31 @@ public struct InboundCallRepository: Sendable {
         return outcome.flatMap(Self.classify)
     }
 
+    /// Tell the server the person holding this device declined `callId`.
+    ///
+    /// ⛔ CALLED ONLY FOR `IncomingCallCommand.requestDecline`, WHICH THE REDUCER EMITS
+    /// ONLY ON A HUMAN DECLINE. A timeout, a withdrawal and a missing session send
+    /// nothing; calling this from any of them would tell the agent, and through it the
+    /// caller, that a person refused a call nobody saw. See the ⛔ on
+    /// ``DistrictEndpoints/declineCall(callId:workspaceId:)``.
+    ///
+    /// ⛔ NO RETRY, AT THIS LAYER OR ABOVE IT, for the reason ``answer(callId:workspaceId:)``
+    /// has none: by the time a retry fired the ring may be over.
+    ///
+    /// ⚠️ THE RESULT IS FOR A LOG LINE, NOT A SCREEN. The local ring has already ended
+    /// when this is sent, and the route fails open (its ring simply times out as it did
+    /// before declines were reported), so no failure here changes what the person sees.
+    /// 404 `call_not_found` is the call ending while the phone rang.
+    public func decline(callId: String, workspaceId: String) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.declineCall(callId: callId, workspaceId: workspaceId),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("CallDeclineResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
     private static func classify(_ response: RawResponse) -> Result<AnswerOutcome, ApiError> {
         guard (200 ... 299).contains(response.statusCode) else {
             return refusal(response)

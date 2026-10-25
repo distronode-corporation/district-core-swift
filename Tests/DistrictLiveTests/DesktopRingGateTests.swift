@@ -165,6 +165,7 @@ final class DesktopRingGateTests: XCTestCase {
             ("timeout", .timeout),
             ("call_ended", .callEnded),
             ("withdrawn", .withdrawn),
+            ("declined", .declined),
             ("parked", .withdrawn),
             (nil, .withdrawn),
         ] as [(String?, RingCancelReason)] {

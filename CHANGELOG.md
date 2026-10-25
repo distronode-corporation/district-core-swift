@@ -6,6 +6,13 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/i18n/api-errors.json` from monorepo ce4085fd4, byte for byte: the new code
+  `engine_unavailable` (English and French), which the monorepo's `drift:app_contracts` was
+  red on. Its catalog entry `api_error.engine_unavailable` (French verbatim from the
+  contract, state `draft`) and accessor are generated (`scripts/gen-l10n.py`).
+
 ## [8.0.0]
 
 The shared core for the Apple Watch round 2 of District AI for iPhone, iPad and Mac: a

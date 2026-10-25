@@ -95,6 +95,7 @@ enum ApiErrorTable {
         case "disclosure_required_in_region": return ApiErrorCopy.disclosureRequiredInRegion
         case "model_unavailable_in_region": return ApiErrorCopy.modelUnavailableInRegion
         case "invalid_engine_mix": return ApiErrorCopy.invalidEngineMix
+        case "engine_unavailable": return ApiErrorCopy.engineUnavailable
         case "language_unavailable": return ApiErrorCopy.languageUnavailable
         case "setup_not_available": return ApiErrorCopy.setupNotAvailable
         case "forwarding_check_unavailable": return ApiErrorCopy.forwardingCheckUnavailable

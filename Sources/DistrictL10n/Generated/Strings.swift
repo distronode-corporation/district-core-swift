@@ -150,6 +150,9 @@ package enum ApiErrorCopy {
     /// `api_error.emergency_number`
     package static var emergencyNumber: String { L10nRuntime.locale == .frCA ? "Les numéros d'urgence ne peuvent pas être composés depuis cette application. Utilisez le composeur de votre téléphone." : "Emergency numbers cannot be dialled from this app. Use your phone's own dialer." }
 
+    /// `api_error.engine_unavailable`
+    package static var engineUnavailable: String { L10nRuntime.locale == .frCA ? "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisissez un autre moteur." : "This voice engine is not available for this workspace yet. Choose another engine." }
+
     /// `api_error.eu_vat_required`
     package static var euVatRequired: String { L10nRuntime.locale == .frCA ? "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation." : "In the European Union we sell to businesses only. Enter your VAT number and we invoice you under the reverse-charge rule." }
 

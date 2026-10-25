@@ -68,6 +68,7 @@ enum ApiErrorTable {
         case "workflow_conditions_invalid": return ApiErrorCopy.workflowConditionsInvalid
         case "workflow_conditions_not_allowed": return ApiErrorCopy.workflowConditionsNotAllowed
         case "workflow_action_needs_message": return ApiErrorCopy.workflowActionNeedsMessage
+        case "workflow_member_push_roles_invalid": return ApiErrorCopy.workflowMemberPushRolesInvalid
         case "workflow_sms_recipient_invalid": return ApiErrorCopy.workflowSmsRecipientInvalid
         case "workflow_sms_recipient_not_member": return ApiErrorCopy.workflowSmsRecipientNotMember
         case "rate_limited": return ApiErrorCopy.rateLimited
@@ -95,6 +96,7 @@ enum ApiErrorTable {
         case "disclosure_required_in_region": return ApiErrorCopy.disclosureRequiredInRegion
         case "model_unavailable_in_region": return ApiErrorCopy.modelUnavailableInRegion
         case "invalid_engine_mix": return ApiErrorCopy.invalidEngineMix
+        case "engine_unavailable": return ApiErrorCopy.engineUnavailable
         case "language_unavailable": return ApiErrorCopy.languageUnavailable
         case "setup_not_available": return ApiErrorCopy.setupNotAvailable
         case "forwarding_check_unavailable": return ApiErrorCopy.forwardingCheckUnavailable

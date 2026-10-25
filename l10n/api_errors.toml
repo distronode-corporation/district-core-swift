@@ -288,7 +288,7 @@ fr = "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisi
 ctx = "error"
 screen = "api_error"
 tier = "T2"
-state = "draft"
+state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `engine_unavailable`, in place of the service's own English."
 
 [api_error.eu_vat_required]

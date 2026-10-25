@@ -11,7 +11,7 @@ All notable changes to this package are recorded here. The format is based on
 - `contracts/i18n/api-errors.json` from monorepo ce4085fd4, byte for byte: the new code
   `engine_unavailable` (English and French), which the monorepo's `drift:app_contracts` was
   red on. Its catalog entry `api_error.engine_unavailable` (French verbatim from the
-  contract, state `draft`) and accessor are generated (`scripts/gen-l10n.py`).
+  contract, reviewed by Sean on 2026-10-25) and accessor are generated (`scripts/gen-l10n.py`).
 
 ## [8.0.0]
 

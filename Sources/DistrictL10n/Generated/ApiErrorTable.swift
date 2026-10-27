@@ -76,6 +76,22 @@ enum ApiErrorTable {
         case "overage_cap_reached": return ApiErrorCopy.overageCapReached
         case "overage_spend_cap_reached": return ApiErrorCopy.overageSpendCapReached
         case "phone_number_limit_reached": return ApiErrorCopy.phoneNumberLimitReached
+        case "hq_voice_allowance_reached": return ApiErrorCopy.hqVoiceAllowanceReached
+        case "hq_voice_busy": return ApiErrorCopy.hqVoiceBusy
+        case "draft_not_found": return ApiErrorCopy.draftNotFound
+        case "draft_changed": return ApiErrorCopy.draftChanged
+        case "draft_field_invalid": return ApiErrorCopy.draftFieldInvalid
+        case "draft_lint_refused": return ApiErrorCopy.draftLintRefused
+        case "draft_nothing_to_undo": return ApiErrorCopy.draftNothingToUndo
+        case "live_changed": return ApiErrorCopy.liveChanged
+        case "audition_busy": return ApiErrorCopy.auditionBusy
+        case "audition_daily_cap": return ApiErrorCopy.auditionDailyCap
+        case "audition_unavailable": return ApiErrorCopy.auditionUnavailable
+        case "workflow_draft_not_found": return ApiErrorCopy.workflowDraftNotFound
+        case "workflow_draft_dry_run_stale": return ApiErrorCopy.workflowDraftDryRunStale
+        case "workflow_voice_cap": return ApiErrorCopy.workflowVoiceCap
+        case "proposal_expired": return ApiErrorCopy.proposalExpired
+        case "proposal_already_handled": return ApiErrorCopy.proposalAlreadyHandled
         case "dgi_requires_studio": return ApiErrorCopy.dgiRequiresStudio
         case "plan_upgrade_required": return ApiErrorCopy.planUpgradeRequired
         case "managed_billing_required": return ApiErrorCopy.managedBillingRequired
@@ -166,6 +182,7 @@ enum ApiErrorTable {
         case "call_predates_feature": return ApiErrorCopy.callPredatesFeature
         case "room_inactive": return ApiErrorCopy.roomInactive
         case "demo_lines_busy": return ApiErrorCopy.demoLinesBusy
+        case "demo_daily_limit_reached": return ApiErrorCopy.demoDailyLimitReached
         case "test_call_limit_reached": return ApiErrorCopy.testCallLimitReached
         case "test_call_in_progress": return ApiErrorCopy.testCallInProgress
         case "test_call_needs_number": return ApiErrorCopy.testCallNeedsNumber
@@ -198,6 +215,13 @@ enum ApiErrorTable {
         case "knowledge_url_unsupported_type": return ApiErrorCopy.knowledgeUrlUnsupportedType
         case "knowledge_url_pdf_unsupported": return ApiErrorCopy.knowledgeUrlPdfUnsupported
         case "knowledge_url_empty": return ApiErrorCopy.knowledgeUrlEmpty
+        case "knowledge_file_too_large": return ApiErrorCopy.knowledgeFileTooLarge
+        case "knowledge_file_too_many_pages": return ApiErrorCopy.knowledgeFileTooManyPages
+        case "knowledge_file_unsupported": return ApiErrorCopy.knowledgeFileUnsupported
+        case "knowledge_file_doc_unsupported": return ApiErrorCopy.knowledgeFileDocUnsupported
+        case "knowledge_file_no_text": return ApiErrorCopy.knowledgeFileNoText
+        case "knowledge_file_unreadable": return ApiErrorCopy.knowledgeFileUnreadable
+        case "knowledge_facts_limit": return ApiErrorCopy.knowledgeFactsLimit
         default: return nil
         }
     }

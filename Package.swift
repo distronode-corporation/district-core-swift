@@ -71,7 +71,7 @@ let package = Package(
         // the 5.0 API changes do not reach this package. Builds clean under swift
         // 6.2.4 in Swift 6 language mode on Linux, which is the tier that has to
         // keep working.
-        .package(url: "https://github.com/apple/swift-crypto.git", exact: "5.0.0"),
+        .package(url: "https://github.com/apple/swift-crypto.git", exact: "5.0.1"),
     ],
     targets: [
         // Every piece of display text the core produces, and the formats it writes

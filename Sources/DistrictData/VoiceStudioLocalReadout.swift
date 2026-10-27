@@ -9,12 +9,14 @@ import Foundation
 /// measured median the service sent. A stage with no measured median is MISSING, and a missing
 /// stage makes the meter "at least". This is section 4 of the service's Studio spec: a chain's
 /// meter is the region's end-of-turn median, plus the brain's only at the region's own location
-/// with thinking off (the setting it was measured on), plus the mouth's (per voice for
+/// at the fixed engines' thinking level (the setting it was measured on), plus the mouth's (per voice for
 /// Deepgram, per model for every other vendor); a realtime meter is a missing end of turn plus
 /// the model's.
 public enum VoiceStudioLocalReadout {
     private static let auto = "auto"
-    private static let thinkingOff = "off"
+    /// The thinking level the brain's median was measured at: the service's fixed engines'
+    /// (`PRESET_LLM.thinking`), "minimal" since the service's 2026-10-25 change ("off" before).
+    private static let measuredThinking = "minimal"
     private static let perVoiceVendor = "deepgram"
     private static let stableChannel = "stable"
 
@@ -135,9 +137,9 @@ public enum VoiceStudioLocalReadout {
     }
 
     /// Whether the brain runs where its median was measured: the region's own location
-    /// (`auto`, or the location `auto` names) with thinking off.
+    /// (`auto`, or the location `auto` names) at the measured thinking level.
     static func brainLocal(_ mix: EngineMix, _ brain: VoiceStudioLlmModel) -> Bool {
-        guard mix.llm.thinking == thinkingOff else { return false }
+        guard mix.llm.thinking == measuredThinking else { return false }
         if mix.llm.location == auto {
             return true
         }

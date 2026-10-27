@@ -114,17 +114,22 @@ final class VoiceStudioLegEditsTests: XCTestCase {
     func testANewBrainKeepsItsLocationOnlyWhereOffered() throws {
         let studio = try VoiceStudioFixture.response()
         var mix = VoiceStudioFixture.fluxChain
-        mix.llm.location = "us-east4"
+        mix.llm.location = "us"
         mix.llm.temperature = 1.2
-        let moved = Edits.brainModel(mix, model: "gemini-3.5-flash", in: studio)
-        XCTAssertEqual(moved.llm.location, "northamerica-northeast1")
+        // Gemini 3.8 Flash runs only at `global`: `us` falls back to its default.
+        let moved = Edits.brainModel(mix, model: "gemini-3.8-flash", in: studio)
+        XCTAssertEqual(moved.llm.location, "global")
         XCTAssertEqual(moved.llm.thinking, "low")
         XCTAssertEqual(moved.llm.temperature, 1.2)
 
+        // Gemini 3.5 Flash offers `global` too, so it is kept rather than reset to `auto`.
         var global = mix
-        global.llm.model = "gemini-3.6-flash"
+        global.llm.model = "gemini-3.8-flash"
         global.llm.location = "global"
-        XCTAssertEqual(Edits.brainModel(global, model: "gemini-3.8-flash", in: studio).llm.location, "global")
+        global.llm.thinking = "low"
+        let back = Edits.brainModel(global, model: "gemini-3.5-flash", in: studio)
+        XCTAssertEqual(back.llm.location, "global")
+        XCTAssertEqual(back.llm.thinking, "minimal")
         XCTAssertEqual(Edits.brainModel(mix, model: "nope", in: studio), mix)
     }
 

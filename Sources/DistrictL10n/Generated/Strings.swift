@@ -66,6 +66,15 @@ package enum ApiErrorCopy {
     /// `api_error.attachment_unsupported`
     package static var attachmentUnsupported: String { L10nRuntime.locale == .frCA ? "Ce type de pièce jointe ne peut pas être envoyé sur ce canal." : "That kind of attachment cannot be sent on this channel." }
 
+    /// `api_error.audition_busy`
+    package static var auditionBusy: String { L10nRuntime.locale == .frCA ? "Deux auditions sont déjà en cours pour cet espace de travail. Terminez-en une et réessayez." : "Two auditions are already running for this workspace. End one and try again." }
+
+    /// `api_error.audition_daily_cap`
+    package static var auditionDailyCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé les auditions d'aujourd'hui. Vous pourrez de nouveau écouter un brouillon demain." : "This workspace has used today's auditions. You can audition again tomorrow." }
+
+    /// `api_error.audition_unavailable`
+    package static var auditionUnavailable: String { L10nRuntime.locale == .frCA ? "L'audition ne peut pas commencer pour le moment. Réessayez dans un instant." : "The audition can't start right now. Please try again in a moment." }
+
     /// `api_error.auto_dial_contact_opted_out`
     package static var autoDialContactOptedOut: String { L10nRuntime.locale == .frCA ? "Ce contact a choisi de ne plus recevoir d'appels de cet espace de travail (liste d'exclusion)." : "This contact has opted out of calls from this workspace (DNC)." }
 
@@ -129,6 +138,9 @@ package enum ApiErrorCopy {
     /// `api_error.default_card_in_use`
     package static var defaultCardInUse: String { L10nRuntime.locale == .frCA ? "Définissez une autre carte comme carte par défaut avant de retirer celle-ci." : "Set another card as default before removing this one." }
 
+    /// `api_error.demo_daily_limit_reached`
+    package static var demoDailyLimitReached: String { L10nRuntime.locale == .frCA ? "Toutes les démonstrations d'aujourd'hui ont été utilisées. Réessayez demain ou consultez nos forfaits pour commencer." : "Today's demos have all been used. Please try again tomorrow, or view our plans to get started." }
+
     /// `api_error.demo_lines_busy`
     package static var demoLinesBusy: String { L10nRuntime.locale == .frCA ? "Toutes les lignes de démonstration sont occupées en ce moment. Réessayez dans quelques minutes." : "Every demo line is busy right now. Please try again in a few minutes." }
 
@@ -143,6 +155,21 @@ package enum ApiErrorCopy {
 
     /// `api_error.do_not_call`
     package static var doNotCall: String { L10nRuntime.locale == .frCA ? "Ce numéro a retiré son consentement aux communications de cet espace de travail." : "That number has opted out of contact from this workspace." }
+
+    /// `api_error.draft_changed`
+    package static var draftChanged: String { L10nRuntime.locale == .frCA ? "Le brouillon a changé depuis son ouverture. Consultez la dernière version et réessayez." : "The draft changed since you opened it. Review the latest version and try again." }
+
+    /// `api_error.draft_field_invalid`
+    package static var draftFieldInvalid: String { L10nRuntime.locale == .frCA ? "Cette valeur du brouillon ne peut pas être enregistrée. Vérifiez le champ et réessayez." : "That draft value can't be saved. Check the field and try again." }
+
+    /// `api_error.draft_lint_refused`
+    package static var draftLintRefused: String { L10nRuntime.locale == .frCA ? "Ce texte ne peut pas être enregistré\u{00A0}: il nie être une IA, prétend être une personne, demande à la réceptionniste de ne pas le dire ou contient des marqueurs réservés. Les personnes qui appellent sont toujours informées qu'elles parlent à une IA." : "That text can't be saved: it denies being an AI, claims to be a person, tells the receptionist not to disclose, or contains reserved markers. Callers are always told when they speak with an AI." }
+
+    /// `api_error.draft_not_found`
+    package static var draftNotFound: String { L10nRuntime.locale == .frCA ? "Il n'y a aucun brouillon de la réceptionniste. Rédigez d'abord un changement." : "There is no receptionist draft to work on. Draft a change first." }
+
+    /// `api_error.draft_nothing_to_undo`
+    package static var draftNothingToUndo: String { L10nRuntime.locale == .frCA ? "Il n'y a pas de version antérieure du brouillon à rétablir." : "There is no earlier version of the draft to go back to." }
 
     /// `api_error.emergency_acknowledgement_required`
     package static var emergencyAcknowledgementRequired: String { L10nRuntime.locale == .frCA ? "Confirmez que vous comprenez que ce numéro ne peut pas servir à appeler le 9-1-1 ni aucun autre service d'urgence, puis réessayez." : "Confirm that you understand this number cannot be used to call 911 or other emergency services, then try again." }
@@ -177,6 +204,12 @@ package enum ApiErrorCopy {
     /// `api_error.forwarding_check_unavailable`
     package static var forwardingCheckUnavailable: String { L10nRuntime.locale == .frCA ? "La vérification du renvoi n'est pas offerte en ce moment. Vous pouvez tout de même tester en appelant votre ligne d'affaires." : "The forwarding check is not available right now. You can still test by calling your business line." }
 
+    /// `api_error.hq_voice_allowance_reached`
+    package static var hqVoiceAllowanceReached: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé toutes les minutes du mode vocal de District HQ prévues ce mois-ci. Le mode vocal revient le 1er du mois prochain; la console texte fonctionne toujours." : "This workspace has used all of this month's District HQ voice minutes. Voice mode is back on the 1st of next month; the text console still works." }
+
+    /// `api_error.hq_voice_busy`
+    package static var hqVoiceBusy: String { L10nRuntime.locale == .frCA ? "Le mode vocal de District HQ est occupé en ce moment. Réessayez dans quelques minutes; la console texte fonctionne toujours." : "District HQ voice mode is busy right now. Please try again in a few minutes; the text console still works." }
+
     /// `api_error.incorrect_password`
     package static var incorrectPassword: String { L10nRuntime.locale == .frCA ? "Ce mot de passe n'est pas le bon." : "That password is not correct." }
 
@@ -209,6 +242,27 @@ package enum ApiErrorCopy {
     /// `api_error.jira_not_connected`
     package static var jiraNotConnected: String { L10nRuntime.locale == .frCA ? "Aucun projet de soutien n'est connecté à cet espace de travail." : "No support project is connected to this workspace." }
 
+    /// `api_error.knowledge_facts_limit`
+    package static var knowledgeFactsLimit: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a atteint sa limite de 300 faits. Supprimez-en avant d'en ajouter." : "This workspace has reached its limit of 300 facts. Remove some before adding more." }
+
+    /// `api_error.knowledge_file_doc_unsupported`
+    package static var knowledgeFileDocUnsupported: String { L10nRuntime.locale == .frCA ? "Les fichiers Word 97-2003 (.doc) ne peuvent pas être lus. Enregistrez le document en .docx ou en PDF et réessayez." : "Word 97-2003 files (.doc) cannot be read. Save the document as .docx or PDF and try again." }
+
+    /// `api_error.knowledge_file_no_text`
+    package static var knowledgeFileNoText: String { L10nRuntime.locale == .frCA ? "Aucun texte n'a été trouvé dans ce fichier." : "No text was found in this file." }
+
+    /// `api_error.knowledge_file_too_large`
+    package static var knowledgeFileTooLarge: String { L10nRuntime.locale == .frCA ? "Ce fichier est trop volumineux pour être lu. La limite est de 10\u{00A0}Mo." : "This file is too large to read. The limit is 10 MB." }
+
+    /// `api_error.knowledge_file_too_many_pages`
+    package static var knowledgeFileTooManyPages: String { L10nRuntime.locale == .frCA ? "Ce document compte trop de pages pour être lu en une fois. La limite est de 30 pages." : "This document has too many pages to read at once. The limit is 30 pages." }
+
+    /// `api_error.knowledge_file_unreadable`
+    package static var knowledgeFileUnreadable: String { L10nRuntime.locale == .frCA ? "Ce fichier n'a pas pu être ouvert. Il est peut-être endommagé ou protégé par un mot de passe." : "This file could not be opened. It may be damaged or protected by a password." }
+
+    /// `api_error.knowledge_file_unsupported`
+    package static var knowledgeFileUnsupported: String { L10nRuntime.locale == .frCA ? "Ce fichier ne peut pas être lu. Utilisez un PDF ou une image (PNG, JPEG ou WebP)." : "This file cannot be read. Use a PDF or an image (PNG, JPEG or WebP)." }
+
     /// `api_error.knowledge_url_blocked`
     package static var knowledgeUrlBlocked: String { L10nRuntime.locale == .frCA ? "Cette adresse mène à un réseau privé ou interne. Elle ne peut donc pas être importée." : "That address points to a private or internal network, so it cannot be imported." }
 
@@ -238,6 +292,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.last_agency_member`
     package static var lastAgencyMember: String { L10nRuntime.locale == .frCA ? "Il s'agit de la dernière personne administratrice de l'espace de travail, elle ne peut donc être ni retirée ni rétrogradée." : "This is the last administrator of the workspace, so it cannot be removed or demoted." }
+
+    /// `api_error.live_changed`
+    package static var liveChanged: String { L10nRuntime.locale == .frCA ? "Quelqu'un a modifié ces réglages depuis la rédaction du brouillon. Réalignez le brouillon sur les réglages en ligne, relisez-le, puis publiez-le." : "Someone changed these settings since they were drafted. Rebase the draft on the live settings, review it, then publish." }
 
     /// `api_error.mailbox_not_found`
     package static var mailboxNotFound: String { L10nRuntime.locale == .frCA ? "Aucune boîte de réception n'est connectée à cet espace de travail." : "No mailbox is connected to this workspace." }
@@ -334,6 +391,12 @@ package enum ApiErrorCopy {
 
     /// `api_error.plan_upgrade_required`
     package static var planUpgradeRequired: String { L10nRuntime.locale == .frCA ? "Cette fonction n'est pas incluse dans le forfait de cet espace de travail." : "That feature is not included in this workspace's plan." }
+
+    /// `api_error.proposal_already_handled`
+    package static var proposalAlreadyHandled: String { L10nRuntime.locale == .frCA ? "Ce changement proposé a déjà été traité." : "That proposed change was already handled." }
+
+    /// `api_error.proposal_expired`
+    package static var proposalExpired: String { L10nRuntime.locale == .frCA ? "Ce changement proposé ne peut plus être confirmé, donc rien n'a été appliqué. Redemandez-le pour qu'il soit proposé de nouveau." : "That proposed change can no longer be confirmed, so nothing was applied. Ask again to propose it afresh." }
 
     /// `api_error.provider_credentials_rejected`
     package static var providerCredentialsRejected: String { L10nRuntime.locale == .frCA ? "Le fournisseur n'a pas accepté ces identifiants. Vérifiez-les, puis testez la connexion de nouveau." : "The provider did not accept these credentials. Check them and test the connection again." }
@@ -548,6 +611,12 @@ package enum ApiErrorCopy {
     /// `api_error.workflow_conditions_not_allowed`
     package static var workflowConditionsNotAllowed: String { L10nRuntime.locale == .frCA ? "Les conditions ne peuvent s'ajouter qu'à un flux qui s'exécute après un appel." : "Conditions can only be added to a workflow that runs after a call." }
 
+    /// `api_error.workflow_draft_dry_run_stale`
+    package static var workflowDraftDryRunStale: String { L10nRuntime.locale == .frCA ? "Faites d'abord un essai à blanc de cette version de l'automatisation, puis publiez-la." : "Run a dry run of this version of the automation first, then publish it." }
+
+    /// `api_error.workflow_draft_not_found`
+    package static var workflowDraftNotFound: String { L10nRuntime.locale == .frCA ? "Cette automatisation en brouillon est introuvable. Elle a peut-être été publiée ou supprimée." : "That drafted automation was not found. It may have been published or discarded." }
+
     /// `api_error.workflow_member_push_roles_invalid`
     package static var workflowMemberPushRolesInvalid: String { L10nRuntime.locale == .frCA ? "Choisissez qui reçoit la notification\u{00A0}: les administrateurs, les membres ou les deux." : "Choose who gets the notification: administrators, members, or both." }
 
@@ -556,6 +625,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.workflow_sms_recipient_not_member`
     package static var workflowSmsRecipientNotMember: String { L10nRuntime.locale == .frCA ? "Cette personne n'est pas membre de cet espace de travail, alors les textos des flux ne peuvent pas lui être envoyés." : "That person is not a member of this workspace, so workflow texts cannot be sent to them." }
+
+    /// `api_error.workflow_voice_cap`
+    package static var workflowVoiceCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a atteint la limite d'automatisations créées à la voix. Créez-en d'autres dans le générateur de flux de travail." : "This workspace has reached the limit of automations built by voice. Build more in the workflow builder." }
 
     /// `api_error.workspace_access_denied`
     package static var workspaceAccessDenied: String { L10nRuntime.locale == .frCA ? "Vous n'êtes pas membre de cet espace de travail." : "You are not a member of that workspace." }

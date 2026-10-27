@@ -1,6 +1,7 @@
 # District Core for Swift
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/distronode-corporation/district-core-swift/badge)](https://scorecard.dev/viewer/?uri=github.com/distronode-corporation/district-core-swift)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15872/badge)](https://www.bestpractices.dev/projects/15872)
 
 The shared Swift core of the native [District AI](https://www.distronode.com/district-ai)
 apps: the models, networking, data repositories, sign-in logic and call state machines
@@ -14,7 +15,7 @@ Consumers:
   (iPhone and iPad)
 - [District AI for Mac](https://github.com/distronode-corporation/district-macos)
 
-This package was extracted from district-ios at `0b2354b`, with its history. 7.0.0 is the
+This package was extracted from district-ios at `0b2354b`, with its history. 7.1.0 is the
 current release.
 
 Links: [project page](https://www.distronode.com/open-source/district-core-swift) ·
@@ -38,7 +39,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "7.0.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "7.1.0"),
 ],
 ```
 
@@ -51,7 +52,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 7.0.0
+    exactVersion: 7.1.0
 ```
 
 ## Modules

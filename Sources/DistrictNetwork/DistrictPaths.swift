@@ -146,6 +146,8 @@ enum DistrictPaths {
     static let districtSetup = district + ["setup"]
     static let analytics = district + ["analytics"]
     static let calls = district + ["calls"]
+    /// ⚠️ NOT UNDER `calls`: a push-to-start token is the USER's, for no call yet.
+    static let liveActivityStartToken = district + ["live-activity", "start-token"]
 
     /// ⛔ THE ROOM-JOIN TOKEN LIVES UNDER `calls`, AND THAT IS THE SERVER'S PATH
     /// RATHER THAN A MISFILING TO CORRECT. `/api/district/rooms/token` does not
@@ -264,6 +266,12 @@ enum DistrictPaths {
     /// rather than worth guarding, since the server owns the id space.
     static func messageThreadTarget(_ id: String) -> [String] {
         messages + [id]
+    }
+
+    /// ⛔ THE SAME PUSH-SUPPLIED ID AS ``messageThreadTarget(_:)``, so a function for
+    /// the same reason: `messages/{id}/sender`, one segment per element.
+    static func messageSender(_ id: String) -> [String] {
+        messages + [id, "sender"]
     }
 
     /// ⛔ FULL-CONTENT SEARCH, AND IT IS NOT ``conversations`` FILTERED. The route
@@ -476,4 +484,6 @@ enum DistrictPaths {
     static let nativeDevices = nativeAuth + ["devices"]
     static let nativeDevicesRevoke = nativeDevices + ["revoke"]
     static let nativeRevokeAll = nativeAuth + ["revoke-all"]
+    /// ⚠️ A SIBLING OF `revoke-all`, under the same public prefix and bearer.
+    static let nativeNotifyToken = nativeAuth + ["notify-token"]
 }

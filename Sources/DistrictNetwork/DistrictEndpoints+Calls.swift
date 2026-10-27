@@ -114,6 +114,107 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// Tell the server a PERSON on this device declined a ringing call.
+    ///
+    /// ⛔ SENT ONLY ON A HUMAN DECLINE, AND NEVER ON A TIMEOUT, A WITHDRAWAL OR A
+    /// MISSING SESSION. The server records the decliner; once every member it rang
+    /// has declined it ends the ring early with `reason: "declined"` and the agent
+    /// takes a message instead of waiting out the rendezvous. A request sent for a
+    /// ring nobody looked at would tell the caller a person refused them. The only
+    /// producer is `IncomingCallCommand.requestDecline(workspace:call:)` (in
+    /// `DistrictCall`), which the reducer emits on a decline press and nowhere else.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. A repeat is harmless server-side (the route is
+    /// idempotent and fails open), but a retry loop outliving the ring would be a
+    /// request about a call that is no longer ringing anybody.
+    ///
+    /// ⚠️ 404 `call_not_found` IS "the call is already over", the ordinary race on a
+    /// ringing screen, and nothing a screen should report.
+    static func declineCall(callId: String, workspaceId: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .declineCall,
+            .post,
+            DistrictPaths.callDecline(callId),
+            body: .json(.object([("workspaceId", .string(workspaceId))]))
+        )
+    }
+
+    /// Send one supervisor line to the agent on a live call.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. The route publishes a reliable LiveKit data
+    /// packet and only then answers, so a 5xx or a dropped response may follow a
+    /// line the agent already acted on, and a retry would say it twice.
+    ///
+    /// ⚠️ THE LINE ARRIVES AS AN INSTRUCTION TO THE AGENT, NOT AS SPEECH TO THE
+    /// CALLER, so canned lines are written in the third person ("The owner will call
+    /// them back today."). ⚠️ The route refuses an empty line and one over 2000
+    /// characters with 400 `invalid_request`; a call not in progress is 400 or 409
+    /// `call_not_in_progress`, and roles are `["agency","client"]`.
+    ///
+    /// - Parameter callId: the `Call.id` (as in ``callDetail(workspaceId:callId:)``),
+    ///   ⛔ sent in the BODY: there is no per-call whisper path.
+    static func whisper(workspaceId: String, callId: String, text: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .whisper,
+            .post,
+            DistrictPaths.callsWhisper,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("callId", .string(callId)),
+                ("whisper", .string(text)),
+            ]))
+        )
+    }
+
+    /// Hand the server one Live Activity push token for a call, so it can update the
+    /// activity on the Lock Screen, the Dynamic Island and the watch while the app sleeps.
+    ///
+    /// ⚠️ THE APP STARTS THE ACTIVITY ITSELF; there is no push-to-start. The server keeps
+    /// each `<userId>:<token>` for three hours and fails open, so a 200 is not a promise
+    /// that updates will arrive, and the activity must read correctly without them.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. ActivityKit hands over a new token whenever it
+    /// rotates one, and each is sent once; a retry loop would outlive the call.
+    ///
+    /// ⚠️ 404 `call_not_found` IS "the call is already over", the same race as the
+    /// decline. Roles are `["agency","client"]`.
+    ///
+    /// - Parameter token: the activity's push token as lowercase hex, as APNs wants it.
+    static func registerLiveActivity(workspaceId: String, callId: String, token: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .registerLiveActivity,
+            .post,
+            DistrictPaths.callLiveActivity(callId),
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("token", .string(token)),
+            ]))
+        )
+    }
+
+    /// Hand the server this device's Live Activity push-to-start token, so a ring can start
+    /// the call's activity with no app running (iOS 18 and later).
+    ///
+    /// ⚠️ THE TOKEN IS THE USER'S, NOT THE WORKSPACE'S. The workspace only routes the request
+    /// to the right cell and authorises it (roles `["agency","client"]`); the server keeps up
+    /// to five tokens per user for 30 days, refreshed on every write, and fails open.
+    ///
+    /// ⛔ NEVER RETRIED AUTOMATICALLY. ActivityKit hands over a new token when it rotates one,
+    /// and the app sends it again when it goes stale; a retry loop adds nothing.
+    ///
+    /// - Parameter token: the push-to-start token as lowercase hex.
+    static func registerLiveActivityStartToken(workspaceId: String, token: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .registerLiveActivityStartToken,
+            .post,
+            DistrictPaths.liveActivityStartToken,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("token", .string(token)),
+            ]))
+        )
+    }
+
     /// Tell the SERVER to end a direct softphone call, carrier leg included.
     ///
     /// ⛔ WITHOUT THIS THE APP CANNOT HANG UP, AND THE FAILURE IS A BILL RATHER

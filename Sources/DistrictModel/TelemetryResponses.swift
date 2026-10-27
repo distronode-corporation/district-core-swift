@@ -98,7 +98,7 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     /// is `{callId, userIds}`, ids only. See `DistrictLive.DesktopRingGate`.
     case callRinging
     /// `call_ring_cancelled`: a ring the server started is over (answered on some device,
-    /// timed out, the caller hung up, or withdrawn). The data is `{callId, reason}`, see
+    /// timed out, the caller hung up, declined, or withdrawn). The data is `{callId, reason}`, see
     /// ``RingCancelReason``. ⛔ NOT a `call_ended`: it only silences a ring, and a device
     /// that answered the call ignores it (contract `docs/ring_cancel_contract.md`, 3.0.1).
     case callRingCancelled

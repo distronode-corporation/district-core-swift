@@ -9,7 +9,10 @@ final class RingCancelTests: XCTestCase {
     }
 
     func testEveryReasonReadsByItsWireName() {
-        XCTAssertEqual(RingCancelReason.allCases.map(\.wire), ["answered", "timeout", "call_ended", "withdrawn"])
+        XCTAssertEqual(
+            RingCancelReason.allCases.map(\.wire),
+            ["answered", "timeout", "call_ended", "withdrawn", "declined"]
+        )
         for reason in RingCancelReason.allCases {
             XCTAssertEqual(RingCancelReason(wire: reason.wire), reason)
         }
@@ -20,6 +23,14 @@ final class RingCancelTests: XCTestCase {
         XCTAssertEqual(RingCancelReason(wire: "parked"), .withdrawn)
         XCTAssertEqual(RingCancelReason(wire: "Answered"), .withdrawn)
         XCTAssertEqual(RingCancelReason(wire: nil), .withdrawn)
+    }
+
+    /// ⛔ `declined` (8.0.0) READS AS ITSELF, and a client older than 8.0.0 reads it as
+    /// `withdrawn` through the rule above, which is what let the server add it.
+    func testADeclineReadsAsItsOwnReason() {
+        XCTAssertEqual(RingCancelReason(wire: "declined"), .declined)
+        XCTAssertEqual(RingCancel.parse(payload(["reason": "declined"]))?.reason, .declined)
+        XCTAssertEqual(RingCancelReason(wire: "Declined"), .withdrawn)
     }
 
     func testTheBackgroundPushParses() {

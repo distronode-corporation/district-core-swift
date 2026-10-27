@@ -234,12 +234,14 @@ public enum CallEndReason: Sendable, Equatable {
     /// ``SoftphoneEvent/dialRefused``.
     case failed(message: String?)
 
-    /// The user refused an inbound call.
+    /// The ring ended on this device without an answer, by a person's decline or by
+    /// the app withdrawing it.
     ///
-    /// ⛔ NOTHING IS SENT TO THE SERVER FOR THIS, AND THE SAME IS TRUE OF
-    /// ``ringTimedOut``. See ``IncomingCallController``, which owns the reasoning
-    /// the two must be indistinguishable from outside, and the only way to
-    /// guarantee that is for neither to send anything.
+    /// ⚠️ A LOCAL REASON, NEVER TRANSMITTED. What the server hears is decided by the
+    /// event, not by this value: a person's decline also emits
+    /// ``IncomingCallCommand/requestDecline(workspace:call:)``, and
+    /// ``IncomingCallEvent/withdrawnLocally`` ends here with no request, like
+    /// ``ringTimedOut``. See ``IncomingCallController``, which owns the reasoning.
     case declined
 
     /// Nobody answered before the local ring timeout.

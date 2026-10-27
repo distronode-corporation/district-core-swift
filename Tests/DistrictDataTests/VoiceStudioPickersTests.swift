@@ -59,7 +59,8 @@ final class VoiceStudioPickersTests: XCTestCase {
             }
         }
         let held = Pickers.brainModels(VoiceStudioFixture.fluxChain, in: studio)
-        XCTAssertEqual(held.map(\.value), ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-3.6-flash"])
+        // Neither the un-offered preview (3.8 here) nor the un-offered Claude brain is listed.
+        XCTAssertEqual(held.map(\.value), ["gemini-3.5-flash"])
         var mix = VoiceStudioFixture.fluxChain
         mix.llm.model = "gemini-3.8-flash"
         XCTAssertEqual(Pickers.brainModels(mix, in: studio).last?.note, studio.labels.previewNote)

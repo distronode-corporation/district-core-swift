@@ -38,7 +38,7 @@ public enum PushEvent: Equatable, Sendable {
     ///
     /// ⛔ THE SERVER IS BLOCKING ON THIS. `actions/ring-app` pushes and then
     /// polls a Redis rendezvous for ~25 seconds; the agent's transfer is held
-    /// open for that window and falls back to PSTN when it expires. So the cost
+    /// open for that window and the agent takes a message when it expires. So the cost
     /// of mishandling this event is a caller sitting in silence, and the cost of
     /// handling it EARLY, answering before a human pressed anything, is a caller
     /// handed to nobody. Nothing may call the answer route on the strength of

@@ -264,6 +264,30 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// One message id exchanged for its sender's display name.
+    ///
+    /// ⛔ BUILT FOR A NOTIFICATION EXTENSION, AND THE ANSWER IS ONE NAME OR NULL ON
+    /// PURPOSE. It returns the contact's name and nothing else (no number, no
+    /// address, no thread), because the credential it accepts besides the app's own
+    /// session is the notify-read token from ``notifyToken()``, which lives in a
+    /// keychain group an extension can read. `null` is "the thread has no named
+    /// contact", and the extension keeps its generic text.
+    ///
+    /// ⚠️ THE ID ARRIVES FROM A PUSH; ``DistrictPaths/messageSender(_:)`` is a
+    /// function for the reason ``DistrictPaths/messageThreadTarget(_:)`` is. ⚠️ The
+    /// workspace is the push's own, as for ``messageThread(workspaceId:id:)``.
+    ///
+    /// ⚠️ ROLES ARE `["agency","client"]`; 404 `message_not_found` is "not in this
+    /// workspace" and "does not exist" alike.
+    static func messageSender(workspaceId: String, id: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .messageSender,
+            .get,
+            DistrictPaths.messageSender(id),
+            query: [ApiQueryItem("workspaceId", workspaceId)]
+        )
+    }
+
     /// Upload one image and get back the URL ``sendMessage`` accepts as a
     /// `mediaUrl`.
     ///

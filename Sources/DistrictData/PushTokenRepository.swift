@@ -67,8 +67,8 @@ public enum PushRegistrationOutcome: Equatable, Sendable {
 ///
 /// ⛔ EVERY FUNCTION HERE RETURNS AND NONE THROWS, AND THAT IS THE CONTRACT RATHER
 /// THAN DEFENSIVE HABIT. Push is a courtesy channel layered on paths that already
-/// work without it (the inbox has a poll; an unanswered ring falls through to
-/// PSTN), so a registration failure must never fail the thing it was attached to.
+/// work without it (the inbox has a poll; on an unanswered ring the agent takes a
+/// message), so a registration failure must never fail the thing it was attached to.
 /// The two call sites make that concrete: one runs during sign-IN, where throwing
 /// would turn a completed login into a failed one, and the other runs during
 /// sign-OUT, where throwing would abandon the token revoke that follows it.

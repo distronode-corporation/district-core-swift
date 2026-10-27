@@ -42,7 +42,7 @@ final class VoiceStudioReadoutTests: XCTestCase {
     // MARK: - An unsaved edit
 
     /// ⛔ ASSEMBLED FROM THE SAME RESPONSE'S MEDIANS: end of turn, the brain at its own region
-    /// with thinking off, and the mouth.
+    /// at its measured thinking level, and the mouth.
     func testAnUnsavedChainSumsTheMeasuredMedians() throws {
         let studio = try VoiceStudioFixture.response()
         let edited = flux.withVoice("aura-2-luna-en")
@@ -74,35 +74,35 @@ final class VoiceStudioReadoutTests: XCTestCase {
         XCTAssertEqual(Readout.blocks(edited, in: studio).last?.latency, VoiceStudioLatencyText.none)
     }
 
-    /// ⛔ THE BRAIN'S MEDIAN COUNTS ONLY WHERE IT WAS MEASURED: thinking off, at the region's own
+    /// ⛔ THE BRAIN'S MEDIAN COUNTS ONLY WHERE IT WAS MEASURED: thinking "minimal", at the region's own
     /// location. Anywhere else the stage is missing and the meter says "at least".
     func testABrainAwayFromItsMeasuredSettingIsAMissingStage() throws {
         let studio = try VoiceStudioFixture.response()
         var thinking = VoiceStudioFixture.fluxChain
-        thinking.llm.thinking = "dynamic"
+        thinking.llm.thinking = "low"
         XCTAssertEqual(Readout.meter(.chained(thinking), in: studio).headline, .local(ms: 520, atLeast: true))
         XCTAssertEqual(Readout.blocks(.chained(thinking), in: studio)[2].latency, VoiceStudioLatencyText.none)
 
         var east = VoiceStudioFixture.fluxChain
-        east.llm.location = "us-east4"
+        east.llm.location = "us"
         XCTAssertEqual(Readout.meter(.chained(east), in: studio).headline, .local(ms: 970, atLeast: false))
     }
 
     func testTheBrainIsLocalOnlyAtItsRegionsOwnLocation() throws {
         let studio = try VoiceStudioFixture.response()
-        let flash25 = try XCTUnwrap(studio.catalog.llm.first { $0.model == "gemini-2.5-flash" })
         let flash35 = try XCTUnwrap(studio.catalog.llm.first { $0.model == "gemini-3.5-flash" })
+        let flash38 = try XCTUnwrap(studio.catalog.llm.first { $0.model == "gemini-3.8-flash" })
         var mix = VoiceStudioFixture.fluxChain
-        XCTAssertTrue(Local.brainLocal(mix, flash25))
-        mix.llm.location = "us-east4"
-        XCTAssertTrue(Local.brainLocal(mix, flash25))
+        XCTAssertTrue(Local.brainLocal(mix, flash35))
+        mix.llm.location = "us"
+        XCTAssertTrue(Local.brainLocal(mix, flash35))
         mix.llm.location = "northamerica-northeast1"
-        XCTAssertFalse(Local.brainLocal(mix, flash25))
-        // ⚠️ A brain the region does not serve has no `auto` to be local to.
         XCTAssertFalse(Local.brainLocal(mix, flash35))
-        mix.llm.thinking = "dynamic"
+        // ⚠️ A brain the region does not serve has no `auto` to be local to.
+        XCTAssertFalse(Local.brainLocal(mix, flash38))
+        mix.llm.thinking = "low"
         mix.llm.location = "auto"
-        XCTAssertFalse(Local.brainLocal(mix, flash25))
+        XCTAssertFalse(Local.brainLocal(mix, flash35))
     }
 
     /// The Turn-taking block is the ear's own for Flux, and the agent's detector otherwise.
@@ -127,7 +127,7 @@ final class VoiceStudioReadoutTests: XCTestCase {
     func testAnUnsavedChainLeavingTheRegionSaysWhichLeg() throws {
         let studio = try VoiceStudioFixture.response()
         var abroad = VoiceStudioFixture.fluxChain
-        abroad.llm.location = "europe-west4"
+        abroad.llm.location = "europe-west3"
         let residency = Readout.residency(.chained(abroad), in: studio)
         XCTAssertFalse(residency.inRegion)
         XCTAssertEqual(residency.text, studio.labels.leavesRegion)

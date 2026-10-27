@@ -236,7 +236,7 @@ final class VoiceStudioTuningTests: XCTestCase {
         XCTAssertNil(resume.setting("default", in: off).turn.interruption)
 
         let thinking = VoiceStudioChoicePath.llmThinking
-        XCTAssertEqual(thinking.value(in: mix), "off")
-        XCTAssertEqual(thinking.setting("dynamic", in: mix).llm.thinking, "dynamic")
+        XCTAssertEqual(thinking.value(in: mix), "minimal")
+        XCTAssertEqual(thinking.setting("low", in: mix).llm.thinking, "low")
     }
 }

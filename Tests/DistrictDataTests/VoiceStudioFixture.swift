@@ -28,12 +28,12 @@ enum VoiceStudioFixture {
         try XCTUnwrap(String(data: ContractFixtures.read(name), encoding: .utf8))
     }
 
-    /// A chain the fixture's current persona runs: Deepgram Flux, Gemini 2.5 Flash at `auto`
-    /// with thinking off, Deepgram Aura-2 Asteria.
+    /// A chain the fixture's current persona runs: Deepgram Flux, Gemini 3.5 Flash at `auto`
+    /// at thinking "minimal" (the setting its median was measured at), Deepgram Aura-2 Asteria.
     static var fluxChain: EngineMix {
         EngineMix(
             stt: EngineMixStt(provider: "deepgram", model: "flux-general-en"),
-            llm: EngineMixLlm(model: "gemini-2.5-flash", location: "auto", thinking: "off"),
+            llm: EngineMixLlm(model: "gemini-3.5-flash", location: "auto", thinking: "minimal"),
             tts: EngineMixTts(provider: "deepgram", model: "aura-2", voice: "aura-2-asteria-en"),
             turn: EngineMixTurn(),
             preemptiveTts: false

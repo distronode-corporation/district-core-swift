@@ -143,6 +143,70 @@ public struct CallsRepository: Sendable {
             .map(\.transcript)
     }
 
+    /// Send one supervisor line to the agent on a live call.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. The route publishes the line to the room before
+    /// it answers, so a lost response may follow a line the agent already acted on, and
+    /// a second send would say it twice. A failure is shown to the person, who decides.
+    ///
+    /// ⚠️ THE FAILURES A SCREEN NAMES ARRIVE AS ``ApiError/http(status:message:code:)``
+    /// with the server's `code`: `call_not_in_progress` (400 or 409, the call ended),
+    /// `call_not_found` (404), `call_predates_feature` (400), `service_unavailable` and
+    /// `service_not_configured` (503), and 403 for a viewer, whose screen should offer no
+    /// whisper in the first place (roles are `["agency","client"]`).
+    ///
+    /// - Parameter text: one line, 1...2000 characters (the route refuses anything
+    ///   else with 400 `invalid_request`), in the third person: it reaches the agent as
+    ///   an instruction, not the caller as speech.
+    public func whisper(workspaceId: String, callId: String, text: String) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.whisper(workspaceId: workspaceId, callId: callId, text: text),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("WhisperResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
+    /// Register one Live Activity push token for a call, so the server can update the
+    /// activity while the app is asleep.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. ActivityKit's `pushTokenUpdates` hands over each
+    /// new token, and each is sent once. A failure costs only server updates: the app
+    /// still updates and ends the activity locally while it is awake.
+    ///
+    /// ⚠️ 404 `call_not_found` is the call ending first, and nothing to show anyone.
+    ///
+    /// - Parameter token: the push token as lowercase hex.
+    public func registerLiveActivity(
+        workspaceId: String,
+        callId: String,
+        token: String
+    ) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.registerLiveActivity(workspaceId: workspaceId, callId: callId, token: token),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("LiveActivityResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
+    /// Register this device's Live Activity push-to-start token, so a ring can start the call's
+    /// activity while the app is not running.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. A failure costs only the server-started activity; the
+    /// app still starts one itself when a ring reaches it in front.
+    public func registerLiveActivityStartToken(workspaceId: String, token: String) async -> Result<Void, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.registerLiveActivityStartToken(workspaceId: workspaceId, token: token),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("LiveActivityStartTokenResponse", $0.success, $0) }
+            .map { _ in () }
+    }
+
     /// One page, because the filtering happens afterwards.
     ///
     /// ⚠️ SMALL ON PURPOSE. The server has no `direction` filter, so the whole

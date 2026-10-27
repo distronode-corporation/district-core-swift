@@ -108,7 +108,8 @@ public struct VoiceStudioLlmModel: Codable, Equatable, Sendable {
     public let temperatureMax: Double
     /// At ``defaultLocation`` and ``defaultThinking``.
     public let residency: VoiceStudioResidency
-    /// ⚠️ Measured at the region's own location with thinking off, and only there.
+    /// ⚠️ Measured at the region's own location at the fixed engines' thinking level ("minimal"),
+    /// and only there.
     public let latency: VoiceStudioLatency?
 }
 

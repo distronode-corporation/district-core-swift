@@ -70,6 +70,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
             IncomingRow(Self.credential, .idle),
             IncomingRow(.answerRejected(.callerGone), .idle),
             IncomingRow(.declinePressed, .idle),
+            IncomingRow(.withdrawnLocally, .idle),
             IncomingRow(.ringTimedOut, .idle),
             IncomingRow(.hangUpPressed, .idle),
             IncomingRow(.dismissed, .idle),
@@ -95,7 +96,13 @@ final class IncomingCallTransitionTableTests: XCTestCase {
             IncomingRow(.answerPressed, .answering, answering),
             IncomingRow(Self.credential, .ringing),
             IncomingRow(.answerRejected(.callerGone), .ringing),
-            IncomingRow(.declinePressed, .ended(.declined), Self.quiet),
+            // ⛔ ONLY A PERSON'S DECLINE SENDS ANYTHING, and the request goes last.
+            IncomingRow(
+                .declinePressed,
+                .ended(.declined),
+                Self.quiet + [.requestDecline(workspace: testWorkspace, call: testCall)]
+            ),
+            IncomingRow(.withdrawnLocally, .ended(.declined), Self.quiet),
             IncomingRow(.ringTimedOut, .ended(.ringTimedOut), Self.quiet),
             IncomingRow(.hangUpPressed, .ended(.hungUpLocally), Self.quiet),
             // ⛔ A ringing call is not dismissible.
@@ -113,8 +120,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
 
     func testAnsweringBeforeTheCredentialLandsClosesNothing() {
         // ⚠️ NO `.engine(.disconnect)` ANYWHERE HERE: no connect has been issued,
-        // so there is no socket to close. That is `engineAttached` doing its job,
-        // and it is also what keeps a decline and a timeout identical.
+        // so there is no socket to close. That is `engineAttached` doing its job.
         var rows: [IncomingRow] = [
             IncomingRow(Self.secondPush, .answering),
             IncomingRow(.answerPressed, .answering),
@@ -126,6 +132,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
                 Self.quiet
             ),
             IncomingRow(.declinePressed, .ended(.hungUpLocally), Self.quiet),
+            IncomingRow(.withdrawnLocally, .ended(.hungUpLocally), Self.quiet),
             // ⛔ The bound does not fire after the press.
             IncomingRow(.ringTimedOut, .answering),
             IncomingRow(.hangUpPressed, .ended(.hungUpLocally), Self.quiet),
@@ -145,6 +152,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
         let rows: [IncomingRow] = [
             IncomingRow(.answerRejected(.callerGone), .ended(.callerCancelled), Self.loud),
             IncomingRow(.declinePressed, .ended(.hungUpLocally), Self.loud),
+            IncomingRow(.withdrawnLocally, .ended(.hungUpLocally), Self.loud),
             IncomingRow(.hangUpPressed, .ended(.hungUpLocally), Self.loud),
             IncomingRow(.engine(.failed(message: "x")), .ended(.failed(message: "x")), Self.loud),
             IncomingRow(.engine(.disconnected(reason: "x")), .ended(.remoteEnded(reason: "x")), Self.loud),
@@ -162,6 +170,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
             IncomingRow(Self.credential, .inCall),
             IncomingRow(.answerRejected(.callerGone), .inCall),
             IncomingRow(.declinePressed, .ended(.hungUpLocally), Self.loud),
+            IncomingRow(.withdrawnLocally, .ended(.hungUpLocally), Self.loud),
             IncomingRow(.ringTimedOut, .inCall),
             IncomingRow(.hangUpPressed, .ended(.hungUpLocally), Self.loud),
             IncomingRow(.dismissed, .inCall),
@@ -187,6 +196,7 @@ final class IncomingCallTransitionTableTests: XCTestCase {
             IncomingRow(Self.credential, ended),
             IncomingRow(.answerRejected(.callerGone), ended),
             IncomingRow(.declinePressed, ended),
+            IncomingRow(.withdrawnLocally, ended),
             IncomingRow(.ringTimedOut, ended),
             IncomingRow(.hangUpPressed, ended),
             IncomingRow(.dismissed, .idle),

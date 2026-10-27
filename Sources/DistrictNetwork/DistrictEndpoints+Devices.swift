@@ -68,6 +68,27 @@ public extension DistrictEndpoints {
         )
     }
 
+    /// Mint the notify-read token for this installation.
+    ///
+    /// ⛔ A CREDENTIAL WITH EXACTLY ONE USE. It authenticates
+    /// ``messageSender(workspaceId:id:)`` and nothing else (every other route answers
+    /// 401 to it), and only while this device's native session is alive, so signing
+    /// out kills it server-side even though it is valid for 30 days. That narrowness
+    /// is what makes it safe to leave where a notification extension can read it,
+    /// which the session tokens never are.
+    ///
+    /// ⚠️ AUTHENTICATED WITH THE SESSION BEARER, so it goes through ``ApiClient`` like
+    /// the device routes; a caller that is not a native session gets a 401. ⚠️ NO
+    /// PARAMETERS EXIST, so `{}` goes, as for ``revokeAllDevices()``.
+    static func notifyToken() -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .notifyToken,
+            .post,
+            DistrictPaths.nativeNotifyToken,
+            body: .json(.object([:]))
+        )
+    }
+
     /// Record (or refresh) this installation's push token.
     ///
     /// ⛔ IT TAKES NO `deviceId`, AND COULD NOT. The server recovers the

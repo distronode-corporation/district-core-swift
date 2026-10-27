@@ -144,4 +144,34 @@ public extension InboxRepository {
             .flatMap { ResponseEnvelope.affirm("MarkReadResponse", $0.success, $0) }
             .map(\.marked)
     }
+
+    /// The display name of whoever sent `messageId`, or nil when the thread has no
+    /// named contact.
+    ///
+    /// ⛔ BUILT FOR A NOTIFICATION EXTENSION, WHICH CALLS IT THROUGH AN ``ApiClient``
+    /// WHOSE TOKEN PROVIDER ANSWERS THE NOTIFY-READ TOKEN (see `NotifyTokenRepository`),
+    /// never the session. That token authenticates this one read and nothing else, so
+    /// the extension cannot be handed anything it should not show.
+    ///
+    /// ⛔ EVERY FAILURE DEGRADES TO THE GENERIC TEXT, AND SO DOES nil. A 401 (the token
+    /// expired, or the session behind it was signed out), a 404, a 403 for a viewer and
+    /// an offline handset are all "keep the notification as the server wrote it"; none
+    /// of them is a retry, and the extension never refreshes anything.
+    ///
+    /// ⚠️ A BLANK NAME IS nil. The route sends null for a thread with no named contact,
+    /// and a lock-screen title of whitespace would be worse than the generic one.
+    func messageSender(workspaceId: String, messageId: String) async -> Result<String?, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.messageSender(workspaceId: workspaceId, id: messageId),
+            as: MessageSenderResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("MessageSenderResponse", $0.success, $0) }
+            .map { response in
+                guard let name = response.name?.trimmingCharacters(in: .whitespacesAndNewlines),
+                      !name.isEmpty
+                else { return nil }
+                return name
+            }
+    }
 }

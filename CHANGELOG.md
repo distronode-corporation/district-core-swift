@@ -6,6 +6,87 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.1.0]
+
+The Live Activity for District AI for iPhone 3.2.0: the app hands the server each Live
+Activity push token for a call, so the activity on the Lock Screen, the Dynamic Island and the
+Apple Watch Smart Stack keeps updating while the app sleeps, and its push-to-start token, so a
+ring can start one. Nothing is removed or renamed.
+⚠️ `EndpointID` gains two cases, which would break an exhaustive `switch` over it; neither
+district-ios nor district-macos switches over `EndpointID` or names any of its cases (their
+sources at `main`, district-ios 2142846 and district-macos b8323d6, mention the type only in
+two comments each), so this is a minor version, as 7.0.1 judged the same question.
+
+### Added
+
+- `DistrictEndpoints.registerLiveActivity(workspaceId:callId:token:)`
+  (`POST /api/district/calls/{id}/live-activity` with `{workspaceId, token}`) and
+  `CallsRepository.registerLiveActivity(workspaceId:callId:token:)`, decoding
+  `SuccessResponse`. Never retried: ActivityKit hands over each rotated token, and each is
+  sent once.
+- `DistrictEndpoints.registerLiveActivityStartToken(workspaceId:token:)`
+  (`POST /api/district/live-activity/start-token` with `{workspaceId, token}`) and
+  `CallsRepository.registerLiveActivityStartToken(workspaceId:token:)`, decoding
+  `SuccessResponse`: the device's push-to-start token (iOS 18), so a ring can start the call's
+  activity with no app running. The token is the user's; the workspace only routes it. Never
+  retried.
+- `EndpointID` cases `registerLiveActivity` and `registerLiveActivityStartToken`, typed from
+  their first commit (`TypedEndpoints.liveCall`). The endpoint total is 126 and the typed
+  count 124.
+- `contracts/mobile/district-call-live-activity.json` and
+  `district-live-activity-start-token.json`, from the service's contract, gated in
+  `ContractFixtureTests` (`ContractManifest.expectedFixtureCount` is 192).
+- `contracts/i18n/api-errors.json` from the service (#41), with its two new codes generated
+  into `l10n/api_errors.toml` and the `ApiErrorTable`: `engine_unavailable` and
+  `workflow_member_push_roles_invalid`, each in English and Canadian French.
+
+## [8.0.0]
+
+The shared core for the Apple Watch round 2 of District AI for iPhone, iPad and Mac: a
+person's decline reaches the server, a supervisor can whisper to the agent, and a
+notification extension can name a message's sender. Nothing is removed or renamed, and it is a
+major version because it is source-breaking (the pull request template's rule): ⚠️ three
+public enums gain a case (`IncomingCallEvent.withdrawnLocally`,
+`IncomingCallCommand.requestDecline`, `RingCancelReason.declined`), so an exhaustive `switch`
+over the inbound command list (both apps' `IncomingCallModel`) or over a
+`DesktopRingEnd.cancelled(_:)` reason (District AI for Mac's `ringStopped`) needs the new arm
+when the pin moves.
+
+### Added
+
+- `DistrictEndpoints.declineCall(callId:workspaceId:)` (`POST /api/district/calls/{id}/decline`
+  with `{workspaceId}`) and `InboundCallRepository.decline(callId:workspaceId:)`, decoding
+  `SuccessResponse`. Never retried.
+- `DistrictEndpoints.whisper(workspaceId:callId:text:)` (`POST /api/district/calls/whisper`
+  with `{workspaceId, callId, whisper}`) and `CallsRepository.whisper(workspaceId:callId:text:)`,
+  decoding `SuccessResponse`. Never retried; a refusal keeps the server's `code`.
+- `DistrictEndpoints.notifyToken()` (`POST /api/auth/native/notify-token` with `{}`),
+  `NotifyTokenResponse` (its token redacted from every description and the mirror) and
+  `NotifyTokenRepository.mint()`.
+- `DistrictEndpoints.messageSender(workspaceId:id:)` (`GET /api/district/messages/{id}/sender`),
+  `MessageSenderResponse` and `InboxRepository.messageSender(workspaceId:messageId:)`, which
+  answers the trimmed name, or nil for a thread with no named contact.
+- `EndpointID` cases `declineCall`, `whisper`, `notifyToken` and `messageSender`, typed from
+  their first commit (`TypedEndpoints.liveCall`, `TypedEndpoints.notifyRead`). The endpoint
+  total is 124 and the typed count 122.
+- `contracts/mobile/district-call-decline.json`, `district-message-sender.json` and
+  `district-notify-token.json`, from the service's contract, gated in `ContractFixtureTests`
+  (`ContractManifest.expectedFixtureCount` is 190).
+- `RingCancelReason.declined`, the ring cancel the server sends once every member it rang has
+  declined. Any other unknown value still reads as `withdrawn`.
+
+### Changed
+
+- ⛔ A person's decline is now reported (Sean's decision, 2026-10-24, GitLab #2 note
+  4083623386). `IncomingCallController` appends `.requestDecline(workspace:call:)` to the
+  shared ending when `.declinePressed` arrives while ringing, so the server can end the ring
+  and the agent takes a message at once. A timeout, a withdrawal and a missing session still
+  send nothing: the apps' `withdraw` and `endForNoSession` paths feed the new
+  `.withdrawnLocally`, which ends the call exactly as `.declinePressed` did and emits no
+  request. `testDecliningAndTimingOutEmitByteIdenticalCommandLists` is replaced by tests that
+  pin both halves.
+- Comments that said an expired ring "falls back to PSTN" now say the agent takes a message.
+
 ## [7.1.0]
 
 The shared core for District AI for iPhone, iPad and Mac after 3.0.3. One public type is

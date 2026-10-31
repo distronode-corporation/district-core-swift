@@ -139,6 +139,7 @@ enum WireTable {
         case (.workflowActionOutcome, "ok"): WireCopy.workflowActionOutcomeOk
         case (.workflowActionOutcome, "skipped"): WireCopy.workflowActionOutcomeSkipped
         case (.workflowActionOutcome, "failed"): WireCopy.workflowActionOutcomeFailed
+        case (.workflowActionReason, "consent-check-failed"): WireCopy.workflowActionReasonConsentCheckFailed
         case (.workflowActionReason, "contact-not-found"): WireCopy.workflowActionReasonContactNotFound
         case (.workflowActionReason, "dnc"): WireCopy.workflowActionReasonDnc
         case (.workflowActionReason, "dormant"): WireCopy.workflowActionReasonDormant
@@ -153,6 +154,7 @@ enum WireTable {
         case (.workflowActionReason, "http-{status}"): WireCopy.workflowActionReasonHttpStatus
         case (.workflowActionReason, "invalid-recipient"): WireCopy.workflowActionReasonInvalidRecipient
         case (.workflowActionReason, "missing-webhook-url"): WireCopy.workflowActionReasonMissingWebhookUrl
+        case (.workflowActionReason, "no-consent"): WireCopy.workflowActionReasonNoConsent
         case (.workflowActionReason, "no-devices"): WireCopy.workflowActionReasonNoDevices
         case (.workflowActionReason, "no-message"): WireCopy.workflowActionReasonNoMessage
         case (.workflowActionReason, "no-provider-credentials"): WireCopy.workflowActionReasonNoProviderCredentials
@@ -161,6 +163,7 @@ enum WireTable {
         case (.workflowActionReason, "postmark-missing"): WireCopy.workflowActionReasonPostmarkMissing
         case (.workflowActionReason, "push-lookup-failed"): WireCopy.workflowActionReasonPushLookupFailed
         case (.workflowActionReason, "push-not-delivered"): WireCopy.workflowActionReasonPushNotDelivered
+        case (.workflowActionReason, "quiet-hours"): WireCopy.workflowActionReasonQuietHours
         case (.workflowActionReason, "recipient-not-member"): WireCopy.workflowActionReasonRecipientNotMember
         case (.workflowActionReason, "recipient-number-held"): WireCopy.workflowActionReasonRecipientNumberHeld
         case (.workflowActionReason, "report-recipient-refused"): WireCopy.workflowActionReasonReportRecipientRefused

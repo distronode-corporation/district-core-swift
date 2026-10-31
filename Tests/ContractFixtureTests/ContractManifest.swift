@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 192
+    static let expectedFixtureCount = 193
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -71,6 +71,9 @@ enum ContractManifest {
         // fixture test, not a client" failure the ⚠️ at the top of `UntypedEndpoints`
         // describes. An entry leaves this list together with its DTO, its descriptor
         // and the repository method that decodes it.
+        // The Inbox thread-assignment read (`GET conversations/assignments`), which
+        // this client does not call yet.
+        "district-conversation-assignments.json",
         "district-pkce-vectors.json",
     ]
 

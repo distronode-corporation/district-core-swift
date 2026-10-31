@@ -59,11 +59,14 @@ final class VoiceStudioPickersTests: XCTestCase {
             }
         }
         let held = Pickers.brainModels(VoiceStudioFixture.fluxChain, in: studio)
-        // Neither the un-offered preview (3.8 here) nor the un-offered Claude brain is listed.
-        XCTAssertEqual(held.map(\.value), ["gemini-3.5-flash"])
+        // The un-offered preview (3.8 here) is not listed; the offered Claude brain is, with no note.
+        XCTAssertEqual(held.map(\.value), ["gemini-3.5-flash", "claude-haiku-5-5"])
+        XCTAssertEqual(held.last?.channelLabel, "Latest")
+        XCTAssertNil(held.last?.note)
         var mix = VoiceStudioFixture.fluxChain
         mix.llm.model = "gemini-3.8-flash"
-        XCTAssertEqual(Pickers.brainModels(mix, in: studio).last?.note, studio.labels.previewNote)
+        let preview = Pickers.brainModels(mix, in: studio).first { $0.value == "gemini-3.8-flash" }
+        XCTAssertEqual(preview?.note, studio.labels.previewNote)
     }
 
     func testMouthVendorsAndModelsFollowTheLanguage() throws {

@@ -63,6 +63,9 @@ package enum ApiErrorCopy {
     /// `api_error.already_cancelled`
     package static var alreadyCancelled: String { L10nRuntime.locale == .frCA ? "Ce rendez-vous a déjà été annulé." : "That booking was already cancelled." }
 
+    /// `api_error.assignee_not_member`
+    package static var assigneeNotMember: String { L10nRuntime.locale == .frCA ? "Cette personne n'est pas membre de cet espace de travail. Ajoutez-la d'abord à l'équipe." : "That person is not a member of this workspace. Add them to the team first." }
+
     /// `api_error.attachment_unsupported`
     package static var attachmentUnsupported: String { L10nRuntime.locale == .frCA ? "Ce type de pièce jointe ne peut pas être envoyé sur ce canal." : "That kind of attachment cannot be sent on this channel." }
 
@@ -113,6 +116,21 @@ package enum ApiErrorCopy {
 
     /// `api_error.call_predates_feature`
     package static var callPredatesFeature: String { L10nRuntime.locale == .frCA ? "Cet appel a commencé avant l'existence de cette fonction, elle n'est donc pas offerte pour lui." : "That call started before this feature existed, so it is not available on it." }
+
+    /// `api_error.caller_id_carrier_failed`
+    package static var callerIdCarrierFailed: String { L10nRuntime.locale == .frCA ? "Impossible de joindre le fournisseur de téléphonie. Réessayez dans quelques minutes." : "The phone carrier could not be reached. Try again in a few minutes." }
+
+    /// `api_error.caller_id_mobile_unverified`
+    package static var callerIdMobileUnverified: String { L10nRuntime.locale == .frCA ? "Confirmez d'abord votre numéro de cellulaire, puis enregistrez-le comme afficheur." : "Confirm your mobile number first, then register it as caller ID." }
+
+    /// `api_error.caller_id_not_confirmed`
+    package static var callerIdNotConfirmed: String { L10nRuntime.locale == .frCA ? "Le fournisseur n'a pas encore confirmé votre numéro. Répondez à l'appel de vérification, entrez le code, puis vérifiez de nouveau." : "The carrier has not confirmed your number yet. Answer the verification call and key in the code, then check again." }
+
+    /// `api_error.caller_id_request_too_soon`
+    package static var callerIdRequestTooSoon: String { L10nRuntime.locale == .frCA ? "Un appel de vérification a été fait il y a moins de 10 minutes. Attendez avant d'en demander un autre." : "A verification call went out less than 10 minutes ago. Wait before asking for another." }
+
+    /// `api_error.caller_id_unavailable`
+    package static var callerIdUnavailable: String { L10nRuntime.locale == .frCA ? "L'utilisation de votre cellulaire comme afficheur n'est pas encore offerte." : "Using your own mobile as caller ID is not available yet." }
 
     /// `api_error.carrier_error`
     package static var carrierError: String { L10nRuntime.locale == .frCA ? "Le transporteur n'a pas pu effectuer cette opération. Réessayez ou communiquez avec notre équipe de soutien." : "The carrier could not complete that. Please try again or contact support." }
@@ -182,6 +200,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.eu_vat_required`
     package static var euVatRequired: String { L10nRuntime.locale == .frCA ? "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation." : "In the European Union we sell to businesses only. Enter your VAT number and we invoice you under the reverse-charge rule." }
+
+    /// `api_error.extra_number_charge_required`
+    package static var extraNumberChargeRequired: String { L10nRuntime.locale == .frCA ? "Ce numéro dépasse ceux que le forfait inclut et entraîne des frais mensuels. Confirmez les frais pour l'acheter." : "This number is beyond the ones the plan includes and has a monthly charge. Confirm the charge to buy it." }
 
     /// `api_error.file_required`
     package static var fileRequired: String { L10nRuntime.locale == .frCA ? "Choisissez un fichier à téléverser." : "Choose a file to upload." }
@@ -649,6 +670,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.workspace_owner_only`
     package static var workspaceOwnerOnly: String { L10nRuntime.locale == .frCA ? "Seule la personne propriétaire de cet espace de travail peut faire cela." : "Only the owner of this workspace can do that." }
+
+    /// `api_error.workspace_owner_protected`
+    package static var workspaceOwnerProtected: String { L10nRuntime.locale == .frCA ? "L'accès du propriétaire de l'espace de travail ne peut pas être modifié ni retiré ici." : "The workspace owner's access cannot be changed or removed here." }
 }
 
 package enum DeskCopy {
@@ -1868,6 +1892,9 @@ package enum WireCopy {
     /// `wire.workflow_action_outcome.skipped`
     package static var workflowActionOutcomeSkipped: String { L10nRuntime.locale == .frCA ? "Ignoré" : "Skipped" }
 
+    /// `wire.workflow_action_reason.consent_check_failed`
+    package static var workflowActionReasonConsentCheckFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le consentement aux textos n'a pas pu être vérifié" : "Not texted: the texting consent could not be checked" }
+
     /// `wire.workflow_action_reason.contact_not_found`
     package static var workflowActionReasonContactNotFound: String { L10nRuntime.locale == .frCA ? "Contact introuvable" : "Contact not found" }
 
@@ -1910,6 +1937,9 @@ package enum WireCopy {
     /// `wire.workflow_action_reason.missing_webhook_url`
     package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook url" }
 
+    /// `wire.workflow_action_reason.no_consent`
+    package static var workflowActionReasonNoConsent: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: aucun appel ni texto de cette personne depuis 24\u{00A0}heures, et aucun consentement au dossier" : "Not texted: no call or text from them in the last 24 hours, and no consent on record" }
+
     /// `wire.workflow_action_reason.no_devices`
     package static var workflowActionReasonNoDevices: String { L10nRuntime.locale == .frCA ? "Aucun membre de l'équipe n'a l'application sur un appareil qui peut recevoir des notifications" : "No team member has the app on a device that can receive notifications" }
 
@@ -1933,6 +1963,9 @@ package enum WireCopy {
 
     /// `wire.workflow_action_reason.push_not_delivered`
     package static var workflowActionReasonPushNotDelivered: String { L10nRuntime.locale == .frCA ? "Aucun appareil n'a accepté la notification" : "No device accepted the notification" }
+
+    /// `wire.workflow_action_reason.quiet_hours`
+    package static var workflowActionReasonQuietHours: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: il était en dehors de 8\u{00A0}h à 21\u{00A0}h là où se trouve peut-être son téléphone" : "Not texted: it was outside 8am to 9pm where their phone may be" }
 
     /// `wire.workflow_action_reason.recipient_not_member`
     package static var workflowActionReasonRecipientNotMember: String { L10nRuntime.locale == .frCA ? "La personne à qui envoyer le texto n'est plus membre de cet espace de travail" : "The person to text is no longer a member of this workspace" }

@@ -76,6 +76,9 @@ enum ApiErrorTable {
         case "overage_cap_reached": return ApiErrorCopy.overageCapReached
         case "overage_spend_cap_reached": return ApiErrorCopy.overageSpendCapReached
         case "phone_number_limit_reached": return ApiErrorCopy.phoneNumberLimitReached
+        case "extra_number_charge_required": return ApiErrorCopy.extraNumberChargeRequired
+        case "workspace_owner_protected": return ApiErrorCopy.workspaceOwnerProtected
+        case "assignee_not_member": return ApiErrorCopy.assigneeNotMember
         case "hq_voice_allowance_reached": return ApiErrorCopy.hqVoiceAllowanceReached
         case "hq_voice_busy": return ApiErrorCopy.hqVoiceBusy
         case "draft_not_found": return ApiErrorCopy.draftNotFound
@@ -176,6 +179,11 @@ enum ApiErrorTable {
         case "member_phone_cannot_text": return ApiErrorCopy.memberPhoneCannotText
         case "member_phone_opted_out": return ApiErrorCopy.memberPhoneOptedOut
         case "member_phone_business_number": return ApiErrorCopy.memberPhoneBusinessNumber
+        case "caller_id_unavailable": return ApiErrorCopy.callerIdUnavailable
+        case "caller_id_mobile_unverified": return ApiErrorCopy.callerIdMobileUnverified
+        case "caller_id_request_too_soon": return ApiErrorCopy.callerIdRequestTooSoon
+        case "caller_id_not_confirmed": return ApiErrorCopy.callerIdNotConfirmed
+        case "caller_id_carrier_failed": return ApiErrorCopy.callerIdCarrierFailed
         case "call_not_in_progress": return ApiErrorCopy.callNotInProgress
         case "call_has_no_room": return ApiErrorCopy.callHasNoRoom
         case "call_not_direct_dial": return ApiErrorCopy.callNotDirectDial

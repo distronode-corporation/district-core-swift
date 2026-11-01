@@ -1,7 +1,14 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/distronode-logo-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/distronode-logo-light.png">
+  <img alt="Distronode" src=".github/assets/distronode-logo-light.png" width="220">
+</picture>
+
 # District Core for Swift
 
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/distronode-corporation/district-core-swift/badge)](https://scorecard.dev/viewer/?uri=github.com/distronode-corporation/district-core-swift)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15872/badge)](https://www.bestpractices.dev/projects/15872)
+[![Latest release](https://img.shields.io/github/v/release/distronode-corporation/district-core-swift?label=release)](https://github.com/distronode-corporation/district-core-swift/releases/latest)
 
 The shared Swift core of the native [District AI](https://www.distronode.com/district-ai)
 apps: the models, networking, data repositories, sign-in logic and call state machines
@@ -15,8 +22,8 @@ Consumers:
   (iPhone and iPad)
 - [District AI for Mac](https://github.com/distronode-corporation/district-macos)
 
-This package was extracted from district-ios at `0b2354b`, with its history. 7.1.0 is the
-current release.
+This package was extracted from district-ios at `0b2354b`, with its history. The
+release badge above names the current release.
 
 Links: [project page](https://www.distronode.com/open-source/district-core-swift) ·
 [GitLab mirror](https://gitlab.com/distronode-corporation/district-core-swift) (read-only
@@ -39,7 +46,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "7.1.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.1.0"),
 ],
 ```
 
@@ -52,7 +59,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 7.1.0
+    exactVersion: 8.1.0
 ```
 
 ## Modules

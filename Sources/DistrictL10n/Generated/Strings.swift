@@ -365,6 +365,12 @@ package enum ApiErrorCopy {
     /// `api_error.message_too_long`
     package static var messageTooLong: String { L10nRuntime.locale == .frCA ? "Ce message est trop long." : "That message is too long." }
 
+    /// `api_error.messaging_app_sms_refused`
+    package static var messagingAppSmsRefused: String { L10nRuntime.locale == .frCA ? "Les textos sont configurés avec vos numéros de téléphone, pas comme une application de messagerie." : "Texting is set up with your phone numbers, not as a messaging app." }
+
+    /// `api_error.messaging_apps_managed`
+    package static var messagingAppsManaged: String { L10nRuntime.locale == .frCA ? "Les applications de messagerie ne peuvent pas être connectées sur le compte Sinch de la plateforme. Connectez votre propre compte Sinch pour ajouter WhatsApp, Messenger ou RCS." : "Messaging apps cannot be connected on the platform's Sinch account. Connect your own Sinch account to add WhatsApp, Messenger or RCS." }
+
     /// `api_error.messaging_provider_not_configured`
     package static var messagingProviderNotConfigured: String { L10nRuntime.locale == .frCA ? "Aucun fournisseur de messagerie n'est connecté à cet espace de travail." : "No messaging provider is connected to this workspace." }
 
@@ -620,8 +626,14 @@ package enum ApiErrorCopy {
     /// `api_error.website_unreadable`
     package static var websiteUnreadable: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu lire ce site Web. Vérifiez l'adresse, ou saisissez vos renseignements vous-même." : "We could not read that website. Check the address, or enter your details yourself." }
 
+    /// `api_error.whatsapp_template_invalid`
+    package static var whatsappTemplateInvalid: String { L10nRuntime.locale == .frCA ? "Ce modèle WhatsApp ne peut pas être envoyé. Il n'est pas approuvé pour ce numéro, ou ses variables ne lui correspondent pas." : "That WhatsApp template cannot be sent. It is not approved for this number, or its variables do not match it." }
+
     /// `api_error.whatsapp_unsupported`
     package static var whatsappUnsupported: String { L10nRuntime.locale == .frCA ? "WhatsApp n'est pas offert sur le compte de messagerie de cet espace de travail." : "WhatsApp is not available on this workspace's messaging account." }
+
+    /// `api_error.whatsapp_window_closed`
+    package static var whatsappWindowClosed: String { L10nRuntime.locale == .frCA ? "La fenêtre WhatsApp de 24 heures avec ce contact est fermée. Envoyez un modèle approuvé pour le joindre de nouveau." : "The 24-hour WhatsApp window with this contact is closed. Send an approved template to reach them again." }
 
     /// `api_error.workflow_action_needs_message`
     package static var workflowActionNeedsMessage: String { L10nRuntime.locale == .frCA ? "La notification de l'équipe ne fonctionne qu'avec le déclencheur d'un message pris pendant un appel." : "Notifying the team works only with the trigger for a message taken during a call." }
@@ -1891,6 +1903,9 @@ package enum WireCopy {
 
     /// `wire.workflow_action_outcome.skipped`
     package static var workflowActionOutcomeSkipped: String { L10nRuntime.locale == .frCA ? "Ignoré" : "Skipped" }
+
+    /// `wire.workflow_action_reason.automated_sender`
+    package static var workflowActionReasonAutomatedSender: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le message venait d'un expéditeur automatisé, comme un code de vérification" : "Not texted: the message came from an automated sender, such as a verification code" }
 
     /// `wire.workflow_action_reason.consent_check_failed`
     package static var workflowActionReasonConsentCheckFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le consentement aux textos n'a pas pu être vérifié" : "Not texted: the texting consent could not be checked" }

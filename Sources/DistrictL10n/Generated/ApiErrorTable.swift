@@ -138,6 +138,10 @@ enum ApiErrorTable {
         case "sending_domain_missing": return ApiErrorCopy.sendingDomainMissing
         case "sending_domain_provider_changed": return ApiErrorCopy.sendingDomainProviderChanged
         case "whatsapp_unsupported": return ApiErrorCopy.whatsappUnsupported
+        case "whatsapp_window_closed": return ApiErrorCopy.whatsappWindowClosed
+        case "whatsapp_template_invalid": return ApiErrorCopy.whatsappTemplateInvalid
+        case "messaging_apps_managed": return ApiErrorCopy.messagingAppsManaged
+        case "messaging_app_sms_refused": return ApiErrorCopy.messagingAppSmsRefused
         case "verify_not_enabled": return ApiErrorCopy.verifyNotEnabled
         case "TRUST_BUNDLES_NOT_APPROVED": return ApiErrorCapsCopy.trustBundlesNotApproved
         case "carrier_rejected": return ApiErrorCopy.carrierRejected

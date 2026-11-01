@@ -1494,6 +1494,15 @@ tier = "T3"
 state = "reviewed"
 note = "A label for the stored value `skipped` of workflowActionOutcome. `actionResults[].outcome` on a workflow run. The portal shows the value itself (only its colour depends on it); it has no label for any of them. The service has no label for it; the English is the value as the website shows it."
 
+[wire.workflow_action_reason.automated_sender]
+en = "Not texted: the message came from an automated sender, such as a verification code"
+fr = "Texto non envoyé\u00A0: le message venait d'un expéditeur automatisé, comme un code de vérification"
+ctx = "label"
+screen = "wire workflow_action_reason"
+tier = "T3"
+state = "reviewed"
+note = "A label for the stored value `automated-sender` of workflowActionReason. The code that opens `actionResults[].reason` on a workflow run: the reason is an English sentence `<code>: <detail>` (the detail can name a number, a tag or a status). The portal shows the whole sentence as sent, under the code's label where it has one (the fallback codes of a text to the owner or a team member, the team push codes and the webhook signing code); an app shows the code's entry, never the detail."
+
 [wire.workflow_action_reason.consent_check_failed]
 en = "Not texted: the texting consent could not be checked"
 fr = "Texto non envoyé\u00A0: le consentement aux textos n'a pas pu être vérifié"

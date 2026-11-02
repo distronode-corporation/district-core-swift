@@ -139,6 +139,7 @@ enum WireTable {
         case (.workflowActionOutcome, "ok"): WireCopy.workflowActionOutcomeOk
         case (.workflowActionOutcome, "skipped"): WireCopy.workflowActionOutcomeSkipped
         case (.workflowActionOutcome, "failed"): WireCopy.workflowActionOutcomeFailed
+        case (.workflowActionReason, "automated-sender"): WireCopy.workflowActionReasonAutomatedSender
         case (.workflowActionReason, "consent-check-failed"): WireCopy.workflowActionReasonConsentCheckFailed
         case (.workflowActionReason, "contact-not-found"): WireCopy.workflowActionReasonContactNotFound
         case (.workflowActionReason, "dnc"): WireCopy.workflowActionReasonDnc

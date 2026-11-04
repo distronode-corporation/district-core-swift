@@ -63,6 +63,9 @@ package enum ApiErrorCopy {
     /// `api_error.already_cancelled`
     package static var alreadyCancelled: String { L10nRuntime.locale == .frCA ? "Ce rendez-vous a déjà été annulé." : "That booking was already cancelled." }
 
+    /// `api_error.assignee_is_viewer`
+    package static var assigneeIsViewer: String { L10nRuntime.locale == .frCA ? "Un Lecteur peut consulter les conversations, mais aucune ne peut lui être assignée. Choisissez un membre qui a un autre rôle." : "A Viewer can read conversations but cannot be assigned one. Choose a member with another role." }
+
     /// `api_error.assignee_not_member`
     package static var assigneeNotMember: String { L10nRuntime.locale == .frCA ? "Cette personne n'est pas membre de cet espace de travail. Ajoutez-la d'abord à l'équipe." : "That person is not a member of this workspace. Add them to the team first." }
 
@@ -374,6 +377,9 @@ package enum ApiErrorCopy {
     /// `api_error.messaging_provider_not_configured`
     package static var messagingProviderNotConfigured: String { L10nRuntime.locale == .frCA ? "Aucun fournisseur de messagerie n'est connecté à cet espace de travail." : "No messaging provider is connected to this workspace." }
 
+    /// `api_error.messenger_window_closed`
+    package static var messengerWindowClosed: String { L10nRuntime.locale == .frCA ? "La fenêtre de réponse Messenger ou Instagram avec ce contact est fermée. Vous pourrez répondre quand il vous écrira de nouveau." : "The Messenger or Instagram reply window with this contact is closed. You can reply once they write to you again." }
+
     /// `api_error.mfa_code_invalid`
     package static var mfaCodeInvalid: String { L10nRuntime.locale == .frCA ? "Ce code n'est pas valide, ou il a déjà été utilisé." : "That code is not valid, or it has already been used." }
 
@@ -505,6 +511,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.sip_provider_required`
     package static var sipProviderRequired: String { L10nRuntime.locale == .frCA ? "Cela exige un fournisseur compatible SIP, c'est-à-dire Twilio ou Telnyx sur cet espace de travail." : "That needs a SIP-capable provider, which means Twilio or Telnyx on this workspace." }
+
+    /// `api_error.sms_reply_not_customer_channel`
+    package static var smsReplyNotCustomerChannel: String { L10nRuntime.locale == .frCA ? "Ce client écrit sur WhatsApp, Messenger ou Instagram et n'a jamais envoyé de texto à ce numéro. Répondez-lui sur son canal à partir de la notification, de la boîte de réception Web ou d'une version à jour de l'application." : "This customer writes on WhatsApp, Messenger or Instagram and has never texted this number. Reply on their channel from the notification, the web Inbox or an updated app." }
 
     /// `api_error.status_change_failed`
     package static var statusChangeFailed: String { L10nRuntime.locale == .frCA ? "Le statut n'a pas pu être modifié. Veuillez réessayer." : "The status could not be changed. Please try again." }
@@ -1948,6 +1957,12 @@ package enum WireCopy {
 
     /// `wire.workflow_action_reason.invalid_recipient`
     package static var workflowActionReasonInvalidRecipient: String { L10nRuntime.locale == .frCA ? "Destinataire invalide" : "Invalid recipient" }
+
+    /// `wire.workflow_action_reason.loop_check_failed`
+    package static var workflowActionReasonLoopCheckFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: les messages récents avec ce numéro n'ont pas pu être vérifiés" : "Not texted: the recent messages with this number could not be checked" }
+
+    /// `wire.workflow_action_reason.loop_paused`
+    package static var workflowActionReasonLoopPaused: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: ce numéro a répondu automatiquement plusieurs fois de suite, les textos vers lui sont donc suspendus pendant une heure" : "Not texted: this number answered automatically several times in a row, so texts to it are paused for an hour" }
 
     /// `wire.workflow_action_reason.missing_webhook_url`
     package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook url" }

@@ -1629,6 +1629,24 @@ tier = "T3"
 state = "reviewed"
 note = "A label for the stored value `invalid-recipient` of workflowActionReason. The code that opens `actionResults[].reason` on a workflow run: the reason is an English sentence `<code>: <detail>` (the detail can name a number, a tag or a status). The portal shows the whole sentence as sent, under the code's label where it has one (the fallback codes of a text to the owner or a team member, the team push codes and the webhook signing code); an app shows the code's entry, never the detail. The service has no label for it; the English is the value as the website shows it."
 
+[wire.workflow_action_reason.loop_check_failed]
+en = "Not texted: the recent messages with this number could not be checked"
+fr = "Texto non envoyé\u00A0: les messages récents avec ce numéro n'ont pas pu être vérifiés"
+ctx = "label"
+screen = "wire workflow_action_reason"
+tier = "T3"
+state = "reviewed"
+note = "A label for the stored value `loop-check-failed` of workflowActionReason. The code that opens `actionResults[].reason` on a workflow run: the reason is an English sentence `<code>: <detail>` (the detail can name a number, a tag or a status). The portal shows the whole sentence as sent, under the code's label where it has one (the fallback codes of a text to the owner or a team member, the team push codes and the webhook signing code); an app shows the code's entry, never the detail."
+
+[wire.workflow_action_reason.loop_paused]
+en = "Not texted: this number answered automatically several times in a row, so texts to it are paused for an hour"
+fr = "Texto non envoyé\u00A0: ce numéro a répondu automatiquement plusieurs fois de suite, les textos vers lui sont donc suspendus pendant une heure"
+ctx = "label"
+screen = "wire workflow_action_reason"
+tier = "T3"
+state = "reviewed"
+note = "A label for the stored value `loop-paused` of workflowActionReason. The code that opens `actionResults[].reason` on a workflow run: the reason is an English sentence `<code>: <detail>` (the detail can name a number, a tag or a status). The portal shows the whole sentence as sent, under the code's label where it has one (the fallback codes of a text to the owner or a team member, the team push codes and the webhook signing code); an app shows the code's entry, never the detail."
+
 [wire.workflow_action_reason.missing_webhook_url]
 en = "Missing webhook url"
 fr = "URL du webhook manquante"

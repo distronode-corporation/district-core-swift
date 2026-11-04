@@ -154,6 +154,8 @@ enum WireTable {
         case (.workflowActionReason, "fallback-push"): WireCopy.workflowActionReasonFallbackPush
         case (.workflowActionReason, "http-{status}"): WireCopy.workflowActionReasonHttpStatus
         case (.workflowActionReason, "invalid-recipient"): WireCopy.workflowActionReasonInvalidRecipient
+        case (.workflowActionReason, "loop-check-failed"): WireCopy.workflowActionReasonLoopCheckFailed
+        case (.workflowActionReason, "loop-paused"): WireCopy.workflowActionReasonLoopPaused
         case (.workflowActionReason, "missing-webhook-url"): WireCopy.workflowActionReasonMissingWebhookUrl
         case (.workflowActionReason, "no-consent"): WireCopy.workflowActionReasonNoConsent
         case (.workflowActionReason, "no-devices"): WireCopy.workflowActionReasonNoDevices

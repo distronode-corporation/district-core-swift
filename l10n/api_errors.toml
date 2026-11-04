@@ -21,6 +21,15 @@ tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `already_cancelled`, in place of the service's own English."
 
+[api_error.assignee_is_viewer]
+en = "A Viewer can read conversations but cannot be assigned one. Choose a member with another role."
+fr = "Un Lecteur peut consulter les conversations, mais aucune ne peut lui être assignée. Choisissez un membre qui a un autre rôle."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `assignee_is_viewer`, in place of the service's own English."
+
 [api_error.assignee_not_member]
 en = "That person is not a member of this workspace. Add them to the team first."
 fr = "Cette personne n'est pas membre de cet espace de travail. Ajoutez-la d'abord à l'équipe."
@@ -949,6 +958,15 @@ tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `messaging_provider_not_configured`, in place of the service's own English."
 
+[api_error.messenger_window_closed]
+en = "The Messenger or Instagram reply window with this contact is closed. You can reply once they write to you again."
+fr = "La fenêtre de réponse Messenger ou Instagram avec ce contact est fermée. Vous pourrez répondre quand il vous écrira de nouveau."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `messenger_window_closed`, in place of the service's own English."
+
 [api_error.mfa_code_invalid]
 en = "That code is not valid, or it has already been used."
 fr = "Ce code n'est pas valide, ou il a déjà été utilisé."
@@ -1345,6 +1363,15 @@ screen = "api_error"
 tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `sip_provider_required`, in place of the service's own English."
+
+[api_error.sms_reply_not_customer_channel]
+en = "This customer writes on WhatsApp, Messenger or Instagram and has never texted this number. Reply on their channel from the notification, the web Inbox or an updated app."
+fr = "Ce client écrit sur WhatsApp, Messenger ou Instagram et n'a jamais envoyé de texto à ce numéro. Répondez-lui sur son canal à partir de la notification, de la boîte de réception Web ou d'une version à jour de l'application."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `sms_reply_not_customer_channel`, in place of the service's own English."
 
 [api_error.status_change_failed]
 en = "The status could not be changed. Please try again."

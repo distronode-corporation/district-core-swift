@@ -79,6 +79,7 @@ enum ApiErrorTable {
         case "extra_number_charge_required": return ApiErrorCopy.extraNumberChargeRequired
         case "workspace_owner_protected": return ApiErrorCopy.workspaceOwnerProtected
         case "assignee_not_member": return ApiErrorCopy.assigneeNotMember
+        case "assignee_is_viewer": return ApiErrorCopy.assigneeIsViewer
         case "hq_voice_allowance_reached": return ApiErrorCopy.hqVoiceAllowanceReached
         case "hq_voice_busy": return ApiErrorCopy.hqVoiceBusy
         case "draft_not_found": return ApiErrorCopy.draftNotFound
@@ -140,6 +141,8 @@ enum ApiErrorTable {
         case "whatsapp_unsupported": return ApiErrorCopy.whatsappUnsupported
         case "whatsapp_window_closed": return ApiErrorCopy.whatsappWindowClosed
         case "whatsapp_template_invalid": return ApiErrorCopy.whatsappTemplateInvalid
+        case "messenger_window_closed": return ApiErrorCopy.messengerWindowClosed
+        case "sms_reply_not_customer_channel": return ApiErrorCopy.smsReplyNotCustomerChannel
         case "messaging_apps_managed": return ApiErrorCopy.messagingAppsManaged
         case "messaging_app_sms_refused": return ApiErrorCopy.messagingAppSmsRefused
         case "verify_not_enabled": return ApiErrorCopy.verifyNotEnabled

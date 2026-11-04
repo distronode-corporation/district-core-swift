@@ -86,6 +86,29 @@ public struct ConversationSummary: Codable, Sendable {
     public let lastMessage: ConversationLastMessage
     public let unreadCount: Int
     public let totalMessages: Int
+    /// Every channel the server will accept a reply to this thread on, the composer's
+    /// default first. Sent only when the read asked for `metaChannels=1`
+    /// (`InboxReadOptions.metaChannels`), so nil means "this server or this read did not
+    /// say", never "no reply".
+    ///
+    /// ⛔ SERVER-DECIDED, AND IT REPLACES ``canSms``/``canEmail`` WHEN PRESENT. It is the
+    /// only field that knows a thread is WhatsApp, Messenger or Instagram. ``replyTargets``
+    /// reads it first.
+    ///
+    /// ⚠️ AN EMPTY ARRAY IS AN ANSWER: the thread has no reply box. ⚠️ A channel this
+    /// build does not know decodes as a raw string and is skipped by ``replyTargets``,
+    /// never a decode failure, so a channel the server adds later costs one option, not
+    /// the Inbox.
+    public let replyOptions: [ReplyOption]?
+    /// The member who owns this thread, or nil when nobody does. Sent only when the read
+    /// asked for `assignments=1` (`InboxReadOptions.assignments`).
+    ///
+    /// ⚠️ nil IS TWO STATES ON THE WIRE (absent: not asked; null: unassigned), and
+    /// ``assignedToMe`` is what tells them apart: it is nil only when the read did not ask.
+    public let assigneeEmail: String?
+    /// The web's "Assigned to me", decided server-side against the session's own email.
+    /// nil when the read did not ask for `assignments=1`.
+    public let assignedToMe: Bool?
 }
 
 public extension ConversationSummary {
@@ -145,13 +168,15 @@ public extension ConversationSummary {
     /// existed, so a thread of such rows reports `[]`, an absence of evidence,
     /// and the order falls back to the previous SMS-first behaviour.
     ///
-    /// ⚠️ WHATSAPP CANNOT BE ORDERED HERE AT ALL, AND THAT IS A WIRE GAP RATHER
-    /// THAN AN OMISSION. `conversations` publishes no `canWhatsapp`, so a
-    /// WhatsApp-only thread arrives with `canSms: true` (its `kind` is `phone`)
-    /// and nothing that says WhatsApp is where the customer is. It goes out as
-    /// SMS. ``MessageChannel/whatsapp`` has no producer in this client either;
-    /// fixing it needs a server field, not a client rule.
+    /// ⛔ ``replyOptions`` WINS WHENEVER THE SERVER SENT IT, in its order, minus any
+    /// channel this build does not know. Everything below it is the fallback for a read
+    /// without `metaChannels=1` (or a server older than it), which publishes no
+    /// `canWhatsapp`: a WhatsApp-only thread arrives there with `canSms: true` and goes out
+    /// as SMS, the gap `replyOptions` closes.
     var replyTargets: [ReplyTarget] {
+        if let replyOptions {
+            return replyOptions.compactMap(\.target)
+        }
         var sms: [ReplyTarget] = []
         var email: [ReplyTarget] = []
         if canSms, let phone = address(stored: contactPhone, counterpartIsAnAddress: false) {
@@ -235,13 +260,43 @@ public struct ReplyTarget: Sendable, Hashable {
     }
 }
 
+/// One `{channel, to}` pair from ``ConversationSummary/replyOptions``, exactly the two
+/// values `messages/send` takes.
+///
+/// ⚠️ ``channel`` IS A RAW STRING, LIKE EVERY VOCABULARY IN THIS MODULE, so a channel the
+/// server adds later decodes (and round-trips) instead of failing the whole list.
+/// ``target`` is where an unknown one is dropped.
+public struct ReplyOption: Codable, Sendable, Equatable {
+    /// `sms`, `email`, `whatsapp`, `messenger` or `instagram` today. See
+    /// ``MessageChannel/replyable``.
+    public let channel: String
+    /// The address to send to on that channel: a phone number, an email address, or a
+    /// Meta page-scoped id (`fb:<psid>`, `ig:<igsid>`). ⛔ Used verbatim: the server
+    /// formatted it for that channel (WhatsApp wants E.164, SMS takes the stored number).
+    public let to: String
+
+    public init(channel: String, to: String) {
+        self.channel = channel
+        self.to = to
+    }
+
+    /// This option as a send destination, or nil when this build does not know the
+    /// channel or the server sent no address.
+    public var target: ReplyTarget? {
+        guard MessageChannel.replyable.contains(channel),
+              !to.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return nil }
+        return ReplyTarget(to: to, channel: channel)
+    }
+}
+
 /// The preview line under a thread's title.
 public struct ConversationLastMessage: Codable, Sendable {
     public let body: String
     /// `inbound` or `outbound`.
     public let direction: String
-    /// `sms`, `email` or `whatsapp`, ⚠️ nil on older rows, which is why this is
-    /// the one Optional here.
+    /// `sms`, `email`, `whatsapp`, `messenger` or `instagram`, ⚠️ nil on older rows,
+    /// which is why this is the one Optional here.
     public let type: String?
     public let status: String
     /// ISO-8601, server-formatted. This module owns no date parsing.

@@ -70,4 +70,8 @@ public extension StrictDecodeVerifier {
         .merging(carrierAndAccount) { _, _ in
             preconditionFailure("a fixture appears in both allowed-null tables")
         }
+        // ⚠️ `AllowedExplicitNulls+Parity.swift`, app parity's Inbox and WhatsApp fixtures.
+        .merging(parity) { _, _ in
+            preconditionFailure("a fixture appears in both allowed-null tables")
+        }
 }

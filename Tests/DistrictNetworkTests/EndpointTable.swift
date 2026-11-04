@@ -69,7 +69,7 @@ enum EndpointTable {
             + messagingReads() + messagingActions()
             + membership() + workflows() + devices() + scheduling() + schedulingAdmin() + support()
             + numberRegistrations() + numberDocuments() + numberWrites()
-            + carrierCompliance() + sipTrunking() + verifyAndLookup() + live()
+            + carrierCompliance() + sipTrunking() + verifyAndLookup() + live() + parity()
     }
 
     /// ⚠️ Force-unwrapped in TEST code only, and the guard it proves is asserted

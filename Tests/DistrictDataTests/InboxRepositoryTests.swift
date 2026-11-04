@@ -64,7 +64,7 @@ final class InboxRepositoryTests: XCTestCase {
         XCTAssertEqual(result.successOnly?.hasMore, false)
         XCTAssertEqual(
             transport.requestedURLs.first,
-            "https://www.distronode.com/api/district/timeline?workspaceId=ws_1&contactId=c_1"
+            "https://www.distronode.com/api/district/timeline?workspaceId=ws_1&contactId=c_1&metaChannels=1"
         )
     }
 
@@ -80,7 +80,7 @@ final class InboxRepositoryTests: XCTestCase {
 
         XCTAssertEqual(
             transport.requestedURLs.first,
-            "https://www.distronode.com/api/district/timeline?workspaceId=ws_1&phoneNumber=%2B14165550134"
+            "https://www.distronode.com/api/district/timeline?workspaceId=ws_1&phoneNumber=%2B14165550134&metaChannels=1"
         )
     }
 
@@ -95,7 +95,7 @@ final class InboxRepositoryTests: XCTestCase {
             .timeline(workspaceId: "ws_1", selector: .contact("c_1"), cursor: cursor)
 
         let expected = "https://www.distronode.com/api/district/timeline?workspaceId=ws_1&contactId=c_1"
-            + "&before=2026-08-19T09%3A41%3A00.000Z&beforeId=m_9"
+            + "&before=2026-08-19T09%3A41%3A00.000Z&beforeId=m_9&metaChannels=1"
         XCTAssertEqual(transport.requestedURLs.first, expected)
     }
 
@@ -118,7 +118,7 @@ final class InboxRepositoryTests: XCTestCase {
         XCTAssertEqual(result.successOnly?.count, 4)
         XCTAssertEqual(
             transport.requestedURLs.first,
-            "https://www.distronode.com/api/district/messages/unread-count?workspaceId=ws_1"
+            "https://www.distronode.com/api/district/messages/unread-count?workspaceId=ws_1&metaChannels=1"
         )
     }
 

@@ -74,19 +74,6 @@ enum ContractManifest {
         // The Inbox thread-assignment read (`GET conversations/assignments`), which
         // this client does not call yet.
         "district-conversation-assignments.json",
-        // App parity (monorepo !105 and !106): Inbox reply options and timeline meta,
-        // thread assignment, and the WhatsApp 24-hour window and templates. The models
-        // follow in their own change.
-        "district-conversation-assign-viewer.json",
-        "district-conversation-assign.json",
-        "district-conversation-unassign.json",
-        "district-conversations-assignee.json",
-        "district-conversations-reply-options.json",
-        "district-message-send-whatsapp-template.json",
-        "district-timeline-meta.json",
-        "district-whatsapp-templates.json",
-        "district-whatsapp-window-closed.json",
-        "district-whatsapp-window.json",
         "district-pkce-vectors.json",
     ]
 
@@ -268,5 +255,5 @@ enum ContractManifest {
     /// account with no billing is one key that is absent rather than null.
     ///
     /// Each path is named with its column in the `AllowedExplicitNulls*.swift` files.
-    static let expectedAllowedNullPaths = 210
+    static let expectedAllowedNullPaths = 236
 }

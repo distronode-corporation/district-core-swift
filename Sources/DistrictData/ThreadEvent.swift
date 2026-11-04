@@ -103,6 +103,10 @@ public enum ThreadEventKind {
     public static let email = "email"
     public static let whatsapp = "whatsapp"
     public static let call = "call"
+    /// Only on a read with `metaChannels=1` (`InboxReadOptions.metaChannels`).
+    public static let messenger = "messenger"
+    /// Only on a read with `metaChannels=1`, like ``messenger``.
+    public static let instagram = "instagram"
 }
 
 /// The `direction` vocabulary. ⚠️ `missed` is call-only.

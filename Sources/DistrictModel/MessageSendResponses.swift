@@ -57,7 +57,7 @@ public struct SentMessage: Codable, Sendable {
     public let subject: String?
     /// Always `outbound` here, but modelled rather than assumed.
     public let direction: String
-    /// `sms`, `email` or `whatsapp`.
+    /// `sms`, `email`, `whatsapp`, `messenger` or `instagram`.
     public let type: String
     /// The PROVIDER's word for where the message got to, `queued` from Twilio,
     /// `sent` from Postmark.
@@ -71,7 +71,8 @@ public struct SentMessage: Codable, Sendable {
     public let createdAt: String
     /// SMS branch only: the provider's external id. Absent on email.
     public let externalId: String?
-    /// `twilio`, `telnyx`, `sinch` or `postmark`.
+    /// `twilio`, `telnyx`, `sinch` or `postmark`, and `meta` for a WhatsApp sender
+    /// connected through Meta (`district-message-send-whatsapp-template.json`).
     public let provider: String
     /// SMS branch only: which of the workspace's gateway accounts sent it.
     /// Absent on email.
@@ -84,6 +85,18 @@ public enum MessageChannel {
     public static let sms = "sms"
     public static let email = "email"
     public static let whatsapp = "whatsapp"
+    /// A Facebook Messenger thread; its `to` is `fb:<psid>`. ⛔ Never sent as SMS: the
+    /// route refuses an SMS to a `fb:` address with 400 `invalid_request`.
+    public static let messenger = "messenger"
+    /// An Instagram Direct thread; its `to` is `ig:<igsid>`. Same rule as ``messenger``.
+    public static let instagram = "instagram"
+
+    /// Every channel this build can send a reply on, so the ones
+    /// ``ReplyOption/target`` keeps.
+    ///
+    /// ⚠️ A SET, NOT AN ENUM, so a channel added here later is not a source break for
+    /// anyone switching over it.
+    public static let replyable: Set<String> = [sms, email, whatsapp, messenger, instagram]
 }
 
 /// `POST /api/district/messages/mark-read`.

@@ -41,9 +41,9 @@ public enum JSONValue: Sendable, Equatable {
     /// transfer directory answered with a 200.
     ///
     /// ⚠️ A pair whose value is `.some(.null)` is KEPT. That is the escape hatch
-    /// for a route that genuinely wants an explicit null; nothing uses it today,
-    /// and it must stay an explicit choice at the call site rather than a
-    /// property of optionality.
+    /// for a route that genuinely wants an explicit null (`conversations/assign`'s
+    /// unassign is the one today), and it must stay an explicit choice at the call
+    /// site rather than a property of optionality.
     public static func object(_ pairs: [(String, JSONValue?)]) -> JSONValue {
         var result: [String: JSONValue] = [:]
         for (key, value) in pairs {

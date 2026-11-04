@@ -36,7 +36,7 @@ final class InboxThreadResolveTests: XCTestCase {
         XCTAssertEqual(result.successOnly?.selector, .contact("c_1"))
         XCTAssertEqual(
             transport.requestedURLs.first,
-            "https://www.distronode.com/api/district/messages/msg_1?workspaceId=ws_1"
+            "https://www.distronode.com/api/district/messages/msg_1?workspaceId=ws_1&metaChannels=1"
         )
         XCTAssertTrue(transport.bodies.isEmpty, "a GET carries no body")
     }

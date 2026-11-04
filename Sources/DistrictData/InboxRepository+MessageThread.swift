@@ -104,7 +104,11 @@ public extension InboxRepository {
         messageId: String
     ) async -> Result<ResolvedThread, ApiError> {
         let outcome = await client.send(
-            DistrictEndpoints.messageThread(workspaceId: workspaceId, id: messageId),
+            DistrictEndpoints.messageThread(
+                workspaceId: workspaceId,
+                id: messageId,
+                metaChannels: options.metaChannels
+            ),
             as: MessageThreadResponse.self
         )
         return outcome

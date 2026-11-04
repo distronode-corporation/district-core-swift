@@ -42,9 +42,20 @@ public struct InboxRepository: Sendable {
     /// THIS one is within a dozen lines of the 500 `swiftlint --strict` allows, and
     /// `DistrictData` is one module with no second reader.
     let client: ApiClient
+    /// What every read here asks for beyond the installed builds' shape. See
+    /// ``InboxReadOptions``. ⚠️ Internal for the reason ``client`` is.
+    let options: InboxReadOptions
 
+    /// ⚠️ THIS BUILD'S DEFAULTS, ``InboxReadOptions/init(metaChannels:assignments:)``:
+    /// Messenger and Instagram on, assignments off. Pass ``InboxReadOptions/legacy`` for the
+    /// requests an installed build makes.
     public init(client: ApiClient) {
+        self.init(client: client, options: InboxReadOptions())
+    }
+
+    public init(client: ApiClient, options: InboxReadOptions) {
         self.client = client
+        self.options = options
     }
 
     // MARK: - Reads
@@ -52,7 +63,7 @@ public struct InboxRepository: Sendable {
     /// The conversation list, most recent first.
     public func conversations(workspaceId: String) async -> Result<ConversationList, ApiError> {
         let outcome = await client.send(
-            DistrictEndpoints.conversations(workspaceId: workspaceId),
+            DistrictEndpoints.conversations(workspaceId: workspaceId, options: options),
             as: ConversationsResponse.self
         )
         return outcome
@@ -87,7 +98,8 @@ public struct InboxRepository: Sendable {
             contactId: selector.contactId,
             address: selector.address,
             before: cursor?.before,
-            beforeId: cursor?.beforeId
+            beforeId: cursor?.beforeId,
+            metaChannels: options.metaChannels
         )
         let outcome = await client.send(descriptor)
         return outcome
@@ -142,7 +154,7 @@ public struct InboxRepository: Sendable {
     /// rendered as a fact.
     public func unreadCount(workspaceId: String) async -> Result<UnreadCountResponse, ApiError> {
         let outcome = await client.send(
-            DistrictEndpoints.unreadCount(workspaceId: workspaceId),
+            DistrictEndpoints.unreadCount(workspaceId: workspaceId, metaChannels: options.metaChannels),
             as: UnreadCountResponse.self
         )
         return outcome

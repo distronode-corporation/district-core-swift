@@ -143,7 +143,15 @@ final class DesktopContractFixtureTests: XCTestCase {
         })
         // ⚠️ THE EIGHT WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
         // not relayed, and their frames are checked by `TranscriptFrameTests`.
-        XCTAssertEqual(Set(types), Set(TelemetryEventType.known.filter { !$0.isTranscript }))
+        //
+        // ⛔ `whisper_applied` IS A WORKSPACE EVENT WITH NO FIXTURE YET: its shape is pinned by
+        // `WhisperReceiptTests` from the voice agent's source until the website records
+        // `telemetry-event-whisper-applied.json`. The re-sync that copies that file in gives
+        // it a verifier above and deletes this exclusion, so the set is whole again.
+        XCTAssertEqual(
+            Set(types),
+            Set(TelemetryEventType.known.filter { !$0.isTranscript && $0 != .whisperApplied })
+        )
     }
 
     /// ⚠️ FOR A MESSAGE EVENT THE ENVELOPE'S `callId` IS THE MESSAGE ID.

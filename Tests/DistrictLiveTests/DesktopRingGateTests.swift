@@ -115,6 +115,7 @@ final class DesktopRingGateTests: XCTestCase {
             .toolOutcome,
             .messageReceived,
             .messageSent,
+            .whisperApplied,
             .unknown("call_parked"),
         ] {
             XCTAssertEqual(

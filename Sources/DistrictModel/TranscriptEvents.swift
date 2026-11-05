@@ -420,7 +420,7 @@ extension TelemetryEnvelope {
         case .transcriptError:
             decodeData(TranscriptErrorData.self).map(TranscriptEvent.error)
         case .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome,
-             .messageReceived, .messageSent, .unknown:
+             .messageReceived, .messageSent, .whisperApplied, .unknown:
             nil
         }
         guard let event, event.version == TranscriptClientOp.version else { return nil }

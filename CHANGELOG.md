@@ -9,11 +9,15 @@ All notable changes to this package are recorded here. The format is based on
 ## [8.2.0]
 
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,
-thread assignment, and the WhatsApp 24-hour window and templates. Nothing is removed or
-renamed and no existing signature changes, so this is a minor version (8.2.0).
-⚠️ `EndpointID` gains three cases, which would break an exhaustive `switch` over it; neither
+thread assignment, and the WhatsApp 24-hour window and templates; and live supervision
+(listen in, take over, the whisper receipt; Sean, 2026-11-05, GitLab #2 note 4171521455).
+Nothing is removed or renamed and no existing signature changes, so this is a minor version
+(8.2.0).
+⚠️ `EndpointID` gains five cases, which would break an exhaustive `switch` over it; neither
 district-ios (1f7babb) nor district-macos (06f29b4) switches over `EndpointID` or names a
-case, the question 8.1.0 and 7.0.1 judged the same way. ⚠️ `PushTokenMemory` gains three
+case, the question 8.1.0 and 7.0.1 judged the same way. ⚠️ `TelemetryEventType` gains
+`whisperApplied`, the same question: no district-ios (bc1ef5a) or district-macos (1dc6e01)
+source switches over it. ⚠️ `PushTokenMemory` gains three
 requirements, each with a default implementation, so existing conformers compile unchanged.
 ⚠️ ONE DEFAULT CHANGES BEHAVIOUR: `InboxRepository(client:)` now sends `metaChannels=1` on
 `conversations`, `timeline`, `messages/{id}` and `messages/unread-count`, so the Inbox lists
@@ -57,8 +61,23 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   `.assigneeIsViewer` and `.assigneeNotMember` (400 on `conversations/assign`); all three
   were already in the `ApiErrorTable` from #50.
 - `EndpointID` cases `assignConversation`, `whatsAppWindow` and `whatsAppTemplates`, typed
-  from their first commit (`TypedEndpoints.inbox`). The endpoint total is 129 and the typed
-  count 127.
+  from their first commit (`TypedEndpoints.inbox`).
+- Live supervision. `CallsRepository.monitor(callId:platform:)` (`POST calls/token` with a
+  `Call.id`, a listen-only seat, `CallMonitorResponse`) and
+  `takeOver(workspaceId:callId:)` (`POST calls/{id}/takeover`, the microphone-only coach seat,
+  `CallTakeoverResponse`), with `DistrictEndpoints.monitorCall(callId:platform:)` and
+  `takeOverCall(callId:workspaceId:)` and the `EndpointID` cases `monitorCall` and
+  `takeOverCall` (`TypedEndpoints.liveCall`, never retried). A blank token or URL is a decode
+  failure. `SupervisedCallID` refuses any id carrying `_` (as core-rust's `LiveCallId` does):
+  every room family has one, `meet_`/`video_` the route reads as a room, and a uuid never does. `TelemetryEventType.whisperApplied` and `TelemetryEnvelope.whisperReceipt`
+  (`WhisperReceipt`, `WhisperReceipt.Reason`), with `firstWords` kept out of `description`.
+  `SuperviseSession` in `DistrictCall` (`SuperviseState`, `SupervisePhase`, `SuperviseEvent`,
+  `SuperviseCommand`, `SuperviseLeg`, `SuperviseProblem`): the takeover is asked for while
+  still listening, a refusal leaves the person listening, a grant leaves the listen room
+  before joining the coach room, hand back is leaving, and CallKit is told of every ending it
+  did not perform. The shapes are modelled from the route source; their contract fixtures
+  arrive with the next website sync, and `whisper_applied` is excluded from the desktop
+  fixture-set assertion until then. The endpoint total is 131 and the typed count 129.
 - The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
   in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
   (`AllowedExplicitNulls+Parity.swift`, total 236).

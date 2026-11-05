@@ -168,6 +168,75 @@ public struct CallsRepository: Sendable {
             .map { _ in () }
     }
 
+    /// A listen-only seat on a live call: the credential to join its room hearing
+    /// everything and publishing nothing.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE. A credential that arrives after the person gave up
+    /// would join them to a customer's call they had walked away from.
+    ///
+    /// ⚠️ A VIEWER MAY LISTEN (roles `["agency","client","viewer"]`); only the whisper and
+    /// the takeover are refused to one. The refusals a screen names arrive as
+    /// ``ApiError/http(status:message:code:)`` with the server's `code`: `room_not_found`
+    /// (404, no such call for this account), `call_predates_feature` (400), the call having
+    /// ended (409 `call_not_in_progress`, once the server checks), and
+    /// `service_not_configured` (503).
+    ///
+    /// - Returns: `.failure(.decoding)` for a 200 that does not affirm success or that
+    ///   carries a blank token or URL: joining on either would show a connected listener
+    ///   over what was really a refusal.
+    public func monitor(
+        callId: SupervisedCallID,
+        platform: ClientPlatform = .ios
+    ) async -> Result<CallMonitorResponse, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.monitorCall(callId: callId, platform: platform),
+            as: CallMonitorResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("CallMonitorResponse", $0.success, $0) }
+            .flatMap { Self.joinable("CallMonitorResponse", $0, url: $0.url, token: $0.token) }
+    }
+
+    /// Take a live call over from the assistant: the microphone-only credential to join
+    /// its room as a coach.
+    ///
+    /// ⛔ NEVER RETRIED, HERE OR ABOVE: a late credential is a live microphone in a
+    /// customer's call. ⛔ AND IT IS ASKED FOR BEFORE THE LISTEN SEAT IS GIVEN UP, so a
+    /// refusal leaves the person listening (`SuperviseSession` in `DistrictCall` orders it).
+    ///
+    /// ⚠️ THE REFUSALS A SCREEN NAMES: `call_not_in_progress` (409, not live or no
+    /// deployment holds the room), `call_has_no_room` (409), `call_not_found` (404),
+    /// 403 for a viewer, 429 (20 a minute per workspace), and `service_unavailable` /
+    /// `service_not_configured` (503, "could not check", never "the call ended"). A
+    /// colleague's own softphone call, where no assistant is listening, is refused with
+    /// the code the server adds for it.
+    public func takeOver(workspaceId: String, callId: String) async -> Result<CallTakeoverResponse, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.takeOverCall(callId: callId, workspaceId: workspaceId),
+            as: CallTakeoverResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("CallTakeoverResponse", $0.success, $0) }
+            .flatMap { Self.joinable("CallTakeoverResponse", $0, url: $0.url, token: $0.token) }
+    }
+
+    /// ⛔ A BLANK CREDENTIAL IS CONTRACT DRIFT, NOT A JOIN, the rule `InboundCallRepository`
+    /// states for the answer: every field is required, so `{}` never reaches here, but
+    /// `""` decodes, and the failure would surface at the media join as a network error on
+    /// a screen already showing the person in the call.
+    private static func joinable<Response>(
+        _ name: String,
+        _ response: Response,
+        url: String,
+        token: String
+    ) -> Result<Response, ApiError> {
+        let blank = { (value: String) in value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        guard !blank(url), !blank(token) else {
+            return .failure(.decoding("\(name) carried no join credential"))
+        }
+        return .success(response)
+    }
+
     /// Register one Live Activity push token for a call, so the server can update the
     /// activity while the app is asleep.
     ///

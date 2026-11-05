@@ -104,7 +104,7 @@ public struct DesktopRingGate: Sendable, Equatable {
         // ⚠️ THE `transcript_*` EVENTS NEVER RING: they reach only a socket that subscribed
         // to a call, and say nothing about who should answer it.
         case .callStarted, .toolOutcome, .messageReceived, .messageSent, .transcriptSnapshot, .transcriptSegment,
-             .transcriptEnded, .transcriptRetracted, .transcriptError, .unknown:
+             .transcriptEnded, .transcriptRetracted, .transcriptError, .whisperApplied, .unknown:
             return []
         }
     }

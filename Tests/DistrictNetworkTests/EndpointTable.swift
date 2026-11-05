@@ -60,7 +60,7 @@ enum EndpointTable {
     static let host = "https://www.distronode.com"
 
     static func all() -> [EndpointExpectation] {
-        core() + setup() + callLog() + telephony()
+        core() + setup() + callLog() + telephony() + supervise()
             + contactReads() + contactWrites() + dgi() + blocking()
             + inboxReads() + inboxWrites()
             + composerReads() + composerWrites() + hq() + usage() + numbers()

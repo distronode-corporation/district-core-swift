@@ -17,11 +17,18 @@ public extension TypedEndpoints {
     /// gated by `district-call-live-activity.json`, and so does
     /// `registerLiveActivityStartToken`, gated by `district-live-activity-start-token.json`.
     ///
+    /// `CallsRepository.monitor` decodes ``CallMonitorResponse`` and
+    /// `CallsRepository.takeOver` decodes ``CallTakeoverResponse``. Neither has a fixture
+    /// yet: both shapes are modelled from the route source and pinned by their repository
+    /// tests until the contract corpus records them.
+    ///
     /// ⛔ NONE IS EVER RETRIED AUTOMATICALLY. A decline is a statement about a ring
     /// that may already be over, a whisper may have reached the agent before its
-    /// response was lost, and a Live Activity token is sent again only when ActivityKit
-    /// rotates it (a start token also when it goes stale).
+    /// response was lost, a listen or takeover credential would outlive a person who
+    /// gave up, and a Live Activity token is sent again only when ActivityKit rotates it
+    /// (a start token also when it goes stale).
     static let liveCall: Set<EndpointID> = [
         .declineCall, .whisper, .registerLiveActivity, .registerLiveActivityStartToken,
+        .monitorCall, .takeOverCall,
     ]
 }

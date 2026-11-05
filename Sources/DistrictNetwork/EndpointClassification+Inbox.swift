@@ -21,7 +21,16 @@ public extension TypedEndpoints {
     /// for the reason `EndpointClassification+Desk.swift` gives: that file is at
     /// SwiftLint's 500-line ceiling and the commentary on those lists is the point of
     /// them. Siblings here are expected rather than exceptional.
+    ///
+    /// ⚠️ APP PARITY ADDS THREE, each typed from its first commit with its fixtures gated
+    /// in `ImplementedFixtures+Parity.swift`: `assignConversation`
+    /// (``ConversationAssignResponse``), `whatsAppWindow` (``WhatsAppWindowResponse``) and
+    /// `whatsAppTemplates` (``WhatsAppTemplatesResponse``). The template send is a body on
+    /// ``EndpointID/sendMessage``, already classified, like `markAllRead` on `markRead`.
     static let inbox: Set<EndpointID> = [
         .messageThread,
+        .assignConversation,
+        .whatsAppWindow,
+        .whatsAppTemplates,
     ]
 }

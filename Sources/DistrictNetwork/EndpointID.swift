@@ -109,6 +109,15 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case sendMessage
     case markRead
     case uploadMedia
+    /// One Inbox thread handed to a member, or taken back. See
+    /// ``DistrictEndpoints/assignConversation(workspaceId:threadKey:assigneeEmail:)``.
+    case assignConversation
+    /// Whether free-form WhatsApp text may go to one customer now. See
+    /// ``DistrictEndpoints/whatsAppWindow(workspaceId:to:senderId:)``.
+    case whatsAppWindow
+    /// The templates one WhatsApp sender may send. See
+    /// ``DistrictEndpoints/whatsAppTemplates(workspaceId:senderId:)``.
+    case whatsAppTemplates
 
     // Composer
     case draft

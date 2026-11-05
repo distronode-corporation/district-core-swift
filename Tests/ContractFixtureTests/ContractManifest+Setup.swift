@@ -10,6 +10,7 @@ extension ContractManifest {
         deskAndSupportFixturesWithAllowedNulls.union(setupFixturesWithAllowedNulls)
             .union(liveTranscriptFixturesWithAllowedNulls)
             .union(carrierFixturesWithAllowedNulls)
+            .union(parityFixturesWithAllowedNulls)
 
     /// `district-setup.json` is the real serialised body of `GET /api/district/setup` (a
     /// `ca` workspace mid-wizard, two steps done, `businessFacts` null), gated in

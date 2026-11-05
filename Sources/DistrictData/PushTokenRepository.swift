@@ -19,7 +19,7 @@ import Foundation
 /// sending TO one installation and is useless without our Firebase service
 /// account, so it is stored as issued. It still identifies one handset, so it is
 /// never logged.
-/// ⛔ SIX MEMBERS RATHER THAN THREE, BECAUSE ONE HANDSET HOLDS **TWO** PUSH
+/// ⛔ SIX TOKEN MEMBERS RATHER THAN THREE, BECAUSE ONE HANDSET HOLDS **TWO** PUSH
 /// TOKENS AND THEY ROTATE INDEPENDENTLY. APNs issues the alert token to
 /// `UIApplication.registerForRemoteNotifications()`; PushKit issues an entirely
 /// separate one to `PKPushRegistry`. A single remembered value would make the
@@ -42,6 +42,32 @@ public protocol PushTokenMemory: Sendable {
     func lastRegisteredVoipToken() -> String?
     func rememberRegisteredVoipToken(_ token: String)
     func forgetRegisteredVoipToken()
+
+    /// The capabilities the server last AFFIRMED with the alert token, as
+    /// ``PushTokenRepository`` writes them (sorted, comma-joined), or nil if none were.
+    ///
+    /// ⛔ WITHOUT IT AN UPGRADE NEVER DECLARES ANYTHING. The register skips a token the
+    /// server already holds, and an app update does not rotate the APNs token, so a build
+    /// that starts declaring `metaChannels` would skip the very request that says so. The
+    /// skip therefore needs the token AND these to match.
+    ///
+    /// ⚠️ DEFAULTED (nil, and a no-op store), so a memory written before this existed keeps
+    /// compiling. Its cost is one request per register while capabilities are declared:
+    /// with nothing remembered, a declaring register never skips.
+    func lastRegisteredCapabilities() -> String?
+    func rememberRegisteredCapabilities(_ capabilities: String)
+    func forgetRegisteredCapabilities()
+}
+
+public extension PushTokenMemory {
+    /// Nothing remembered. See the ⚠️ on the requirement.
+    func lastRegisteredCapabilities() -> String? {
+        nil
+    }
+
+    func rememberRegisteredCapabilities(_: String) {}
+
+    func forgetRegisteredCapabilities() {}
 }
 
 /// What a register call did.
@@ -112,15 +138,35 @@ public struct PushTokenRepository: Sendable {
     private let client: ApiClient
     private let memory: any PushTokenMemory
     private let platform: ClientPlatform
+    private let capabilities: Set<DeviceCapability>
 
     /// - Parameter platform: which app is registering. ⚠️ Defaulted to
     ///   ``ClientPlatform/ios`` so the iOS register is byte-identical. The macOS
     ///   app passes ``ClientPlatform/macos`` and calls ``register(token:)`` only:
     ///   the server refuses `voip` from a Mac.
+    ///
+    /// ⚠️ DECLARES NO CAPABILITIES, so the register is byte-identical to every earlier
+    /// version. A build that opens Messenger and Instagram threads uses
+    /// ``init(client:memory:platform:capabilities:)``.
     public init(client: ApiClient, memory: any PushTokenMemory, platform: ClientPlatform = .ios) {
+        self.init(client: client, memory: memory, platform: platform, capabilities: [])
+    }
+
+    /// - Parameter capabilities: what this installation can open, sent with the ALERT
+    ///   token (the row message pushes go to) as `capabilities`. ⛔ Declare
+    ///   ``DeviceCapability/metaChannels`` only when the Inbox reads send `metaChannels=1`
+    ///   too: a Meta push opens `messages/{id}`, which 404s a Meta message without it.
+    ///   ⚠️ Never sent with the VoIP token: a ring is not a message push.
+    public init(
+        client: ApiClient,
+        memory: any PushTokenMemory,
+        platform: ClientPlatform,
+        capabilities: Set<DeviceCapability>
+    ) {
         self.client = client
         self.memory = memory
         self.platform = platform
+        self.capabilities = capabilities
     }
 
     /// Tell the server this installation can be pushed to at `token`.
@@ -175,9 +221,21 @@ public struct PushTokenRepository: Sendable {
     /// and a second copy is what would drift.
     private func send(token: String, slot: RememberedSlot) async -> Result<PushRegistrationOutcome, ApiError> {
         guard !token.isEmpty else { return .success(.noTokenToRegister) }
-        guard remembered(slot) != token else { return .success(.alreadyRegistered) }
+        let declared = slot == .alert ? capabilities : []
+        let fingerprint = declared.sorted().map(\.rawValue).joined(separator: ",")
+        // ⚠️ nil AND "" ARE THE SAME ANSWER, "declared nothing", so a build that declares
+        // nothing skips exactly as before this existed.
+        let rememberedCapabilities = slot == .alert ? memory.lastRegisteredCapabilities() ?? "" : ""
+        guard remembered(slot) != token || rememberedCapabilities != fingerprint else {
+            return .success(.alreadyRegistered)
+        }
 
-        let descriptor = DistrictEndpoints.registerPushToken(token: token, kind: slot.kind, platform: platform)
+        let descriptor = DistrictEndpoints.registerPushToken(
+            token: token,
+            kind: slot.kind,
+            platform: platform,
+            capabilities: declared
+        )
         let outcome = await client.send(descriptor, as: SuccessResponse.self)
         let affirmed = outcome.flatMap { ResponseEnvelope.affirm("PushRegisterResponse", $0.success, $0) }
         switch affirmed {
@@ -187,6 +245,9 @@ public struct PushTokenRepository: Sendable {
             // remembering a token the server may not hold would make the next
             // register skip and leave push silently off.
             remember(token, slot)
+            if slot == .alert {
+                memory.rememberRegisteredCapabilities(fingerprint)
+            }
             return .success(.registered)
         case let .failure(error):
             return .failure(error)
@@ -254,6 +315,7 @@ public struct PushTokenRepository: Sendable {
     public func unregister() async -> Result<Void, ApiError> {
         memory.forgetRegisteredToken()
         memory.forgetRegisteredVoipToken()
+        memory.forgetRegisteredCapabilities()
         let outcome = await client.send(DistrictEndpoints.unregisterPushToken(), as: SuccessResponse.self)
         return outcome
             .flatMap { ResponseEnvelope.affirm("PushUnregisterResponse", $0.success, $0) }
@@ -277,5 +339,6 @@ public struct PushTokenRepository: Sendable {
     public func forgetRegistration() {
         memory.forgetRegisteredToken()
         memory.forgetRegisteredVoipToken()
+        memory.forgetRegisteredCapabilities()
     }
 }

@@ -81,4 +81,14 @@ public enum ApiErrorCode {
     /// 400 from the same route when no `nonce` was sent and the server requires one
     /// (`HANDOFF_REQUIRE_NONCE`). Its `error` is the sentence the user sees.
     public static let nonceRequired = "nonce_required"
+    /// 409 from `POST /api/district/messages/send` when an app sends SMS to a customer who
+    /// has written on WhatsApp, Messenger or Instagram and never by SMS. Not a retry: the
+    /// reply goes on the customer's channel, the first of the thread's `replyOptions`.
+    public static let smsReplyNotCustomerChannel = "sms_reply_not_customer_channel"
+    /// 400 from `POST /api/district/conversations/assign` naming a Viewer: a Viewer can
+    /// read conversations and cannot be assigned one. The picker offers other roles only.
+    /// See `district-conversation-assign-viewer.json`.
+    public static let assigneeIsViewer = "assignee_is_viewer"
+    /// 400 from the same route naming someone who is not a member of the workspace.
+    public static let assigneeNotMember = "assignee_not_member"
 }

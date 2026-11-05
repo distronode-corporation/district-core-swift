@@ -108,7 +108,9 @@ public struct TimelineEvent: Codable, Sendable {
     /// ⚠️ UNIQUE ACROSS BOTH SOURCES ONLY BECAUSE cuids ARE. The server merges two
     /// queries without namespacing their ids.
     public let id: String
-    /// `sms`, `email`, `whatsapp` or `call`.
+    /// `sms`, `email`, `whatsapp` or `call`, and `messenger` or `instagram` on a read
+    /// that sent `metaChannels=1` (`district-timeline-meta.json`). ⚠️ Raw, so a type the
+    /// server adds later renders as an unknown row rather than failing the thread.
     public let type: String
     /// ISO-8601 from the server.
     ///

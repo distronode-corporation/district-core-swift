@@ -6,6 +6,61 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,
+thread assignment, and the WhatsApp 24-hour window and templates. Nothing is removed or
+renamed and no existing signature changes, so this is a minor version (8.2.0).
+⚠️ `EndpointID` gains three cases, which would break an exhaustive `switch` over it; neither
+district-ios (1f7babb) nor district-macos (06f29b4) switches over `EndpointID` or names a
+case, the question 8.1.0 and 7.0.1 judged the same way. ⚠️ `PushTokenMemory` gains three
+requirements, each with a default implementation, so existing conformers compile unchanged.
+⚠️ ONE DEFAULT CHANGES BEHAVIOUR: `InboxRepository(client:)` now sends `metaChannels=1` on
+`conversations`, `timeline`, `messages/{id}` and `messages/unread-count`, so the Inbox lists
+Messenger and Instagram threads and `ConversationSummary.replyTargets` follows the server's
+`replyOptions`. `InboxRepository(client:options: .legacy)` keeps the old requests.
+
+### Added
+
+- `InboxReadOptions` (`metaChannels`, default on; `assignments`, default off; `.legacy`) and
+  `InboxRepository.init(client:options:)`. The four reads above carry the flags, and the
+  descriptor overloads `DistrictEndpoints.conversations(workspaceId:options:)`,
+  `timeline(workspaceId:contactId:address:before:beforeId:metaChannels:)`,
+  `unreadCount(workspaceId:metaChannels:)` and `messageThread(workspaceId:id:metaChannels:)`
+  build them; the old descriptors are unchanged.
+- `ConversationSummary.replyOptions` (`[ReplyOption]?`, `{channel, to}`),
+  `ConversationSummary.assigneeEmail` and `ConversationSummary.assignedToMe`. `replyTargets`
+  (and so `replyTarget`) reads `replyOptions` first when present, in the server's order, and
+  skips a channel this build does not know; `[]` is no reply box. `ReplyOption.target`, and
+  `MessageChannel.messenger`, `.instagram` and `.replyable`. `ThreadEventKind.messenger` and
+  `.instagram`.
+- `InboxRepository.assign(workspaceId:threadKey:assigneeEmail:)` (`POST
+  conversations/assign`; `nil` unassigns and is sent as an explicit `null`), decoding
+  `ConversationAssignResponse` and `ThreadAssignment`, and
+  `DistrictEndpoints.assignConversation(workspaceId:threadKey:assigneeEmail:)`.
+- `InboxRepository.whatsAppWindow(workspaceId:to:senderId:)` (`GET
+  workspace/whatsapp/window`, `WhatsAppWindowResponse`, `WhatsAppWindow`),
+  `whatsAppTemplates(workspaceId:senderId:)` (`GET workspace/whatsapp/templates`,
+  `WhatsAppTemplatesResponse`, `WhatsAppTemplate` with `isSendable` and `filled(with:)`),
+  `sendWhatsAppTemplate(workspaceId:to:senderId:template:variables:)` and
+  `sendWhatsApp(workspaceId:to:body:senderId:)` (both `messages/send`), with their
+  descriptors. None is retried.
+- `DeviceCapability` (`.metaChannels`),
+  `PushTokenRepository.init(client:memory:platform:capabilities:)` and
+  `DistrictEndpoints.registerPushToken(token:kind:platform:capabilities:)`: the alert
+  register declares `capabilities`, and its skip now needs the token AND the declared
+  capabilities to match, so an upgrade with an unchanged APNs token still declares them once.
+  `PushTokenMemory.lastRegisteredCapabilities()`, `rememberRegisteredCapabilities(_:)` and
+  `forgetRegisteredCapabilities()` store them (defaults store nothing, which costs one request
+  per declaring register). The old initialiser declares nothing.
+- `ApiErrorCode.smsReplyNotCustomerChannel` (409 on `messages/send`),
+  `.assigneeIsViewer` and `.assigneeNotMember` (400 on `conversations/assign`); all three
+  were already in the `ApiErrorTable` from #50.
+- `EndpointID` cases `assignConversation`, `whatsAppWindow` and `whatsAppTemplates`, typed
+  from their first commit (`TypedEndpoints.inbox`). The endpoint total is 129 and the typed
+  count 127.
+- The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
+  in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
+  (`AllowedExplicitNulls+Parity.swift`, total 236).
+
 ## [8.1.0]
 
 The Live Activity for District AI for iPhone 3.2.0: the app hands the server each Live

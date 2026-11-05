@@ -127,8 +127,15 @@ public struct SuperviseSession: Sendable, Equatable {
             return (next, [])
         case (.joiningTakeover, .connected):
             next.phase = .takenOver
-            // ⛔ THE ONE PLACE THIS SESSION OPENS THE MICROPHONE.
-            return (next, [.engine(.takeover, .setMuted(false))])
+            // ⛔ THE ONE PLACE THIS SESSION OPENS THE MICROPHONE. ⚠️ AND THE SPEAKER IS
+            // RE-APPLIED: the swap carried the person's choice over, but the coach leg is a new
+            // engine on the default route, so without this the state says speaker while the
+            // audio plays in the earpiece and the next toggle inverts the wrong way.
+            var commands: [SuperviseCommand] = [.engine(.takeover, .setMuted(false))]
+            if next.media.speakerRequested {
+                commands.append(.engine(.takeover, .setSpeakerphone(true)))
+            }
+            return (next, commands)
         case let (.joiningListen, .failed(message)):
             return end(state, at: .idle, problem: .listenFailed(message: message), report: true)
         case let (.joiningListen, .disconnected(reason)):

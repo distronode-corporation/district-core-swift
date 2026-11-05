@@ -226,9 +226,38 @@ final class SuperviseSessionTests: XCTestCase {
         supervise.handle(.takeoverGranted(url: "wss://coach", token: "t"))
 
         XCTAssertTrue(supervise.state.media.speakerRequested)
+        // ⛔ THE COACH LEG IS A NEW ENGINE: the speaker is re-applied when it connects, with
+        // the microphone (Seer, #52).
+        XCTAssertEqual(
+            supervise.handle(.engine(.takeover, .connected)),
+            [.engine(.takeover, .setMuted(false)), .engine(.takeover, .setSpeakerphone(true))]
+        )
         XCTAssertEqual(supervise.handle(.speakerToggled), [.engine(.takeover, .setSpeakerphone(false))])
         var idle = session()
         XCTAssertEqual(idle.handle(.speakerToggled), [], "no engine, nothing to route")
+    }
+
+    /// ⛔ A ROOM THAT HANGS UP WHILE STILL BEING JOINED IS A FAILED JOIN, on either leg: the OS
+    /// is told, the one engine is disconnected, and the reason is kept.
+    func testARoomThatDisconnectsWhileJoiningIsAFailedJoin() {
+        var joiningListen = session()
+        joiningListen.handle(.listenPressed)
+        joiningListen.handle(.listenGranted(url: "wss://listen", token: "listen-jwt"))
+        XCTAssertEqual(
+            joiningListen.handle(.engine(.listen, .disconnected(reason: "room closed"))),
+            [.reportCallEnded, .engine(.listen, .disconnect)]
+        )
+        XCTAssertEqual(joiningListen.state.problem, .listenFailed(message: "room closed"))
+
+        var joiningCoach = listening()
+        joiningCoach.handle(.takeOverPressed)
+        joiningCoach.handle(.takeoverGranted(url: "wss://coach", token: "coach-jwt"))
+        XCTAssertEqual(
+            joiningCoach.handle(.engine(.takeover, .disconnected(reason: "room closed"))),
+            [.reportCallEnded, .engine(.takeover, .disconnect)]
+        )
+        XCTAssertEqual(joiningCoach.state.problem, .takeoverJoinFailed(message: "room closed"))
+        XCTAssertEqual(joiningCoach.state.phase, .idle)
     }
 
     func testADroppedCoachRoomIsReported() {

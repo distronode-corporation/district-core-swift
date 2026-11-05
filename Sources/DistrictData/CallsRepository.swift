@@ -151,7 +151,8 @@ public struct CallsRepository: Sendable {
     ///
     /// ⚠️ THE FAILURES A SCREEN NAMES ARRIVE AS ``ApiError/http(status:message:code:)``
     /// with the server's `code`: `call_not_in_progress` (400 or 409, the call ended),
-    /// `call_not_found` (404), `call_predates_feature` (400), `service_unavailable` and
+    /// `call_has_no_receptionist` (409, a team member's own softphone call, where no
+    /// assistant is listening), `call_not_found` (404), `call_predates_feature` (400), `service_unavailable` and
     /// `service_not_configured` (503), and 403 for a viewer, whose screen should offer no
     /// whisper in the first place (roles are `["agency","client"]`).
     ///
@@ -177,9 +178,9 @@ public struct CallsRepository: Sendable {
     /// ⚠️ A VIEWER MAY LISTEN (roles `["agency","client","viewer"]`); only the whisper and
     /// the takeover are refused to one. The refusals a screen names arrive as
     /// ``ApiError/http(status:message:code:)`` with the server's `code`: `room_not_found`
-    /// (404, no such call for this account), `call_predates_feature` (400), the call having
-    /// ended (409 `call_not_in_progress`, once the server checks), and
-    /// `service_not_configured` (503).
+    /// (404, no such call for this account), `call_predates_feature` (400), `call_ended`
+    /// (409, the call is neither in progress nor ringing: a stale Live tile or a replayed
+    /// id), and `service_not_configured` (503).
     ///
     /// - Returns: `.failure(.decoding)` for a 200 that does not affirm success or that
     ///   carries a blank token or URL: joining on either would show a connected listener
@@ -207,9 +208,9 @@ public struct CallsRepository: Sendable {
     /// ⚠️ THE REFUSALS A SCREEN NAMES: `call_not_in_progress` (409, not live or no
     /// deployment holds the room), `call_has_no_room` (409), `call_not_found` (404),
     /// 403 for a viewer, 429 (20 a minute per workspace), and `service_unavailable` /
-    /// `service_not_configured` (503, "could not check", never "the call ended"). A
-    /// colleague's own softphone call, where no assistant is listening, is refused with
-    /// the code the server adds for it.
+    /// `service_not_configured` (503, "could not check", never "the call ended"), and
+    /// `call_has_no_receptionist` (409) for a team member's own softphone call, where no
+    /// assistant is listening to step back. An ended call stays `call_not_in_progress`.
     public func takeOver(workspaceId: String, callId: String) async -> Result<CallTakeoverResponse, ApiError> {
         let outcome = await client.send(
             DistrictEndpoints.takeOverCall(callId: callId, workspaceId: workspaceId),

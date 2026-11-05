@@ -141,6 +141,29 @@ final class SuperviseSessionTests: XCTestCase {
         XCTAssertEqual(supervise.state.problem, .takeoverRefused(refusal))
     }
 
+    /// ⛔ A TEAM MEMBER'S OWN CALL REFUSES THE TAKEOVER (409 `call_has_no_receptionist`) AND
+    /// THE PERSON KEEPS LISTENING, with the code kept for the screen's sentence.
+    func testATakeoverOfATeamMembersOwnCallLeavesThePersonListening() {
+        let ownCall = ApiError.http(status: 409, message: "x", code: "call_has_no_receptionist")
+        var supervise = listening()
+        supervise.handle(.takeOverPressed)
+
+        XCTAssertEqual(supervise.handle(.takeoverRefused(ownCall)), [])
+        XCTAssertEqual(supervise.state.phase, .listening)
+        XCTAssertEqual(supervise.state.problem, .takeoverRefused(ownCall))
+    }
+
+    /// ⛔ A LISTEN ON A CALL THAT HAS ENDED (409 `call_ended`) ENDS THE CALLKIT CALL, like
+    /// any refused listen, and keeps the code.
+    func testAListenOnAnEndedCallReportsTheCallKitCallAndKeepsCallEnded() {
+        let ended = ApiError.http(status: 409, message: "This call has ended.", code: "call_ended")
+        var supervise = session()
+        supervise.handle(.listenPressed)
+
+        XCTAssertEqual(supervise.handle(.listenRefused(ended)), [.reportCallEnded])
+        XCTAssertEqual(supervise.state.problem, .listenRefused(ended))
+    }
+
     /// ⛔ LEAVE THE LISTEN ROOM, THEN JOIN THE COACH ROOM, THEN OPEN THE MICROPHONE.
     func testAGrantSwapsTheLegsInOrderAndOpensTheMicrophoneOnlyOnceJoined() {
         var supervise = listening()

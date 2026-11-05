@@ -75,9 +75,19 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   `SuperviseCommand`, `SuperviseLeg`, `SuperviseProblem`): the takeover is asked for while
   still listening, a refusal leaves the person listening, a grant leaves the listen room
   before joining the coach room, hand back is leaving, and CallKit is told of every ending it
-  did not perform. The shapes are modelled from the route source; their contract fixtures
-  arrive with the next website sync, and `whisper_applied` is excluded from the desktop
-  fixture-set assertion until then. The endpoint total is 131 and the typed count 129.
+  did not perform. The endpoint total is 131 and the typed count 129.
+- Live supervision's five contract fixtures, from the website at monorepo e44c194b9
+  (`district-call-monitor-token.json`, `district-call-takeover.json`,
+  `district-call-whisper.json`, `telemetry-event-whisper-applied.json` and
+  `telemetry-event-whisper-not-applied.json`), gated in `ImplementedFixtures+Supervise.swift`
+  against the models above; `ContractManifest.expectedFixtureCount` goes 203 to 208, and the
+  desktop event-set assertion counts the mobile receipts, so `whisper_applied` is no longer
+  excluded. `SuperviseContractTests` reads their values.
+- `ApiErrorCode.callEnded` (409 from `calls/token` for a call neither in progress nor
+  ringing), `.callHasNoReceptionist` (409 from the whisper and the takeover on a team
+  member's own softphone call) and `.callNotInProgress`. An ended call on the whisper or the
+  takeover stays `call_not_in_progress`. The two new codes are in the `ApiErrorTable` with the
+  website's English and French (`contracts/i18n/api-errors.json` from monorepo e44c194b9).
 - The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
   in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
   (`AllowedExplicitNulls+Parity.swift`, total 236).

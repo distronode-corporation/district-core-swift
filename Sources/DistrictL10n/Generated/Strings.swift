@@ -105,6 +105,12 @@ package enum ApiErrorCopy {
     /// `api_error.calendar_unreachable`
     package static var calendarUnreachable: String { L10nRuntime.locale == .frCA ? "Le calendrier n'a pas pu être joint à l'instant. Veuillez réessayer dans quelques minutes." : "The calendar could not be reached just now. Please try again in a few minutes." }
 
+    /// `api_error.call_ended`
+    package static var callEnded: String { L10nRuntime.locale == .frCA ? "Cet appel est terminé." : "That call has ended." }
+
+    /// `api_error.call_has_no_receptionist`
+    package static var callHasNoReceptionist: String { L10nRuntime.locale == .frCA ? "Il s'agit de l'appel d'un membre de l'équipe. Votre réceptionniste n'y participe pas, alors vous ne pouvez pas lui souffler de consigne ni prendre l'appel." : "That is a team member's own call. Your receptionist is not on it, so you cannot send a note or take the call over." }
+
     /// `api_error.call_has_no_room`
     package static var callHasNoRoom: String { L10nRuntime.locale == .frCA ? "Cet appel n'a aucune salle à joindre." : "That call has no room to join." }
 

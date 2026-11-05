@@ -91,4 +91,16 @@ public enum ApiErrorCode {
     public static let assigneeIsViewer = "assignee_is_viewer"
     /// 400 from the same route naming someone who is not a member of the workspace.
     public static let assigneeNotMember = "assignee_not_member"
+    /// 409 from `POST /api/district/calls/token` asked to listen to a call that is neither
+    /// in progress nor ringing (a stale Live tile, a replayed id). Not retried: the call is
+    /// over. ⚠️ ONLY THE LISTEN SAYS THIS: an ended call on the whisper or the takeover is
+    /// still `call_not_in_progress`.
+    public static let callEnded = "call_ended"
+    /// 409 from the whisper and the takeover on a team member's own softphone call (a
+    /// `direct_` room): no assistant is on it to take a note or step back. Not "the call
+    /// ended", and a screen must not word it so.
+    public static let callHasNoReceptionist = "call_has_no_receptionist"
+    /// 400 or 409 from the whisper, and 409 from the takeover, when the call is not live or
+    /// no deployment holds its room.
+    public static let callNotInProgress = "call_not_in_progress"
 }

@@ -41,8 +41,9 @@ public extension DistrictEndpoints {
     /// ⛔ NEVER RETRIED AUTOMATICALLY: a credential that answered after the person gave up
     /// would put a live microphone in a customer's call. Roles `["agency","client"]`; the
     /// route also answers 409 `call_not_in_progress` (not live, or no deployment holds the
-    /// room), 409 `call_has_no_room`, 404 `call_not_found`, 429 (20 a minute per workspace)
-    /// and 503 `service_unavailable` / `service_not_configured`.
+    /// room), 409 `call_has_no_room`, 409 `call_has_no_receptionist` (a team member's own
+    /// softphone call), 404 `call_not_found`, 429 (20 a minute per workspace) and 503
+    /// `service_unavailable` / `service_not_configured`.
     static func takeOverCall(callId: String, workspaceId: String) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .takeOverCall,

@@ -45,6 +45,22 @@ final class SuperviseRepositoryTests: XCTestCase {
         XCTAssertEqual(transport.requests.count, 1)
     }
 
+    /// ⛔ AN ENDED CALL IS NOT LISTENED TO: `calls/token` answers 409 `call_ended` for a call
+    /// that is neither in progress nor ringing (a stale Live tile, a replayed id), and the
+    /// seat is not asked for again.
+    func testAListenOnAnEndedCallIsRefusedWithCallEnded() async {
+        let transport = RepositoryTransport(
+            json: #"{"success":false,"error":"This call has ended.","code":"call_ended"}"#,
+            status: 409
+        )
+
+        let result = await CallsRepository(client: .repositoryTest(transport)).monitor(callId: Self.callId)
+
+        XCTAssertEqual(result.failureOnly?.httpStatus, 409)
+        XCTAssertEqual(result.failureOnly?.code, "call_ended")
+        XCTAssertEqual(transport.requests.count, 1)
+    }
+
     func testAListenSeatThatDoesNotAffirmSuccessIsADecodeFailure() async {
         let transport = RepositoryTransport(json: #"{"success":false,"token":"t","url":"wss://x"}"#)
 
@@ -87,8 +103,8 @@ final class SuperviseRepositoryTests: XCTestCase {
     /// ⛔ "COULD NOT CHECK" (503) AND "GONE" (409) STAY DISTINCT CODES, and neither is retried.
     func testTakeoverRefusalsCarryTheirCodesAndAreOneRequestEach() async {
         let cases: [(Int, String)] = [
-            (409, "call_not_in_progress"), (409, "call_has_no_room"), (404, "call_not_found"),
-            (503, "service_unavailable"),
+            (409, "call_not_in_progress"), (409, "call_has_no_room"), (409, "call_has_no_receptionist"),
+            (404, "call_not_found"), (503, "service_unavailable"),
         ]
         for (status, code) in cases {
             let transport = RepositoryTransport(

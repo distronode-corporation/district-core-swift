@@ -5,8 +5,9 @@ import XCTest
 /// The `whisper_applied` receipt, read off a telemetry envelope.
 ///
 /// ⚠️ THE FRAMES ARE THE VOICE AGENT'S OWN (`district-voice-agent/src/__tests__/
-/// test_live_transcript.py`, `publish_event("whisper_applied", …)`) until the website
-/// records `telemetry-event-whisper-applied.json`.
+/// test_live_transcript.py`, `publish_event("whisper_applied", …)`), for the edge cases the
+/// website's two recorded receipts (`contracts/mobile/telemetry-event-whisper-*.json`,
+/// read by `SuperviseContractTests`) do not cover.
 final class WhisperReceiptTests: XCTestCase {
     private func envelope(_ data: String, type: String = "whisper_applied") throws -> TelemetryEnvelope {
         let json = #"{"workspaceId":"ws_1","callId":"call_1","eventType":""# + type

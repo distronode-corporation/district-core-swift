@@ -40,6 +40,34 @@ final class ApiErrorLocalizationTests: XCTestCase {
 
     /// ⛔ A REFUSAL THIS CLIENT WROTE ITSELF IS SHOWN IN FRENCH AS IT IS: its message is
     /// catalog text in the active language, and it has no code to look up.
+    /// ⚠️ THE TWO SUPERVISE REFUSALS SAY THE WEBSITE'S SENTENCE IN FRENCH (contracts/i18n,
+    /// monorepo e44c194b9). In English the server's own message still wins.
+    func testTheSuperviseRefusalsSayTheWebsitesSentence() {
+        let ended = ApiError.http(status: 409, message: "This call has ended.", code: ApiErrorCode.callEnded)
+        let ownCall = ApiError.http(
+            status: 409, message: "This is a team member's own call.", code: ApiErrorCode.callHasNoReceptionist
+        )
+        XCTAssertEqual(ApiErrorCode.callEnded, "call_ended")
+        XCTAssertEqual(ApiErrorCode.callHasNoReceptionist, "call_has_no_receptionist")
+        XCTAssertEqual(ApiErrorCode.callNotInProgress, "call_not_in_progress")
+        L10nRuntime.withLocale(.frCA) {
+            XCTAssertEqual(ended.localizedMessage, "Cet appel est terminé.")
+            XCTAssertEqual(
+                ownCall.localizedMessage,
+                "Il s'agit de l'appel d'un membre de l'équipe. Votre réceptionniste n'y participe pas, "
+                    + "alors vous ne pouvez pas lui souffler de consigne ni prendre l'appel."
+            )
+        }
+        L10nRuntime.withLocale(.en) {
+            XCTAssertEqual(ended.localizedMessage, "This call has ended.")
+            XCTAssertEqual(
+                ApiErrorText.sentence(for: "call_has_no_receptionist"),
+                "That is a team member's own call. Your receptionist is not on it, so you cannot send a note "
+                    + "or take the call over."
+            )
+        }
+    }
+
     func testFrenchShowsTheClientsOwnRefusal() {
         L10nRuntime.withLocale(.frCA) {
             for sentence in ClientRefusal.sentences {

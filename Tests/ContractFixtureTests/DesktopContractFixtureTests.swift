@@ -141,16 +141,18 @@ final class DesktopContractFixtureTests: XCTestCase {
                 false
             }
         })
-        // ⚠️ THE EIGHT WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
+        // ⚠️ THE NINE WORKSPACE EVENTS. The five `transcript_*` events are subscribed to,
         // not relayed, and their frames are checked by `TranscriptFrameTests`.
         //
-        // ⛔ `whisper_applied` IS A WORKSPACE EVENT WITH NO FIXTURE YET: its shape is pinned by
-        // `WhisperReceiptTests` from the voice agent's source until the website records
-        // `telemetry-event-whisper-applied.json`. The re-sync that copies that file in gives
-        // it a verifier above and deletes this exclusion, so the set is whole again.
+        // ⚠️ `whisper_applied` IS RECORDED IN THE MOBILE SET, not here: the website writes
+        // `telemetry-event-whisper-applied.json` and `-not-applied.json` into
+        // `contracts/mobile/`, where `ImplementedFixtures.supervise` gates them. They count
+        // toward the set, so an event with no fixture in either corpus still fails here.
+        let mobileReceipts = try ["telemetry-event-whisper-applied.json", "telemetry-event-whisper-not-applied.json"]
+            .map { try JSONDecoder().decode(TelemetryEnvelope.self, from: ContractFixtures.read($0)).eventType }
         XCTAssertEqual(
-            Set(types),
-            Set(TelemetryEventType.known.filter { !$0.isTranscript && $0 != .whisperApplied })
+            Set(types + mobileReceipts),
+            Set(TelemetryEventType.known.filter { !$0.isTranscript })
         )
     }
 

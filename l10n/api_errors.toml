@@ -428,7 +428,7 @@ note = "Shown on any screen when the service refuses a request with the error co
 
 [api_error.engine_unavailable]
 en = "This voice engine is not available for this workspace yet. Choose another engine."
-fr = "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisissez un autre moteur."
+fr = "Ce moteur vocal n'est pas encore offert à cet espace de travail. Choisissez un autre moteur."
 ctx = "error"
 screen = "api_error"
 tier = "T2"

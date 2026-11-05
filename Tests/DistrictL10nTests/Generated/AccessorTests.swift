@@ -754,7 +754,7 @@ final class GeneratedAccessorTests: XCTestCase {
             XCTAssertEqual(ApiErrorCopy.draftNothingToUndo, "Il n'y a pas de version antérieure du brouillon à rétablir.")
             XCTAssertEqual(ApiErrorCopy.emergencyAcknowledgementRequired, "Confirmez que vous comprenez que ce numéro ne peut pas servir à appeler le 9-1-1 ni aucun autre service d'urgence, puis réessayez.")
             XCTAssertEqual(ApiErrorCopy.emergencyNumber, "Les numéros d'urgence ne peuvent pas être composés depuis cette application. Utilisez le composeur de votre téléphone.")
-            XCTAssertEqual(ApiErrorCopy.engineUnavailable, "Ce moteur vocal n'est pas encore offert pour cet espace de travail. Choisissez un autre moteur.")
+            XCTAssertEqual(ApiErrorCopy.engineUnavailable, "Ce moteur vocal n'est pas encore offert à cet espace de travail. Choisissez un autre moteur.")
             XCTAssertEqual(ApiErrorCopy.euVatRequired, "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation.")
             XCTAssertEqual(ApiErrorCopy.extraNumberChargeRequired, "Ce numéro dépasse ceux que le forfait inclut et entraîne des frais mensuels. Confirmez les frais pour l'acheter.")
             XCTAssertEqual(ApiErrorCopy.fileRequired, "Choisissez un fichier à téléverser.")

@@ -121,13 +121,13 @@ package enum ApiErrorCopy {
     package static var callPredatesFeature: String { L10nRuntime.locale == .frCA ? "Cet appel a commencé avant l'existence de cette fonction, elle n'est donc pas offerte pour lui." : "That call started before this feature existed, so it is not available on it." }
 
     /// `api_error.caller_id_carrier_failed`
-    package static var callerIdCarrierFailed: String { L10nRuntime.locale == .frCA ? "Impossible de joindre le fournisseur de téléphonie. Réessayez dans quelques minutes." : "The phone carrier could not be reached. Try again in a few minutes." }
+    package static var callerIdCarrierFailed: String { L10nRuntime.locale == .frCA ? "Impossible de joindre le transporteur de téléphonie. Réessayez dans quelques minutes." : "The phone carrier could not be reached. Try again in a few minutes." }
 
     /// `api_error.caller_id_mobile_unverified`
-    package static var callerIdMobileUnverified: String { L10nRuntime.locale == .frCA ? "Confirmez d'abord votre numéro de cellulaire, puis enregistrez-le comme afficheur." : "Confirm your mobile number first, then register it as caller ID." }
+    package static var callerIdMobileUnverified: String { L10nRuntime.locale == .frCA ? "Confirmez d'abord votre numéro de cellulaire, puis inscrivez-le comme afficheur." : "Confirm your mobile number first, then register it as caller ID." }
 
     /// `api_error.caller_id_not_confirmed`
-    package static var callerIdNotConfirmed: String { L10nRuntime.locale == .frCA ? "Le fournisseur n'a pas encore confirmé votre numéro. Répondez à l'appel de vérification, entrez le code, puis vérifiez de nouveau." : "The carrier has not confirmed your number yet. Answer the verification call and key in the code, then check again." }
+    package static var callerIdNotConfirmed: String { L10nRuntime.locale == .frCA ? "Le transporteur n'a pas encore confirmé votre numéro. Répondez à l'appel de vérification, entrez le code, puis vérifiez de nouveau." : "The carrier has not confirmed your number yet. Answer the verification call and key in the code, then check again." }
 
     /// `api_error.caller_id_request_too_soon`
     package static var callerIdRequestTooSoon: String { L10nRuntime.locale == .frCA ? "Un appel de vérification a été fait il y a moins de 10 minutes. Attendez avant d'en demander un autre." : "A verification call went out less than 10 minutes ago. Wait before asking for another." }
@@ -318,7 +318,7 @@ package enum ApiErrorCopy {
     package static var lastAgencyMember: String { L10nRuntime.locale == .frCA ? "Il s'agit de la dernière personne administratrice de l'espace de travail, elle ne peut donc être ni retirée ni rétrogradée." : "This is the last administrator of the workspace, so it cannot be removed or demoted." }
 
     /// `api_error.live_changed`
-    package static var liveChanged: String { L10nRuntime.locale == .frCA ? "Quelqu'un a modifié ces réglages depuis la rédaction du brouillon. Réalignez le brouillon sur les réglages en ligne, relisez-le, puis publiez-le." : "Someone changed these settings since they were drafted. Rebase the draft on the live settings, review it, then publish." }
+    package static var liveChanged: String { L10nRuntime.locale == .frCA ? "Quelqu'un a modifié ces réglages depuis la rédaction du brouillon. Mettez le brouillon à jour avec les réglages en vigueur, relisez-le, puis publiez-le." : "Someone changed these settings since they were drafted. Rebase the draft on the live settings, review it, then publish." }
 
     /// `api_error.mailbox_not_found`
     package static var mailboxNotFound: String { L10nRuntime.locale == .frCA ? "Aucune boîte de réception n'est connectée à cet espace de travail." : "No mailbox is connected to this workspace." }
@@ -1995,7 +1995,7 @@ package enum WireCopy {
     package static var workflowActionReasonPushNotDelivered: String { L10nRuntime.locale == .frCA ? "Aucun appareil n'a accepté la notification" : "No device accepted the notification" }
 
     /// `wire.workflow_action_reason.quiet_hours`
-    package static var workflowActionReasonQuietHours: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: il était en dehors de 8\u{00A0}h à 21\u{00A0}h là où se trouve peut-être son téléphone" : "Not texted: it was outside 8am to 9pm where their phone may be" }
+    package static var workflowActionReasonQuietHours: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: il n'était pas entre 8\u{00A0}h et 21\u{00A0}h là où se trouve peut-être son téléphone" : "Not texted: it was outside 8am to 9pm where their phone may be" }
 
     /// `wire.workflow_action_reason.recipient_not_member`
     package static var workflowActionReasonRecipientNotMember: String { L10nRuntime.locale == .frCA ? "La personne à qui envoyer le texto n'est plus membre de cet espace de travail" : "The person to text is no longer a member of this workspace" }

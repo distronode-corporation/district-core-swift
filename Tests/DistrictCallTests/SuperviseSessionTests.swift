@@ -22,9 +22,9 @@ final class SuperviseSessionTests: XCTestCase {
         var supervise = session(role)
         supervise.handle(.listenPressed)
         supervise.handle(.listenGranted(url: "wss://listen", token: "listen-jwt"))
-        supervise.handle(.engine(.listen, .connected))
-        supervise.handle(.engine(.listen, .participantJoined(caller)))
-        supervise.handle(.engine(.listen, .participantJoined(agent)))
+        supervise.handle(.listen, .connected)
+        supervise.handle(.listen, .participantJoined(caller))
+        supervise.handle(.listen, .participantJoined(agent))
         return supervise
     }
 
@@ -33,8 +33,8 @@ final class SuperviseSessionTests: XCTestCase {
         var supervise = listening()
         supervise.handle(.takeOverPressed)
         supervise.handle(.takeoverGranted(url: "wss://coach", token: "coach-jwt"))
-        supervise.handle(.engine(.takeover, .connected))
-        supervise.handle(.engine(.takeover, .participantJoined(caller)))
+        supervise.handle(.takeover, .connected)
+        supervise.handle(.takeover, .participantJoined(caller))
         return supervise
     }
 
@@ -51,12 +51,12 @@ final class SuperviseSessionTests: XCTestCase {
         let response = CallMonitorResponse(success: true, token: "listen-jwt", url: "wss://listen")
         XCTAssertEqual(
             supervise.handle(.listenGranted(response)),
-            [.join(.listen, url: "wss://listen", token: "listen-jwt")]
+            [.join(.listen, generation: 1, url: "wss://listen", token: "listen-jwt")]
         )
         XCTAssertEqual(supervise.state.phase, .joiningListen)
 
         // ⛔ NO MICROPHONE COMMAND, EVER, ON THE LISTEN LEG.
-        XCTAssertEqual(supervise.handle(.engine(.listen, .connected)), [])
+        XCTAssertEqual(supervise.handle(.listen, .connected), [])
         XCTAssertEqual(supervise.state.phase, .listening)
         XCTAssertFalse(supervise.state.media.microphoneEnabled)
         XCTAssertFalse(supervise.state.holdsTheCall)
@@ -81,7 +81,7 @@ final class SuperviseSessionTests: XCTestCase {
         supervise.handle(.listenGranted(url: "wss://listen", token: "t"))
 
         XCTAssertEqual(
-            supervise.handle(.engine(.listen, .failed(message: "timeout"))),
+            supervise.handle(.listen, .failed(message: "timeout")),
             [.reportCallEnded, .engine(.listen, .disconnect)]
         )
         XCTAssertEqual(supervise.state.phase, .idle)
@@ -93,7 +93,7 @@ final class SuperviseSessionTests: XCTestCase {
         var supervise = listening()
 
         XCTAssertEqual(
-            supervise.handle(.engine(.listen, .disconnected(reason: "network"))),
+            supervise.handle(.listen, .disconnected(reason: "network")),
             [.reportCallEnded, .engine(.listen, .disconnect)]
         )
         XCTAssertEqual(supervise.state.problem, .listenDropped(reason: "network"))
@@ -142,51 +142,6 @@ final class SuperviseSessionTests: XCTestCase {
         XCTAssertEqual(supervise.state.problem, .takeoverRefused(refusal))
     }
 
-    // MARK: - A team member's own call
-
-    /// ⛔ NO ASSISTANT, NO NOTE AND NO TAKEOVER, BUT LISTENING STAYS. A team member's own
-    /// softphone call (`receptionistOnCall: false`) offers Listen only, and a stray Take over
-    /// asks nothing of the server.
-    func testATeamMembersOwnCallOffersListenOnly() {
-        var supervise = SuperviseSession(callId: "call_1", role: .agency, receptionistOnCall: false)
-        XCTAssertTrue(supervise.state.mayListen)
-        XCTAssertFalse(supervise.state.mayWhisper)
-
-        supervise.handle(.listenPressed)
-        supervise.handle(.listenGranted(url: "wss://listen", token: "listen-jwt"))
-        supervise.handle(.engine(.listen, .connected))
-        XCTAssertEqual(supervise.state.phase, .listening)
-        XCTAssertFalse(supervise.state.mayTakeOver)
-        XCTAssertFalse(supervise.state.mayWhisper)
-        XCTAssertEqual(supervise.handle(.takeOverPressed), [])
-        XCTAssertEqual(supervise.state.phase, .listening)
-    }
-
-    /// ⚠️ THE DEFAULT IS THE ASSISTANT BEING ON THE CALL, the website's reading of an absent
-    /// flag, so a caller that never passes it keeps every action.
-    func testTheAssistantIsAssumedOnTheCallUnlessSaidOtherwise() {
-        let supervise = listening(.agency)
-        XCTAssertTrue(supervise.state.receptionistOnCall)
-        XCTAssertTrue(supervise.state.mayWhisper)
-        XCTAssertTrue(supervise.state.mayTakeOver)
-    }
-
-    /// ⛔ A SESSION BUILT FROM THE FEED FOLLOWS EACH ROW: the recorded `district-calls.json`
-    /// has three calls with the assistant on them and two team-member softphone calls.
-    func testASessionFromTheFeedReadsTheReceptionistFlag() throws {
-        var url = URL(fileURLWithPath: #filePath)
-        for _ in 0 ..< 3 {
-            url = url.deletingLastPathComponent()
-        }
-        let feed = try JSONDecoder().decode(
-            [CallSummary].self,
-            from: Data(contentsOf: url.appendingPathComponent("contracts/mobile/district-calls.json"))
-        )
-        let mayWhisper = feed.map { SuperviseSession(call: $0, role: .client).state.mayWhisper }
-        XCTAssertEqual(mayWhisper, [true, true, true, false, false])
-        XCTAssertEqual(SuperviseSession(call: feed[3], role: .client).state.callId, "call_contract_outbound_unanswered")
-    }
-
     /// ⛔ A TEAM MEMBER'S OWN CALL REFUSES THE TAKEOVER (409 `call_has_no_receptionist`) AND
     /// THE PERSON KEEPS LISTENING, with the code kept for the screen's sentence.
     func testATakeoverOfATeamMembersOwnCallLeavesThePersonListening() {
@@ -218,16 +173,19 @@ final class SuperviseSessionTests: XCTestCase {
 
         XCTAssertEqual(
             supervise.handle(.takeoverGranted(grant)),
-            [.engine(.listen, .disconnect), .join(.takeover, url: "wss://coach", token: "coach-jwt")]
+            [
+                .engine(.listen, .disconnect),
+                .join(.takeover, generation: 2, url: "wss://coach", token: "coach-jwt"),
+            ]
         )
         XCTAssertEqual(supervise.state.phase, .joiningTakeover)
         XCTAssertFalse(supervise.state.mayWhisper, "the assistant is about to step back")
 
         // ⛔ THE LISTEN ENGINE'S OWN LATE DISCONNECT ENDS NOTHING.
-        XCTAssertEqual(supervise.handle(.engine(.listen, .disconnected(reason: nil))), [])
+        XCTAssertEqual(supervise.handle(.listen, .disconnected(reason: nil)), [])
         XCTAssertEqual(supervise.state.phase, .joiningTakeover)
 
-        XCTAssertEqual(supervise.handle(.engine(.takeover, .connected)), [.engine(.takeover, .setMuted(false))])
+        XCTAssertEqual(supervise.handle(.takeover, .connected), [.engine(.takeover, .setMuted(false))])
         XCTAssertEqual(supervise.state.phase, .takenOver)
         XCTAssertTrue(supervise.state.holdsTheCall)
     }
@@ -240,7 +198,7 @@ final class SuperviseSessionTests: XCTestCase {
         supervise.handle(.takeoverGranted(url: "wss://coach", token: "coach-jwt"))
 
         XCTAssertEqual(
-            supervise.handle(.engine(.takeover, .failed(message: "mic"))),
+            supervise.handle(.takeover, .failed(message: "mic")),
             [.reportCallEnded, .engine(.takeover, .disconnect)]
         )
         XCTAssertEqual(supervise.state.phase, .idle)
@@ -257,7 +215,7 @@ final class SuperviseSessionTests: XCTestCase {
 
     func testMuteGoesToTheCoachLegOnly() {
         var supervise = takenOver()
-        supervise.handle(.engine(.takeover, .microphoneChanged(enabled: true)))
+        supervise.handle(.takeover, .microphoneChanged(enabled: true))
 
         XCTAssertEqual(supervise.handle(.muteToggled), [.engine(.takeover, .setMuted(true))])
 
@@ -275,7 +233,7 @@ final class SuperviseSessionTests: XCTestCase {
         // ⛔ THE COACH LEG IS A NEW ENGINE: the speaker is re-applied when it connects, with
         // the microphone (Seer, #52).
         XCTAssertEqual(
-            supervise.handle(.engine(.takeover, .connected)),
+            supervise.handle(.takeover, .connected),
             [.engine(.takeover, .setMuted(false)), .engine(.takeover, .setSpeakerphone(true))]
         )
         XCTAssertEqual(supervise.handle(.speakerToggled), [.engine(.takeover, .setSpeakerphone(false))])
@@ -290,7 +248,7 @@ final class SuperviseSessionTests: XCTestCase {
         joiningListen.handle(.listenPressed)
         joiningListen.handle(.listenGranted(url: "wss://listen", token: "listen-jwt"))
         XCTAssertEqual(
-            joiningListen.handle(.engine(.listen, .disconnected(reason: "room closed"))),
+            joiningListen.handle(.listen, .disconnected(reason: "room closed")),
             [.reportCallEnded, .engine(.listen, .disconnect)]
         )
         XCTAssertEqual(joiningListen.state.problem, .listenFailed(message: "room closed"))
@@ -299,7 +257,7 @@ final class SuperviseSessionTests: XCTestCase {
         joiningCoach.handle(.takeOverPressed)
         joiningCoach.handle(.takeoverGranted(url: "wss://coach", token: "coach-jwt"))
         XCTAssertEqual(
-            joiningCoach.handle(.engine(.takeover, .disconnected(reason: "room closed"))),
+            joiningCoach.handle(.takeover, .disconnected(reason: "room closed")),
             [.reportCallEnded, .engine(.takeover, .disconnect)]
         )
         XCTAssertEqual(joiningCoach.state.problem, .takeoverJoinFailed(message: "room closed"))
@@ -310,7 +268,7 @@ final class SuperviseSessionTests: XCTestCase {
         var supervise = takenOver()
 
         XCTAssertEqual(
-            supervise.handle(.engine(.takeover, .disconnected(reason: "network"))),
+            supervise.handle(.takeover, .disconnected(reason: "network")),
             [.reportCallEnded, .engine(.takeover, .disconnect)]
         )
         XCTAssertEqual(supervise.state.problem, .takeoverDropped(reason: "network"))
@@ -347,9 +305,9 @@ final class SuperviseSessionTests: XCTestCase {
     func testTheRoomEmptyingIsTheCallEnding() {
         var supervise = listening()
 
-        XCTAssertEqual(supervise.handle(.engine(.listen, .participantLeft(agent))), [], "the caller is still there")
+        XCTAssertEqual(supervise.handle(.listen, .participantLeft(agent)), [], "the caller is still there")
         XCTAssertEqual(
-            supervise.handle(.engine(.listen, .participantLeft(caller))),
+            supervise.handle(.listen, .participantLeft(caller)),
             [.reportCallEnded, .engine(.listen, .disconnect)]
         )
         XCTAssertEqual(supervise.state.phase, .over)

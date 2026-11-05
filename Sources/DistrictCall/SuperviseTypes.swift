@@ -75,6 +75,11 @@ public struct SuperviseState: Sendable, Equatable {
     /// The leg whose engine exists right now, if any.
     public internal(set) var leg: SuperviseLeg?
 
+    /// The generation of the engine the latest join built: `0` before any, then one more
+    /// per ``SuperviseCommand/join(_:generation:url:token:)``. Only engine events carrying
+    /// it are applied.
+    public internal(set) var generation = 0
+
     /// ⚠️ THE MICROPHONE STARTS OFF, unlike a softphone call's: a listener publishes
     /// nothing. ``CallMediaState/microphoneEnabled`` turns true only once the engine
     /// reports the takeover's microphone started.
@@ -148,8 +153,11 @@ public enum SuperviseEvent: Sendable, Equatable {
     case takeoverGranted(url: String, token: String)
     /// The server refused the takeover, or it could not be asked.
     case takeoverRefused(ApiError)
-    /// Something one leg's media session reported.
-    case engine(SuperviseLeg, CallEngineEvent)
+    /// Something one leg's media session reported. ⛔ `generation` IS THE ONE THE ENGINE WAS
+    /// BUILT WITH (``SuperviseCommand/join(_:generation:url:token:)``), and the session drops
+    /// an event whose generation is not the current one: a stopped engine's late
+    /// `disconnected` must not end the listen that replaced it.
+    case engine(SuperviseLeg, generation: Int, CallEngineEvent)
     /// Stop listening, or Hand back: both are leaving the room. ⛔ On iOS every producer
     /// has already put a `CXEndCallAction` through CallKit, so nothing reports it again.
     case stopPressed
@@ -193,7 +201,11 @@ public enum SuperviseCommand: Sendable, Equatable {
     /// Build a FRESH engine for `leg` and connect it with this credential. ⚠️ Publishing
     /// nothing: the microphone, for the takeover leg only, follows as a separate
     /// ``engine(_:_:)`` command once the join is done.
-    case join(SuperviseLeg, url: String, token: String)
+    ///
+    /// ⛔ TAG THE ENGINE WITH `generation` and send every event it reports as
+    /// ``SuperviseEvent/engine(_:generation:_:)`` with that number. Each join has a new one,
+    /// so the events of an engine this session has already left are ignored.
+    case join(SuperviseLeg, generation: Int, url: String, token: String)
     /// Something for `leg`'s engine. ⚠️ A command for a leg whose engine is already gone is
     /// a no-op, which ``CallEngine/disconnect()``'s idempotence already guarantees.
     case engine(SuperviseLeg, CallCommand)

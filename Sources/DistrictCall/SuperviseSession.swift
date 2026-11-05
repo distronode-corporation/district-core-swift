@@ -64,9 +64,11 @@ public struct SuperviseSession: Sendable, Equatable {
             return (next, [])
         case .callEnded:
             return end(state, at: .over, problem: nil, report: state.phase != .idle)
-        case let .engine(leg, event):
-            // ⛔ AN EVENT FROM A LEG THAT IS NOT THE CURRENT ONE IS DROPPED. See ``SuperviseLeg``.
-            guard leg == state.leg else { return (state, []) }
+        case let .engine(leg, generation, event):
+            // ⛔ AN EVENT FROM A LEG THAT IS NOT THE CURRENT ONE IS DROPPED (``SuperviseLeg``),
+            // AND SO IS ONE FROM AN EARLIER ENGINE ON THE SAME LEG: after Stop and Listen
+            // again, the first engine's late `disconnected` would otherwise end the second.
+            guard leg == state.leg, generation == state.generation else { return (state, []) }
             return reduceEngine(state, event)
         case .speakerToggled:
             return toggleSpeaker(state)
@@ -88,7 +90,8 @@ public struct SuperviseSession: Sendable, Equatable {
             next.phase = .joiningListen
             next.leg = .listen
             next.media = SuperviseState.listenMedia()
-            return (next, [.join(.listen, url: url, token: token)])
+            next.generation += 1
+            return (next, [.join(.listen, generation: next.generation, url: url, token: token)])
         case let (.requestingListen, .listenRefused(error)):
             // ⛔ REPORTED: the OS already holds the call the person started.
             return end(state, at: .idle, problem: .listenRefused(error), report: true)
@@ -104,7 +107,11 @@ public struct SuperviseSession: Sendable, Equatable {
             var media = SuperviseState.listenMedia()
             media.speakerRequested = state.media.speakerRequested
             next.media = media
-            return (next, [.engine(.listen, .disconnect), .join(.takeover, url: url, token: token)])
+            next.generation += 1
+            return (next, [
+                .engine(.listen, .disconnect),
+                .join(.takeover, generation: next.generation, url: url, token: token),
+            ])
         case let (.requestingTakeover, .takeoverRefused(error)):
             // ⛔ STILL LISTENING: nothing was torn down, and nothing is.
             var next = state

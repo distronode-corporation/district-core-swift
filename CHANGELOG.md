@@ -75,7 +75,10 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   `SuperviseCommand`, `SuperviseLeg`, `SuperviseProblem`): the takeover is asked for while
   still listening, a refusal leaves the person listening, a grant leaves the listen room
   before joining the coach room, hand back is leaving, and CallKit is told of every ending it
-  did not perform. The endpoint total is 131 and the typed count 129.
+  did not perform. Every `SuperviseCommand.join(_:generation:url:token:)` carries a new
+  generation, and `SuperviseEvent.engine(_:generation:_:)` must carry the one its engine was
+  built with: an event from an engine the session has already left (Stop, then Listen again)
+  is ignored. The endpoint total is 131 and the typed count 129.
 - Live supervision's five contract fixtures, from the website at monorepo e44c194b9 (re-synced at 6c0099cdf)
   (`district-call-monitor-token.json`, `district-call-takeover.json`,
   `district-call-whisper.json`, `telemetry-event-whisper-applied.json` and

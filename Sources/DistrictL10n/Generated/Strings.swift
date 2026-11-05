@@ -76,7 +76,7 @@ package enum ApiErrorCopy {
     package static var auditionBusy: String { L10nRuntime.locale == .frCA ? "Deux auditions sont déjà en cours pour cet espace de travail. Terminez-en une et réessayez." : "Two auditions are already running for this workspace. End one and try again." }
 
     /// `api_error.audition_daily_cap`
-    package static var auditionDailyCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé les auditions d'aujourd'hui. Vous pourrez de nouveau écouter un brouillon demain." : "This workspace has used today's auditions. You can audition again tomorrow." }
+    package static var auditionDailyCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé toutes ses auditions pour aujourd'hui. Vous pourrez faire de nouvelles auditions demain." : "This workspace has used today's auditions. You can audition again tomorrow." }
 
     /// `api_error.audition_unavailable`
     package static var auditionUnavailable: String { L10nRuntime.locale == .frCA ? "L'audition ne peut pas commencer pour le moment. Réessayez dans un instant." : "The audition can't start right now. Please try again in a moment." }
@@ -205,7 +205,7 @@ package enum ApiErrorCopy {
     package static var euVatRequired: String { L10nRuntime.locale == .frCA ? "Dans l'Union européenne, nous vendons uniquement aux entreprises. Saisissez votre numéro de TVA et nous vous facturons selon le régime de l'autoliquidation." : "In the European Union we sell to businesses only. Enter your VAT number and we invoice you under the reverse-charge rule." }
 
     /// `api_error.extra_number_charge_required`
-    package static var extraNumberChargeRequired: String { L10nRuntime.locale == .frCA ? "Ce numéro dépasse ceux que le forfait inclut et entraîne des frais mensuels. Confirmez les frais pour l'acheter." : "This number is beyond the ones the plan includes and has a monthly charge. Confirm the charge to buy it." }
+    package static var extraNumberChargeRequired: String { L10nRuntime.locale == .frCA ? "Ce numéro s'ajoute à ceux qu'inclut le forfait et entraîne des frais mensuels. Confirmez les frais pour l'acheter." : "This number is beyond the ones the plan includes and has a monthly charge. Confirm the charge to buy it." }
 
     /// `api_error.file_required`
     package static var fileRequired: String { L10nRuntime.locale == .frCA ? "Choisissez un fichier à téléverser." : "Choose a file to upload." }
@@ -372,7 +372,7 @@ package enum ApiErrorCopy {
     package static var messagingAppSmsRefused: String { L10nRuntime.locale == .frCA ? "Les textos sont configurés avec vos numéros de téléphone, pas comme une application de messagerie." : "Texting is set up with your phone numbers, not as a messaging app." }
 
     /// `api_error.messaging_apps_managed`
-    package static var messagingAppsManaged: String { L10nRuntime.locale == .frCA ? "Les applications de messagerie ne peuvent pas être connectées sur le compte Sinch de la plateforme. Connectez votre propre compte Sinch pour ajouter WhatsApp, Messenger ou RCS." : "Messaging apps cannot be connected on the platform's Sinch account. Connect your own Sinch account to add WhatsApp, Messenger or RCS." }
+    package static var messagingAppsManaged: String { L10nRuntime.locale == .frCA ? "Les applications de messagerie ne peuvent pas être connectées au moyen du compte Sinch de la plateforme. Connectez votre propre compte Sinch pour ajouter WhatsApp, Messenger ou RCS." : "Messaging apps cannot be connected on the platform's Sinch account. Connect your own Sinch account to add WhatsApp, Messenger or RCS." }
 
     /// `api_error.messaging_provider_not_configured`
     package static var messagingProviderNotConfigured: String { L10nRuntime.locale == .frCA ? "Aucun fournisseur de messagerie n'est connecté à cet espace de travail." : "No messaging provider is connected to this workspace." }
@@ -636,7 +636,7 @@ package enum ApiErrorCopy {
     package static var websiteUnreadable: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu lire ce site Web. Vérifiez l'adresse, ou saisissez vos renseignements vous-même." : "We could not read that website. Check the address, or enter your details yourself." }
 
     /// `api_error.whatsapp_template_invalid`
-    package static var whatsappTemplateInvalid: String { L10nRuntime.locale == .frCA ? "Ce modèle WhatsApp ne peut pas être envoyé. Il n'est pas approuvé pour ce numéro, ou ses variables ne lui correspondent pas." : "That WhatsApp template cannot be sent. It is not approved for this number, or its variables do not match it." }
+    package static var whatsappTemplateInvalid: String { L10nRuntime.locale == .frCA ? "Ce modèle WhatsApp ne peut pas être envoyé. Il n'est pas approuvé pour ce numéro, ou ses variables ne correspondent pas à celles du modèle." : "That WhatsApp template cannot be sent. It is not approved for this number, or its variables do not match it." }
 
     /// `api_error.whatsapp_unsupported`
     package static var whatsappUnsupported: String { L10nRuntime.locale == .frCA ? "WhatsApp n'est pas offert sur le compte de messagerie de cet espace de travail." : "WhatsApp is not available on this workspace's messaging account." }
@@ -654,7 +654,7 @@ package enum ApiErrorCopy {
     package static var workflowConditionsNotAllowed: String { L10nRuntime.locale == .frCA ? "Les conditions ne peuvent s'ajouter qu'à un flux qui s'exécute après un appel." : "Conditions can only be added to a workflow that runs after a call." }
 
     /// `api_error.workflow_draft_dry_run_stale`
-    package static var workflowDraftDryRunStale: String { L10nRuntime.locale == .frCA ? "Faites d'abord un essai à blanc de cette version de l'automatisation, puis publiez-la." : "Run a dry run of this version of the automation first, then publish it." }
+    package static var workflowDraftDryRunStale: String { L10nRuntime.locale == .frCA ? "Testez d'abord cette version de l'automatisation, puis publiez-la." : "Run a dry run of this version of the automation first, then publish it." }
 
     /// `api_error.workflow_draft_not_found`
     package static var workflowDraftNotFound: String { L10nRuntime.locale == .frCA ? "Cette automatisation en brouillon est introuvable. Elle a peut-être été publiée ou supprimée." : "That drafted automation was not found. It may have been published or discarded." }
@@ -669,7 +669,7 @@ package enum ApiErrorCopy {
     package static var workflowSmsRecipientNotMember: String { L10nRuntime.locale == .frCA ? "Cette personne n'est pas membre de cet espace de travail, alors les textos des flux ne peuvent pas lui être envoyés." : "That person is not a member of this workspace, so workflow texts cannot be sent to them." }
 
     /// `api_error.workflow_voice_cap`
-    package static var workflowVoiceCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a atteint la limite d'automatisations créées à la voix. Créez-en d'autres dans le générateur de flux de travail." : "This workspace has reached the limit of automations built by voice. Build more in the workflow builder." }
+    package static var workflowVoiceCap: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a atteint la limite d'automatisations créées à la voix. Créez-en d'autres dans l'éditeur de flux de travail." : "This workspace has reached the limit of automations built by voice. Build more in the workflow builder." }
 
     /// `api_error.workspace_access_denied`
     package static var workspaceAccessDenied: String { L10nRuntime.locale == .frCA ? "Vous n'êtes pas membre de cet espace de travail." : "You are not a member of that workspace." }
@@ -1569,7 +1569,7 @@ package enum WireCopy {
     package static var dispositionEscalated: String { L10nRuntime.locale == .frCA ? "Transmis à une personne" : "Passed to a person" }
 
     /// `wire.disposition.info`
-    package static var dispositionInfo: String { L10nRuntime.locale == .frCA ? "Demande de renseignements" : "Information only" }
+    package static var dispositionInfo: String { L10nRuntime.locale == .frCA ? "Renseignements" : "Information only" }
 
     /// `wire.disposition.interested`
     package static var dispositionInterested: String { L10nRuntime.locale == .frCA ? "Intéressé" : "Interested" }
@@ -1640,8 +1640,14 @@ package enum WireCopy {
     /// `wire.message_delivery_status.failed`
     package static var messageDeliveryStatusFailed: String { L10nRuntime.locale == .frCA ? "Échec" : "Failed" }
 
+    /// `wire.message_delivery_status.handled`
+    package static var messageDeliveryStatusHandled: String { L10nRuntime.locale == .frCA ? "Traité" : "Handled" }
+
     /// `wire.message_delivery_status.queued`
     package static var messageDeliveryStatusQueued: String { L10nRuntime.locale == .frCA ? "Envoyé" : "Sent" }
+
+    /// `wire.message_delivery_status.read`
+    package static var messageDeliveryStatusRead: String { L10nRuntime.locale == .frCA ? "Lu" : "Read" }
 
     /// `wire.message_delivery_status.received`
     package static var messageDeliveryStatusReceived: String { L10nRuntime.locale == .frCA ? "Reçu" : "Received" }
@@ -1914,7 +1920,7 @@ package enum WireCopy {
     package static var workflowActionOutcomeSkipped: String { L10nRuntime.locale == .frCA ? "Ignoré" : "Skipped" }
 
     /// `wire.workflow_action_reason.automated_sender`
-    package static var workflowActionReasonAutomatedSender: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le message venait d'un expéditeur automatisé, comme un code de vérification" : "Not texted: the message came from an automated sender, such as a verification code" }
+    package static var workflowActionReasonAutomatedSender: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le message venait d'un expéditeur automatisé (un code de vérification, par exemple)" : "Not texted: the message came from an automated sender, such as a verification code" }
 
     /// `wire.workflow_action_reason.consent_check_failed`
     package static var workflowActionReasonConsentCheckFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: le consentement aux textos n'a pas pu être vérifié" : "Not texted: the texting consent could not be checked" }
@@ -1962,7 +1968,7 @@ package enum WireCopy {
     package static var workflowActionReasonLoopCheckFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: les messages récents avec ce numéro n'ont pas pu être vérifiés" : "Not texted: the recent messages with this number could not be checked" }
 
     /// `wire.workflow_action_reason.loop_paused`
-    package static var workflowActionReasonLoopPaused: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: ce numéro a répondu automatiquement plusieurs fois de suite, les textos vers lui sont donc suspendus pendant une heure" : "Not texted: this number answered automatically several times in a row, so texts to it are paused for an hour" }
+    package static var workflowActionReasonLoopPaused: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: ce numéro a répondu automatiquement plusieurs fois de suite, les textos à ce numéro sont donc suspendus pendant une heure" : "Not texted: this number answered automatically several times in a row, so texts to it are paused for an hour" }
 
     /// `wire.workflow_action_reason.missing_webhook_url`
     package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook url" }

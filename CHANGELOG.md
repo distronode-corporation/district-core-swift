@@ -108,9 +108,9 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   `live_changed`, `caller_id_carrier_failed`, `caller_id_not_confirmed`,
   `caller_id_mobile_unverified` and the `quiet_hours` workflow reason.
   `contracts/i18n/api-errors.json` and `wire-vocabulary.json` are copied from that commit.
-- `i18n/fr-CA/signoff.json` records the French review of the 47 catalog entries added since
-  7.0.3 (`api_errors` and `wire`), so the release guard passes on the tag. 8.1.0 was tagged
-  without renewing it, and its guard run failed.
+- `i18n/fr-CA/signoff.json` records Sean's sign-off (2026-11-05) of every catalog change since
+  8.1.0, the four catalogs as they are at da074db, so the release guard passes on the tag.
+  8.1.0 was tagged without renewing it, and its guard run failed.
 
 ### Fixed
 

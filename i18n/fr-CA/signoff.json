@@ -1,23 +1,23 @@
 {
-  "signed_off_by": "Sean Dean (manager review by Claude, xhigh; Sean's OK 2026-11-05 in iMac session 9448bc94; GitLab #2)",
+  "signed_off_by": "Sean Dean (manager review by Claude, xhigh; Sean's sign-off 2026-11-05, \"Sign off all\", in iMac session 9448bc94 from the 3.3.0 French sign-off page)",
   "release": "8.2.0",
-  "commit": "fbc28248e9e6d2faddc0d6e3cf0169cf7bb1e142",
+  "commit": "da074db6e80e042b801497a1f426499620f3f2fb",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "78085cb07c5682c9a932f45bc5ce36fa434b5c5c62e6ed44a9e2e7bb9ca296eb"
+      "sha256": "607791a7f833f419af4657bdc8cb9cd6ea9bb2fb8ba5b1c16f3cedc0a5470c89"
     },
     {
       "path": "l10n/core.toml",
-      "sha256": "c0b0478a992d4a50628d36b329e9d15bb7b33ba00593a6c157accdc4e8165aa5"
+      "sha256": "cc4b4da93892b3e7064fa3ac7c579a01030c57b5ad02d5083b04dc67cdaa43ff"
     },
     {
       "path": "l10n/countries.toml",
-      "sha256": "ea9e6f93453c9bab08fdd74724b463a439ad2c4d46917f7a57da809a64e152dd"
+      "sha256": "b30df139aaa73e81ee49ac0213b117887a7d299a692a396f71cbb0b12813c28f"
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "ecf52cae66f2e91fd56c90b456f795a62421dfbeefda74d41c946a3ea22b7634"
+      "sha256": "70bfd2e33689b24cbf124a23144c4ff71a5ba88af64dd9da30c655a3d53aae01"
     }
   ]
 }

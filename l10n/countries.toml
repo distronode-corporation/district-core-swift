@@ -28,6 +28,7 @@ ctx = "label"
 screen = "dialer"
 tier = "T1"
 state = "reviewed"
+waive = { SENTENCE-CASE = "A proper name: CLDR fr-CA capitalizes the compass point in this country's name." }
 note = "The place a phone number starting +211 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_212]
@@ -205,6 +206,7 @@ ctx = "label"
 screen = "dialer"
 tier = "T1"
 state = "reviewed"
+waive = { SENTENCE-CASE = "A proper name: CLDR fr-CA capitalizes the compass point in this country's name." }
 note = "The place a phone number starting +27 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_299]
@@ -518,6 +520,7 @@ ctx = "label"
 screen = "dialer"
 tier = "T1"
 state = "reviewed"
+waive = { SENTENCE-CASE = "A proper name: CLDR fr-CA capitalizes the compass point in this country's name." }
 note = "The place a phone number starting +389 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_39]
@@ -772,7 +775,7 @@ note = "The place a phone number starting +57 rings, shown on the keypad while t
 
 [dial_region.code_58]
 en = "Venezuela"
-fr = "Venezuela"
+fr = "Vénézuéla"
 ctx = "label"
 screen = "dialer"
 tier = "T1"
@@ -861,6 +864,7 @@ ctx = "label"
 screen = "dialer"
 tier = "T1"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "The place a phone number starting +64 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_65]
@@ -906,6 +910,7 @@ ctx = "label"
 screen = "dialer"
 tier = "T1"
 state = "reviewed"
+waive = { SENTENCE-CASE = "A proper name: CLDR fr-CA capitalizes the compass point in this country's name." }
 note = "The place a phone number starting +82 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_84]

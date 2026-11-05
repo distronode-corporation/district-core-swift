@@ -85,6 +85,14 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   takes it whenever `contracts/i18n/` carries some, unless the entry has an `fr_variant`
   (`no_sending_number` keeps the Apple word « réglages »). `ContractFrenchTests` holds
   every error code and wire value to the contract's French, read from the JSON.
+- The hand-written catalogs (`core`, `countries`), which no generator reads from the
+  website, were audited against it, and fifteen French strings take the website's text:
+  the scheduling settings' clock examples (« 12 heures (2 h 30 p.m.) », « 24 heures
+  (14 h 30) »), four notification and delivery labels, the team roles (« Agence »,
+  « Client »), « Non disponible », date ranges with « au », « Aujourd'hui {clock} » and
+  « Demain {clock} », « Refusé avec {code} », « Secteur d'activité » and « Vénézuéla »
+  (CLDR fr-CA, which the website's dialler shows). frcheck's remaining findings on these
+  catalogs are waived, each with its reason, or carry an `fr_variant`.
 
 ## [8.1.0]
 

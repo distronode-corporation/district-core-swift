@@ -104,11 +104,12 @@ note = "A call routing rule's field: the estimated value of the caller's busines
 
 [routing.field_industry]
 en = "Industry"
-fr = "Secteur"
+fr = "Secteur d'activité"
 ctx = "label"
 screen = "routing rules"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "A call routing rule's field: the caller's industry (business sector), in the field picker."
 
 [routing.field_line_type]
@@ -127,6 +128,7 @@ ctx = "label"
 screen = "routing rules"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "A call routing rule's field: the caller's seniority. The parenthesis gives example stored values (vp, c-suite) the operator types; keep those in English."
 
 [routing.operator_contains]
@@ -310,6 +312,7 @@ ctx = "label"
 screen = "scheduling calendars"
 tier = "T3"
 state = "reviewed"
+waive = { SENTENCE-CASE = "A product name: Google's own French name for Google Calendar is « Google Agenda »." }
 note = "The name of a calendar service a calendar account is connected through. Use Google's own French name for the product (Google Agenda)."
 
 [scheduling.calendar.provider_microsoft]
@@ -331,16 +334,18 @@ note = "Status of one webhook delivery: the receiving server accepted it."
 
 [scheduling.developer.delivery_no_answer]
 en = "No answer"
-fr = "Sans réponse"
+fr = "Aucune réponse"
 ctx = "label"
 screen = "scheduling developer"
 tier = "T3"
 state = "reviewed"
+fr_variant = "A webhook delivery outcome, as the website's deliveryNoAnswer says it; a call's no-answer status is « Sans réponse » (wire call_status)."
+waive = { LEN = "website's wording" }
 note = "Status of one webhook delivery: the receiving server never answered."
 
 [scheduling.developer.delivery_rejected]
 en = "Rejected with {code}"
-fr = "Refusé avec le code {code}"
+fr = "Refusé avec {code}"
 ctx = "label"
 screen = "scheduling developer"
 tier = "T3"
@@ -392,6 +397,7 @@ ctx = "label"
 screen = "scheduling developer"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "Tab on the scheduling developer screen: the third-party apps given access."
 
 [scheduling.developer.tab_keys]
@@ -415,12 +421,13 @@ note = "Tab on the scheduling developer screen: the webhook endpoints that recei
 
 [scheduling.hours.date_range]
 en = "{start} to {end}"
-fr = "{start} à {end}"
+fr = "{start} au {end}"
 ctx = "format"
 screen = "scheduling availability"
 tier = "T3"
 args = { start = "str", end = "str" }
 state = "reviewed"
+fr_variant = "A range of dates takes « au » (the website's overrideRange); a range of times takes « à » (hours.time_range, overview.window)."
 note = "A run of days off or changed hours, e.g. \"Aug 3 to Aug 7, 2026\". {start} and {end} are dates."
 
 [scheduling.hours.out_of_office]
@@ -454,7 +461,7 @@ note = "The hours on a date override, e.g. \"9:00 to 17:00\". {start} and {end} 
 
 [scheduling.hours.unavailable]
 en = "Unavailable"
-fr = "Indisponible"
+fr = "Non disponible"
 ctx = "label"
 screen = "scheduling availability"
 tier = "T3"
@@ -524,17 +531,18 @@ note = "Who booked, when the booking carries neither a name nor an email address
 
 [scheduling.overview.today]
 en = "Today {clock}"
-fr = "Aujourd'hui à {clock}"
+fr = "Aujourd'hui {clock}"
 ctx = "format"
 screen = "scheduling overview"
 tier = "T3"
 args = { clock = "str" }
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "When the next booking starts, if it is today, e.g. \"Today 14:30\". {clock} is the time of day."
 
 [scheduling.overview.tomorrow]
 en = "Tomorrow {clock}"
-fr = "Demain à {clock}"
+fr = "Demain {clock}"
 ctx = "format"
 screen = "scheduling overview"
 tier = "T3"
@@ -599,7 +607,7 @@ note = "Email notification switch: tell me when a booking I attend is confirmed.
 
 [scheduling.settings.notify_host_booking]
 en = "Somebody books you"
-fr = "Quelqu'un prend rendez-vous"
+fr = "Quelqu'un vous réserve"
 ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
@@ -635,7 +643,7 @@ note = "Heading of the second group of email notification switches."
 
 [scheduling.settings.notify_host_reschedule]
 en = "Somebody moves their booking"
-fr = "Quelqu'un reporte son rendez-vous"
+fr = "Quelqu'un déplace son rendez-vous"
 ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
@@ -653,11 +661,12 @@ note = "Email notification switch: remind me before a booking I attend."
 
 [scheduling.settings.notify_reschedule]
 en = "A booking is moved"
-fr = "Un rendez-vous est reporté"
+fr = "Un rendez-vous est déplacé"
 ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "Email notification switch: tell me when a booking I attend moves to another time."
 
 [scheduling.settings.tab_assistant]
@@ -667,6 +676,7 @@ ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "Tab on the scheduling settings screen: the AI assistant that answers on the booking page."
 
 [scheduling.settings.tab_booking_page]
@@ -676,6 +686,7 @@ ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "Tab on the scheduling settings screen: the public page customers book from."
 
 [scheduling.settings.tab_notifications]
@@ -698,16 +709,17 @@ note = "Tab on the scheduling settings screen: the operator's own scheduling pro
 
 [scheduling.settings.time_format_12h]
 en = "12-hour (2:30 pm)"
-fr = "12 heures (2:30 pm)"
+fr = "12 heures (2\u00A0h\u00A030\u00A0p.m.)"
 ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
 state = "reviewed"
+waive = { TYPO-TIME = "website's wording: the fr-CA 12-hour form « 2 h 30 p.m. » is the example this choice shows." }
 note = "Choice of clock for the booking page: a 12-hour clock, with an example time in the parenthesis."
 
 [scheduling.settings.time_format_24h]
 en = "24-hour (14:30)"
-fr = "24 heures (14:30)"
+fr = "24 heures (14\u00A0h\u00A030)"
 ctx = "label"
 screen = "scheduling settings"
 tier = "T3"
@@ -716,7 +728,7 @@ note = "Choice of clock for the booking page: a 24-hour clock, with an example t
 
 [scheduling.team.role_agency]
 en = "Agency"
-fr = "Administrateur"
+fr = "Agence"
 ctx = "label"
 screen = "scheduling team"
 tier = "T3"
@@ -725,11 +737,12 @@ note = "A workspace member's role, as the scheduling team screen names it: the a
 
 [scheduling.team.role_client]
 en = "Client"
-fr = "Membre"
+fr = "Client"
 ctx = "label"
 screen = "scheduling team"
 tier = "T3"
 state = "reviewed"
+same_ok = true
 note = "A workspace member's role, as the scheduling team screen names it: a member of the client business."
 
 [scheduling.team.role_removed]
@@ -757,6 +770,7 @@ ctx = "label"
 screen = "scheduling team"
 tier = "T3"
 state = "reviewed"
+waive = { LEN = "website's wording" }
 note = "Badge on a workspace member who has no scheduling account yet."
 
 [scheduling.team.state_archived]

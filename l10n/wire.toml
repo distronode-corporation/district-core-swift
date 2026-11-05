@@ -1121,6 +1121,7 @@ ctx = "label"
 screen = "wire research_status"
 tier = "T3"
 state = "reviewed"
+waive = { SENTENCE-CASE = "« Web » is capitalized as a proper noun in fr-CA (OQLF), as the website writes it." }
 note = "A label for the stored value `crawling` of researchStatus. `dgiStatus` on a contact (GET /api/district/contacts, /contacts/get): the lead research job."
 
 [wire.research_status.failed]

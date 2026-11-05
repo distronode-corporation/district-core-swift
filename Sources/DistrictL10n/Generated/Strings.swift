@@ -961,7 +961,7 @@ package enum DialRegionCopy {
     package static var code57: String { L10nRuntime.locale == .frCA ? "Colombie" : "Colombia" }
 
     /// `dial_region.code_58`
-    package static var code58: String { L10nRuntime.locale == .frCA ? "Venezuela" : "Venezuela" }
+    package static var code58: String { L10nRuntime.locale == .frCA ? "Vénézuéla" : "Venezuela" }
 
     /// `dial_region.code_591`
     package static var code591: String { L10nRuntime.locale == .frCA ? "Bolivie" : "Bolivia" }
@@ -1145,7 +1145,7 @@ package enum RoutingCopy {
     package static var fieldEstimatedValue: String { L10nRuntime.locale == .frCA ? "Valeur estimée" : "Estimated Value" }
 
     /// `routing.field_industry`
-    package static var fieldIndustry: String { L10nRuntime.locale == .frCA ? "Secteur" : "Industry" }
+    package static var fieldIndustry: String { L10nRuntime.locale == .frCA ? "Secteur d'activité" : "Industry" }
 
     /// `routing.field_line_type`
     package static var fieldLineType: String { L10nRuntime.locale == .frCA ? "Type de ligne (mobile/landline/voip)" : "Line Type (mobile/landline/voip)" }
@@ -1226,11 +1226,11 @@ package enum SchedulingCopy {
     package static var developerDeliveryDelivered: String { L10nRuntime.locale == .frCA ? "Livré" : "Delivered" }
 
     /// `scheduling.developer.delivery_no_answer`
-    package static var developerDeliveryNoAnswer: String { L10nRuntime.locale == .frCA ? "Sans réponse" : "No answer" }
+    package static var developerDeliveryNoAnswer: String { L10nRuntime.locale == .frCA ? "Aucune réponse" : "No answer" }
 
     /// `scheduling.developer.delivery_rejected`
     package static func developerDeliveryRejected(_ code: String) -> String {
-        L10nRuntime.locale == .frCA ? "Refusé avec le code \(code)" : "Rejected with \(code)"
+        L10nRuntime.locale == .frCA ? "Refusé avec \(code)" : "Rejected with \(code)"
     }
 
     /// `scheduling.developer.delivery_waiting`
@@ -1258,7 +1258,7 @@ package enum SchedulingCopy {
 
     /// `scheduling.hours.date_range`
     package static func hoursDateRange(_ start: String, _ end: String) -> String {
-        L10nRuntime.locale == .frCA ? "\(start) à \(end)" : "\(start) to \(end)"
+        L10nRuntime.locale == .frCA ? "\(start) au \(end)" : "\(start) to \(end)"
     }
 
     /// `scheduling.hours.out_of_office`
@@ -1275,7 +1275,7 @@ package enum SchedulingCopy {
     }
 
     /// `scheduling.hours.unavailable`
-    package static var hoursUnavailable: String { L10nRuntime.locale == .frCA ? "Indisponible" : "Unavailable" }
+    package static var hoursUnavailable: String { L10nRuntime.locale == .frCA ? "Non disponible" : "Unavailable" }
 
     /// `scheduling.overview.booking`
     package static var overviewBooking: String { L10nRuntime.locale == .frCA ? "Rendez-vous" : "Booking" }
@@ -1314,12 +1314,12 @@ package enum SchedulingCopy {
 
     /// `scheduling.overview.today`
     package static func overviewToday(_ clock: String) -> String {
-        L10nRuntime.locale == .frCA ? "Aujourd'hui à \(clock)" : "Today \(clock)"
+        L10nRuntime.locale == .frCA ? "Aujourd'hui \(clock)" : "Today \(clock)"
     }
 
     /// `scheduling.overview.tomorrow`
     package static func overviewTomorrow(_ clock: String) -> String {
-        L10nRuntime.locale == .frCA ? "Demain à \(clock)" : "Tomorrow \(clock)"
+        L10nRuntime.locale == .frCA ? "Demain \(clock)" : "Tomorrow \(clock)"
     }
 
     /// `scheduling.overview.window`
@@ -1343,7 +1343,7 @@ package enum SchedulingCopy {
     package static var settingsNotifyConfirmation: String { L10nRuntime.locale == .frCA ? "Un rendez-vous est confirmé" : "A booking is confirmed" }
 
     /// `scheduling.settings.notify_host_booking`
-    package static var settingsNotifyHostBooking: String { L10nRuntime.locale == .frCA ? "Quelqu'un prend rendez-vous" : "Somebody books you" }
+    package static var settingsNotifyHostBooking: String { L10nRuntime.locale == .frCA ? "Quelqu'un vous réserve" : "Somebody books you" }
 
     /// `scheduling.settings.notify_host_cancel`
     package static var settingsNotifyHostCancel: String { L10nRuntime.locale == .frCA ? "Quelqu'un annule" : "Somebody cancels" }
@@ -1355,13 +1355,13 @@ package enum SchedulingCopy {
     package static var settingsNotifyHostHeading: String { L10nRuntime.locale == .frCA ? "Comme hôte" : "As a host" }
 
     /// `scheduling.settings.notify_host_reschedule`
-    package static var settingsNotifyHostReschedule: String { L10nRuntime.locale == .frCA ? "Quelqu'un reporte son rendez-vous" : "Somebody moves their booking" }
+    package static var settingsNotifyHostReschedule: String { L10nRuntime.locale == .frCA ? "Quelqu'un déplace son rendez-vous" : "Somebody moves their booking" }
 
     /// `scheduling.settings.notify_reminder`
     package static var settingsNotifyReminder: String { L10nRuntime.locale == .frCA ? "Un rendez-vous approche" : "A booking is coming up" }
 
     /// `scheduling.settings.notify_reschedule`
-    package static var settingsNotifyReschedule: String { L10nRuntime.locale == .frCA ? "Un rendez-vous est reporté" : "A booking is moved" }
+    package static var settingsNotifyReschedule: String { L10nRuntime.locale == .frCA ? "Un rendez-vous est déplacé" : "A booking is moved" }
 
     /// `scheduling.settings.tab_assistant`
     package static var settingsTabAssistant: String { L10nRuntime.locale == .frCA ? "Assistante de réservation" : "Booking assistant" }
@@ -1376,16 +1376,16 @@ package enum SchedulingCopy {
     package static var settingsTabProfile: String { L10nRuntime.locale == .frCA ? "Votre profil" : "Your profile" }
 
     /// `scheduling.settings.time_format_12h`
-    package static var settingsTimeFormat12h: String { L10nRuntime.locale == .frCA ? "12 heures (2:30 pm)" : "12-hour (2:30 pm)" }
+    package static var settingsTimeFormat12h: String { L10nRuntime.locale == .frCA ? "12 heures (2\u{00A0}h\u{00A0}30\u{00A0}p.m.)" : "12-hour (2:30 pm)" }
 
     /// `scheduling.settings.time_format_24h`
-    package static var settingsTimeFormat24h: String { L10nRuntime.locale == .frCA ? "24 heures (14:30)" : "24-hour (14:30)" }
+    package static var settingsTimeFormat24h: String { L10nRuntime.locale == .frCA ? "24 heures (14\u{00A0}h\u{00A0}30)" : "24-hour (14:30)" }
 
     /// `scheduling.team.role_agency`
-    package static var teamRoleAgency: String { L10nRuntime.locale == .frCA ? "Administrateur" : "Agency" }
+    package static var teamRoleAgency: String { L10nRuntime.locale == .frCA ? "Agence" : "Agency" }
 
     /// `scheduling.team.role_client`
-    package static var teamRoleClient: String { L10nRuntime.locale == .frCA ? "Membre" : "Client" }
+    package static var teamRoleClient: String { L10nRuntime.locale == .frCA ? "Client" : "Client" }
 
     /// `scheduling.team.role_removed`
     package static var teamRoleRemoved: String { L10nRuntime.locale == .frCA ? "Retiré de l'espace de travail" : "Removed from the workspace" }

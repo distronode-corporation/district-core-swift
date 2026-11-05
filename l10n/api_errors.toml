@@ -875,6 +875,7 @@ ctx = "error"
 screen = "api_error"
 tier = "T2"
 state = "reviewed"
+waive = { TYPO-NUMBER = "An example phone number (+1 416 555 0123), not a number with thousands." }
 note = "Shown on any screen when the service refuses a request with the error code `member_phone_invalid`, in place of the service's own English."
 
 [api_error.member_phone_opted_out]

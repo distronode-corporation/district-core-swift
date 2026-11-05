@@ -217,12 +217,12 @@ final class RoutingRuleVocabularyTests: XCTestCase {
     /// parenthetical to make the list look tidier is how an operator types "Business"
     /// into a field that holds `business`.
     func testTheLabelsKeepTheirValueHints() {
-        XCTAssertEqual(RoutingRuleField.callerType.label, "Caller Type (business/consumer)")
-        XCTAssertEqual(RoutingRuleField.lineType.label, "Line Type (mobile/landline/voip)")
-        XCTAssertEqual(RoutingRuleField.isDecisionMaker.label, "Decision Maker (true/false)")
+        XCTAssertEqual(RoutingRuleField.callerType.label, "Caller type (business/consumer)")
+        XCTAssertEqual(RoutingRuleField.lineType.label, "Line type (mobile/landline/voip)")
+        XCTAssertEqual(RoutingRuleField.isDecisionMaker.label, "Decision maker (true/false)")
         XCTAssertEqual(RoutingRuleField.seniority.label, "Seniority (e.g. vp, c-suite)")
         XCTAssertEqual(RoutingRuleField.industry.label, "Industry")
-        XCTAssertEqual(RoutingRuleField.estimatedValue.label, "Estimated Value")
+        XCTAssertEqual(RoutingRuleField.estimatedValue.label, "Estimated value")
         XCTAssertEqual(RoutingRuleOperator.contains.label, "Contains")
         XCTAssertEqual(RoutingRuleOperator.equals.label, "Equals")
     }

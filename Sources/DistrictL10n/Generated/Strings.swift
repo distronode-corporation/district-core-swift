@@ -1136,19 +1136,19 @@ package enum InboxCopy {
 
 package enum RoutingCopy {
     /// `routing.field_caller_type`
-    package static var fieldCallerType: String { L10nRuntime.locale == .frCA ? "Type d'appelant (business/consumer)" : "Caller Type (business/consumer)" }
+    package static var fieldCallerType: String { L10nRuntime.locale == .frCA ? "Type d'appelant (business/consumer)" : "Caller type (business/consumer)" }
 
     /// `routing.field_decision_maker`
-    package static var fieldDecisionMaker: String { L10nRuntime.locale == .frCA ? "Décideur (true/false)" : "Decision Maker (true/false)" }
+    package static var fieldDecisionMaker: String { L10nRuntime.locale == .frCA ? "Décideur (true/false)" : "Decision maker (true/false)" }
 
     /// `routing.field_estimated_value`
-    package static var fieldEstimatedValue: String { L10nRuntime.locale == .frCA ? "Valeur estimée" : "Estimated Value" }
+    package static var fieldEstimatedValue: String { L10nRuntime.locale == .frCA ? "Valeur estimée" : "Estimated value" }
 
     /// `routing.field_industry`
     package static var fieldIndustry: String { L10nRuntime.locale == .frCA ? "Secteur d'activité" : "Industry" }
 
     /// `routing.field_line_type`
-    package static var fieldLineType: String { L10nRuntime.locale == .frCA ? "Type de ligne (mobile/landline/voip)" : "Line Type (mobile/landline/voip)" }
+    package static var fieldLineType: String { L10nRuntime.locale == .frCA ? "Type de ligne (mobile/landline/voip)" : "Line type (mobile/landline/voip)" }
 
     /// `routing.field_seniority`
     package static var fieldSeniority: String { L10nRuntime.locale == .frCA ? "Niveau hiérarchique (p. ex. vp, c-suite)" : "Seniority (e.g. vp, c-suite)" }

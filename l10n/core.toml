@@ -76,7 +76,7 @@ state = "reviewed"
 note = "Refusal shown when the operator saves an empty reply draft. The second sentence tells them to delete the draft rather than save it empty."
 
 [routing.field_caller_type]
-en = "Caller Type (business/consumer)"
+en = "Caller type (business/consumer)"
 fr = "Type d'appelant (business/consumer)"
 ctx = "label"
 screen = "routing rules"
@@ -85,7 +85,7 @@ state = "reviewed"
 note = "A call routing rule's field, in the field picker. The parenthesis lists the values the rule compares against; business and consumer are stored values typed by the operator, so keep them in English inside the parenthesis. Title case copies the web form."
 
 [routing.field_decision_maker]
-en = "Decision Maker (true/false)"
+en = "Decision maker (true/false)"
 fr = "Décideur (true/false)"
 ctx = "label"
 screen = "routing rules"
@@ -94,7 +94,7 @@ state = "reviewed"
 note = "A call routing rule's field: whether the caller is a decision maker. The parenthesis lists the values the rule compares against; true and false are stored values, so keep them in English."
 
 [routing.field_estimated_value]
-en = "Estimated Value"
+en = "Estimated value"
 fr = "Valeur estimée"
 ctx = "label"
 screen = "routing rules"
@@ -113,7 +113,7 @@ waive = { LEN = "website's wording" }
 note = "A call routing rule's field: the caller's industry (business sector), in the field picker."
 
 [routing.field_line_type]
-en = "Line Type (mobile/landline/voip)"
+en = "Line type (mobile/landline/voip)"
 fr = "Type de ligne (mobile/landline/voip)"
 ctx = "label"
 screen = "routing rules"
@@ -295,6 +295,7 @@ ctx = "label"
 screen = "scheduling calendars"
 tier = "T3"
 state = "reviewed"
+fr_variant = "Apple's own French name for its Calendar app on Apple platforms; the website says « Apple Calendar »."
 note = "The name of a calendar service a calendar account is connected through. Use Apple's own French name for its Calendar app."
 
 [scheduling.calendar.provider_caldav]
@@ -497,6 +498,7 @@ screen = "scheduling overview"
 tier = "T3"
 args = { count = "int", active = "str" }
 state = "reviewed"
+fr_variant = "The website agrees « actif » with the number of active event types (« 2 actifs »); this catalog's plural switches on {count} only, so « actifs : {active} » reads correctly for every number."
 note = "The overview's event types row, e.g. \"3 event types, 2 active\". {count} is how many event types there are, {active} how many are switched on. The web never makes \"active\" plural; French may agree it with the count of active ones only if it reads naturally."
 
 [scheduling.overview.hours_clause]

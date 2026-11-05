@@ -931,6 +931,7 @@ screen = "dialer"
 tier = "T1"
 state = "reviewed"
 same_ok = true
+fr_variant = "Kept short, as the English is (« Hong Kong », not CLDR fr-CA's « R.A.S. chinoise de Hong Kong »): the dialler names the place a number rings on one line. Sean's decision, 2026-11-05."
 note = "The place a phone number starting +852 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_853]
@@ -941,6 +942,7 @@ screen = "dialer"
 tier = "T1"
 state = "reviewed"
 same_ok = true
+fr_variant = "Kept short, as the English is (« Macao », not CLDR fr-CA's « R.A.S. chinoise de Macao »): the dialler names the place a number rings on one line. Sean's decision, 2026-11-05."
 note = "The place a phone number starting +853 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_855]
@@ -1138,6 +1140,7 @@ screen = "dialer"
 tier = "T1"
 state = "reviewed"
 same_ok = true
+fr_variant = "Kept short, as the English is (« Palestine », not CLDR fr-CA's « Territoires palestiniens »): the dialler names the place a number rings on one line. Sean's decision, 2026-11-05."
 note = "The place a phone number starting +970 rings, shown on the keypad while the operator types, inside the app sentence \"This number rings {name}.\". Use the CLDR fr-CA name with no preposition; the app's own French sentence supplies it. A leading \"the\" in the English is part of the English sentence only."
 
 [dial_region.code_971]

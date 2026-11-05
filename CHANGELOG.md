@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.2.0]
+
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,
 thread assignment, and the WhatsApp 24-hour window and templates. Nothing is removed or
 renamed and no existing signature changes, so this is a minor version (8.2.0).
@@ -60,6 +62,14 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
 - The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
   in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
   (`AllowedExplicitNulls+Parity.swift`, total 236).
+
+### Changed
+
+- The French of `api_error.engine_unavailable` is the website's (« offert à cet espace de
+  travail », monorepo fec800ce8), which `contracts/i18n/api-errors.json` already carried.
+- `i18n/fr-CA/signoff.json` records the French review of the 47 catalog entries added since
+  7.0.3 (`api_errors` and `wire`), so the release guard passes on the tag. 8.1.0 was tagged
+  without renewing it, and its guard run failed.
 
 ## [8.1.0]
 

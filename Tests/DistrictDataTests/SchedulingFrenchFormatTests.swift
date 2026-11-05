@@ -122,7 +122,7 @@ final class SchedulingFrenchFormatTests: XCTestCase {
             )
             XCTAssertEqual(
                 SchedulingOverviewSummary.bookingWhen(startAt: "2026-07-20T14:30:00Z", timezone: "UTC", now: now),
-                "Aujourd'hui \u{E0} 14 h 30"
+                "Aujourd'hui 14 h 30"
             )
         }
         L10nRuntime.withLocale(.en) {
@@ -155,19 +155,19 @@ final class SchedulingFrenchFormatTests: XCTestCase {
         L10nRuntime.withLocale(.frCA) {
             XCTAssertEqual(
                 SchedulingHoursFormat.formatOverrideDates(start: "2026-12-24", end: "2026-12-26"),
-                "24 d\u{E9}c. \u{E0} 26 d\u{E9}c. 2026"
+                "24 d\u{E9}c. au 26 d\u{E9}c. 2026"
             )
             XCTAssertEqual(
                 SchedulingHoursFormat.formatOverrideDates(start: "2026-08-01", end: "2026-08-03"),
-                "1er ao\u{FB}t \u{E0} 3 ao\u{FB}t 2026"
+                "1er ao\u{FB}t au 3 ao\u{FB}t 2026"
             )
             XCTAssertEqual(
                 SchedulingHoursFormat.formatOverrideDates(start: "2026-12-30", end: "2027-01-01"),
-                "30 d\u{E9}c. 2026 \u{E0} 1er janv. 2027"
+                "30 d\u{E9}c. 2026 au 1er janv. 2027"
             )
             XCTAssertEqual(
                 SchedulingHoursFormat.formatOverrideDates(start: "2026-99-12", end: "2026-09-14"),
-                "2026-99-12 \u{E0} 14 sept. 2026"
+                "2026-99-12 au 14 sept. 2026"
             )
         }
         L10nRuntime.withLocale(.en) {

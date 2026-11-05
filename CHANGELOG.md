@@ -75,6 +75,25 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   7.0.3 (`api_errors` and `wire`), so the release guard passes on the tag. 8.1.0 was tagged
   without renewing it, and its guard run failed.
 
+### Fixed
+
+- Seven French sentences the website had fixed in French alone now reach the core:
+  `knowledge_url_too_large`, `knowledge_url_unsupported_type`, `member_phone_cannot_text`,
+  `transfer_incomplete`, and the wire labels `disposition` `info`, `workflowActionReason`
+  `fallback-failed` and `recipient-number-held`. `scripts/gen-l10n.py` kept an entry's
+  French while its English was unchanged, so it never read the contract's French; it now
+  takes it whenever `contracts/i18n/` carries some, unless the entry has an `fr_variant`
+  (`no_sending_number` keeps the Apple word « réglages »). `ContractFrenchTests` holds
+  every error code and wire value to the contract's French, read from the JSON.
+- The hand-written catalogs (`core`, `countries`), which no generator reads from the
+  website, were audited against it, and fifteen French strings take the website's text:
+  the scheduling settings' clock examples (« 12 heures (2 h 30 p.m.) », « 24 heures
+  (14 h 30) »), four notification and delivery labels, the team roles (« Agence »,
+  « Client »), « Non disponible », date ranges with « au », « Aujourd'hui {clock} » and
+  « Demain {clock} », « Refusé avec {code} », « Secteur d'activité » and « Vénézuéla »
+  (CLDR fr-CA, which the website's dialler shows). frcheck's remaining findings on these
+  catalogs are waived, each with its reason, or carry an `fr_variant`.
+
 ## [8.1.0]
 
 The Live Activity for District AI for iPhone 3.2.0: the app hands the server each Live

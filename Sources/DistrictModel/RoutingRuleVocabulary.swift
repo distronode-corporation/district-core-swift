@@ -20,7 +20,7 @@ import Foundation
 /// next save, with nothing on screen saying so.
 ///
 /// ⚠️ COPIED FROM THE WEB FORM VERBATIM, LABELS INCLUDED. Three of the six labels
-/// carry their own value hints ("Caller Type (business/consumer)") because the
+/// carry their own value hints ("Caller type (business/consumer)") because the
 /// match is a substring test against a value nothing documents on screen; dropping
 /// the hint to make the list look tidier is how an operator types "Business" into a
 /// field that holds `business`.

@@ -68,7 +68,7 @@ final class ApiErrorLocalizationTests: XCTestCase {
     /// The vocabularies' labels come from the catalog and keep their English.
     func testRoutingRuleLabelsKeepTheirEnglish() {
         L10nRuntime.withLocale(.en) {
-            XCTAssertEqual(RoutingRuleField.callerType.label, "Caller Type (business/consumer)")
+            XCTAssertEqual(RoutingRuleField.callerType.label, "Caller type (business/consumer)")
             XCTAssertEqual(RoutingRuleOperator.equals.label, "Equals")
         }
     }

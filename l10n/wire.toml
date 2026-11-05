@@ -447,7 +447,7 @@ note = "A label for the stored value `escalated` of disposition. `disposition` o
 
 [wire.disposition.info]
 en = "Information only"
-fr = "Information seulement"
+fr = "Demande de renseignements"
 ctx = "label"
 screen = "wire disposition"
 tier = "T3"
@@ -1121,6 +1121,7 @@ ctx = "label"
 screen = "wire research_status"
 tier = "T3"
 state = "reviewed"
+waive = { SENTENCE-CASE = "« Web » is capitalized as a proper noun in fr-CA (OQLF), as the website writes it." }
 note = "A label for the stored value `crawling` of researchStatus. `dgiStatus` on a contact (GET /api/district/contacts, /contacts/get): the lead research job."
 
 [wire.research_status.failed]
@@ -1595,7 +1596,7 @@ note = "A label for the stored value `fallback-email-push` of workflowActionReas
 
 [wire.workflow_action_reason.fallback_failed]
 en = "Not texted, and the email and app fallback failed too"
-fr = "Texto non envoyé, et le courriel et l'application de secours ont aussi échoué"
+fr = "Texto non envoyé, et l'envoi par courriel et dans l'application a aussi échoué"
 ctx = "label"
 screen = "wire workflow_action_reason"
 tier = "T3"
@@ -1757,7 +1758,7 @@ note = "A label for the stored value `recipient-not-member` of workflowActionRea
 
 [wire.workflow_action_reason.recipient_number_held]
 en = "Not sent: the person's mobile is a business number on District"
-fr = "Non envoyé\u00A0: le cellulaire de cette personne est un numéro d'entreprise sur District"
+fr = "Non envoyé\u00A0: le numéro de cellulaire de cette personne appartient à une entreprise sur District"
 ctx = "label"
 screen = "wire workflow_action_reason"
 tier = "T3"

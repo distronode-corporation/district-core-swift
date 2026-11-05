@@ -6,6 +6,17 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Fixed
+
+- Seven French sentences the website had fixed in French alone now reach the core:
+  `knowledge_url_too_large`, `knowledge_url_unsupported_type`, `member_phone_cannot_text`,
+  `transfer_incomplete`, and the wire labels `disposition` `info`, `workflowActionReason`
+  `fallback-failed` and `recipient-number-held`. `scripts/gen-l10n.py` kept an entry's
+  French while its English was unchanged, so it never read the contract's French; it now
+  takes it whenever `contracts/i18n/` carries some, unless the entry has an `fr_variant`
+  (`no_sending_number` keeps the Apple word « réglages »). `ContractFrenchTests` holds
+  every error code and wire value to the contract's French, read from the JSON.
+
 ## [8.2.0]
 
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,

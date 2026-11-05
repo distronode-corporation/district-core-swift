@@ -735,7 +735,7 @@ note = "Shown on any screen when the service refuses a request with the error co
 
 [api_error.knowledge_url_too_large]
 en = "That page is larger than 2 MB. Import a smaller page or paste the text instead."
-fr = "Cette page dépasse 2 Mo. Importez une page plus petite ou collez plutôt le texte."
+fr = "Cette page dépasse 2\u00A0Mo. Importez une page plus petite ou collez plutôt le texte."
 ctx = "error"
 screen = "api_error"
 tier = "T2"
@@ -753,7 +753,7 @@ note = "Shown on any screen when the service refuses a request with the error co
 
 [api_error.knowledge_url_unsupported_type]
 en = "Only web pages (HTML) and plain text can be imported. Paste the text instead."
-fr = "Seuls les pages Web (HTML) et le texte brut peuvent être importés. Collez plutôt le texte."
+fr = "Seuls le texte brut et les pages Web (HTML) peuvent être importés. Collez plutôt le texte."
 ctx = "error"
 screen = "api_error"
 tier = "T2"
@@ -843,7 +843,7 @@ note = "Shown on any screen when the service refuses a request with the error co
 
 [api_error.member_phone_cannot_text]
 en = "This business cannot send texts yet. Texts start once its number's text messaging is approved. Until then, alerts come by email and in the app."
-fr = "Cette entreprise ne peut pas encore envoyer de textos. Les textos commenceront dès que la messagerie texte de son numéro sera approuvée. D'ici là, les alertes vous parviennent par courriel et dans l'application."
+fr = "Cette entreprise ne peut pas encore envoyer de textos. L'envoi de textos commencera dès que la messagerie texte de son numéro sera approuvée. D'ici là, les alertes vous parviendront par courriel et dans l'application."
 ctx = "error"
 screen = "api_error"
 tier = "T2"
@@ -1519,7 +1519,7 @@ note = "Shown on any screen when the service refuses a request with the error co
 
 [api_error.transfer_incomplete]
 en = "Some details or documents for this transfer are still missing. Complete every step, then try again."
-fr = "Il manque encore des renseignements ou des documents pour ce transfert. Remplissez chaque étape, puis réessayez."
+fr = "Il manque encore des renseignements ou des documents pour ce transfert. Terminez chaque étape, puis réessayez."
 ctx = "error"
 screen = "api_error"
 tier = "T2"

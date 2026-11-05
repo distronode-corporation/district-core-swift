@@ -303,13 +303,13 @@ package enum ApiErrorCopy {
     package static var knowledgeUrlTimeout: String { L10nRuntime.locale == .frCA ? "Cette page a mis trop de temps à répondre. Réessayez dans un instant." : "That page took too long to answer. Try again in a moment." }
 
     /// `api_error.knowledge_url_too_large`
-    package static var knowledgeUrlTooLarge: String { L10nRuntime.locale == .frCA ? "Cette page dépasse 2 Mo. Importez une page plus petite ou collez plutôt le texte." : "That page is larger than 2 MB. Import a smaller page or paste the text instead." }
+    package static var knowledgeUrlTooLarge: String { L10nRuntime.locale == .frCA ? "Cette page dépasse 2\u{00A0}Mo. Importez une page plus petite ou collez plutôt le texte." : "That page is larger than 2 MB. Import a smaller page or paste the text instead." }
 
     /// `api_error.knowledge_url_unreachable`
     package static var knowledgeUrlUnreachable: String { L10nRuntime.locale == .frCA ? "Impossible d'atteindre cette page. Vérifiez l'adresse et assurez-vous que la page est publique, puis réessayez." : "That page could not be reached. Check the address and that the page is public, then try again." }
 
     /// `api_error.knowledge_url_unsupported_type`
-    package static var knowledgeUrlUnsupportedType: String { L10nRuntime.locale == .frCA ? "Seuls les pages Web (HTML) et le texte brut peuvent être importés. Collez plutôt le texte." : "Only web pages (HTML) and plain text can be imported. Paste the text instead." }
+    package static var knowledgeUrlUnsupportedType: String { L10nRuntime.locale == .frCA ? "Seuls le texte brut et les pages Web (HTML) peuvent être importés. Collez plutôt le texte." : "Only web pages (HTML) and plain text can be imported. Paste the text instead." }
 
     /// `api_error.language_unavailable`
     package static var languageUnavailable: String { L10nRuntime.locale == .frCA ? "Cette langue n'est pas encore offerte pour cet espace de travail. Choisissez une autre langue." : "This language is not available for this workspace yet. Choose another language." }
@@ -339,7 +339,7 @@ package enum ApiErrorCopy {
     package static var memberPhoneBusinessNumber: String { L10nRuntime.locale == .frCA ? "Ce numéro appartient à une entreprise sur District, alors il ne peut pas recevoir d'alertes. Entrez votre propre numéro de cellulaire." : "This number belongs to a business on District, so it cannot receive alerts. Enter your own mobile number." }
 
     /// `api_error.member_phone_cannot_text`
-    package static var memberPhoneCannotText: String { L10nRuntime.locale == .frCA ? "Cette entreprise ne peut pas encore envoyer de textos. Les textos commenceront dès que la messagerie texte de son numéro sera approuvée. D'ici là, les alertes vous parviennent par courriel et dans l'application." : "This business cannot send texts yet. Texts start once its number's text messaging is approved. Until then, alerts come by email and in the app." }
+    package static var memberPhoneCannotText: String { L10nRuntime.locale == .frCA ? "Cette entreprise ne peut pas encore envoyer de textos. L'envoi de textos commencera dès que la messagerie texte de son numéro sera approuvée. D'ici là, les alertes vous parviendront par courriel et dans l'application." : "This business cannot send texts yet. Texts start once its number's text messaging is approved. Until then, alerts come by email and in the app." }
 
     /// `api_error.member_phone_code_expired`
     package static var memberPhoneCodeExpired: String { L10nRuntime.locale == .frCA ? "Ce code est expiré ou a déjà été utilisé. Demandez-en un nouveau." : "That code has expired or was already used. Send a new one." }
@@ -564,7 +564,7 @@ package enum ApiErrorCopy {
     package static var transferEmergencyAcknowledgementRequired: String { L10nRuntime.locale == .frCA ? "Confirmez que vous comprenez qu'après le transfert, cette ligne ne joindra plus le 9-1-1 et que les téléphones de bureau qui l'utilisent cesseront de fonctionner." : "Confirm that you understand that after the transfer this line will not reach 9-1-1, and that desk phones on it will stop working." }
 
     /// `api_error.transfer_incomplete`
-    package static var transferIncomplete: String { L10nRuntime.locale == .frCA ? "Il manque encore des renseignements ou des documents pour ce transfert. Remplissez chaque étape, puis réessayez." : "Some details or documents for this transfer are still missing. Complete every step, then try again." }
+    package static var transferIncomplete: String { L10nRuntime.locale == .frCA ? "Il manque encore des renseignements ou des documents pour ce transfert. Terminez chaque étape, puis réessayez." : "Some details or documents for this transfer are still missing. Complete every step, then try again." }
 
     /// `api_error.transfer_line_type_unknown`
     package static var transferLineTypeUnknown: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu confirmer qu'il s'agit d'une ligne locale. Ce numéro ne peut donc pas encore être transféré." : "We could not confirm that this is a local line, so it cannot be transferred in yet." }
@@ -1569,7 +1569,7 @@ package enum WireCopy {
     package static var dispositionEscalated: String { L10nRuntime.locale == .frCA ? "Transmis à une personne" : "Passed to a person" }
 
     /// `wire.disposition.info`
-    package static var dispositionInfo: String { L10nRuntime.locale == .frCA ? "Information seulement" : "Information only" }
+    package static var dispositionInfo: String { L10nRuntime.locale == .frCA ? "Demande de renseignements" : "Information only" }
 
     /// `wire.disposition.interested`
     package static var dispositionInterested: String { L10nRuntime.locale == .frCA ? "Intéressé" : "Interested" }
@@ -1947,7 +1947,7 @@ package enum WireCopy {
     package static var workflowActionReasonFallbackEmailPush: String { L10nRuntime.locale == .frCA ? "Texto non envoyé, l'alerte est partie par courriel et dans l'application à la place" : "Not texted, so it was emailed and sent to the app instead" }
 
     /// `wire.workflow_action_reason.fallback_failed`
-    package static var workflowActionReasonFallbackFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé, et le courriel et l'application de secours ont aussi échoué" : "Not texted, and the email and app fallback failed too" }
+    package static var workflowActionReasonFallbackFailed: String { L10nRuntime.locale == .frCA ? "Texto non envoyé, et l'envoi par courriel et dans l'application a aussi échoué" : "Not texted, and the email and app fallback failed too" }
 
     /// `wire.workflow_action_reason.fallback_push`
     package static var workflowActionReasonFallbackPush: String { L10nRuntime.locale == .frCA ? "Texto non envoyé et courriel en échec, l'alerte est partie dans l'application à la place" : "Not texted and the email failed, so it was sent to the app instead" }
@@ -2001,7 +2001,7 @@ package enum WireCopy {
     package static var workflowActionReasonRecipientNotMember: String { L10nRuntime.locale == .frCA ? "La personne à qui envoyer le texto n'est plus membre de cet espace de travail" : "The person to text is no longer a member of this workspace" }
 
     /// `wire.workflow_action_reason.recipient_number_held`
-    package static var workflowActionReasonRecipientNumberHeld: String { L10nRuntime.locale == .frCA ? "Non envoyé\u{00A0}: le cellulaire de cette personne est un numéro d'entreprise sur District" : "Not sent: the person's mobile is a business number on District" }
+    package static var workflowActionReasonRecipientNumberHeld: String { L10nRuntime.locale == .frCA ? "Non envoyé\u{00A0}: le numéro de cellulaire de cette personne appartient à une entreprise sur District" : "Not sent: the person's mobile is a business number on District" }
 
     /// `wire.workflow_action_reason.report_recipient_refused`
     package static var workflowActionReasonReportRecipientRefused: String { L10nRuntime.locale == .frCA ? "Destinataire du rapport refusé" : "Report recipient refused" }

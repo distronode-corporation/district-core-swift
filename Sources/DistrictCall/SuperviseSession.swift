@@ -25,8 +25,15 @@ import DistrictModel
 public struct SuperviseSession: Sendable, Equatable {
     public private(set) var state: SuperviseState
 
-    public init(callId: String, role: WorkspaceRole?) {
-        state = SuperviseState(callId: callId, role: role)
+    public init(callId: String, role: WorkspaceRole?, receptionistOnCall: Bool = true) {
+        state = SuperviseState(callId: callId, role: role, receptionistOnCall: receptionistOnCall)
+    }
+
+    /// A session for a call as the feed, the detail or the overview listed it: its id, and
+    /// whether the assistant is on it (an absent ``CallSummary/receptionistOnCall`` reads as
+    /// `true`).
+    public init(call: CallSummary, role: WorkspaceRole?) {
+        self.init(callId: call.id, role: role, receptionistOnCall: call.hasReceptionist)
     }
 
     /// Apply one event and return what the app must do, in order.

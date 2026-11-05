@@ -1,5 +1,6 @@
 import DistrictCall
 import DistrictModel
+import Foundation
 import XCTest
 
 /// Live supervision of one call: listen, take over, hand back, and every way out.
@@ -139,6 +140,51 @@ final class SuperviseSessionTests: XCTestCase {
         XCTAssertEqual(supervise.state.phase, .listening)
         XCTAssertEqual(supervise.state.leg, .listen)
         XCTAssertEqual(supervise.state.problem, .takeoverRefused(refusal))
+    }
+
+    // MARK: - A team member's own call
+
+    /// ⛔ NO ASSISTANT, NO NOTE AND NO TAKEOVER, BUT LISTENING STAYS. A team member's own
+    /// softphone call (`receptionistOnCall: false`) offers Listen only, and a stray Take over
+    /// asks nothing of the server.
+    func testATeamMembersOwnCallOffersListenOnly() {
+        var supervise = SuperviseSession(callId: "call_1", role: .agency, receptionistOnCall: false)
+        XCTAssertTrue(supervise.state.mayListen)
+        XCTAssertFalse(supervise.state.mayWhisper)
+
+        supervise.handle(.listenPressed)
+        supervise.handle(.listenGranted(url: "wss://listen", token: "listen-jwt"))
+        supervise.handle(.engine(.listen, .connected))
+        XCTAssertEqual(supervise.state.phase, .listening)
+        XCTAssertFalse(supervise.state.mayTakeOver)
+        XCTAssertFalse(supervise.state.mayWhisper)
+        XCTAssertEqual(supervise.handle(.takeOverPressed), [])
+        XCTAssertEqual(supervise.state.phase, .listening)
+    }
+
+    /// ⚠️ THE DEFAULT IS THE ASSISTANT BEING ON THE CALL, the website's reading of an absent
+    /// flag, so a caller that never passes it keeps every action.
+    func testTheAssistantIsAssumedOnTheCallUnlessSaidOtherwise() {
+        let supervise = listening(.agency)
+        XCTAssertTrue(supervise.state.receptionistOnCall)
+        XCTAssertTrue(supervise.state.mayWhisper)
+        XCTAssertTrue(supervise.state.mayTakeOver)
+    }
+
+    /// ⛔ A SESSION BUILT FROM THE FEED FOLLOWS EACH ROW: the recorded `district-calls.json`
+    /// has three calls with the assistant on them and two team-member softphone calls.
+    func testASessionFromTheFeedReadsTheReceptionistFlag() throws {
+        var url = URL(fileURLWithPath: #filePath)
+        for _ in 0 ..< 3 {
+            url = url.deletingLastPathComponent()
+        }
+        let feed = try JSONDecoder().decode(
+            [CallSummary].self,
+            from: Data(contentsOf: url.appendingPathComponent("contracts/mobile/district-calls.json"))
+        )
+        let mayWhisper = feed.map { SuperviseSession(call: $0, role: .client).state.mayWhisper }
+        XCTAssertEqual(mayWhisper, [true, true, true, false, false])
+        XCTAssertEqual(SuperviseSession(call: feed[3], role: .client).state.callId, "call_contract_outbound_unanswered")
     }
 
     /// ⛔ A TEAM MEMBER'S OWN CALL REFUSES THE TAKEOVER (409 `call_has_no_receptionist`) AND

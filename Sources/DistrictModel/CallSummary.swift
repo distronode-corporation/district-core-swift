@@ -128,6 +128,20 @@ public struct CallSummary: Codable, Sendable {
     /// line). See ``PhoneIntel``. Optional for the same reason as
     /// ``hasTranscript``.
     public let phoneIntel: PhoneIntel?
+    /// Whether the assistant is on this call. `false` for a team member's own softphone
+    /// call (a `direct_` room): no assistant is there to take a note or step back, so a
+    /// screen offers Listen and hides Whisper and Take over (the routes would refuse them
+    /// with 409 `call_has_no_receptionist`).
+    ///
+    /// ⚠️ OPTIONAL ON THE WIRE: a server from before live supervise omits it, and the strict
+    /// gate needs absent to stay absent on re-encode. Read ``hasReceptionist``, which treats
+    /// an absent value as `true`, the website's default.
+    public let receptionistOnCall: Bool?
+
+    /// ``receptionistOnCall``, with an absent value read as `true`.
+    public var hasReceptionist: Bool {
+        receptionistOnCall ?? true
+    }
 }
 
 // MARK: - What the server writes when it has nothing to say

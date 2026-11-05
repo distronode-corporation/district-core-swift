@@ -85,9 +85,16 @@ public struct SuperviseState: Sendable, Equatable {
     /// The assistant's answer to the latest note, if one has arrived since it was sent.
     public internal(set) var receipt: WhisperReceipt?
 
-    public init(callId: String, role: WorkspaceRole?) {
+    /// Whether the assistant is on the call (``CallSummary/hasReceptionist``). ⛔ `false` for
+    /// a team member's own softphone call: Listen is still offered, Whisper and Take over
+    /// are not. The routes' 409 `call_has_no_receptionist` stays the fallback for a summary
+    /// read before the call changed hands.
+    public let receptionistOnCall: Bool
+
+    public init(callId: String, role: WorkspaceRole?, receptionistOnCall: Bool = true) {
         self.callId = callId
         self.role = role
+        self.receptionistOnCall = receptionistOnCall
     }
 
     /// Whether Listen may be offered: any established role, while not in the call.
@@ -99,7 +106,7 @@ public struct SuperviseState: Sendable, Equatable {
     /// while this person holds the call or is about to: a note would make the assistant
     /// speak again over them (the website's `whisperTakenOverPlaceholder`).
     public var mayWhisper: Bool {
-        guard role?.canMutate == true else { return false }
+        guard role?.canMutate == true, receptionistOnCall else { return false }
         switch phase {
         case .idle, .requestingListen, .joiningListen, .listening, .requestingTakeover:
             return true
@@ -111,7 +118,7 @@ public struct SuperviseState: Sendable, Equatable {
     /// Whether Take over may be offered. ⛔ Only while listening: the listen call is the
     /// one the system already holds (CallKit on iOS), and the takeover continues it.
     public var mayTakeOver: Bool {
-        role?.canMutate == true && phase == .listening
+        role?.canMutate == true && receptionistOnCall && phase == .listening
     }
 
     /// Whether this person's microphone is live on the call.

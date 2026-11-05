@@ -76,13 +76,18 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   still listening, a refusal leaves the person listening, a grant leaves the listen room
   before joining the coach room, hand back is leaving, and CallKit is told of every ending it
   did not perform. The endpoint total is 131 and the typed count 129.
-- Live supervision's five contract fixtures, from the website at monorepo e44c194b9
+- Live supervision's five contract fixtures, from the website at monorepo e44c194b9 (re-synced at 6c0099cdf)
   (`district-call-monitor-token.json`, `district-call-takeover.json`,
   `district-call-whisper.json`, `telemetry-event-whisper-applied.json` and
   `telemetry-event-whisper-not-applied.json`), gated in `ImplementedFixtures+Supervise.swift`
   against the models above; `ContractManifest.expectedFixtureCount` goes 203 to 208, and the
   desktop event-set assertion counts the mobile receipts, so `whisper_applied` is no longer
   excluded. `SuperviseContractTests` reads their values.
+- `CallSummary.receptionistOnCall` (feed, detail and overview rows, from the website at monorepo
+  6c0099cdf) and `hasReceptionist`, which reads an absent value as `true`. `false` marks a team
+  member's own softphone call: `SuperviseState.receptionistOnCall` (and
+  `SuperviseSession(call:role:)`, which reads it from the row) keeps Listen and hides Whisper
+  and Take over. The routes' 409 `call_has_no_receptionist` stays the fallback.
 - `ApiErrorCode.callEnded` (409 from `calls/token` for a call neither in progress nor
   ringing), `.callHasNoReceptionist` (409 from the whisper and the takeover on a team
   member's own softphone call) and `.callNotInProgress`. An ended call on the whisper or the

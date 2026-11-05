@@ -67,6 +67,10 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
 
 - The French of `api_error.engine_unavailable` is the website's (« offert à cet espace de
   travail », monorepo fec800ce8), which `contracts/i18n/api-errors.json` already carried.
+- Five French sentences shared with the website follow its fixes (monorepo 35edbd30c):
+  `live_changed`, `caller_id_carrier_failed`, `caller_id_not_confirmed`,
+  `caller_id_mobile_unverified` and the `quiet_hours` workflow reason.
+  `contracts/i18n/api-errors.json` and `wire-vocabulary.json` are copied from that commit.
 - `i18n/fr-CA/signoff.json` records the French review of the 47 catalog entries added since
   7.0.3 (`api_errors` and `wire`), so the release guard passes on the tag. 8.1.0 was tagged
   without renewing it, and its guard run failed.

@@ -1,11 +1,11 @@
 {
   "signed_off_by": "Sean Dean (manager review by Claude, xhigh; Sean's OK 2026-11-05 in iMac session 9448bc94; GitLab #2)",
   "release": "8.2.0",
-  "commit": "7f642a21155fd20c54bdf802e300bebc53140304",
+  "commit": "fbc28248e9e6d2faddc0d6e3cf0169cf7bb1e142",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "890e9c8e101c7013c4f1dfa932100e259354ff9a43bdd7aa42291bed9d2bbdc4"
+      "sha256": "78085cb07c5682c9a932f45bc5ce36fa434b5c5c62e6ed44a9e2e7bb9ca296eb"
     },
     {
       "path": "l10n/core.toml",
@@ -17,7 +17,7 @@
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "0e4f1e2d731fdcd7608e37268aabd226327f8ed9a0b614ca0453eede8d6a756f"
+      "sha256": "ecf52cae66f2e91fd56c90b456f795a62421dfbeefda74d41c946a3ea22b7634"
     }
   ]
 }

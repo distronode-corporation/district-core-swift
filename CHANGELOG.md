@@ -6,12 +6,18 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.2.0]
+
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,
-thread assignment, and the WhatsApp 24-hour window and templates. Nothing is removed or
-renamed and no existing signature changes, so this is a minor version (8.2.0).
-⚠️ `EndpointID` gains three cases, which would break an exhaustive `switch` over it; neither
+thread assignment, and the WhatsApp 24-hour window and templates; and live supervision
+(listen in, take over, the whisper receipt; Sean, 2026-11-05, GitLab #2 note 4171521455).
+Nothing is removed or renamed and no existing signature changes, so this is a minor version
+(8.2.0).
+⚠️ `EndpointID` gains five cases, which would break an exhaustive `switch` over it; neither
 district-ios (1f7babb) nor district-macos (06f29b4) switches over `EndpointID` or names a
-case, the question 8.1.0 and 7.0.1 judged the same way. ⚠️ `PushTokenMemory` gains three
+case, the question 8.1.0 and 7.0.1 judged the same way. ⚠️ `TelemetryEventType` gains
+`whisperApplied`, the same question: no district-ios (bc1ef5a) or district-macos (1dc6e01)
+source switches over it. ⚠️ `PushTokenMemory` gains three
 requirements, each with a default implementation, so existing conformers compile unchanged.
 ⚠️ ONE DEFAULT CHANGES BEHAVIOUR: `InboxRepository(client:)` now sends `metaChannels=1` on
 `conversations`, `timeline`, `messages/{id}` and `messages/unread-count`, so the Inbox lists
@@ -55,11 +61,75 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   `.assigneeIsViewer` and `.assigneeNotMember` (400 on `conversations/assign`); all three
   were already in the `ApiErrorTable` from #50.
 - `EndpointID` cases `assignConversation`, `whatsAppWindow` and `whatsAppTemplates`, typed
-  from their first commit (`TypedEndpoints.inbox`). The endpoint total is 129 and the typed
-  count 127.
+  from their first commit (`TypedEndpoints.inbox`).
+- Live supervision. `CallsRepository.monitor(callId:platform:)` (`POST calls/token` with a
+  `Call.id`, a listen-only seat, `CallMonitorResponse`) and
+  `takeOver(workspaceId:callId:)` (`POST calls/{id}/takeover`, the microphone-only coach seat,
+  `CallTakeoverResponse`), with `DistrictEndpoints.monitorCall(callId:platform:)` and
+  `takeOverCall(callId:workspaceId:)` and the `EndpointID` cases `monitorCall` and
+  `takeOverCall` (`TypedEndpoints.liveCall`, never retried). A blank token or URL is a decode
+  failure. `SupervisedCallID` refuses any id carrying `_` (as core-rust's `LiveCallId` does):
+  every room family has one, `meet_`/`video_` the route reads as a room, and a uuid never does. `TelemetryEventType.whisperApplied` and `TelemetryEnvelope.whisperReceipt`
+  (`WhisperReceipt`, `WhisperReceipt.Reason`), with `firstWords` kept out of `description`.
+  `SuperviseSession` in `DistrictCall` (`SuperviseState`, `SupervisePhase`, `SuperviseEvent`,
+  `SuperviseCommand`, `SuperviseLeg`, `SuperviseProblem`): the takeover is asked for while
+  still listening, a refusal leaves the person listening, a grant leaves the listen room
+  before joining the coach room, hand back is leaving, and CallKit is told of every ending it
+  did not perform. Every `SuperviseCommand.join(_:generation:url:token:)` carries a new
+  generation, and `SuperviseEvent.engine(_:generation:_:)` must carry the one its engine was
+  built with: an event from an engine the session has already left (Stop, then Listen again)
+  is ignored. The endpoint total is 131 and the typed count 129.
+- Live supervision's five contract fixtures, from the website at monorepo e44c194b9 (re-synced at 6c0099cdf)
+  (`district-call-monitor-token.json`, `district-call-takeover.json`,
+  `district-call-whisper.json`, `telemetry-event-whisper-applied.json` and
+  `telemetry-event-whisper-not-applied.json`), gated in `ImplementedFixtures+Supervise.swift`
+  against the models above; `ContractManifest.expectedFixtureCount` goes 203 to 208, and the
+  desktop event-set assertion counts the mobile receipts, so `whisper_applied` is no longer
+  excluded. `SuperviseContractTests` reads their values.
+- `CallSummary.receptionistOnCall` (feed, detail and overview rows, from the website at monorepo
+  6c0099cdf) and `hasReceptionist`, which reads an absent value as `true`. `false` marks a team
+  member's own softphone call: `SuperviseState.receptionistOnCall` (and
+  `SuperviseSession(call:role:)`, which reads it from the row) keeps Listen and hides Whisper
+  and Take over. The routes' 409 `call_has_no_receptionist` stays the fallback.
+- `ApiErrorCode.callEnded` (409 from `calls/token` for a call neither in progress nor
+  ringing), `.callHasNoReceptionist` (409 from the whisper and the takeover on a team
+  member's own softphone call) and `.callNotInProgress`. An ended call on the whisper or the
+  takeover stays `call_not_in_progress`. The two new codes are in the `ApiErrorTable` with the
+  website's English and French (`contracts/i18n/api-errors.json` from monorepo e44c194b9).
 - The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
   in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
   (`AllowedExplicitNulls+Parity.swift`, total 236).
+
+### Changed
+
+- The French of `api_error.engine_unavailable` is the website's (« offert à cet espace de
+  travail », monorepo fec800ce8), which `contracts/i18n/api-errors.json` already carried.
+- Five French sentences shared with the website follow its fixes (monorepo 35edbd30c):
+  `live_changed`, `caller_id_carrier_failed`, `caller_id_not_confirmed`,
+  `caller_id_mobile_unverified` and the `quiet_hours` workflow reason.
+  `contracts/i18n/api-errors.json` and `wire-vocabulary.json` are copied from that commit.
+- `i18n/fr-CA/signoff.json` records Sean's sign-off (2026-11-05) of every catalog change since
+  8.1.0, the four catalogs as they are at da074db, so the release guard passes on the tag.
+  8.1.0 was tagged without renewing it, and its guard run failed.
+
+### Fixed
+
+- Seven French sentences the website had fixed in French alone now reach the core:
+  `knowledge_url_too_large`, `knowledge_url_unsupported_type`, `member_phone_cannot_text`,
+  `transfer_incomplete`, and the wire labels `disposition` `info`, `workflowActionReason`
+  `fallback-failed` and `recipient-number-held`. `scripts/gen-l10n.py` kept an entry's
+  French while its English was unchanged, so it never read the contract's French; it now
+  takes it whenever `contracts/i18n/` carries some, unless the entry has an `fr_variant`
+  (`no_sending_number` keeps the Apple word « réglages »). `ContractFrenchTests` holds
+  every error code and wire value to the contract's French, read from the JSON.
+- The hand-written catalogs (`core`, `countries`), which no generator reads from the
+  website, were audited against it, and fifteen French strings take the website's text:
+  the scheduling settings' clock examples (« 12 heures (2 h 30 p.m.) », « 24 heures
+  (14 h 30) »), four notification and delivery labels, the team roles (« Agence »,
+  « Client »), « Non disponible », date ranges with « au », « Aujourd'hui {clock} » and
+  « Demain {clock} », « Refusé avec {code} », « Secteur d'activité » and « Vénézuéla »
+  (CLDR fr-CA, which the website's dialler shows). frcheck's remaining findings on these
+  catalogs are waived, each with its reason, or carry an `fr_variant`.
 
 ## [8.1.0]
 

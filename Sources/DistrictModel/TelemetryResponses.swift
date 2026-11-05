@@ -124,10 +124,14 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     /// `transcript_error`: a transcript op could not be honoured. See
     /// ``TranscriptErrorData``.
     case transcriptError
+    /// `whisper_applied`: the assistant handled a whisper. The data is
+    /// `{applied, firstWords, reason?}`, read by ``TelemetryEnvelope/whisperReceipt``.
+    /// ⚠️ Relayed to the whole workspace, like the call events.
+    case whisperApplied
     /// A name this client does not know, kept as it was sent.
     case unknown(String)
 
-    /// The thirteen names this client knows, for a table-driven test.
+    /// The fourteen names this client knows, for a table-driven test.
     ///
     /// ⚠️ THE FIVE `transcript_*` NAMES REACH ONLY A SOCKET THAT SUBSCRIBED TO THAT CALL
     /// (`transcript.subscribe`, see ``TranscriptClientOp``). The server never relays them
@@ -135,7 +139,7 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
     public static let known: [TelemetryEventType] = [
         .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome, .messageReceived,
         .messageSent, .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted,
-        .transcriptError,
+        .transcriptError, .whisperApplied,
     ]
 
     /// Whether this is one of the five `transcript_*` events, which belong to one call's
@@ -145,7 +149,7 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
         case .transcriptSnapshot, .transcriptSegment, .transcriptEnded, .transcriptRetracted, .transcriptError:
             true
         case .callStarted, .callUpdated, .callEnded, .callRinging, .callRingCancelled, .toolOutcome,
-             .messageReceived, .messageSent, .unknown:
+             .messageReceived, .messageSent, .whisperApplied, .unknown:
             false
         }
     }
@@ -171,6 +175,7 @@ public enum TelemetryEventType: Sendable, Equatable, Hashable {
         case .transcriptEnded: "transcript_ended"
         case .transcriptRetracted: "transcript_retracted"
         case .transcriptError: "transcript_error"
+        case .whisperApplied: "whisper_applied"
         case let .unknown(name): name
         }
     }

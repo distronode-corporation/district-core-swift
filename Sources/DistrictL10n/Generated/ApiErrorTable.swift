@@ -195,6 +195,8 @@ enum ApiErrorTable {
         case "call_has_no_room": return ApiErrorCopy.callHasNoRoom
         case "call_not_direct_dial": return ApiErrorCopy.callNotDirectDial
         case "call_predates_feature": return ApiErrorCopy.callPredatesFeature
+        case "call_ended": return ApiErrorCopy.callEnded
+        case "call_has_no_receptionist": return ApiErrorCopy.callHasNoReceptionist
         case "room_inactive": return ApiErrorCopy.roomInactive
         case "demo_lines_busy": return ApiErrorCopy.demoLinesBusy
         case "demo_daily_limit_reached": return ApiErrorCopy.demoDailyLimitReached

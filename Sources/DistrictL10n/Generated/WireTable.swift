@@ -194,6 +194,8 @@ enum WireTable {
         case (.messageDeliveryStatus, "delivered"): WireCopy.messageDeliveryStatusDelivered
         case (.messageDeliveryStatus, "failed"): WireCopy.messageDeliveryStatusFailed
         case (.messageDeliveryStatus, "received"): WireCopy.messageDeliveryStatusReceived
+        case (.messageDeliveryStatus, "handled"): WireCopy.messageDeliveryStatusHandled
+        case (.messageDeliveryStatus, "read"): WireCopy.messageDeliveryStatusRead
         case (.researchStatus, "pending"): WireCopy.researchStatusPending
         case (.researchStatus, "crawling"): WireCopy.researchStatusCrawling
         case (.researchStatus, "complete"): WireCopy.researchStatusComplete

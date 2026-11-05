@@ -149,7 +149,8 @@ public extension DistrictEndpoints {
     /// CALLER, so canned lines are written in the third person ("The owner will call
     /// them back today."). ⚠️ The route refuses an empty line and one over 2000
     /// characters with 400 `invalid_request`; a call not in progress is 400 or 409
-    /// `call_not_in_progress`, and roles are `["agency","client"]`.
+    /// `call_not_in_progress`, a team member's own softphone call is 409
+    /// `call_has_no_receptionist`, and roles are `["agency","client"]`.
     ///
     /// - Parameter callId: the `Call.id` (as in ``callDetail(workspaceId:callId:)``),
     ///   ⛔ sent in the BODY: there is no per-call whisper path.

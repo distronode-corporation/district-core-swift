@@ -1,7 +1,8 @@
 import Foundation
 
 /// The routes a person uses to act on a call they are not in: declining a ring,
-/// whispering to the agent on a live call, and registering a Live Activity for it.
+/// whispering to the agent on a live call, taking a live call over, and registering a
+/// Live Activity for it. (Listening in is ``DistrictPaths/callsToken``.)
 ///
 /// ⚠️ A SIBLING FILE BECAUSE `DistrictPaths.swift` SITS AT SwiftLint's 500-LINE
 /// `file_length`, the reason `DistrictPaths+Numbers.swift` exists. ``DistrictPaths/calls``
@@ -23,5 +24,12 @@ extension DistrictPaths {
     /// one segment, and the hyphen is part of the route.
     static func callLiveActivity(_ callId: String) -> [String] {
         calls + [callId, "live-activity"]
+    }
+
+    /// ⛔ A FUNCTION, LIKE ``callDecline(_:)``: `calls/{id}/takeover`, the id as one
+    /// segment. ⛔ NOT ``callAnswer(_:)``, ONE SEGMENT AWAY: an answer carries `handoff` and
+    /// ends the assistant's part of the call for good, a takeover is a coach stepping in.
+    static func callTakeover(_ callId: String) -> [String] {
+        calls + [callId, "takeover"]
     }
 }

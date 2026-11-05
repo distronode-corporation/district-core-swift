@@ -61,6 +61,12 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// activity on a ring. ⛔ Never retried. See
     /// ``DistrictEndpoints/registerLiveActivityStartToken(workspaceId:token:)``.
     case registerLiveActivityStartToken
+    /// A listen-only seat on a live call (`calls/token` with a `Call.id`). ⛔ Never
+    /// retried. See ``DistrictEndpoints/monitorCall(callId:platform:)``.
+    case monitorCall
+    /// The microphone-only credential that takes a live call over from the assistant.
+    /// ⛔ Never retried. See ``DistrictEndpoints/takeOverCall(callId:workspaceId:)``.
+    case takeOverCall
 
     // Rooms + meetings
     case roomToken

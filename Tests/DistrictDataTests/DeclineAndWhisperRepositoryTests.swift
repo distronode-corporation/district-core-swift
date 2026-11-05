@@ -86,6 +86,24 @@ final class DeclineAndWhisperRepositoryTests: XCTestCase {
         XCTAssertEqual(transport.requests.count, 1)
     }
 
+    /// ⛔ A TEAM MEMBER'S OWN SOFTPHONE CALL HAS NO RECEPTIONIST TO WHISPER TO: 409
+    /// `call_has_no_receptionist`, its own code, not `call_not_in_progress`, so the screen
+    /// says why instead of "the call ended". Never sent again.
+    func testAWhisperOnATeamMembersOwnCallIsRefusedWithItsCode() async {
+        let transport = RepositoryTransport(
+            json: #"{"success":false,"error":"This is a team member's own call.","#
+                + #""code":"call_has_no_receptionist"}"#,
+            status: 409
+        )
+
+        let result = await CallsRepository(client: .repositoryTest(transport))
+            .whisper(workspaceId: "ws_1", callId: "call_1", text: "Ask what the call is about.")
+
+        XCTAssertEqual(result.failureOnly?.httpStatus, 409)
+        XCTAssertEqual(result.failureOnly?.code, "call_has_no_receptionist")
+        XCTAssertEqual(transport.requests.count, 1)
+    }
+
     /// ⚠️ A 503 IS THE ONE FAILURE THAT MAY HAVE BEEN DELIVERED NOWHERE AND IS STILL NOT
     /// RETRIED HERE: whether to send again is the person's call, not this layer's.
     func testAnUnreachableCallingServiceIsOneRequest() async {

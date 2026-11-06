@@ -1,8 +1,9 @@
 import DistrictModel
 import Foundation
 
-// App parity's ten fixtures (monorepo !105 and !106), in a file of their own because
-// `ImplementedFixtures.swift` is at its 500-line ceiling.
+// App parity's thirteen fixtures (monorepo !105 and !106, then the Messenger and Instagram
+// window read's three), in a file of their own because `ImplementedFixtures.swift` is at its
+// 500-line ceiling.
 
 extension ImplementedFixtures {
     /// ⛔ EACH LEAVES `ContractManifest.unimplemented` WITH ITS DTO, ITS DESCRIPTOR AND THE
@@ -24,6 +25,9 @@ extension ImplementedFixtures {
             gate("district-whatsapp-window-closed.json", WhatsAppWindowResponse.self),
             gate("district-whatsapp-templates.json", WhatsAppTemplatesResponse.self),
             gate("district-message-send-whatsapp-template.json", SendMessageResponse.self),
+            gate("district-meta-window.json", MetaWindowResponse.self),
+            gate("district-meta-window-human-agent.json", MetaWindowResponse.self),
+            gate("district-meta-window-closed.json", MetaWindowResponse.self),
         ]
     }
 }

@@ -248,4 +248,48 @@ final class ParityContractTests: XCTestCase {
         XCTAssertEqual(sent.body, "Hi Ada, this is a reminder of your appointment on Thursday.")
         XCTAssertNil(sent.subject)
     }
+
+    // MARK: - Messenger and Instagram
+
+    /// The three states the composer draws: open (nothing), human agent (the badge, no AI
+    /// draft) and closed (the warning, Send disabled).
+    func testTheMetaWindowOpenHumanAgentAndClosed() throws {
+        let open = try StrictDecodeVerifier.verify(fixture: "district-meta-window.json", as: MetaWindowResponse.self)
+        let human = try StrictDecodeVerifier.verify(
+            fixture: "district-meta-window-human-agent.json",
+            as: MetaWindowResponse.self
+        )
+        let closed = try StrictDecodeVerifier.verify(
+            fixture: "district-meta-window-closed.json",
+            as: MetaWindowResponse.self
+        )
+
+        XCTAssertEqual(open.window, MetaWindow(state: .open, until: "2026-08-16T14:25:00.000Z"))
+        XCTAssertEqual(human.window, MetaWindow(state: .humanAgent, until: "2026-08-22T14:25:00.000Z"))
+        XCTAssertEqual(closed.window, MetaWindow(state: .closed, until: nil))
+    }
+
+    /// ⛔ A STATE THIS BUILD DOES NOT KNOW IS KEPT BY NAME AND BLOCKS NOTHING: it decodes
+    /// rather than failing the read, and re-encodes as it came.
+    func testAnUnknownMetaWindowStateIsKeptByName() throws {
+        let json = Data(#"{"success":true,"window":{"state":"ad_window","until":null}}"#.utf8)
+
+        let response = try JSONDecoder().decode(MetaWindowResponse.self, from: json)
+        let again = try JSONEncoder().encode(response.window.state)
+
+        XCTAssertEqual(response.window.state, .unknown("ad_window"))
+        XCTAssertEqual(String(bytes: again, encoding: .utf8), #""ad_window""#)
+        XCTAssertEqual(MetaWindowState(wire: "human_agent"), .humanAgent)
+        XCTAssertEqual(MetaWindowState.humanAgent.wire, "human_agent")
+    }
+
+    /// The refusal a closed window's send answers has its own constant and the website's
+    /// sentence, in both languages.
+    func testTheMetaWindowRefusalHasItsSentence() {
+        XCTAssertEqual(ApiErrorCode.messengerWindowClosed, "messenger_window_closed")
+        XCTAssertNotNil(ApiErrorText.sentence(for: ApiErrorCode.messengerWindowClosed))
+        L10nRuntime.withLocale(.frCA) {
+            XCTAssertNotNil(ApiErrorText.sentence(for: ApiErrorCode.messengerWindowClosed))
+        }
+    }
 }

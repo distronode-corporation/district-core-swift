@@ -316,4 +316,33 @@ final class InboxParityRepositoryTests: XCTestCase {
          "externalId":"wamid.1","provider":"meta","accountId":"wa_1"}}
         """#
     }
+
+    // MARK: - Messenger and Instagram
+
+    func testTheMetaWindowReadSendsTheChannelAndTheAddress() async {
+        let transport = RepositoryTransport(queue: [
+            #"{"success":true,"window":{"state":"human_agent","until":"2026-08-22T14:25:00.000Z"}}"#,
+            #"{"success":true,"window":{"state":"closed","until":null}}"#,
+        ])
+        let inbox = InboxRepository(client: .repositoryTest(transport))
+
+        let messenger = await inbox.metaWindow(workspaceId: "ws_1", channel: MessageChannel.messenger, to: "fb:5550101")
+        let instagram = await inbox.metaWindow(workspaceId: "ws_1", channel: MessageChannel.instagram, to: "ig:5550102")
+
+        XCTAssertEqual(messenger.successOnly, MetaWindow(state: .humanAgent, until: "2026-08-22T14:25:00.000Z"))
+        XCTAssertEqual(instagram.successOnly, MetaWindow(state: .closed, until: nil))
+        XCTAssertEqual(transport.requestedURLs, [
+            "\(Self.host)/messages/send?workspaceId=ws_1&channel=messenger&to=fb%3A5550101",
+            "\(Self.host)/messages/send?workspaceId=ws_1&channel=instagram&to=ig%3A5550102",
+        ])
+    }
+
+    func testAMetaWindowThatDoesNotAffirmSuccessIsADecodeFailure() async {
+        let transport = RepositoryTransport(json: #"{"success":false,"window":{"state":"open","until":null}}"#)
+
+        let result = await InboxRepository(client: .repositoryTest(transport))
+            .metaWindow(workspaceId: "ws_1", channel: MessageChannel.messenger, to: "fb:5550101")
+
+        XCTAssertEqual(result.failureOnly, .decoding("MetaWindowResponse did not affirm success=true"))
+    }
 }

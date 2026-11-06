@@ -85,6 +85,11 @@ public enum ApiErrorCode {
     /// has written on WhatsApp, Messenger or Instagram and never by SMS. Not a retry: the
     /// reply goes on the customer's channel, the first of the thread's `replyOptions`.
     public static let smsReplyNotCustomerChannel = "sms_reply_not_customer_channel"
+    /// 409 from `POST /api/district/messages/send` when a Messenger or Instagram reply falls
+    /// outside Meta's reply window (Instagram answers the same code). Not a retry: the
+    /// composer shows the window closed until the customer writes again. See
+    /// ``MetaWindowResponse``.
+    public static let messengerWindowClosed = "messenger_window_closed"
     /// 400 from `POST /api/district/conversations/assign` naming a Viewer: a Viewer can
     /// read conversations and cannot be assigned one. The picker offers other roles only.
     /// See `district-conversation-assign-viewer.json`.

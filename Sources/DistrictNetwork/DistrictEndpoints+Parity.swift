@@ -238,4 +238,25 @@ public extension DistrictEndpoints {
             ]))
         )
     }
+
+    // MARK: - Messenger and Instagram
+
+    /// Whether a Messenger or Instagram reply may go to `to` now: open, the 7-day human agent
+    /// window, or closed.
+    ///
+    /// ⚠️ A GET ON THE SEND'S OWN PATH, `messages/send`. ⚠️ `to` IS THE REPLY OPTION'S ADDRESS
+    /// VERBATIM, `fb:<psid>` for `messenger` and `ig:<igsid>` for `instagram`: a prefix that
+    /// does not match `channel`, or a non-digit id, is 400 `invalid_request`. Viewer and up.
+    static func metaWindow(workspaceId: String, channel: String, to: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .metaWindow,
+            .get,
+            DistrictPaths.messagesSend,
+            query: [
+                ApiQueryItem("workspaceId", workspaceId),
+                ApiQueryItem("channel", channel),
+                ApiQueryItem("to", to),
+            ]
+        )
+    }
 }

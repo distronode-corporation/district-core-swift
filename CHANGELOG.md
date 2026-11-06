@@ -6,6 +6,23 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+The Messenger and Instagram reply window, read the way the web Inbox reads it, so the apps'
+composers can say when a reply is a human agent's and when the window is closed. Nothing is
+removed or renamed and no existing signature changes, so this is a minor version.
+⚠️ `EndpointID` gains `metaWindow`, which would break an exhaustive `switch` over it;
+neither district-ios nor district-macos switches over `EndpointID` or names a case.
+
+### Added
+
+- `InboxRepository.metaWindow(workspaceId:channel:to:)` (`GET messages/send?workspaceId&channel&to`,
+  `MetaWindowResponse`, `MetaWindow`, `MetaWindowState`). `state` is `open`, `humanAgent`
+  or `closed`; any other value decodes to `unknown(_:)`, kept by name, and blocks nothing.
+  `until` is when the state ends (nil when closed). A preview, never the gate: the send
+  still answers 409 `messenger_window_closed`.
+- `ApiErrorCode.messengerWindowClosed` (its sentence was already in `ApiErrorTable`).
+- The three fixtures `district-meta-window.json`, `-human-agent.json` and `-closed.json`,
+  gated (211 fixtures, 237 allowed null paths).
+
 ## [8.2.0]
 
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,

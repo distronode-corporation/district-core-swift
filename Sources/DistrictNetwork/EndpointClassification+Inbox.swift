@@ -27,10 +27,14 @@ public extension TypedEndpoints {
     /// (``ConversationAssignResponse``), `whatsAppWindow` (``WhatsAppWindowResponse``) and
     /// `whatsAppTemplates` (``WhatsAppTemplatesResponse``). The template send is a body on
     /// ``EndpointID/sendMessage``, already classified, like `markAllRead` on `markRead`.
+    ///
+    /// ⚠️ AND `metaWindow` (``MetaWindowResponse``), the Messenger and Instagram window read,
+    /// its three fixtures gated in the same file.
     static let inbox: Set<EndpointID> = [
         .messageThread,
         .assignConversation,
         .whatsAppWindow,
         .whatsAppTemplates,
+        .metaWindow,
     ]
 }

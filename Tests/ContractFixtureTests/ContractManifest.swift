@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 208
+    static let expectedFixtureCount = 211
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -255,5 +255,5 @@ enum ContractManifest {
     /// account with no billing is one key that is absent rather than null.
     ///
     /// Each path is named with its column in the `AllowedExplicitNulls*.swift` files.
-    static let expectedAllowedNullPaths = 236
+    static let expectedAllowedNullPaths = 237
 }

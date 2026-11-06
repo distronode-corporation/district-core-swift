@@ -131,4 +131,25 @@ public extension InboxRepository {
             .flatMap { ResponseEnvelope.affirm("SendMessageResponse", $0.success, $0) }
             .map(\.message)
     }
+
+    // MARK: - Messenger and Instagram
+
+    /// Whether a Messenger or Instagram reply may go to `to` now, and how.
+    ///
+    /// ⛔ A PREVIEW, NOT THE GATE: the send still answers 409 `messenger_window_closed` when
+    /// the window shut in between. ``MetaWindowState/closed`` disables Send and says why;
+    /// ``MetaWindowState/humanAgent`` says the reply is a human agent's and offers no AI draft;
+    /// an ``MetaWindowState/unknown(_:)`` state, like a failed read, blocks nothing.
+    ///
+    /// - Parameter channel: ``MessageChannel/messenger`` or ``MessageChannel/instagram``.
+    /// - Parameter to: that channel's ``ReplyOption/to``, `fb:<psid>` or `ig:<igsid>`.
+    func metaWindow(workspaceId: String, channel: String, to: String) async -> Result<MetaWindow, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.metaWindow(workspaceId: workspaceId, channel: channel, to: to),
+            as: MetaWindowResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("MetaWindowResponse", $0.success, $0) }
+            .map(\.window)
+    }
 }

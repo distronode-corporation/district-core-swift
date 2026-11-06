@@ -124,6 +124,9 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// The templates one WhatsApp sender may send. See
     /// ``DistrictEndpoints/whatsAppTemplates(workspaceId:senderId:)``.
     case whatsAppTemplates
+    /// Whether, and how, a Messenger or Instagram reply may go to one customer now. See
+    /// ``DistrictEndpoints/metaWindow(workspaceId:channel:to:)``.
+    case metaWindow
 
     // Composer
     case draft

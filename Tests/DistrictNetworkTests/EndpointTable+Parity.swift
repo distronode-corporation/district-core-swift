@@ -2,8 +2,8 @@
 import Foundation
 
 extension EndpointTable {
-    /// App parity's three new routes: the thread assignment write and the WhatsApp
-    /// composer's two reads. Read off the routes on the service (`conversations/assign`,
+    /// App parity's four new rows: the thread assignment write, the WhatsApp composer's two
+    /// reads, and the Messenger and Instagram window read. Read off the routes on the service (`conversations/assign`,
     /// `workspace/whatsapp/window`, `workspace/whatsapp/templates`).
     ///
     /// ⚠️ THE REST OF APP PARITY IS NOT A ROW: the opt-in flags, the capabilities and the
@@ -37,6 +37,13 @@ extension EndpointTable {
                 DistrictEndpoints.whatsAppTemplates(workspaceId: "ws_1", senderId: "wa_1"),
                 .get,
                 "\(host)/api/district/workspace/whatsapp/templates?workspaceId=ws_1&senderId=wa_1"
+            ),
+            // ⚠️ A GET ON THE SEND'S OWN PATH, and the `fb:` colon is percent-encoded.
+            EndpointExpectation(
+                .metaWindow,
+                DistrictEndpoints.metaWindow(workspaceId: "ws_1", channel: "messenger", to: "fb:5550101"),
+                .get,
+                "\(host)/api/district/messages/send?workspaceId=ws_1&channel=messenger&to=fb%3A5550101"
             ),
         ]
     }

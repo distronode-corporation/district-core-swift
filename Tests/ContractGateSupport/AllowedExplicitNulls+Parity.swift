@@ -1,7 +1,7 @@
 import Foundation
 
 // App parity's allowlist entries (Inbox reply options and assignment, WhatsApp window and
-// templates), in a file of their own like `+Setup` and `+Meetings`. Chained into
+// templates, the Messenger and Instagram window), in a file of their own like `+Setup` and `+Meetings`. Chained into
 // `allowedExplicitNulls` in `AllowedExplicitNulls+Union.swift`.
 
 extension StrictDecodeVerifier {
@@ -47,6 +47,10 @@ extension StrictDecodeVerifier {
         "district-whatsapp-window-closed.json": [
             "$.receivedOn",
             "$.window.expiresAt",
+        ],
+        //   until   Null while the Messenger or Instagram window is closed.
+        "district-meta-window-closed.json": [
+            "$.window.until",
         ],
         //   senderId        Null on a template tied to no one sender (row 0).
         //   variableCount   Null when the body's placeholders are named (row 1).

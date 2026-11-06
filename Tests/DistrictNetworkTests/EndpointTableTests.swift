@@ -77,7 +77,7 @@ final class EndpointTableTests: XCTestCase {
         // exactly like a duplicate row. The assertions are immune, they compare the
         // built array against `EndpointID.allCases`, but the ad-hoc check a reader
         // reaches for first is not.
-        XCTAssertEqual(rows.count, 131)
+        XCTAssertEqual(rows.count, 132)
     }
 
     func testMethodPathQueryAndBodyForEveryEndpoint() throws {

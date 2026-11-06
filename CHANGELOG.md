@@ -4,7 +4,7 @@ All notable changes to this package are recorded here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [8.3.0] - 2026-11-06
 
 The Messenger and Instagram reply window, read the way the web Inbox reads it, so the apps'
 composers can say when a reply is a human agent's and when the window is closed. Nothing is

@@ -22,6 +22,9 @@ enum ApiErrorTable {
         case "MFA_NOT_STARTED": return ApiErrorCapsCopy.mfaNotStarted
         case "mfa_code_invalid": return ApiErrorCopy.mfaCodeInvalid
         case "browser_session_required": return ApiErrorCopy.browserSessionRequired
+        case "reauth_required": return ApiErrorCopy.reauthRequired
+        case "reauth_failed": return ApiErrorCopy.reauthFailed
+        case "confirmation_mismatch": return ApiErrorCopy.confirmationMismatch
         case "region_elsewhere": return ApiErrorCopy.regionElsewhere
         case "forbidden": return ApiErrorCopy.forbidden
         case "workspace_access_denied": return ApiErrorCopy.workspaceAccessDenied

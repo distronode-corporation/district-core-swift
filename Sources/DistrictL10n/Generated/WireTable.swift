@@ -43,6 +43,10 @@ public enum WireCategory: String, CaseIterable, Sendable {
     case schedulingWebhookDeliveryStatus
     case schedulingHostRole
     case schedulingQuestionType
+    case numberRegistrationStatus
+    case numberRegistrationEndUserType
+    case numberRegistrationNumberType
+    case numberRequirementKind
 }
 
 /// Wire value to its catalog label.
@@ -250,6 +254,19 @@ enum WireTable {
         case (.schedulingQuestionType, "text"): WireCopy.schedulingQuestionTypeText
         case (.schedulingQuestionType, "select"): WireCopy.schedulingQuestionTypeSelect
         case (.schedulingQuestionType, "checkbox"): WireCopy.schedulingQuestionTypeCheckbox
+        case (.numberRegistrationStatus, "draft"): WireCopy.numberRegistrationStatusDraft
+        case (.numberRegistrationStatus, "pending-review"): WireCopy.numberRegistrationStatusPendingReview
+        case (.numberRegistrationStatus, "in-review"): WireCopy.numberRegistrationStatusInReview
+        case (.numberRegistrationStatus, "twilio-approved"): WireCopy.numberRegistrationStatusTwilioApproved
+        case (.numberRegistrationStatus, "twilio-rejected"): WireCopy.numberRegistrationStatusTwilioRejected
+        case (.numberRegistrationEndUserType, "individual"): WireCopy.numberRegistrationEndUserTypeIndividual
+        case (.numberRegistrationEndUserType, "business"): WireCopy.numberRegistrationEndUserTypeBusiness
+        case (.numberRegistrationNumberType, "local"): WireCopy.numberRegistrationNumberTypeLocal
+        case (.numberRegistrationNumberType, "mobile"): WireCopy.numberRegistrationNumberTypeMobile
+        case (.numberRegistrationNumberType, "national"): WireCopy.numberRegistrationNumberTypeNational
+        case (.numberRegistrationNumberType, "toll free"): WireCopy.numberRegistrationNumberTypeTollFree
+        case (.numberRequirementKind, "end_user"): WireCopy.numberRequirementKindEndUser
+        case (.numberRequirementKind, "supporting_document"): WireCopy.numberRequirementKindSupportingDocument
         default: nil
         }
     }

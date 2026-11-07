@@ -20,18 +20,20 @@ useDefault = true
 # server contract suite's fixed test secret, so they protect no real room:
 #   cUwBK6...  room `meet_ws-contract-test_weekly-review`
 #   YfxKDU...  room `preview_ws-contract-test_00000000-0000-4000-8000-000000000000`
+#   YFT+/c...  room `hq_ws-contract-test_00000000-0000-4000-8000-000000000000` (HQ by voice)
 [[allowlists]]
 description = "LiveKit E2EE keys in contract fixtures and tests (test data)"
 targetRules = ["generic-api-key"]
 condition = "AND"
 paths = [
-  '''(^|/)contracts/mobile/district-(room-token|room-token-viewer|persona-preview-token)\.json$''',
+  '''(^|/)contracts/mobile/district-(room-token|room-token-viewer|persona-preview-token|hq-voice-token)\.json$''',
   '''(^|/)Tests/DistrictDataTests/WorkspacePersonaRepositoryTests\.swift$''',
 ]
 regexTarget = "secret"
 regexes = [
   '''^cUwBK6pBSbabCBfQZ8VZW\+bW5dOg2dwb3JG8q7E4Jc4=$''',
   '''^YfxKDUkaaGp2WrLLGHCHbe2nn5ArCWBd\+x\+k7EzDr/8=$''',
+  '''^YFT\+/ceW4bhgizPFpeX9E5a3PVZ9T07aWRQq4uwQwW0=$''',
 ]
 
 # Placeholders in the native sign-in token-response decoding tests. The JWT is a literal

@@ -6,6 +6,35 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+District HQ by voice, as the Windows and Linux apps have it (core-rust `hq_voice.rs`): the
+four voice routes and the agent's packets. Additive only, so a minor version. ⚠️ `EndpointID`
+gains five cases, which would break an exhaustive `switch` over it; neither district-ios nor
+district-macos switches over `EndpointID`.
+
+### Added
+
+- `HQRepository.voiceToken(workspaceId:locale:history:)` (`POST hq/voice-token`,
+  `HQVoiceTokenResponse`). A credential that is not an encrypted HQ room (`isJoinable`: the
+  room name starts `hq_` and `e2ee.key` is non-blank) is refused as a decoding failure. The
+  token, the session id and the key are left out of `description`. The history is bounded
+  as the service bounds it (`HQVoiceTurn.bounded`: the last 6 non-blank turns, 500
+  characters each) and left out when empty.
+- `HQRepository.reportVoiceScreen(workspaceId:roomName:screen:)` (`POST hq/voice-context`,
+  `HQVoiceScreen`, `HQVoiceSelection`, which drops an id the service would refuse).
+- `HQRepository.voiceSettings(workspaceId:)` and `saveVoiceSettings(workspaceId:settings:)`
+  (`GET` and `PUT hq/voice-settings`, `HQVoiceSettings`).
+- `HQRepository.confirm(workspaceId:voiceProposal:)`, which sends the proposal's id with its
+  tool and arguments, and `cancel(workspaceId:proposalId:)` (`POST hq/proposals/cancel`).
+  `DistrictEndpoints.hqConfirm` takes an optional `proposalId`, absent by default.
+- `HQVoicePacket.read(_:)`: the agent's `hq.proposal` packets (`HQVoiceProposal`,
+  `HQVoiceResolution`), with the web client's validation; anything else is nil. `HQAgentState`,
+  `HQMicMode` (`push`, else open) and the `HQVoice` constants (topics, attributes, the
+  30-minute session).
+- `ApiErrorCode.hqVoiceAllowanceReached` and `hqVoiceBusy`.
+- The six fixtures `district-hq-voice-token.json`, `-token-allowance.json`, `-context.json`,
+  `-settings.json`, `-settings-put.json` and `district-hq-proposal-cancel.json`, gated
+  (217 fixtures). Endpoint rows 137, typed 135.
+
 ### Fixed
 
 - Six wire labels with no label of their own wrote an initialism in sentence case: "Mms",

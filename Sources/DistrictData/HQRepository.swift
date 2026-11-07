@@ -59,7 +59,7 @@ public struct HqConfirmation: Sendable {
 /// ⚠️ RATE LIMITED AT 30/MIN PER ACCOUNT, shared by both operations, so the 429 is
 /// surfaced rather than absorbed.
 public struct HQRepository: Sendable {
-    private let client: ApiClient
+    let client: ApiClient
 
     public init(client: ApiClient) {
         self.client = client

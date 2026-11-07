@@ -56,7 +56,8 @@ public extension DistrictEndpoints {
     static func hqConfirm(
         workspaceId: String,
         tool: String,
-        args: JSONValue
+        args: JSONValue,
+        proposalId: String? = nil
     ) -> ApiRequestDescriptor {
         ApiRequestDescriptor(
             .hqConfirm,
@@ -67,6 +68,9 @@ public extension DistrictEndpoints {
                 ("confirm", .object([
                     ("tool", .string(tool)),
                     ("args", args),
+                    // ⚠️ ONLY FOR A VOICE PROPOSAL CONFIRMED BY A CLICK: the service records
+                    // the proposal as resolved. Absent for the text console's writes.
+                    ("proposalId", .optional(proposalId)),
                 ])),
             ]))
         )

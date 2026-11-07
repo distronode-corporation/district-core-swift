@@ -138,6 +138,12 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // HQ
     case hqPrompt
     case hqConfirm
+    /// HQ by voice. See ``DistrictEndpoints/hqVoiceToken(workspaceId:locale:history:)``.
+    case hqVoiceToken
+    case hqVoiceContext
+    case hqVoiceSettings
+    case saveHqVoiceSettings
+    case hqProposalCancel
 
     // Analytics + usage
     case analytics

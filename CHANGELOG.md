@@ -6,6 +6,17 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- HQ by voice: `HQRepository.endVoice` (`POST hq/voice-end`, a running session stopped, only
+  the minutes used counted) and `discardVoice` (`POST hq/voice-discard`, a session that never
+  started: a declined notice or a failed join), both by the credential's `sessionId`, with
+  `HQVoiceEndResponse` and `HQVoiceDiscardResponse`. Both are idempotent on the service and
+  answer a flag. The two fixtures come from the service ahead of its release, gated.
+  233 fixtures (with the 14 below); endpoint rows 139, typed 137.
+  ⚠️ `EndpointID` gains two cases (`hqVoiceEnd`, `hqVoiceDiscard`); neither district-ios nor
+  district-macos switches over it.
+
 ### Changed
 
 - Contracts: the server's 14 new mobile fixtures (the rest of the setup wizard, the

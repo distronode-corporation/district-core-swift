@@ -388,6 +388,9 @@ enum DistrictPaths {
     static let hqVoiceSettings = hq + ["voice-settings"]
     /// A proposal the voice agent made, cancelled by a click.
     static let hqProposalCancel = hq + ["proposals", "cancel"]
+    /// A running session stopped, and a session whose notice was declined.
+    static let hqVoiceEnd = hq + ["voice-end"]
+    static let hqVoiceDiscard = hq + ["voice-discard"]
 
     /// District Desk: the tickets THIS workspace's own customers have raised.
     ///

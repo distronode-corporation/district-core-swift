@@ -144,6 +144,8 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case hqVoiceSettings
     case saveHqVoiceSettings
     case hqProposalCancel
+    case hqVoiceEnd
+    case hqVoiceDiscard
 
     // Analytics + usage
     case analytics

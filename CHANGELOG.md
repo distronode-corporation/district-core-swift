@@ -4,6 +4,14 @@ All notable changes to this package are recorded here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the package follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Six wire labels with no label of their own wrote an initialism in sentence case: "Mms",
+  "Sms", "Ok", "Dnc", "Http {status}" and "Missing webhook url" now read "MMS", "SMS", "OK",
+  "DNC", "HTTP {status}" and "Missing webhook URL". English only; the French is unchanged.
+
 ## [8.3.0] - 2026-11-06
 
 The Messenger and Instagram reply window, read the way the web Inbox reads it, so the apps'

@@ -1677,10 +1677,10 @@ package enum WireCopy {
     package static var messagingCredentialSourceManaged: String { L10nRuntime.locale == .frCA ? "Service géré" : "Managed Service" }
 
     /// `wire.number_capability.mms`
-    package static var numberCapabilityMms: String { L10nRuntime.locale == .frCA ? "MMS" : "Mms" }
+    package static var numberCapabilityMms: String { L10nRuntime.locale == .frCA ? "MMS" : "MMS" }
 
     /// `wire.number_capability.sms`
-    package static var numberCapabilitySms: String { L10nRuntime.locale == .frCA ? "Texto" : "Sms" }
+    package static var numberCapabilitySms: String { L10nRuntime.locale == .frCA ? "Texto" : "SMS" }
 
     /// `wire.number_capability.voice`
     package static var numberCapabilityVoice: String { L10nRuntime.locale == .frCA ? "Voix" : "Voice" }
@@ -1920,7 +1920,7 @@ package enum WireCopy {
     package static var workflowActionOutcomeFailed: String { L10nRuntime.locale == .frCA ? "Échec" : "Failed" }
 
     /// `wire.workflow_action_outcome.ok`
-    package static var workflowActionOutcomeOk: String { L10nRuntime.locale == .frCA ? "OK" : "Ok" }
+    package static var workflowActionOutcomeOk: String { L10nRuntime.locale == .frCA ? "OK" : "OK" }
 
     /// `wire.workflow_action_outcome.skipped`
     package static var workflowActionOutcomeSkipped: String { L10nRuntime.locale == .frCA ? "Ignoré" : "Skipped" }
@@ -1935,7 +1935,7 @@ package enum WireCopy {
     package static var workflowActionReasonContactNotFound: String { L10nRuntime.locale == .frCA ? "Contact introuvable" : "Contact not found" }
 
     /// `wire.workflow_action_reason.dnc`
-    package static var workflowActionReasonDnc: String { L10nRuntime.locale == .frCA ? "Liste d'exclusion" : "Dnc" }
+    package static var workflowActionReasonDnc: String { L10nRuntime.locale == .frCA ? "Liste d'exclusion" : "DNC" }
 
     /// `wire.workflow_action_reason.dormant`
     package static var workflowActionReasonDormant: String { L10nRuntime.locale == .frCA ? "Inactif" : "Dormant" }
@@ -1965,7 +1965,7 @@ package enum WireCopy {
     package static var workflowActionReasonFallbackPush: String { L10nRuntime.locale == .frCA ? "Texto non envoyé et courriel en échec, l'alerte est partie dans l'application à la place" : "Not texted and the email failed, so it was sent to the app instead" }
 
     /// `wire.workflow_action_reason.http_status`
-    package static var workflowActionReasonHttpStatus: String { L10nRuntime.locale == .frCA ? "HTTP {status}" : "Http {status}" }
+    package static var workflowActionReasonHttpStatus: String { L10nRuntime.locale == .frCA ? "HTTP {status}" : "HTTP {status}" }
 
     /// `wire.workflow_action_reason.invalid_recipient`
     package static var workflowActionReasonInvalidRecipient: String { L10nRuntime.locale == .frCA ? "Destinataire invalide" : "Invalid recipient" }
@@ -1977,7 +1977,7 @@ package enum WireCopy {
     package static var workflowActionReasonLoopPaused: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: ce numéro a répondu automatiquement plusieurs fois de suite, les textos à ce numéro sont donc suspendus pendant une heure" : "Not texted: this number answered automatically several times in a row, so texts to it are paused for an hour" }
 
     /// `wire.workflow_action_reason.missing_webhook_url`
-    package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook url" }
+    package static var workflowActionReasonMissingWebhookUrl: String { L10nRuntime.locale == .frCA ? "URL du webhook manquante" : "Missing webhook URL" }
 
     /// `wire.workflow_action_reason.no_consent`
     package static var workflowActionReasonNoConsent: String { L10nRuntime.locale == .frCA ? "Texto non envoyé\u{00A0}: aucun appel ni texto de cette personne depuis 24\u{00A0}heures, et aucun consentement au dossier" : "Not texted: no call or text from them in the last 24 hours, and no consent on record" }

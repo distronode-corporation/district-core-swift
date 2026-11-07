@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.4.2] - 2026-11-07
+
 ### Added
 
 - Native re-authentication and account deletion (`NativeReauthRepository`). A fresh proof for

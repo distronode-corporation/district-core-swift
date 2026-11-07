@@ -1,33 +1,6 @@
 {
-  "originHash" : "9638df6f319b7dc4a79c48a563871bedf65a64dc424f9c0e382d2ea05fba22d8",
+  "originHash" : "6751c2ebda7e83621eacfedc5e5ee29ef825f31cc6621bb84027f2335c1bb391",
   "pins" : [
-    {
-      "identity" : "client-sdk-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/livekit/client-sdk-swift",
-      "state" : {
-        "revision" : "f07831a7f06bca9e2fc2e136db591b7b42f16d8d",
-        "version" : "2.17.0"
-      }
-    },
-    {
-      "identity" : "livekit-uniffi-xcframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/livekit/livekit-uniffi-xcframework.git",
-      "state" : {
-        "revision" : "7a9bf91b1601d5c408ae0cac7dc2047b5a4f615e",
-        "version" : "0.1.9"
-      }
-    },
-    {
-      "identity" : "sentry-cocoa",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/getsentry/sentry-cocoa",
-      "state" : {
-        "revision" : "4f135c52afeeb1d6937eb93824c7ec1cddcaa372",
-        "version" : "9.30.1"
-      }
-    },
     {
       "identity" : "swift-asn1",
       "kind" : "remoteSourceControl",
@@ -44,15 +17,6 @@
       "state" : {
         "revision" : "c2cbadd7263439d8015189668f96ff5b5be565ce",
         "version" : "5.0.3"
-      }
-    },
-    {
-      "identity" : "webrtc-xcframework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/livekit/webrtc-xcframework.git",
-      "state" : {
-        "revision" : "c73deceaddd9c07293871ae28f24d4326cc86d62",
-        "version" : "150.7871.2"
       }
     }
   ],

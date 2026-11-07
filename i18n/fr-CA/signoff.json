@@ -1,11 +1,11 @@
 {
-  "signed_off_by": "Sean Dean (sign-off 2026-11-07 for 8.4.0: l10n/wire.toml changed English initialisms only, no French text)",
-  "release": "8.4.0",
-  "commit": "270dc8b34829596988c8758614a4d3ab7f7b4c81",
+  "signed_off_by": "Sean Dean (sign-off 2026-11-07 of the 16 new strings: the number registration labels and three re-authentication errors, the same text signed off for district-core-rust 10.0.0)",
+  "release": "8.4.1",
+  "commit": "12294d1fab58d5fcf89a27f1f5ff87d5bbeefa3d",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "607791a7f833f419af4657bdc8cb9cd6ea9bb2fb8ba5b1c16f3cedc0a5470c89"
+      "sha256": "62050ec4e40c34371587e12246c29a551382f759dc4aa9e1e5b94e7cca379e5d"
     },
     {
       "path": "l10n/core.toml",
@@ -17,7 +17,7 @@
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "34d31a34090cc1d7531b55bd5f7c17b9de932d32fe11330db6d2e0c03a144e9d"
+      "sha256": "89e055fc681b75afea026ff450bd690dbb5826c7eb4e243bbbf5b432f9c63119"
     }
   ]
 }

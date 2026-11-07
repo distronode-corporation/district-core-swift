@@ -6,6 +6,13 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- Contracts: the server's 14 new mobile fixtures (the rest of the setup wizard, the
+  integrations read, the campaign dialer, native re-authentication, two-factor and account
+  deletion), each in `ContractManifest.unimplemented`, and the error and wire catalogs
+  regenerated: three error codes, four number registration categories.
+
 ## [8.4.0] - 2026-11-07
 
 District HQ by voice, as the Windows and Linux apps have it (core-rust `hq_voice.rs`): the

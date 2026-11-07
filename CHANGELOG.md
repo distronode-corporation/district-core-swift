@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.4.0] - 2026-11-07
+
 District HQ by voice, as the Windows and Linux apps have it (core-rust `hq_voice.rs`): the
 four voice routes and the agent's packets. Additive only, so a minor version. ⚠️ `EndpointID`
 gains five cases, which would break an exhaustive `switch` over it; neither district-ios nor

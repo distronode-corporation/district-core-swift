@@ -1,7 +1,7 @@
 {
-  "signed_off_by": "Sean Dean (manager review by Claude, xhigh; Sean's sign-off 2026-11-05, \"Sign off all\", in iMac session 9448bc94 from the 3.3.0 French sign-off page)",
-  "release": "8.2.0",
-  "commit": "da074db6e80e042b801497a1f426499620f3f2fb",
+  "signed_off_by": "Sean Dean (sign-off 2026-11-07 for 8.4.0: l10n/wire.toml changed English initialisms only, no French text)",
+  "release": "8.4.0",
+  "commit": "270dc8b34829596988c8758614a4d3ab7f7b4c81",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
@@ -17,7 +17,7 @@
     },
     {
       "path": "l10n/wire.toml",
-      "sha256": "70bfd2e33689b24cbf124a23144c4ff71a5ba88af64dd9da30c655a3d53aae01"
+      "sha256": "34d31a34090cc1d7531b55bd5f7c17b9de932d32fe11330db6d2e0c03a144e9d"
     }
   ]
 }

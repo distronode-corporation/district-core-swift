@@ -6,6 +6,23 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- Native re-authentication and account deletion (`NativeReauthRepository`). A fresh proof for
+  one `NativeReauthAction` (`delete-account` or `2fa-change`): `reauthenticate(action:code:
+  codeVerifier:redirectUri:)` exchanges the re-authentication sheet's code
+  (`POST /api/auth/native/reauth/sso`), and `reauthenticate(action:password:code:)` takes the
+  password and, once asked (`MFA_REQUIRED`), the authenticator code
+  (`POST /api/auth/native/reauth/password`). Both answer how long the proof stands, and a
+  proof for another action is refused. `deleteAccount(confirmation:)`
+  (`DELETE /api/auth/delete-account` with the typed email) spends a `delete-account` proof and
+  answers whether vendor-held support data is still being erased. `district-native-reauth.json`
+  and `district-account-delete.json` leave `ContractManifest.unimplemented`; the three
+  two-factor fixtures stay there for the two-factor settings. Endpoint rows 142, typed 140.
+  ⚠️ `EndpointID` gains three cases; neither district-ios nor district-macos switches over it.
+  ⚠️ `deleteAccount` is the second DELETE that carries a body and the first with no query: the
+  route reads the confirmation off `req.json()` and belongs to no workspace.
+
 ## [8.4.1] - 2026-11-07
 
 ### Added

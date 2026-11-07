@@ -77,7 +77,7 @@ final class EndpointTableTests: XCTestCase {
         // exactly like a duplicate row. The assertions are immune, they compare the
         // built array against `EndpointID.allCases`, but the ad-hoc check a reader
         // reaches for first is not.
-        XCTAssertEqual(rows.count, 139)
+        XCTAssertEqual(rows.count, 142)
     }
 
     func testMethodPathQueryAndBodyForEveryEndpoint() throws {
@@ -129,8 +129,10 @@ final class EndpointTableTests: XCTestCase {
     /// matters most: `workspaceId` in the URL is what lets `requireWorkspaceRole` run
     /// before `req.json()` is parsed.
     func testNoDeleteCarriesABodyExceptTheOneThatMust() {
-        // ⛔ ONE ENTRY. Adding a second is a decision about a convention, not a fix.
-        let bodyBearingDeletes: Set<EndpointID> = [.deleteRegistrationDocument]
+        // ⛔ TWO ENTRIES, each a decision about a convention, not a fix. `deleteAccount` is the
+        // website's own route: it reads the typed confirmation off `req.json()`, and with no
+        // workspace it has no query to carry either.
+        let bodyBearingDeletes: Set<EndpointID> = [.deleteRegistrationDocument, .deleteAccount]
 
         for row in EndpointTable.all() where row.descriptor.method == .delete {
             if !bodyBearingDeletes.contains(row.id) {
@@ -140,7 +142,9 @@ final class EndpointTableTests: XCTestCase {
                     "\(row.id.rawValue): a DELETE must not carry a body"
                 )
             }
-            XCTAssertFalse(row.descriptor.query.isEmpty, "\(row.id.rawValue): a DELETE needs its query")
+            if row.id != .deleteAccount {
+                XCTAssertFalse(row.descriptor.query.isEmpty, "\(row.id.rawValue): a DELETE needs its query")
+            }
         }
 
         // ⚠️ ASSERTED POSITIVELY TOO, so the allow-list cannot outlive the reason for it:

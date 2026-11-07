@@ -146,6 +146,10 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case hqProposalCancel
     case hqVoiceEnd
     case hqVoiceDiscard
+    /// A fresh re-authentication and the account deletion it guards.
+    case nativeReauthSso
+    case nativeReauthPassword
+    case deleteAccount
 
     // Analytics + usage
     case analytics

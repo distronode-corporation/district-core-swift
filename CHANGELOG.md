@@ -6,6 +6,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.4.1] - 2026-11-07
+
 ### Added
 
 - HQ by voice: `HQRepository.endVoice` (`POST hq/voice-end`, a running session stopped, only

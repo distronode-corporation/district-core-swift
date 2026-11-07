@@ -39,6 +39,7 @@ enum ImplementedFixtures {
             + persona + scheduling + schedulingAdmin + knowledge + messaging + districtHQ + automation + deskAndSupport
             + billing + numbers + meetingRecords + schedulingA + schedulingB + schedulingC + setup + voiceStudio
             + liveTranscript + carrierAndAccount + notifyAndDecline + parity + supervise + hqVoice
+            + nativeReauth
     }
 
     static var names: Set<String> {

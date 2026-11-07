@@ -276,9 +276,20 @@ final class EndpointSurfaceTests: XCTestCase {
     /// ⚠️ `scheduling/webhook/{workspaceId}` is absent for the duller reason that
     /// this client is never its caller; the assertion below covers both, since
     /// neither segment may appear anywhere on the surface.
+    ///
+    /// ⚠️ `auth/native/reauth/sso` IS ALLOWED: it answers JSON (a proof's lifetime), never a
+    /// redirect, so the rule is about `sso` under `scheduling`.
     func testTheSchedulingSsoAndWebhookRoutesAreNotReachable() {
         for row in EndpointTable.all() {
-            XCTAssertFalse(row.descriptor.segments.contains("sso"), "\(row.id.rawValue) addresses scheduling/sso")
+            let segments = row.descriptor.segments
+            XCTAssertFalse(
+                segments.contains("sso") && segments.contains("scheduling"),
+                "\(row.id.rawValue) addresses scheduling/sso"
+            )
+            XCTAssertTrue(
+                !segments.contains("sso") || segments == DistrictPaths.nativeReauthSso,
+                "\(row.id.rawValue) addresses an sso route that is not the re-authentication exchange"
+            )
             XCTAssertFalse(
                 row.descriptor.segments.contains("webhook"),
                 "\(row.id.rawValue) addresses the scheduler's inbound webhook"

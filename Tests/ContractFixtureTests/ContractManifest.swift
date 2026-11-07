@@ -89,13 +89,11 @@ enum ContractManifest {
         "district-setup-lookup.json",
         "district-setup-patch.json",
         "district-setup-test-call.json",
-        // Native re-authentication and the account routes it guards: two-factor
-        // enrolment, confirmation and removal, and deleting the account.
-        "district-account-delete.json",
+        // The two-factor routes a fresh re-authentication guards: enrolment, confirmation and
+        // removal.
         "district-mfa-confirm.json",
         "district-mfa-disable.json",
         "district-mfa-enroll.json",
-        "district-native-reauth.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

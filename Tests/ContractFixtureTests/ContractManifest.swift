@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 219
+    static let expectedFixtureCount = 233
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -75,6 +75,27 @@ enum ContractManifest {
         // this client does not call yet.
         "district-conversation-assignments.json",
         "district-pkce-vectors.json",
+        // The iOS parity routes the server pins in its own suite, recorded before any
+        // client here calls them: the rest of the setup wizard (the facts patch, the
+        // website lookup and its refusal, the test call, and the forwarding check's
+        // start and poll), the integrations read (and its Viewer variant, which has no
+        // `calendar`), and the campaign dialer.
+        "district-calls-outbound.json",
+        "district-connections-viewer.json",
+        "district-connections.json",
+        "district-forwarding-check-start.json",
+        "district-forwarding-check.json",
+        "district-setup-lookup-unreadable.json",
+        "district-setup-lookup.json",
+        "district-setup-patch.json",
+        "district-setup-test-call.json",
+        // Native re-authentication and the account routes it guards: two-factor
+        // enrolment, confirmation and removal, and deleting the account.
+        "district-account-delete.json",
+        "district-mfa-confirm.json",
+        "district-mfa-disable.json",
+        "district-mfa-enroll.json",
+        "district-native-reauth.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

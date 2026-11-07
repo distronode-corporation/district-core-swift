@@ -156,6 +156,9 @@ package enum ApiErrorCopy {
     /// `api_error.checkout_subscription_exists`
     package static var checkoutSubscriptionExists: String { L10nRuntime.locale == .frCA ? "Vous avez déjà un forfait actif. Modifiez-le depuis la section Facturation de votre tableau de bord plutôt que d'en acheter un deuxième." : "You already have an active plan. Change it from Billing in your dashboard instead of buying a second one." }
 
+    /// `api_error.confirmation_mismatch`
+    package static var confirmationMismatch: String { L10nRuntime.locale == .frCA ? "Tapez exactement l'adresse courriel du compte pour confirmer." : "Type the account's email address exactly to confirm." }
+
     /// `api_error.connector_not_found`
     package static var connectorNotFound: String { L10nRuntime.locale == .frCA ? "Ce connecteur est introuvable." : "That connector could not be found." }
 
@@ -454,6 +457,12 @@ package enum ApiErrorCopy {
 
     /// `api_error.rate_limited`
     package static var rateLimited: String { L10nRuntime.locale == .frCA ? "Cette action a été tentée plusieurs fois à l'instant. Attendez un moment, puis réessayez." : "That has been tried several times just now. Please wait a moment and try again." }
+
+    /// `api_error.reauth_failed`
+    package static var reauthFailed: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu confirmer qu'il s'agit bien de vous. Veuillez réessayer." : "We could not confirm it is you. Please try again." }
+
+    /// `api_error.reauth_required`
+    package static var reauthRequired: String { L10nRuntime.locale == .frCA ? "Confirmez de nouveau qu'il s'agit bien de vous, puis réessayez." : "Confirm it is you again, then try once more." }
 
     /// `api_error.region_elsewhere`
     package static var regionElsewhere: String { L10nRuntime.locale == .frCA ? "Votre compte est hébergé dans une autre région. Connectez-vous dans cette région." : "Your account is hosted in another region. Sign in there." }
@@ -1696,6 +1705,45 @@ package enum WireCopy {
 
     /// `wire.number_provider.unknown`
     package static var numberProviderUnknown: String { L10nRuntime.locale == .frCA ? "Inconnu" : "Unknown" }
+
+    /// `wire.number_registration_end_user_type.business`
+    package static var numberRegistrationEndUserTypeBusiness: String { L10nRuntime.locale == .frCA ? "Entreprise" : "Business" }
+
+    /// `wire.number_registration_end_user_type.individual`
+    package static var numberRegistrationEndUserTypeIndividual: String { L10nRuntime.locale == .frCA ? "Particulier" : "Individual" }
+
+    /// `wire.number_registration_number_type.local`
+    package static var numberRegistrationNumberTypeLocal: String { L10nRuntime.locale == .frCA ? "Local" : "Local" }
+
+    /// `wire.number_registration_number_type.mobile`
+    package static var numberRegistrationNumberTypeMobile: String { L10nRuntime.locale == .frCA ? "Mobile" : "Mobile" }
+
+    /// `wire.number_registration_number_type.national`
+    package static var numberRegistrationNumberTypeNational: String { L10nRuntime.locale == .frCA ? "National" : "National" }
+
+    /// `wire.number_registration_number_type.toll_free`
+    package static var numberRegistrationNumberTypeTollFree: String { L10nRuntime.locale == .frCA ? "Sans frais" : "Toll-free" }
+
+    /// `wire.number_registration_status.draft`
+    package static var numberRegistrationStatusDraft: String { L10nRuntime.locale == .frCA ? "Brouillon" : "Draft" }
+
+    /// `wire.number_registration_status.in_review`
+    package static var numberRegistrationStatusInReview: String { L10nRuntime.locale == .frCA ? "En cours d'examen" : "In review" }
+
+    /// `wire.number_registration_status.pending_review`
+    package static var numberRegistrationStatusPendingReview: String { L10nRuntime.locale == .frCA ? "En attente d'examen" : "Pending review" }
+
+    /// `wire.number_registration_status.twilio_approved`
+    package static var numberRegistrationStatusTwilioApproved: String { L10nRuntime.locale == .frCA ? "Approuvée" : "Approved" }
+
+    /// `wire.number_registration_status.twilio_rejected`
+    package static var numberRegistrationStatusTwilioRejected: String { L10nRuntime.locale == .frCA ? "Refusée" : "Rejected" }
+
+    /// `wire.number_requirement_kind.end_user`
+    package static var numberRequirementKindEndUser: String { L10nRuntime.locale == .frCA ? "Vos renseignements" : "Your details" }
+
+    /// `wire.number_requirement_kind.supporting_document`
+    package static var numberRequirementKindSupportingDocument: String { L10nRuntime.locale == .frCA ? "Documents" : "Documents" }
 
     /// `wire.number_status.active`
     package static var numberStatusActive: String { L10nRuntime.locale == .frCA ? "Actif" : "Active" }

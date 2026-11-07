@@ -13,9 +13,16 @@ All notable changes to this package are recorded here. The format is based on
   started: a declined notice or a failed join), both by the credential's `sessionId`, with
   `HQVoiceEndResponse` and `HQVoiceDiscardResponse`. Both are idempotent on the service and
   answer a flag. The two fixtures come from the monorepo branch `wip/hqv-web-end`, gated.
-  219 fixtures; endpoint rows 139, typed 137.
+  233 fixtures (with the 14 below); endpoint rows 139, typed 137.
   ⚠️ `EndpointID` gains two cases (`hqVoiceEnd`, `hqVoiceDiscard`); neither district-ios nor
   district-macos switches over it.
+
+### Changed
+
+- Contracts: the server's 14 new mobile fixtures (the rest of the setup wizard, the
+  integrations read, the campaign dialer, native re-authentication, two-factor and account
+  deletion), each in `ContractManifest.unimplemented`, and the error and wire catalogs
+  regenerated: three error codes, four number registration categories.
 
 ## [8.4.0] - 2026-11-07
 

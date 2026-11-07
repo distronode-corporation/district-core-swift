@@ -382,6 +382,12 @@ enum DistrictPaths {
     }
 
     static let hq = district + ["hq"]
+    /// HQ by voice: the session's credential, the screen report and the member's settings.
+    static let hqVoiceToken = hq + ["voice-token"]
+    static let hqVoiceContext = hq + ["voice-context"]
+    static let hqVoiceSettings = hq + ["voice-settings"]
+    /// A proposal the voice agent made, cancelled by a click.
+    static let hqProposalCancel = hq + ["proposals", "cancel"]
 
     /// District Desk: the tickets THIS workspace's own customers have raised.
     ///

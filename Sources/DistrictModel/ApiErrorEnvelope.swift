@@ -90,6 +90,12 @@ public enum ApiErrorCode {
     /// composer shows the window closed until the customer writes again. See
     /// ``MetaWindowResponse``.
     public static let messengerWindowClosed = "messenger_window_closed"
+    /// From `POST /api/district/hq/voice-token` when the workspace has used this month's
+    /// HQ voice minutes. Not a retry: the text console keeps working. ``HQVoice/allowanceReachedCode``.
+    public static let hqVoiceAllowanceReached = HQVoice.allowanceReachedCode
+    /// From `POST /api/district/hq/voice-token` when voice mode is at capacity. Try again
+    /// in a few minutes; the text console keeps working.
+    public static let hqVoiceBusy = "hq_voice_busy"
     /// 400 from `POST /api/district/conversations/assign` naming a Viewer: a Viewer can
     /// read conversations and cannot be assigned one. The picker offers other roles only.
     /// See `district-conversation-assign-viewer.json`.

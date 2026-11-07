@@ -94,6 +94,28 @@ public extension HQRepository {
     }
 
     /// Cancels a voice proposal by a click.
+    /// Ends a running session. Answers whether this call ended it.
+    func endVoice(workspaceId: String, sessionId: String) async -> Result<Bool, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.hqVoiceEnd(workspaceId: workspaceId, sessionId: sessionId),
+            as: HQVoiceEndResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("HQVoiceEndResponse", $0.success, $0) }
+            .map(\.ended)
+    }
+
+    /// Discards a session that never started. Answers whether it was discarded.
+    func discardVoice(workspaceId: String, sessionId: String) async -> Result<Bool, ApiError> {
+        let outcome = await client.send(
+            DistrictEndpoints.hqVoiceDiscard(workspaceId: workspaceId, sessionId: sessionId),
+            as: HQVoiceDiscardResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("HQVoiceDiscardResponse", $0.success, $0) }
+            .map(\.discarded)
+    }
+
     func cancel(workspaceId: String, proposalId: String) async -> Result<Void, ApiError> {
         let outcome = await client.send(
             DistrictEndpoints.hqProposalCancel(workspaceId: workspaceId, proposalId: proposalId),

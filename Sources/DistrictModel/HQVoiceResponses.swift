@@ -203,6 +203,20 @@ public struct HQProposalCancelResponse: Codable, Sendable, Equatable {
     public let success: Bool
 }
 
+/// `POST /api/district/hq/voice-end`: whether this call ended the session (false when it had
+/// already ended, was discarded, or is not the member's).
+public struct HQVoiceEndResponse: Codable, Sendable, Equatable {
+    public let success: Bool
+    public let ended: Bool
+}
+
+/// `POST /api/district/hq/voice-discard`: whether the session was discarded (false once it
+/// started, or after 90 seconds).
+public struct HQVoiceDiscardResponse: Codable, Sendable, Equatable {
+    public let success: Bool
+    public let discarded: Bool
+}
+
 /// The kind of record a screen report names.
 public enum HQVoiceRecordKind: String, Sendable, Equatable {
     case call

@@ -50,6 +50,20 @@ extension EndpointTable {
                 "\(host)/api/district/hq/proposals/cancel",
                 .json(#"{"proposalId":"p_1","workspaceId":"ws_1"}"#)
             ),
+            EndpointExpectation(
+                .hqVoiceEnd,
+                DistrictEndpoints.hqVoiceEnd(workspaceId: "ws_1", sessionId: "s_1"),
+                .post,
+                "\(host)/api/district/hq/voice-end",
+                .json(#"{"sessionId":"s_1","workspaceId":"ws_1"}"#)
+            ),
+            EndpointExpectation(
+                .hqVoiceDiscard,
+                DistrictEndpoints.hqVoiceDiscard(workspaceId: "ws_1", sessionId: "s_1"),
+                .post,
+                "\(host)/api/district/hq/voice-discard",
+                .json(#"{"sessionId":"s_1","workspaceId":"ws_1"}"#)
+            ),
         ]
     }
 

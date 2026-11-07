@@ -75,6 +75,28 @@ final class HQVoiceRepositoryTests: XCTestCase {
         ])
     }
 
+    /// ⚠️ BOTH ANSWER A FLAG, NOT AN ERROR, FOR A SESSION THEY DID NOT CHANGE: the routes are
+    /// idempotent, and a refusal is the plain envelope.
+    func testASessionIsEndedAndDiscardedByItsSessionId() async {
+        let transport = RepositoryTransport(queue: [
+            #"{"success":true,"ended":true}"#,
+            #"{"success":true,"discarded":false}"#,
+            #"{"success":false,"error":"Nope."}"#,
+        ])
+        let hq = HQRepository(client: .repositoryTest(transport))
+        let ended = await hq.endVoice(workspaceId: "ws_1", sessionId: "s1")
+        let discarded = await hq.discardVoice(workspaceId: "ws_1", sessionId: "s2")
+        let refused = await hq.endVoice(workspaceId: "ws_1", sessionId: "s3")
+        XCTAssertEqual(ended.successOnly, true)
+        XCTAssertEqual(discarded.successOnly, false)
+        XCTAssertNil(refused.successOnly)
+        XCTAssertEqual(transport.bodies, [
+            #"{"sessionId":"s1","workspaceId":"ws_1"}"#,
+            #"{"sessionId":"s2","workspaceId":"ws_1"}"#,
+            #"{"sessionId":"s3","workspaceId":"ws_1"}"#,
+        ])
+    }
+
     func testTheScreenAndTheSettingsRoundTrip() async throws {
         let settings = #"{"success":true,"settings":{"voice":"Puck","length":"normal","pace":"normal","#
             + #""language":"portal","micMode":"open"}}"#

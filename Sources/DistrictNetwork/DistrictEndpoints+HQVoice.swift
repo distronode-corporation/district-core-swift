@@ -91,4 +91,33 @@ public extension DistrictEndpoints {
             ]))
         )
     }
+
+    /// Ends a running session, so only the minutes used are counted. ⚠️ Idempotent on the
+    /// service: an ended, discarded, unknown or other member's session answers `ended: false`.
+    /// - Parameter sessionId: the credential's ``HQVoiceTokenResponse/sessionId``.
+    static func hqVoiceEnd(workspaceId: String, sessionId: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .hqVoiceEnd,
+            .post,
+            DistrictPaths.hqVoiceEnd,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("sessionId", .string(sessionId)),
+            ]))
+        )
+    }
+
+    /// Discards a session that never started: the notice was declined, or the join failed
+    /// before it went live. ⚠️ The service discards only within 90 seconds of the token.
+    static func hqVoiceDiscard(workspaceId: String, sessionId: String) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .hqVoiceDiscard,
+            .post,
+            DistrictPaths.hqVoiceDiscard,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("sessionId", .string(sessionId)),
+            ]))
+        )
+    }
 }

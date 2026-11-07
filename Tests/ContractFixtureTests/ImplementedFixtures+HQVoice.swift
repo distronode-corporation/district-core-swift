@@ -18,6 +18,8 @@ extension ImplementedFixtures {
             gate("district-hq-voice-settings.json", HQVoiceSettingsResponse.self),
             gate("district-hq-voice-settings-put.json", HQVoiceSettingsResponse.self),
             gate("district-hq-proposal-cancel.json", HQProposalCancelResponse.self),
+            gate("district-hq-voice-end.json", HQVoiceEndResponse.self),
+            gate("district-hq-voice-discard.json", HQVoiceDiscardResponse.self),
         ]
     }
 }

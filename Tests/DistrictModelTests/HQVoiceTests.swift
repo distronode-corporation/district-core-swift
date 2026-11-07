@@ -25,8 +25,22 @@ final class HQVoiceTests: XCTestCase {
         XCTAssertFalse(credential(roomName: "meet_ws-1_x").isJoinable)
     }
 
-    /// ⛔ THE TOKEN AND THE SESSION ID NEVER REACH A LOG.
+    /// A page outside the service's table cannot be named.
+    func testOnlyAPageOfTheServicesTableCanBeNamed() {
+        XCTAssertEqual(HQVoicePage(id: "calls"), .calls)
+        XCTAssertNotNil(HQVoicePage(id: "studio-persona"))
+        XCTAssertNil(HQVoicePage(id: "Jordan Lee"))
+        XCTAssertNil(HQVoicePage(id: "Calls"))
+        XCTAssertEqual(HQVoicePage.table.count, 45)
+    }
+
+    /// ⛔ THE TOKEN AND THE SESSION ID NEVER REACH A LOG, `dump` included.
     func testTheSecretsAreRedacted() {
+        var dumped = ""
+        dump(credential(), to: &dumped)
+        XCTAssertFalse(dumped.contains("jwt-secret"), dumped)
+        XCTAssertFalse(dumped.contains("session-secret"), dumped)
+        XCTAssertFalse(dumped.contains("c2VjcmV0"), dumped)
         for text in [credential().description, credential().debugDescription, String(describing: credential())] {
             XCTAssertFalse(text.contains("jwt-secret"), text)
             XCTAssertFalse(text.contains("session-secret"), text)

@@ -7,16 +7,26 @@ final class HQVoiceRepositoryTests: XCTestCase {
     private static let token = #"{"success":true,"token":"jwt","url":"wss://lk.example.test","roomName":"hq_ws_1_x","#
         + #""processingRegion":"us","micMode":"push","sessionId":"s1","e2ee":{"key":"k"}}"#
 
-    func testATokenIsMintedWithTheLocaleAndTheBoundedHistory() async {
+    /// ⛔ THE REQUEST CARRIES ONLY THE BOUNDED HISTORY: the last six non-blank turns, each
+    /// trimmed and cut to 500 characters.
+    func testATokenIsMintedWithTheLocaleAndTheBoundedHistory() async throws {
         let transport = RepositoryTransport(json: Self.token)
+        let turns = [HQVoiceTurn(role: .user, text: "dropped, the oldest")]
+            + (1 ... 5).map { HQVoiceTurn(role: .model, text: "turn \($0)") }
+            + [
+                HQVoiceTurn(role: .user, text: "   "),
+                HQVoiceTurn(role: .user, text: String(repeating: "a", count: 600)),
+            ]
         let result = await HQRepository(client: .repositoryTest(transport))
-            .voiceToken(workspaceId: "ws_1", locale: "en", history: [HQVoiceTurn(role: .model, text: "Hello")])
+            .voiceToken(workspaceId: "ws_1", locale: "en", history: turns)
         XCTAssertEqual(result.successOnly?.roomName, "hq_ws_1_x")
         XCTAssertEqual(result.successOnly?.micMode, .push)
-        XCTAssertEqual(
-            transport.bodies,
-            [#"{"history":[{"role":"model","text":"Hello"}],"locale":"en","workspaceId":"ws_1"}"#]
-        )
+        let body = try XCTUnwrap(transport.bodies.first)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(body.utf8)) as? [String: Any])
+        let sent = try XCTUnwrap(object["history"] as? [[String: String]])
+        XCTAssertEqual(sent.map { $0["text"]?.count ?? 0 }, [6, 6, 6, 6, 6, 500])
+        XCTAssertEqual(sent.first?["text"], "turn 1", "the oldest turn and the blank one were not dropped")
+        XCTAssertEqual(object["locale"] as? String, "en")
     }
 
     /// ⛔ A ROOM WITHOUT ITS KEY IS NEVER HANDED TO A CALLER.
@@ -71,7 +81,7 @@ final class HQVoiceRepositoryTests: XCTestCase {
         let transport = RepositoryTransport(queue: [#"{"success":true}"#, settings, settings])
         let hq = HQRepository(client: .repositoryTest(transport))
         let reported = await hq.reportVoiceScreen(
-            workspaceId: "ws_1", roomName: "hq_ws_1_x", screen: HQVoiceScreen(version: 1, page: "hq")
+            workspaceId: "ws_1", roomName: "hq_ws_1_x", screen: HQVoiceScreen(version: 1, page: .hq)
         )
         let read = await hq.voiceSettings(workspaceId: "ws_1")
         let saved = try await hq.saveVoiceSettings(workspaceId: "ws_1", settings: XCTUnwrap(read.successOnly))

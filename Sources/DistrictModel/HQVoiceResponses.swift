@@ -132,7 +132,21 @@ public struct HQVoiceTokenResponse: Codable, Sendable, Equatable {
     }
 }
 
-extension HQVoiceTokenResponse: CustomStringConvertible, CustomDebugStringConvertible {
+extension HQVoiceTokenResponse: CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable {
+    /// ⛔ REDACTED FOR `dump` AND EVERY OTHER MIRROR-BASED PRINT TOO, as ``NotifyTokenResponse``.
+    public var customMirror: Mirror {
+        Mirror(self, children: [
+            "success": success,
+            "token": "<redacted>",
+            "url": url,
+            "roomName": roomName,
+            "processingRegion": processingRegion,
+            "micMode": micModeWire,
+            "sessionId": "<redacted>",
+            "e2ee": e2ee == nil ? "none" : "<redacted>",
+        ])
+    }
+
     public var description: String {
         "HQVoiceTokenResponse(roomName: \(roomName), url: \(url), processingRegion: \(processingRegion), "
             + "micMode: \(micModeWire), token: <redacted>, sessionId: <redacted>, e2ee: "
@@ -217,17 +231,53 @@ public struct HQVoiceSelection: Sendable, Equatable {
     }
 }
 
+/// A page of the service's page table (`lib/district/hq-voice-pages.ts`), the only values
+/// a screen report may name.
+///
+/// ⛔ CLOSED: an id outside the table cannot be built, so a report can never carry free
+/// text (a name, a search) as its page.
+public struct HQVoicePage: Sendable, Equatable {
+    /// The service's page table, every id it accepts.
+    public static let table: Set<String> = [
+        "home", "inbox", "calls", "live", "phone", "desk", "hq", "hq-activity", "rooms", "meeting",
+        "meetings", "studio", "studio-persona", "studio-voice", "studio-call-handling", "studio-call-types",
+        "studio-skills", "studio-knowledge", "studio-integrations", "studio-video", "scheduling",
+        "scheduling-event-types", "scheduling-event-type", "scheduling-hours", "scheduling-bookings",
+        "scheduling-calendar", "scheduling-team", "scheduling-settings", "scheduling-developer", "contacts",
+        "dgi", "analytics", "campaigns", "workflows", "marketplace", "settings", "whatsapp-settings",
+        "messenger-settings", "workspaces", "billing", "account", "support", "admin", "admin-messages",
+        "social",
+    ]
+
+    public let id: String
+
+    /// The page, or nil for an id the service's table does not have.
+    public init?(id: String) {
+        guard Self.table.contains(id) else { return nil }
+        self.id = id
+    }
+
+    private init(known id: String) {
+        self.id = id
+    }
+
+    public static let home = HQVoicePage(known: "home")
+    public static let inbox = HQVoicePage(known: "inbox")
+    public static let calls = HQVoicePage(known: "calls")
+    public static let contacts = HQVoicePage(known: "contacts")
+    public static let hq = HQVoicePage(known: "hq")
+}
+
 /// What is on the member's screen during a session, the `snapshot` of a voice-context
-/// report. Free of personal data by construction: a page id from the service's page table
-/// and, at most, a record's id.
+/// report. Free of personal data by construction: a page of the service's page table
+/// (``HQVoicePage``) and, at most, a record's id (``HQVoiceSelection``).
 public struct HQVoiceScreen: Sendable, Equatable {
     /// The session's count of reports, from 1.
     public let version: Int
-    /// A page id of the service's page table (`hq`, `calls`, `inbox`, ...).
-    public let page: String
+    public let page: HQVoicePage
     public let selected: HQVoiceSelection?
 
-    public init(version: Int, page: String, selected: HQVoiceSelection? = nil) {
+    public init(version: Int, page: HQVoicePage, selected: HQVoiceSelection? = nil) {
         self.version = version
         self.page = page
         self.selected = selected

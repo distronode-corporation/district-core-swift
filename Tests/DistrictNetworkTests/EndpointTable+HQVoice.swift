@@ -32,7 +32,7 @@ extension EndpointTable {
                     roomName: "hq_ws_1_abc",
                     screen: HQVoiceScreen(
                         version: 2,
-                        page: "calls",
+                        page: .calls,
                         selected: HQVoiceSelection(kind: .call, id: "call_1")
                     )
                 ),

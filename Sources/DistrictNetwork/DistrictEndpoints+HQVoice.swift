@@ -41,7 +41,7 @@ public extension DistrictEndpoints {
                 ("roomName", .string(roomName)),
                 ("snapshot", .object([
                     ("version", .integer(screen.version)),
-                    ("page", .string(screen.page)),
+                    ("page", .string(screen.page.id)),
                     ("selected", screen.selected.map { selected in
                         .object([("kind", .string(selected.kind.rawValue)), ("id", .string(selected.id))])
                     }),

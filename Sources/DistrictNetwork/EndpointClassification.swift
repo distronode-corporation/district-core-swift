@@ -80,6 +80,7 @@ public enum TypedEndpoints {
         core.union(desk).union(inbox).union(callHandling).union(numbers).union(softphone)
             .union(schedulingAdmin).union(persona).union(blocking).union(setup).union(live)
             .union(liveCall).union(notifyRead).union(hqVoice).union(nativeReauth)
+            .union(twoStepSettings)
 
     private static let core: Set<EndpointID> = [
         .unreadCount,

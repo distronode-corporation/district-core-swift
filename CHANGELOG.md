@@ -6,6 +6,26 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.5.0] - not yet tagged
+
+### Added
+
+- Two-step verification settings (`TwoStepSettingsRepository`), each behind a fresh
+  `2fa-change` proof from `NativeReauthRepository`: `enroll()` (`POST /api/auth/mfa/enroll`,
+  no body) answers `MfaEnrollResponse` (the secret, its `otpauth://` URI and a QR code of it)
+  and checks the proof without spending it; `confirm(totp:)` (`POST /api/auth/mfa/confirm`)
+  spends it and answers `MfaConfirmResponse` with the recovery codes; `disable()`
+  (`POST /api/auth/mfa/disable`, no body and no password, the proof stands in) spends it and
+  answers `MfaDisableResponse`. Without a proof each answers 403 `reauth_required`, and the
+  service's code is kept. A 200 that contradicts the step (`enrolled` false after confirming,
+  true after disabling) is a decoding failure. ⛔ `MfaEnrollResponse` and `MfaConfirmResponse`
+  redact the secret, the URI, the QR code and the recovery codes from `description`,
+  `debugDescription` and the mirror. `district-mfa-enroll.json`, `district-mfa-confirm.json`
+  and `district-mfa-disable.json` leave `ContractManifest.unimplemented`. Endpoint rows 145,
+  typed 143. ⚠️ `EndpointID` gains three cases (`mfaEnroll`, `mfaConfirm`, `mfaDisable`);
+  neither district-ios nor district-macos switches over it. The status read
+  (`GET /api/auth/mfa`) is not here yet: the service has no fixture for it.
+
 ## [8.4.2] - 2026-11-07
 
 ### Added

@@ -89,11 +89,6 @@ enum ContractManifest {
         "district-setup-lookup.json",
         "district-setup-patch.json",
         "district-setup-test-call.json",
-        // The two-factor routes a fresh re-authentication guards: enrolment, confirmation and
-        // removal.
-        "district-mfa-confirm.json",
-        "district-mfa-disable.json",
-        "district-mfa-enroll.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

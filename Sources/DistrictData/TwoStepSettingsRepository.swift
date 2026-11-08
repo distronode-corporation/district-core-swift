@@ -2,20 +2,32 @@ import DistrictModel
 import DistrictNetwork
 import Foundation
 
-/// Turning two-step verification on and off from an app.
+/// Reading two-step verification, and turning it on and off, from an app.
 ///
-/// ⛔ A FRESH `2fa-change` PROOF COMES FIRST, from ``NativeReauthRepository`` with
-/// ``NativeReauthAction/twoFactorChange``. ``enroll()`` checks it without spending it, so a
-/// restarted enrolment needs no second re-authentication; ``confirm(totp:)`` and ``disable()``
-/// spend it. Without one each answers 403 `reauth_required`; a hand-off cookie or any other
-/// non-browser credential that is not this app's bearer answers 403 `browser_session_required`.
-/// Other refusals keep the service's `code` (`MFA_ALREADY_ENABLED`, `MFA_NOT_STARTED`,
-/// `MFA_NOT_PENDING`, `mfa_code_invalid`, `rate_limited`) for the caller to act on.
+/// ⛔ A FRESH `2fa-change` PROOF COMES BEFORE EVERY CHANGE (``status()`` needs none), from
+/// ``NativeReauthRepository`` with ``NativeReauthAction/twoFactorChange``. ``enroll()`` checks it
+/// without spending it, so a restarted enrolment needs no second re-authentication;
+/// ``confirm(totp:)`` and ``disable()`` spend it. Without one each answers 403 `reauth_required`;
+/// a hand-off cookie or any other non-browser credential that is not this app's bearer answers
+/// 403 `browser_session_required`. Other refusals keep the service's `code`
+/// (`MFA_ALREADY_ENABLED`, `MFA_NOT_STARTED`, `MFA_NOT_PENDING`, `mfa_code_invalid`,
+/// `rate_limited`) for the caller to act on.
 public struct TwoStepSettingsRepository: Sendable {
     private let client: ApiClient
 
     public init(client: ApiClient) {
         self.client = client
+    }
+
+    /// Whether the factor is on and how many recovery codes are left. ⚠️ NO PROOF NEEDED: the
+    /// service answers counts and booleans only, to any signed-in session (401 `unauthorized` or
+    /// `session_expired` otherwise, 404 `account_not_found` for an account that is gone). A 200
+    /// whose `enrolled` disagrees with whether `enrolledAt` is set is a decoding failure.
+    public func status() async -> Result<MfaStatusResponse, ApiError> {
+        let outcome = await client.send(DistrictEndpoints.mfaStatus(), as: MfaStatusResponse.self)
+        return outcome.flatMap { status in
+            ResponseEnvelope.affirm("MfaStatusResponse", status.enrolled == (status.enrolledAt != nil), status)
+        }
     }
 
     /// Starts enrolment: a new secret, its `otpauth://` URI and a QR code of it. The factor is

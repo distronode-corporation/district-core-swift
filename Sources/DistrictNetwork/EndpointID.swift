@@ -158,7 +158,9 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case nativeReauthSso
     case nativeReauthPassword
     case deleteAccount
-    /// Two-step verification settings, each behind a fresh `2fa-change` proof.
+    /// Two-step verification: the status read, then the three changes, each behind a fresh
+    /// `2fa-change` proof.
+    case mfaStatus
     case mfaEnroll
     case mfaConfirm
     case mfaDisable

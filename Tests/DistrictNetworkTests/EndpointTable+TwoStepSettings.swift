@@ -7,6 +7,7 @@ extension EndpointTable {
     /// disabling send no body: the first reads none, and the second reads none from an app.
     static func twoStepSettings() -> [EndpointExpectation] {
         [
+            EndpointExpectation(.mfaStatus, DistrictEndpoints.mfaStatus(), .get, "\(host)/api/auth/mfa"),
             EndpointExpectation(.mfaEnroll, DistrictEndpoints.mfaEnroll(), .post, "\(host)/api/auth/mfa/enroll"),
             EndpointExpectation(
                 .mfaConfirm,

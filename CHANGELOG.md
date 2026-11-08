@@ -23,8 +23,18 @@ All notable changes to this package are recorded here. The format is based on
   `debugDescription` and the mirror. `district-mfa-enroll.json`, `district-mfa-confirm.json`
   and `district-mfa-disable.json` leave `ContractManifest.unimplemented`. Endpoint rows 145,
   typed 143. ⚠️ `EndpointID` gains three cases (`mfaEnroll`, `mfaConfirm`, `mfaDisable`);
-  neither district-ios nor district-macos switches over it. The status read
-  (`GET /api/auth/mfa`) is not here yet: the service has no fixture for it.
+  neither district-ios nor district-macos switches over it.
+- The two-step status read, `TwoStepSettingsRepository.status()` (`GET /api/auth/mfa`, no
+  proof needed), answers `MfaStatusResponse`: `enrolled`, `enrolledAt` (an ISO-8601 string,
+  nil while the factor is off, read with `WireInstant.parse`), `backupCodesRemaining` and
+  `canDisable` (what the website allows; an app's proof stands in for the password). Counts
+  and booleans only, so nothing needs redacting. Refusals keep their code and status (401
+  `unauthorized` and `session_expired`, 404 `account_not_found`), and a 200 whose `enrolled`
+  disagrees with `enrolledAt` is a decoding failure. The service's new
+  `district-mfa-status.json` is vendored unchanged and gated, so the fixture count is 234 (the
+  Android client's count moves with it). With the setup wizard's six below, endpoint rows
+  152, typed 150. ⚠️ `EndpointID` gains
+  `mfaStatus`.
 
 - The setup wizard's writes and step reads (`SetupWizardRepository`), owner only like the
   state itself: `load` and `save(steps:businessFacts:)` (`GET`/`PATCH /api/district/setup`;

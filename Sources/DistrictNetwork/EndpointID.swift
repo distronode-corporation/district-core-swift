@@ -261,6 +261,10 @@ public enum EndpointID: String, Sendable, CaseIterable {
     case availability
     case saveAvailability
 
+    /// The workspace's email sender name and Reply-to, a read and a write on one path.
+    case emailIdentity
+    case saveEmailIdentity
+
     // Knowledge base
     case knowledgeDocuments
     case createDocument

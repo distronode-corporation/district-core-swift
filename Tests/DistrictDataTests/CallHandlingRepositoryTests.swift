@@ -19,11 +19,9 @@ import XCTest
 ///     fan-out reads that table. It reaches the caller with its status intact so
 ///     that sentence can be shown instead of a shrug.
 ///
-/// ⚠️ THERE ARE NO CONTRACT FIXTURES FOR THIS FAMILY and that is a property of the
-/// corpus rather than a lowered bar: the contract corpus mirrors the Kotlin client,
-/// which has no call-handling surface. This file and the route source are what pin
-/// the shapes, which is the same footing `searchMessages` and `createContact` sit
-/// on.
+/// ⚠️ CALL HANDLING'S TWO BODIES ARE GATED AGAINST THE SERVICE'S FIXTURES
+/// (`district-call-handling.json`, `-patch.json`); AVAILABILITY HAS NONE, so this file and
+/// the route source are what pin it, the footing `searchMessages` and `createContact` sit on.
 final class CallHandlingRepositoryTests: XCTestCase {
     private func repository(_ transport: RepositoryTransport) -> CallHandlingRepository {
         CallHandlingRepository(client: .repositoryTest(transport))

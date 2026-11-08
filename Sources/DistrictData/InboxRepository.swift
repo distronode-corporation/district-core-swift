@@ -343,11 +343,12 @@ public struct InboxRepository: Sendable {
             .map(\.marked)
     }
 
-    /// Upload one image and get back the URL ``send(workspaceId:target:body:subject:mediaUrls:)``
+    /// Upload one image or PDF and get back the URL ``send(workspaceId:target:body:subject:mediaUrls:)``
     /// accepts as a `mediaUrl`.
     ///
     /// ⚠️ THE SERVER'S LIMITS ARE MIRRORED CLIENT-SIDE RATHER THAN TRUSTED TO THE
-    /// ROUND TRIP: JPEG, PNG, GIF or WebP only, 1 byte to 5MB. Pre-checking is the
+    /// ROUND TRIP: JPEG, PNG, GIF, WebP or PDF only, 1 byte to 5MB, and a PDF's bytes
+    /// must start `%PDF-`. Pre-checking is the
     /// difference between an instant "that file is too large" and five megabytes
     /// spent on a metered connection to be told the same thing.
     ///
@@ -362,7 +363,7 @@ public struct InboxRepository: Sendable {
         mimeType: String,
         bytes: Data
     ) async -> Result<UploadedMedia, ApiError> {
-        if let refusal = MediaUploadLimits.refusal(mimeType: mimeType, byteCount: bytes.count) {
+        if let refusal = MediaUploadLimits.refusal(mimeType: mimeType, bytes: bytes) {
             return .failure(refusal)
         }
         let outcome = await client.send(
@@ -387,13 +388,19 @@ public struct InboxRepository: Sendable {
 /// duplicating them here buys latency and a metered connection, not safety. If
 /// the two ever disagree the server is right, and this constant is the one to fix.
 public enum MediaUploadLimits {
-    /// The four types the route allows. Anything else is a 400 naming the rule.
+    /// The four image types and PDF, the five the route allows. Anything else is a 400
+    /// naming the rule. ⛔ HTML and SVG stay out: served back from the service's origin,
+    /// either could run script.
     public static let allowedMimeTypes: Set<String> = [
         "image/jpeg",
         "image/png",
         "image/gif",
         "image/webp",
+        MediaMimeType.pdf,
     ]
+
+    /// The first bytes of every PDF, `%PDF-`.
+    static let pdfMagic = Data("%PDF-".utf8)
 
     /// 5 MB, as the route counts it.
     public static let maximumByteCount = 5 * 1024 * 1024
@@ -413,6 +420,21 @@ public enum MediaUploadLimits {
         }
         guard byteCount <= maximumByteCount else {
             return .http(status: 400, message: InboxCopy.attachmentSize)
+        }
+        return nil
+    }
+
+    /// ``refusal(mimeType:byteCount:)``, then the route's PDF check.
+    ///
+    /// ⛔ A PDF IS CHECKED BY ITS BYTES, NOT ITS CLAIMED TYPE, as the route does: the type
+    /// is the caller's word, so a file named `.pdf` that does not start `%PDF-` is refused
+    /// before five megabytes are spent learning that.
+    public static func refusal(mimeType: String, bytes: Data) -> ApiError? {
+        if let refusal = refusal(mimeType: mimeType, byteCount: bytes.count) {
+            return refusal
+        }
+        guard mimeType != MediaMimeType.pdf || bytes.starts(with: pdfMagic) else {
+            return .http(status: 400, message: InboxCopy.attachmentNotPdf)
         }
         return nil
     }

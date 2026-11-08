@@ -14,6 +14,14 @@ final class ClientRefusalFrenchTests: XCTestCase {
         }
     }
 
+    /// The PDF refusal too, which is the core's own sentence like the others.
+    func testThePdfRefusalKeepsItsSentenceInFrench() {
+        L10nRuntime.withLocale(.frCA) {
+            let refusal = MediaUploadLimits.refusal(mimeType: "application/pdf", bytes: Data([1, 2]))
+            XCTAssertEqual(refusal?.localizedMessage, "Ce fichier n'est pas un PDF.")
+        }
+    }
+
     /// And the same failure from the server, with no code, is the screen's to word.
     func testTheServersSentenceWithNoCodeIsLeftToTheScreen() {
         L10nRuntime.withLocale(.frCA) {

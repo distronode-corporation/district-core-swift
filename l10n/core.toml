@@ -48,6 +48,15 @@ tier = "T2"
 state = "reviewed"
 note = "Refusal shown before sending a message attachment that has no bytes."
 
+[inbox.attachment_not_pdf]
+en = "That file is not a PDF."
+fr = "Ce fichier n'est pas un PDF."
+ctx = "error"
+screen = "inbox compose"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before sending a message attachment labelled as a PDF whose contents are not a PDF. PDF is a format name."
+
 [inbox.attachment_size]
 en = "Attachments must be 5 MB or smaller."
 fr = "Les pièces jointes sont limitées à 5 Mo."
@@ -58,13 +67,13 @@ state = "reviewed"
 note = "Refusal shown before sending a message attachment larger than 5 megabytes. Use the French unit abbreviation (Mo)."
 
 [inbox.attachment_type]
-en = "Attachments must be a JPEG, PNG, GIF or WebP image."
-fr = "Les pièces jointes doivent être des images JPEG, PNG, GIF ou WebP."
+en = "Attachments must be a JPEG, PNG, GIF or WebP image, or a PDF."
+fr = "Les pièces jointes doivent être des images JPEG, PNG, GIF ou WebP, ou des PDF."
 ctx = "error"
 screen = "inbox compose"
 tier = "T2"
 state = "reviewed"
-note = "Refusal shown before sending a message attachment that is not one of the four image formats. The four are format names."
+note = "Refusal shown before sending a message attachment that is not one of the four image formats or a PDF. The five are format names."
 
 [inbox.draft_blank]
 en = "A draft cannot be blank. Delete it instead."

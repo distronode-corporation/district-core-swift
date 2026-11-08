@@ -18,6 +18,7 @@ package enum ClientRefusal {
             DeskCopy.logoType,
             DeskCopy.settingsEmpty,
             InboxCopy.attachmentEmpty,
+            InboxCopy.attachmentNotPdf,
             InboxCopy.attachmentSize,
             InboxCopy.attachmentType,
             InboxCopy.draftBlank,

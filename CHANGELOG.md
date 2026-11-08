@@ -6,6 +6,42 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [8.6.0] - not yet tagged
+
+### Added
+
+- Timeline attachments: `TimelineEvent.attachments` (optional) carries one
+  `TimelineAttachment` (`url`, `mimeType`, `fileName`, the last two nil when the service
+  cannot say) per entry of `mediaUrls`, in the same order. `mediaUrls` is unchanged.
+  `ThreadEvent.attachments` carries them on both the typed and the shape-guarded path (empty
+  from a service older than the key; an entry without a string `url` is skipped), and
+  `TimelineAttachment.isPDF` (against the new `MediaMimeType.pdf`) tells a document
+  from an image. `district-timeline.json` and
+  `district-timeline-meta.json` are re-vendored with the service's new PDF row.
+- PDF uploads: `MediaUploadLimits.allowedMimeTypes` gains `application/pdf` (five types),
+  and the new `MediaUploadLimits.refusal(mimeType:bytes:)`, which `uploadMedia` now calls,
+  refuses a file sent as a PDF whose bytes do not start `%PDF-`, as the route does. The type
+  refusal names PDF (`inbox.attachment_type`, EN and fr-CA), and `inbox.attachment_not_pdf`
+  is new. The 5 MB cap is unchanged.
+- The workspace's email identity on `WorkspaceRepository`: `emailIdentity(workspaceId:)`
+  (`GET /api/district/workspace/email-identity`, every role) answers
+  `EmailIdentityResponse` (`senderName`, `replyTo`, `memberEmail`; `""` is unset), and
+  `saveEmailIdentity(workspaceId:senderName:replyTo:)` (`PATCH`, `agency` and `client`)
+  answers `EmailIdentitySaveResponse` (no `memberEmail`). nil leaves a value alone and `""`
+  clears it; neither field, a sender name over 100 or a Reply-to over 320 UTF-16 units is
+  refused without a request. Refusals keep their code and status. ⚠️ `EndpointID` gains
+  `emailIdentity` and `saveEmailIdentity`.
+- `StudioArea.integrations`: `/dashboard/district/studio/integrations` now resolves to the
+  Studio's Integrations area instead of the browser. ⚠️ `StudioArea` gains a case; an app
+  that switches over it and has no integrations screen must open the web page itself.
+
+### Changed
+
+- Call handling is gated against the service's new `district-call-handling.json` and
+  `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
+  change to the type. With the email identity's two, the fixture count is 238 (the Android
+  client's count moves with it). Endpoint rows 154, typed 152.
+
 ## [8.5.0] - 2026-11-08
 
 ### Added

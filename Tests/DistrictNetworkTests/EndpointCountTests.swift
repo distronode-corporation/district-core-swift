@@ -51,8 +51,8 @@ extension EndpointSurfaceTests {
         //
         // ⛔ A ROUTE WITH NO CONTRACT FIXTURE MUST NOT MOVE
         // `ContractManifest.expectedFixtureCount`. The corpus mirrors the Kotlin
-        // client, so a surface that client lacks (search, support, the desk, call
-        // handling, the hang-up, blocking) arrives with no fixture, and the count is
+        // client, so a surface that client lacks (search, support, the desk, the
+        // hang-up, blocking) arrives with no fixture, and the count is
         // asserted EXACTLY against the files on disk. Its wire shape is pinned by the
         // byte-exact rows in `EndpointTable` instead.
         //
@@ -69,7 +69,7 @@ extension EndpointSurfaceTests {
         // `SchedulingAdminRepository.perform` is generic and decodes whatever type the
         // CALLER names, so what is fixed is the ENVELOPE rather than the payload. See
         // `TypedEndpoints.schedulingAdmin`.
-        XCTAssertEqual(typed.count, 150)
+        XCTAssertEqual(typed.count, 152)
         // ⚠️ THE THIRD LIST, `RedirectEndpoints`, IS GONE. Its two members (the call
         // recording and the scheduler recording download) were retired on 2026-10-03.
     }

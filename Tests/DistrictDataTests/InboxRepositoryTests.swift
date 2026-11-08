@@ -295,12 +295,59 @@ final class InboxRepositoryTests: XCTestCase {
     /// these and its answer wins; this constant only buys latency.
     func testTheUnsupportedTypeAndEmptyFileRefusalsAreDistinct() {
         XCTAssertEqual(
-            MediaUploadLimits.refusal(mimeType: "application/pdf", byteCount: 10)?.message,
-            "Attachments must be a JPEG, PNG, GIF or WebP image."
+            MediaUploadLimits.refusal(mimeType: "image/svg+xml", byteCount: 10)?.message,
+            "Attachments must be a JPEG, PNG, GIF or WebP image, or a PDF."
         )
+        XCTAssertEqual(MediaUploadLimits.refusal(mimeType: "text/html", byteCount: 10)?.httpStatus, 400)
         XCTAssertEqual(MediaUploadLimits.refusal(mimeType: "image/gif", byteCount: 0)?.message, "That file is empty.")
         XCTAssertNil(MediaUploadLimits.refusal(mimeType: "image/webp", byteCount: 1))
-        XCTAssertEqual(MediaUploadLimits.allowedMimeTypes.count, 4)
+        XCTAssertNil(MediaUploadLimits.refusal(mimeType: "application/pdf", byteCount: 10))
+        XCTAssertEqual(MediaUploadLimits.allowedMimeTypes.count, 5)
+    }
+
+    /// ⛔ A PDF IS CHECKED BY ITS BYTES, AS THE ROUTE DOES: a file that only claims the type
+    /// is refused without a request, and the byte check runs after the size checks.
+    func testAPdfIsCheckedByItsBytes() {
+        let pdf = Data("%PDF-1.7\n".utf8)
+        XCTAssertNil(MediaUploadLimits.refusal(mimeType: "application/pdf", bytes: pdf))
+        XCTAssertEqual(
+            MediaUploadLimits.refusal(mimeType: "application/pdf", bytes: Data("<html>".utf8))?.message,
+            "That file is not a PDF."
+        )
+        XCTAssertEqual(
+            MediaUploadLimits.refusal(mimeType: "application/pdf", bytes: Data("%PDF".utf8))?.message,
+            "That file is not a PDF."
+        )
+        XCTAssertEqual(
+            MediaUploadLimits.refusal(mimeType: "application/pdf", bytes: Data())?.message,
+            "That file is empty."
+        )
+        // ⚠️ An image is not byte-checked: the route checks only a PDF's bytes.
+        XCTAssertNil(MediaUploadLimits.refusal(mimeType: "image/png", bytes: Data("%PDF-".utf8)))
+    }
+
+    /// A file that only claims to be a PDF is refused before it is sent, and a real one is sent.
+    func testAPdfUploadIsByteCheckedBeforeItIsSent() async {
+        let body = #"""
+        {"success":true,"media":{"id":"med_2","mimeType":"application/pdf","sizeBytes":9,
+         "url":"https://www.distronode.com/api/media/med_2?name=quote.pdf"}}
+        """#
+        let transport = RepositoryTransport(json: body)
+        let repository = InboxRepository(client: .repositoryTest(transport))
+
+        let fake = await repository
+            .uploadMedia(workspaceId: "ws_1", fileName: "quote.pdf", mimeType: "application/pdf", bytes: Data([1, 2]))
+        XCTAssertEqual(fake.failureOnly?.message, "That file is not a PDF.")
+        XCTAssertTrue(transport.requestedURLs.isEmpty)
+
+        let real = await repository.uploadMedia(
+            workspaceId: "ws_1",
+            fileName: "quote.pdf",
+            mimeType: "application/pdf",
+            bytes: Data("%PDF-1.7\n".utf8)
+        )
+        XCTAssertEqual(real.successOnly?.url, "https://www.distronode.com/api/media/med_2?name=quote.pdf")
+        XCTAssertEqual(transport.requestedURLs.count, 1)
     }
 
     /// ⛔ THE URL IT RETURNS IS AN ANONYMOUS CAPABILITY URL and must be loaded back

@@ -73,8 +73,8 @@ final class ApiErrorLocalizationTests: XCTestCase {
             for sentence in ClientRefusal.sentences {
                 XCTAssertEqual(ApiError.http(status: 400, message: sentence).localizedMessage, sentence)
             }
-            // Eight refusals, seven sentences: the desk and the inbox both say "That file is empty."
-            XCTAssertEqual(ClientRefusal.sentences.count, 7)
+            // Nine refusals, eight sentences: the desk and the inbox both say "That file is empty."
+            XCTAssertEqual(ClientRefusal.sentences.count, 8)
         }
     }
 

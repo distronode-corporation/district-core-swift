@@ -99,8 +99,8 @@ public struct TimelinePageInfo: Codable, Sendable {
 /// ⚠️ THE OPTIONALS ARE THE FIELDS THE FIXTURES OMIT, NOT THE FIELDS THAT CAN BE
 /// NULL. Neither timeline fixture carries a single explicit null: `duration`,
 /// `summary` and `hasTranscript` are simply absent on a message row, `subject` on
-/// anything that is not an email, and `mediaUrls` on a message with no
-/// attachments. The strict gate compares key sets, so each of these has to be an
+/// anything that is not an email, and `mediaUrls` and `attachments` on a message
+/// with no attachments. The strict gate compares key sets, so each of these has to be an
 /// Optional for the re-encode to omit the key exactly where the fixture does.
 public struct TimelineEvent: Codable, Sendable {
     /// The `Message.id` or `Call.id` this row came from.
@@ -138,6 +138,13 @@ public struct TimelineEvent: Codable, Sendable {
     /// ⛔ THESE ARE ANONYMOUS CAPABILITY URLs (`/api/media/<uuid>`) and must be
     /// loaded WITHOUT this client's bearer token.
     public let mediaUrls: [String]?
+    /// What each of ``mediaUrls`` is: one entry per URL, in the same order.
+    ///
+    /// ⚠️ BESIDE ``mediaUrls``, NEVER INSTEAD OF IT. The service added this key and left
+    /// ``mediaUrls`` unchanged so an installed build keeps reading the URLs; a row with no
+    /// media omits both keys, and a server older than the change omits this one alone,
+    /// which is why it is Optional and why nil says nothing about the URLs.
+    public let attachments: [TimelineAttachment]?
     /// Call rows only, in seconds.
     public let duration: Int?
     /// The voice agent's post-call summary, when one exists.
@@ -151,4 +158,40 @@ public struct TimelineEvent: Codable, Sendable {
     /// fetch the text from `calls/{id}/transcript` only when it is tapped. Adding
     /// the field back would model a key neither fixture has.
     public let hasTranscript: Bool?
+}
+
+/// One attachment on a timeline message: its URL, and what the service knows about it.
+///
+/// ⛔ ``url`` IS AN ANONYMOUS CAPABILITY URL, like every entry in
+/// ``TimelineEvent/mediaUrls``, and is loaded WITHOUT this client's bearer token.
+///
+/// ⚠️ ``mimeType`` AND ``fileName`` ARE NULL WHEN NOTHING SAYS (a carrier link with no
+/// extension), and such an attachment renders as an image, as every one did before the
+/// key existed. For an upload of the service's own the type comes from the stored row;
+/// otherwise from the URL. An uploaded PDF's URL carries its name (`?name=`), which is
+/// where ``fileName`` comes from.
+public struct TimelineAttachment: Codable, Sendable, Equatable {
+    public let url: String
+    /// `image/jpeg`, `application/pdf` and so on, or nil when nothing says. ⚠️ Raw, so a
+    /// type the service adds later renders as a file rather than failing the thread.
+    public let mimeType: String?
+    /// The name to show, or nil when nothing says.
+    public let fileName: String?
+
+    public init(url: String, mimeType: String?, fileName: String?) {
+        self.url = url
+        self.mimeType = mimeType
+        self.fileName = fileName
+    }
+
+    /// Whether this attachment is a PDF, the one non-image type the upload route accepts.
+    public var isPDF: Bool {
+        mimeType == MediaMimeType.pdf
+    }
+}
+
+/// The attachment types the service names.
+public enum MediaMimeType {
+    /// The one document type the upload route accepts, checked there by its bytes.
+    public static let pdf = "application/pdf"
 }

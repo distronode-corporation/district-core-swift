@@ -1139,11 +1139,14 @@ package enum InboxCopy {
     /// `inbox.attachment_empty`
     package static var attachmentEmpty: String { L10nRuntime.locale == .frCA ? "Ce fichier est vide." : "That file is empty." }
 
+    /// `inbox.attachment_not_pdf`
+    package static var attachmentNotPdf: String { L10nRuntime.locale == .frCA ? "Ce fichier n'est pas un PDF." : "That file is not a PDF." }
+
     /// `inbox.attachment_size`
     package static var attachmentSize: String { L10nRuntime.locale == .frCA ? "Les pièces jointes sont limitées à 5 Mo." : "Attachments must be 5 MB or smaller." }
 
     /// `inbox.attachment_type`
-    package static var attachmentType: String { L10nRuntime.locale == .frCA ? "Les pièces jointes doivent être des images JPEG, PNG, GIF ou WebP." : "Attachments must be a JPEG, PNG, GIF or WebP image." }
+    package static var attachmentType: String { L10nRuntime.locale == .frCA ? "Les pièces jointes doivent être des images JPEG, PNG, GIF ou WebP, ou des PDF." : "Attachments must be a JPEG, PNG, GIF or WebP image, or a PDF." }
 
     /// `inbox.draft_blank`
     package static var draftBlank: String { L10nRuntime.locale == .frCA ? "Un brouillon ne peut pas être vide. Supprimez-le plutôt." : "A draft cannot be blank. Delete it instead." }

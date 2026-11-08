@@ -120,6 +120,7 @@ final class ThreadPageReaderTests: XCTestCase {
         XCTAssertEqual(event.status, "")
         XCTAssertNil(event.subject)
         XCTAssertEqual(event.mediaUrls, [])
+        XCTAssertEqual(event.attachments, [])
         XCTAssertNil(event.durationSeconds)
         XCTAssertNil(event.summary)
         XCTAssertFalse(event.hasTranscript)
@@ -137,6 +138,38 @@ final class ThreadPageReaderTests: XCTestCase {
 
         let urls = try XCTUnwrap(page.events.first).mediaUrls
         XCTAssertEqual(urls, ["https://www.distronode.com/api/media/a", "https://www.distronode.com/api/media/b"])
+    }
+
+    /// ⚠️ AN ATTACHMENT WITHOUT A STRING `url` IS SKIPPED, the same rule as `mediaUrls`, and a
+    /// null or absent type or name stays nil: the service sends null when nothing says.
+    func testAnAttachmentWithoutAURLIsSkippedAndAMissingTypeStaysNil() throws {
+        let row = #"""
+        {"id":"m_1","timestamp":"2026-08-19T09:41:00.000Z",
+         "mediaUrls":["https://carrier.test/a","https://carrier.test/b"],
+         "attachments":[{"url":"https://carrier.test/a","mimeType":null,"fileName":null},{"url":7},
+          {"mimeType":"image/png"},{"url":"https://carrier.test/b"}]}
+        """#
+        let page = try read(#"{"success":true,"timeline":[\#(row)]}"#)
+
+        let attachments = try XCTUnwrap(page.events.first).attachments
+        XCTAssertEqual(attachments, [
+            TimelineAttachment(url: "https://carrier.test/a", mimeType: nil, fileName: nil),
+            TimelineAttachment(url: "https://carrier.test/b", mimeType: nil, fileName: nil),
+        ])
+        XCTAssertEqual(attachments.map(\.isPDF), [false, false])
+    }
+
+    /// ⚠️ A ROW WITH MEDIA FROM A SERVER OLDER THAN `attachments` KEEPS ITS URLS, both ways.
+    func testAServerOlderThanAttachmentsStillCarriesTheURLs() throws {
+        let row = #"""
+        {"id":"m_1","type":"sms","timestamp":"2026-08-19T09:41:00.000Z","direction":"inbound",
+         "body":"","status":"received","mediaUrls":["https://carrier.test/a"]}
+        """#
+        let both = try readBothWays(#"{"success":true,"timeline":[\#(row)]}"#)
+
+        XCTAssertEqual(both.typed, both.fallback)
+        XCTAssertEqual(both.typed.events.first?.mediaUrls, ["https://carrier.test/a"])
+        XCTAssertEqual(both.typed.events.first?.attachments, [])
     }
 
     /// ⛔ THE TRANSCRIPT ITSELF IS NOT IN THIS PAYLOAD, DELIBERATELY. Transcripts
@@ -190,14 +223,18 @@ final class ThreadPageReaderTests: XCTestCase {
     /// ⛔ THE TWO PATHS MUST AGREE VALUE FOR VALUE ON THE FIELD UNION, and this
     /// document is `district-timeline.json`'s: a missed call, an answered call
     /// with a duration, a summary and a transcript flag, an outbound SMS, an MMS
-    /// carrying `mediaUrls`, and an email carrying `subject`. Those are the six
-    /// keys that are OPTIONAL on the DTO and defaulted by the fallback, i.e.
-    /// exactly the places the two mappings could drift apart.
+    /// and a PDF carrying `mediaUrls` and `attachments`, and an email carrying `subject`.
+    /// Those are the seven keys that are OPTIONAL on the DTO and defaulted by the
+    /// fallback, i.e. exactly the places the two mappings could drift apart.
     func testTheTypedPathAndTheFallbackProduceTheSamePageForTheFirstPageShape() throws {
         let both = try readBothWays(Self.firstPageDocument)
 
         XCTAssertEqual(both.typed, both.fallback)
-        XCTAssertEqual(both.typed.events.count, 5)
+        XCTAssertEqual(both.typed.events.count, 6)
+        let pdf = try XCTUnwrap(both.typed.events.first { $0.id == "msg_timeline_pdf_out" })
+        XCTAssertEqual(pdf.attachments.map(\.isPDF), [true])
+        XCTAssertEqual(pdf.attachments.first?.fileName, "Roof quote.pdf")
+        XCTAssertEqual(pdf.attachments.map(\.url), pdf.mediaUrls)
         XCTAssertEqual(both.typed.droppedEventCount, 0)
     }
 
@@ -287,7 +324,13 @@ final class ThreadPageReaderTests: XCTestCase {
       "body":"Confirmed for Thursday at 2pm.","status":"delivered"},
      {"id":"msg_timeline_mms","type":"sms","timestamp":"2026-08-15T14:10:00.000Z","direction":"inbound",
       "body":"Here is the photo of the roof.","status":"received",
-      "mediaUrls":["https://media.contract.test/roof.jpg"]},
+      "mediaUrls":["https://media.contract.test/roof.jpg"],
+      "attachments":[{"url":"https://media.contract.test/roof.jpg","mimeType":"image/jpeg","fileName":"roof.jpg"}]},
+     {"id":"msg_timeline_pdf_out","type":"sms","timestamp":"2026-08-15T14:15:00.000Z","direction":"outbound",
+      "body":"Here is the quote for the roof.","status":"delivered",
+      "mediaUrls":["https://www.distronode.test/api/media/0b5e?name=Roof%20quote.pdf"],
+      "attachments":[{"url":"https://www.distronode.test/api/media/0b5e?name=Roof%20quote.pdf",
+       "mimeType":"application/pdf","fileName":"Roof quote.pdf"}]},
      {"id":"msg_timeline_email","type":"email","timestamp":"2026-08-15T14:20:00.000Z","direction":"inbound",
       "body":"Could we move Thursday to Friday?","status":"received","subject":"Re: Thursday appointment"}
     ],"pageInfo":{"hasMore":false,"oldest":"2026-08-15T13:10:00.000Z","oldestId":"call_contract_missed"}}

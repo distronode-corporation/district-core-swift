@@ -1,7 +1,7 @@
 import DistrictModel
 import Foundation
 
-// The setup wizard's read, in a file of its own because `ImplementedFixtures.swift` is at its
+// The setup wizard's state, writes and step reads, in a file of its own because `ImplementedFixtures.swift` is at its
 // 500-line ceiling (the same reason `+Persona` and `+MessageThread` exist).
 
 extension ImplementedFixtures {
@@ -17,6 +17,16 @@ extension ImplementedFixtures {
     static var setup: [ImplementedFixture] {
         [
             gate("district-setup.json", DistrictSetupResponse.self),
+            // The PATCH answers the whole state after the write, the same body as the GET.
+            gate("district-setup-patch.json", DistrictSetupResponse.self),
+            gate("district-setup-lookup.json", SetupLookupResponse.self),
+            gate("district-setup-lookup-unreadable.json", SetupLookupRefusal.self),
+            gate("district-setup-test-call.json", SetupTestCallResponse.self),
+            gate("district-forwarding-check.json", ForwardingCheckResponse.self),
+            gate("district-forwarding-check-start.json", ForwardingCheckResponse.self),
+            gate("district-connections.json", ConnectionsResponse.self),
+            // A viewer's answer: the rows without the calendar resolution.
+            gate("district-connections-viewer.json", ConnectionsResponse.self),
         ]
     }
 }

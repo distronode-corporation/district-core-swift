@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 193
+    static let expectedFixtureCount = 195
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -74,7 +74,11 @@ enum ContractManifest {
         // The Inbox thread-assignment read (`GET conversations/assignments`), which
         // this client does not call yet.
         "district-conversation-assignments.json",
+        // The `metaChannels=1` Inbox reads (app parity: replyOptions and Messenger/Instagram
+        // threads), which this client does not send yet. They leave with `ReplyOption`.
+        "district-conversations-reply-options.json",
         "district-pkce-vectors.json",
+        "district-timeline-meta.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

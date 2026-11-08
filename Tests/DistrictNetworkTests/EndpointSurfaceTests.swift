@@ -315,18 +315,22 @@ final class EndpointSurfaceTests: XCTestCase {
         XCTAssertEqual(billed.method, .post)
     }
 
-    /// ⛔ A CAMPAIGN PAUSE MUST NEVER REACH `workspace/campaign-settings`, WHICH
-    /// REBUILDS ALL THREE SDR FIELDS FROM THE BODY, the same JSON sent one path
-    /// over answers 200 and wipes the goal text.
-    func testTheCampaignPauseUsesTheStatusPathNotTheSettingsPath() {
+    /// ⛔ A CAMPAIGN PAUSE NEVER REACHES `workspace/campaign-settings`, AND THAT ROUTE NEVER
+    /// CARRIES THE SWITCH. The on switch goes to `campaign-status`, which merges and answers
+    /// the read's shape; `campaign-settings` is reached by one ID only, for the batch size
+    /// and goal, and no body built for it can hold `infiniteSdrEnabled`.
+    func testTheCampaignPauseUsesTheStatusPathNotTheSettingsPath() throws {
         let pause = DistrictEndpoints.setCampaignEnabled(workspaceId: "ws_1", infiniteSdrEnabled: false)
         XCTAssertEqual(ApiPath.build(pause.segments), "/api/district/workspace/campaign-status")
-        for row in EndpointTable.all() {
-            XCTAssertFalse(
-                row.descriptor.segments.contains("campaign-settings"),
-                "\(row.id.rawValue) addresses the destructive campaign-settings route"
-            )
-        }
+        let settings = EndpointTable.all().filter { $0.descriptor.segments.contains("campaign-settings") }
+        XCTAssertEqual(settings.map(\.id), [.saveCampaignSettings])
+        let full = DistrictEndpoints.saveCampaignSettings(
+            workspaceId: "ws_1",
+            sdrBatchSize: 10,
+            sdrCampaignGoal: ""
+        )
+        XCTAssertEqual(try encodedBody(full), #"{"sdrBatchSize":10,"sdrCampaignGoal":"","workspaceId":"ws_1"}"#)
+        XCTAssertFalse(try encodedBody(full).contains("infiniteSdrEnabled"))
     }
 
     /// ⚠️ An id is encoded as exactly ONE segment. A call id of `a/../../admin`

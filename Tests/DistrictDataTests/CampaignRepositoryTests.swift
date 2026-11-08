@@ -109,10 +109,10 @@ final class CampaignRepositoryTests: XCTestCase {
     // MARK: - Pausing and resuming
 
     /// ⛔ IT PATCHES `campaign-status`, NOT `campaign-settings`, AND THE PATH IS THE
-    /// WHOLE FEATURE. The same `{infiniteSdrEnabled:false}` sent to the settings route
-    /// would WIPE the goal text and reset the batch size to 1, with a 200; this route
-    /// spreads the stored Json and assigns one key. The URL is asserted for that
-    /// reason rather than as boilerplate.
+    /// WHOLE FEATURE. This route spreads the stored Json, assigns one key and answers
+    /// the read's shape; the settings route saves the batch size and goal only and
+    /// answers a bare `{success}`. The URL is asserted for that reason rather than as
+    /// boilerplate.
     ///
     /// ⛔ AND THE REPLY IS ADOPTED. It is the READ's shape, derived from the object the
     /// server just merged rather than re-read, so the two fields the request never

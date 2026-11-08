@@ -26,7 +26,7 @@ final class EndpointCampaignGuardTests: XCTestCase {
         XCTAssertEqual(DistrictPaths.aiCampaignLaunch, Self.outbound)
         XCTAssertNil(EndpointID(rawValue: "callsOutbound"), "a second name for the launcher")
 
-        XCTAssertEqual(TypedEndpoints.campaigns, [.aiCampaignLaunch])
+        XCTAssertTrue(TypedEndpoints.campaigns.contains(.aiCampaignLaunch))
         XCTAssertFalse(TypedEndpoints.softphone.contains(.aiCampaignLaunch))
 
         // The routes under `calls/` a person dials and answers through, so the filter

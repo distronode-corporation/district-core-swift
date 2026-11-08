@@ -3,8 +3,8 @@ import DistrictModel
 import DistrictNetwork
 import Foundation
 
-/// AI calling campaigns: the workspace's voice agent phones a list of contacts with one
-/// goal.
+/// AI calling campaigns: the launcher, where the workspace's voice agent phones a list of
+/// contacts with one goal, and the always-on campaign's batch size and goal.
 ///
 /// ⛔ THE ONLY WAY TO `calls/outbound`, AND NOTHING SOFTPHONE-RELATED REACHES IT. The voice
 /// agent places these calls and speaks on them, so a person who dialled through this route
@@ -62,5 +62,36 @@ public struct CampaignsRepository: Sendable {
             as: AICampaignLaunchResponse.self
         )
         return outcome.flatMap { ResponseEnvelope.affirm("AICampaignLaunchResponse", $0.success, $0) }
+    }
+
+    /// Saves the always-on campaign's batch size and goal. nil leaves a value as it is;
+    /// `""` clears the goal.
+    ///
+    /// ⛔ NEVER THE ON SWITCH: pausing and resuming is
+    /// `WorkflowsRepository.setCampaignEnabled(workspaceId:infiniteSdrEnabled:)`, on
+    /// `campaign-status`.
+    ///
+    /// ⚠️ A BATCH SIZE OUTSIDE 1 TO ``DistrictEndpoints/campaignMaxBatchSize`` IS REFUSED
+    /// WITHOUT A REQUEST, the route's own range. The route answers a bare `{success}`; the
+    /// saved values are read back from `campaign-status`.
+    public func saveCampaignSettings(
+        workspaceId: String,
+        sdrBatchSize: Int? = nil,
+        sdrCampaignGoal: String? = nil
+    ) async -> Result<Void, ApiError> {
+        if let sdrBatchSize, !(1 ... DistrictEndpoints.campaignMaxBatchSize).contains(sdrBatchSize) {
+            return .failure(.http(status: 400, message: CampaignCopy.batchSizeRange))
+        }
+        let outcome = await client.send(
+            DistrictEndpoints.saveCampaignSettings(
+                workspaceId: workspaceId,
+                sdrBatchSize: sdrBatchSize,
+                sdrCampaignGoal: sdrCampaignGoal
+            ),
+            as: SuccessResponse.self
+        )
+        return outcome
+            .flatMap { ResponseEnvelope.affirm("CampaignSettingsResponse", $0.success, $0) }
+            .map { _ in }
     }
 }

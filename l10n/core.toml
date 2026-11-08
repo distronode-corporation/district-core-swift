@@ -3,6 +3,15 @@ catalog = "core"
 platform = "swift"
 apple = true
 
+[campaign.batch_size_range]
+en = "The batch size must be between 1 and 50 contacts."
+fr = "La taille du lot doit être de 1 à 50 contacts."
+ctx = "error"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before saving the always-on AI calling campaign's settings with a batch size (how many contacts it calls per run) below 1 or above 50. Mirrors the service's own range."
+
 [campaign.no_contacts]
 en = "Choose at least one contact to call."
 fr = "Choisissez au moins un contact à appeler."

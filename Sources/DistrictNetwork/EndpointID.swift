@@ -83,6 +83,10 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// `CampaignsRepository` alone. See
     /// ``DistrictEndpoints/aiCampaignLaunch(workspaceId:contactIds:prompt:accountId:)``.
     case aiCampaignLaunch
+    /// The campaign's batch size and goal (`workspace/campaign-settings`). ⛔ Never the on
+    /// switch, which is ``setCampaignEnabled``. See
+    /// ``DistrictEndpoints/saveCampaignSettings(workspaceId:sdrBatchSize:sdrCampaignGoal:)``.
+    case saveCampaignSettings
 
     // Rooms + meetings
     case roomToken
@@ -392,7 +396,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // nothing. With no case here and no ``DistrictPaths`` constant, and with
     // ``ApiRequestDescriptor``'s initialiser internal, `workspace/numbers/purchase` is
     // UNCONSTRUCTIBLE from outside this module rather than merely undocumented, the
-    // same mechanism that holds out `calls/outbound`, for an entirely different reason.
+    // same mechanism that holds out `video_` rooms, for an entirely different reason.
     // ⛔ 3.1.1 ALSO COVERS STEERING, so nothing links to the web marketplace either.
     // `EndpointSurfaceTests` pins both halves.
     //

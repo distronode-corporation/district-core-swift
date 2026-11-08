@@ -13,6 +13,7 @@ package enum ClientRefusal {
     /// Every refusal sentence in the active language.
     package static var sentences: Set<String> {
         [
+            CampaignCopy.batchSizeRange,
             CampaignCopy.noContacts,
             CampaignCopy.promptBlank,
             CampaignCopy.tooManyContacts,

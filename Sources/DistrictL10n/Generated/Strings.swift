@@ -712,6 +712,9 @@ package enum ApiErrorCopy {
 }
 
 package enum CampaignCopy {
+    /// `campaign.batch_size_range`
+    package static var batchSizeRange: String { L10nRuntime.locale == .frCA ? "La taille du lot doit être de 1 à 50 contacts." : "The batch size must be between 1 and 50 contacts." }
+
     /// `campaign.no_contacts`
     package static var noContacts: String { L10nRuntime.locale == .frCA ? "Choisissez au moins un contact à appeler." : "Choose at least one contact to call." }
 

@@ -102,13 +102,14 @@ enum DistrictPaths {
     static let workspaceMessaging = workspace + ["messaging"]
     static let workspaceMessagingTest = workspaceMessaging + ["test"]
 
-    /// ⛔ NOT `workspace/campaign-settings`, WHICH IS A DIFFERENT ROUTE AND A
-    /// DESTRUCTIVE ONE. The PATCH on `campaign-settings` writes all three SDR
-    /// fields unconditionally, so a partial body sent to it WIPES the goal text
-    /// and resets the batch size to 1, with a 200. `campaign-status` reads the
-    /// stored Json, spreads it and assigns ONE key. One path apart, opposite
-    /// outcomes.
+    /// ⛔ THE ON SWITCH, AND THE ONLY ROUTE THIS CLIENT SENDS IT TO.
+    /// `campaign-status` reads the stored Json, spreads it and assigns ONE key.
+    /// Its sibling ``workspaceCampaignSettings`` saves the batch size and the
+    /// goal, and never carries the switch from here.
     static let workspaceCampaignStatus = workspace + ["campaign-status"]
+    /// The campaign's batch size and goal. The route writes only the keys the
+    /// body carries.
+    static let workspaceCampaignSettings = workspace + ["campaign-settings"]
 
     /// ⛔ ONE PATH, FOUR VERBS, AND ITS SIBLING IS A SEPARATE ROUTE. The roster
     /// lives at `workspace/members` (GET/POST/PATCH/DELETE) and the display name

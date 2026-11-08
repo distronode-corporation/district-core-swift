@@ -65,13 +65,13 @@ public enum ApiBody: Sendable, Equatable {
 /// One fully-described request: the verb, the path as SEGMENTS, the query and
 /// the body.
 ///
-/// ⛔ THE INITIALISER IS INTERNAL, AND THAT IS THE `calls/outbound` GUARD. A
+/// ⛔ THE INITIALISER IS INTERNAL, AND THAT IS WHAT KEEPS THE SURFACE CLOSED. A
 /// public initialiser taking a segment list would let any caller, feature code,
-/// a future repository, a well-meant helper, address `calls/outbound` (the AI
-/// campaign dialer, which puts the voice agent on a human's line) or any other
-/// route this client has deliberately not ported. Because only
-/// ``DistrictEndpoints`` can construct one, the set of expressible requests is
-/// exactly ``EndpointID/allCases``.
+/// a future repository, a well-meant helper, address a route this client has
+/// deliberately not ported, or address `calls/outbound` (the AI campaign
+/// launcher, which puts the voice agent on the line) by a second way. Because
+/// only ``DistrictEndpoints`` can construct one, the set of expressible requests
+/// is exactly ``EndpointID/allCases``.
 ///
 /// ⛔ SEGMENTS, NEVER AN INTERPOLATED STRING. A call id of `a/../../admin`
 /// interpolated into `calls/{id}/transcript` resolved to

@@ -9,6 +9,7 @@ import XCTest
 final class GeneratedAccessorTests: XCTestCase {
     func testEveryCoreAccessorSaysWhatItsCatalogSays() {
         L10nRuntime.withLocale(.en) {
+            XCTAssertEqual(CampaignCopy.batchSizeRange, "The batch size must be between 1 and 50 contacts.")
             XCTAssertEqual(CampaignCopy.noContacts, "Choose at least one contact to call.")
             XCTAssertEqual(CampaignCopy.promptBlank, "Describe the goal of these calls before launching the campaign.")
             XCTAssertEqual(CampaignCopy.sinchContactRequired, "This workspace's carrier can only place this call to a saved contact.")
@@ -108,6 +109,7 @@ final class GeneratedAccessorTests: XCTestCase {
             XCTAssertEqual(VoiceStudioCopy.residencyLeg("{leg}", "{place}"), "{leg}: {place}")
         }
         L10nRuntime.withLocale(.frCA) {
+            XCTAssertEqual(CampaignCopy.batchSizeRange, "La taille du lot doit être de 1 à 50 contacts.")
             XCTAssertEqual(CampaignCopy.noContacts, "Choisissez au moins un contact à appeler.")
             XCTAssertEqual(CampaignCopy.promptBlank, "Décrivez l'objectif de ces appels avant de lancer la campagne.")
             XCTAssertEqual(CampaignCopy.sinchContactRequired, "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré.")

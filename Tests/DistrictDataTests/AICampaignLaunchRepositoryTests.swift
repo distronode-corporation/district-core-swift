@@ -105,3 +105,57 @@ final class AICampaignLaunchRepositoryTests: XCTestCase {
         XCTAssertEqual(unaffirmed.failureOnly, .decoding("AICampaignLaunchResponse did not affirm success=true"))
     }
 }
+
+/// The always-on campaign's batch size and goal: only what is given is sent, and the
+/// switch never is.
+final class CampaignSettingsRepositoryTests: XCTestCase {
+    func testOnlyTheGivenSettingsAreSentAndTheSwitchNever() async {
+        let transport = RepositoryTransport(queue: [#"{"success":true}"#, #"{"success":true}"#])
+        let campaigns = CampaignsRepository(client: .repositoryTest(transport))
+        let both = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrBatchSize: 50, sdrCampaignGoal: "")
+        let goal = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrCampaignGoal: "Book demos")
+        XCTAssertNotNil(both.successOnly)
+        XCTAssertNotNil(goal.successOnly)
+        XCTAssertEqual(transport.requests.map(\.method), [.patch, .patch])
+        XCTAssertEqual(transport.requestedURLs, Array(
+            repeating: "https://www.distronode.com/api/district/workspace/campaign-settings",
+            count: 2
+        ))
+        XCTAssertEqual(transport.bodies, [
+            #"{"sdrBatchSize":50,"sdrCampaignGoal":"","workspaceId":"ws_1"}"#,
+            #"{"sdrCampaignGoal":"Book demos","workspaceId":"ws_1"}"#,
+        ])
+    }
+
+    /// ⚠️ THE ROUTE'S RANGE IS REFUSED HERE, 1 TO 50, and nothing is sent.
+    func testABatchSizeOutsideTheRangeIsRefusedBeforeSending() async {
+        let transport = RepositoryTransport(queue: [])
+        let campaigns = CampaignsRepository(client: .repositoryTest(transport))
+        let zero = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrBatchSize: 0)
+        let over = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrBatchSize: 51)
+        XCTAssertEqual(zero.failureOnly, .http(status: 400, message: CampaignCopy.batchSizeRange))
+        XCTAssertEqual(over.failureOnly, .http(status: 400, message: CampaignCopy.batchSizeRange))
+        XCTAssertTrue(transport.requests.isEmpty)
+    }
+
+    /// A body that does not affirm success is a decoding failure, and a refusal keeps its code.
+    func testAnUnaffirmedSaveFailsAndARefusalKeepsItsCode() async {
+        let transport = RepositoryTransport([
+            HTTPResponse(
+                statusCode: 200,
+                headers: ["Content-Type": "application/json"],
+                body: Data(#"{"success":false}"#.utf8)
+            ),
+            HTTPResponse(
+                statusCode: 403,
+                headers: ["Content-Type": "application/json"],
+                body: Data(#"{"success":false,"error":"Forbidden","code":"forbidden"}"#.utf8)
+            ),
+        ])
+        let campaigns = CampaignsRepository(client: .repositoryTest(transport))
+        let unaffirmed = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrBatchSize: 5)
+        let refused = await campaigns.saveCampaignSettings(workspaceId: "ws_1", sdrBatchSize: 5)
+        XCTAssertEqual(unaffirmed.failureOnly, .decoding("CampaignSettingsResponse did not affirm success=true"))
+        XCTAssertEqual(refused.failureOnly?.code, "forbidden")
+    }
+}

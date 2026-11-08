@@ -10,7 +10,7 @@ import Foundation
 /// but a string template is the shape that invites the next path to take an id.
 ///
 /// ⛔ THEY ARE NOT IN ``DistrictPaths`` AND HAVE NO ``EndpointID``, WHICH IS THE
-/// SAME GUARD `calls/outbound` RELIES ON RATHER THAN AN OMISSION. Those are the
+/// SAME GUARD THAT HOLDS OUT `video_` ROOMS, NOT AN OMISSION. Those are the
 /// raw materials of ``ApiRequestDescriptor``, and a descriptor is a request
 /// ``ApiClient`` will attach a bearer to, which these five routes must never
 /// be: the credential is the code (exchange), Apple's identity token, or the

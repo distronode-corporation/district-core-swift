@@ -51,16 +51,25 @@ All notable changes to this package are recorded here. The format is based on
   address, in its own `TypedEndpoints.campaigns` family, and `EndpointSurfaceTests`'
   negative test is replaced by `EndpointCampaignGuardTests`, which pins that one ID
   addresses the route and that no repository but `CampaignsRepository` names it.
-  `district-calls-outbound.json` leaves `ContractManifest.unimplemented` as vendored; its
-  DNC row says `do_not_call` where the route sends `auto_dial_contact_opted_out`, and the
-  service's corrected fixture decodes unchanged.
+  `district-calls-outbound.json` is re-vendored from the service (one row per status, and
+  one skip per recipient rule: `auto_dial_country_not_permitted`, `auto_dial_outside_hours`,
+  `auto_dial_contact_opted_out`) and leaves `ContractManifest.unimplemented`.
+- The always-on campaign's batch size and goal,
+  `CampaignsRepository.saveCampaignSettings(workspaceId:sdrBatchSize:sdrCampaignGoal:)`
+  (`PATCH /api/district/workspace/campaign-settings`, `agency` and `client`): nil leaves a
+  value alone and is not sent, `""` clears the goal, and a batch size outside 1 to 50 is
+  refused without a request (`campaign.batch_size_range`, EN and fr-CA). It answers a bare
+  `{success}`, pinned by the service's new `district-campaign-settings.json`. ⛔ The on
+  switch never goes there: pausing stays `WorkflowsRepository.setCampaignEnabled` on
+  `campaign-status`. `EndpointID` gains `saveCampaignSettings`.
 
 ### Changed
 
 - Call handling is gated against the service's new `district-call-handling.json` and
   `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
   change to the type. With the email identity's two, the fixture count is 238 (the Android
-  client's count moves with it). With the campaign launcher, endpoint rows 155, typed 153.
+  client's count moves with it). With the campaign launcher and the campaign settings,
+  the fixture count is 239, endpoint rows 156, typed 154.
 
 ## [8.5.0] - 2026-11-08
 

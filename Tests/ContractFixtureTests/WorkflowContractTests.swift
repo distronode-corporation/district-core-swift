@@ -216,9 +216,8 @@ final class WorkflowContractTests: XCTestCase {
     /// firing a second request that would race its own write.
     ///
     /// ⛔ AND THE TWO FIELDS THE REQUEST DID NOT MENTION SURVIVED, WHICH IS THE
-    /// ASSERTION. The same `{infiniteSdrEnabled:false}` sent to
-    /// `workspace/campaign-settings` would wipe the goal text and reset the batch size
-    /// to 1, with a 200; this fixture is what shows `campaign-status` merges instead. A
+    /// ASSERTION: this fixture is what shows `campaign-status` merges rather than
+    /// rebuilding the three SDR fields from its body. A
     /// reply that echoed its own input would be indistinguishable from the correct one
     /// if the goal were missing, so the presence of both is the evidence.
     func testThePauseAnswersTheReadsShapeAndKeepsWhatItDidNotMention() throws {
@@ -233,7 +232,7 @@ final class WorkflowContractTests: XCTestCase {
         XCTAssertEqual(
             campaign.sdrCampaignGoal,
             "Book demos with lapsed trials",
-            "⛔ not wiped: campaign-status merges, campaign-settings would not"
+            "⛔ not wiped: campaign-status merges"
         )
     }
 

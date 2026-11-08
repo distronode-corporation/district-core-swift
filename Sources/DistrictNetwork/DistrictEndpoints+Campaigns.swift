@@ -1,7 +1,7 @@
 import Foundation
 
-/// The AI campaign launcher: the workspace's voice agent phones a list of contacts with
-/// one goal.
+/// AI campaigns: the launcher, where the workspace's voice agent phones a list of contacts
+/// with one goal, and the always-on campaign's batch size and goal.
 public extension DistrictEndpoints {
     /// The most contacts one launch may name: the route's `MAX_CONTACTS_PER_REQUEST`.
     ///
@@ -40,6 +40,35 @@ public extension DistrictEndpoints {
                 ("prompt", .string(prompt)),
                 ("accountId", .optional(accountId)),
                 ("channel", .string("voice")),
+            ]))
+        )
+    }
+
+    /// The most contacts the always-on campaign calls per run: the route's
+    /// `MAX_SDR_BATCH_SIZE`.
+    static let campaignMaxBatchSize = 50
+
+    /// Saves the always-on campaign's batch size and goal.
+    ///
+    /// ⛔ NEVER THE ON SWITCH. `infiniteSdrEnabled` goes only to `campaign-status`
+    /// (``setCampaignEnabled(workspaceId:infiniteSdrEnabled:)``), and this body cannot
+    /// carry it.
+    ///
+    /// ⚠️ THE ROUTE WRITES ONLY THE KEYS THE BODY CARRIES, so nil leaves a value alone
+    /// and is dropped from the body. `""` clears the goal.
+    static func saveCampaignSettings(
+        workspaceId: String,
+        sdrBatchSize: Int?,
+        sdrCampaignGoal: String?
+    ) -> ApiRequestDescriptor {
+        ApiRequestDescriptor(
+            .saveCampaignSettings,
+            .patch,
+            DistrictPaths.workspaceCampaignSettings,
+            body: .json(.object([
+                ("workspaceId", .string(workspaceId)),
+                ("sdrBatchSize", sdrBatchSize.map { JSONValue.integer($0) }),
+                ("sdrCampaignGoal", .optional(sdrCampaignGoal)),
             ]))
         )
     }

@@ -240,13 +240,11 @@ public extension DistrictEndpoints {
 
     /// Pause or resume the always-on SDR engine, and touch nothing else.
     ///
-    /// ⛔ THIS IS **NOT** `workspace/campaign-settings`, AND THE DISTINCTION IS THE
-    /// WHOLE REASON THE CALL EXISTS. That route rebuilds all three SDR fields from
-    /// the request body (`sdrCampaignGoal: goal || ""`,
-    /// `sdrBatchSize: floor(Number(size) || 1)`), so a partial body sent to pause a
-    /// campaign WIPES the goal text and resets the batch size to 1, with a 200.
-    /// `PATCH campaign-status` reads the stored Json, spreads it, and assigns ONE
-    /// key. Never point this at the other path to "reuse" a route.
+    /// ⛔ THIS IS **NOT** `workspace/campaign-settings`. `PATCH campaign-status`
+    /// reads the stored Json, spreads it, and assigns ONE key; the batch size and
+    /// the goal go through
+    /// ``saveCampaignSettings(workspaceId:sdrBatchSize:sdrCampaignGoal:)``, and the
+    /// switch goes only here. Never point this at the other path to "reuse" a route.
     ///
     /// ⛔ EXCLUDES `viewer` UNLIKE THE GET ON THE SAME PATH, the only verb split
     /// in this API. Watching a campaign and pausing one are different powers.

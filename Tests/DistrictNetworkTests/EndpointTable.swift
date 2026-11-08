@@ -70,7 +70,7 @@ enum EndpointTable {
             + membership() + workflows() + devices() + scheduling() + schedulingAdmin() + support()
             + numberRegistrations() + numberDocuments() + numberWrites()
             + carrierCompliance() + sipTrunking() + verifyAndLookup() + live() + parity() + hqVoice()
-            + nativeReauth() + twoStepSettings()
+            + nativeReauth() + twoStepSettings() + emailIdentity()
     }
 
     /// ⚠️ Force-unwrapped in TEST code only, and the guard it proves is asserted

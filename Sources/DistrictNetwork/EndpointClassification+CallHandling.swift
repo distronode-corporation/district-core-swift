@@ -18,13 +18,11 @@ public extension TypedEndpoints {
     /// ``DistrictData``'s `CallHandlingRepository` belong together, so no screen can
     /// reach one of these routes and get bytes back.
     ///
-    /// ⚠️ ALL FOUR HAVE NO CONTRACT FIXTURE, a property of the CORPUS rather than a
-    /// lowered bar, like `createContact` and `searchMessages`: the shared corpus
-    /// mirrors the Android client and that client has no call-handling surface. What
-    /// pins the shapes is the route source and `CallHandlingRepositoryTests`.
-    /// ⛔ SO `ContractManifest.expectedFixtureCount` MUST NOT MOVE FOR THEM. It is
-    /// asserted EXACTLY against the files on disk and nothing is on disk; bumping
-    /// it to "account for" these would red the fixture suite.
+    /// ⚠️ CALL HANDLING HAS FIXTURES, AVAILABILITY DOES NOT. `district-call-handling.json`
+    /// and `-patch.json` gate ``CallHandlingResponse`` for both verbs; the availability
+    /// pair has none in the corpus, so the route source and `CallHandlingRepositoryTests`
+    /// pin it. ⛔ `ContractManifest.expectedFixtureCount` counts files on disk, so it moves
+    /// only when one arrives.
     ///
     /// ⚠️ BOTH PATCHES ECHO THE VALUES THEY WROTE, which makes them the first writes on
     /// the workspace surface that need no re-read. Every save on

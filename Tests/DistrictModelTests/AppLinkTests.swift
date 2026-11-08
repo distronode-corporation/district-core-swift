@@ -207,6 +207,7 @@ final class AppLinkTests: XCTestCase {
             "call-handling": .callHandling,
             "skills": .skills,
             "knowledge": .knowledge,
+            "integrations": .integrations,
         ]
         XCTAssertEqual(Set(expected.values), Set(StudioArea.allCases))
         for (segment, area) in expected {
@@ -228,12 +229,25 @@ final class AppLinkTests: XCTestCase {
 
     /// ⛔ THE BROWSER, NOT THE SETTINGS HUB: these are real Studio pages neither app draws.
     func testAStudioPageTheAppsDoNotDrawOpensInTheBrowser() {
-        for segment in ["integrations", "video", "home", "not-a-page", "integrations/jira"] {
+        for segment in ["video", "home", "not-a-page", "video/settings"] {
             let resolved = AppLinkResolver.resolve(
                 url("https://www.distronode.com/dashboard/district/studio/" + segment + "?workspaceId=ws-2")
             )
             XCTAssertEqual(resolved, AppLinkOutcome.openInBrowser, segment)
         }
+    }
+
+    /// The Integrations page, an area since 8.6.0: a deeper path under it is still the page,
+    /// and the link keeps its workspace.
+    func testTheIntegrationsPageIsAStudioArea() {
+        let resolved = destination(
+            "https://www.distronode.com/dashboard/district/studio/integrations/calendar?workspaceId=ws-2"
+        )
+        XCTAssertEqual(resolved?.section, .studio)
+        XCTAssertEqual(resolved?.studioArea, .integrations)
+        XCTAssertEqual(resolved?.detailId, "integrations")
+        XCTAssertEqual(resolved?.workspaceId, "ws-2")
+        XCTAssertEqual(StudioArea.integrations.rawValue, "integrations")
     }
 
     func testTheStudioAreaIsCaseFoldedAndOnlyItsFirstSegmentIsRead() {

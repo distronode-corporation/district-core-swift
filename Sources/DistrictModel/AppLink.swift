@@ -55,8 +55,8 @@ public enum DistrictSection: String, Hashable, Sendable, CaseIterable {
 
     /// District Studio, the web's section for the AI receptionist's settings
     /// (`/dashboard/district/studio`, since 2026-10-04). ⚠️ ONLY THE AREAS IN
-    /// ``StudioArea`` RESOLVE HERE; the Studio's other pages (`integrations`, `video`)
-    /// have no screen in either app and resolve to ``AppLinkOutcome/openInBrowser``.
+    /// ``StudioArea`` RESOLVE HERE; the Studio's other page (`video`) has no screen in
+    /// either app and resolves to ``AppLinkOutcome/openInBrowser``.
     /// The area travels as ``AppLinkDestination/detailId`` and is read back through
     /// ``AppLinkDestination/studioArea``; no area at all is the Studio home, which the
     /// apps draw as their settings hub.
@@ -67,16 +67,19 @@ public enum DistrictSection: String, Hashable, Sendable, CaseIterable {
 ///
 /// ⛔ A CLOSED LIST, AND THE ABSENCES ARE DECISIONS. The web's Studio has seven pages
 /// after its home: Persona, Voice, Call handling, Skills, Knowledge, Integrations,
-/// Video. `integrations` and `video` are absent because neither app draws them, and a
-/// link to one that landed on the settings hub would show something the user did not
-/// ask for; they open the web page instead. The raw values are the web's path
-/// segments, so `call-handling` keeps its hyphen.
+/// Video. `video` is absent because neither app draws it, and a link to it that landed
+/// on the settings hub would show something the user did not ask for; it opens the web
+/// page instead. The raw values are the web's path segments, so `call-handling` keeps
+/// its hyphen.
 public enum StudioArea: String, Hashable, Sendable, CaseIterable {
     case persona
     case voice
     case callHandling = "call-handling"
     case skills
     case knowledge
+    /// `/dashboard/district/studio/integrations`, since 8.6.0. ⚠️ An app that has no
+    /// integrations screen yet must route this case to the web page itself.
+    case integrations
 }
 
 /// What a claimed URL means: a section, optionally one detail id, optionally a tenant.
@@ -252,8 +255,8 @@ public enum AppLinkResolver {
     /// to ``AppLinkOutcome/openInBrowser`` and opens the real web page. Any other
     /// segment inside the prefix resolves the same way.
     ///
-    /// - `studio/integrations`, `studio/video` and any other Studio page outside
-    ///   ``StudioArea``: neither app draws them. See ``DistrictSection/studio``.
+    /// - `studio/video` and any other Studio page outside ``StudioArea``: neither app
+    ///   draws them. See ``DistrictSection/studio``.
     /// - `settings`: ⛔ AMBIGUOUS IN A WAY THAT MATTERS, exactly as on Android. This
     ///   app has TWO settings surfaces, `Tab.account` (sign-out and account deletion,
     ///   deliberately tenant-free) and `Route.workspaceSettings` (persona, routing,
@@ -293,9 +296,9 @@ public enum AppLinkResolver {
     /// `calls/<id>` paragraph below gives for a page the website has not published either.
     ///
     /// ⚠️ `studio/<area>` IS KEPT TOO, and unlike `scheduling/<sub>` an unknown area is
-    /// the BROWSER rather than the section's root. The Studio's unmapped pages
-    /// (`integrations`, `video`) are real pages with real controls, and the settings hub
-    /// is not them. Only the area segment is read: `studio/persona/anything` is Persona.
+    /// the BROWSER rather than the section's root. The Studio's unmapped page (`video`)
+    /// is a real page with real controls, and the settings hub is not it. Only the area
+    /// segment is read: `studio/persona/anything` is Persona.
     ///
     /// ⚠️ `calls/<id>` IS THE OTHER DEEPER PATH THAT IS KEPT, AND THIS IS THE DELIBERATE
     /// DIVERGENCE FROM ANDROID. Android drops the id because it navigates to a single

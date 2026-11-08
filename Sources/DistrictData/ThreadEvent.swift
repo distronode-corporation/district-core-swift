@@ -71,6 +71,11 @@ public struct ThreadEvent: Sendable, Equatable, Identifiable {
     /// ⛔ THESE ARE ANONYMOUS CAPABILITY URLs (`/api/media/<uuid>`) and must be
     /// loaded WITHOUT this client's bearer token, see ``UploadedMedia/url``.
     public let mediaUrls: [String]
+    /// What each of ``mediaUrls`` is, one per URL in the same order, so a PDF can be drawn
+    /// as a file rather than an image. ⚠️ EMPTY ON A SERVER OLDER THAN THE KEY, while
+    /// ``mediaUrls`` is still filled: an entry of ``mediaUrls`` with no attachment here
+    /// renders as an image, as it did before.
+    public let attachments: [TimelineAttachment]
     /// Call rows only, in seconds.
     public let durationSeconds: Int?
     /// Call rows only.
@@ -233,6 +238,7 @@ enum ThreadPageReader {
             status: row.status,
             subject: row.subject,
             mediaUrls: row.mediaUrls ?? [],
+            attachments: row.attachments ?? [],
             durationSeconds: row.duration,
             summary: row.summary,
             hasTranscript: row.hasTranscript ?? false
@@ -319,9 +325,21 @@ enum ThreadPageReader {
             // the server filters it to strings on the way out, but this reads a
             // shape nothing in the database enforces.
             mediaUrls: row["mediaUrls"]?.arrayValue?.compactMap(\.stringValue) ?? [],
+            // ⚠️ An entry without a string `url` is skipped, the same rule as `mediaUrls`.
+            attachments: row["attachments"]?.arrayValue?.compactMap(attachment(from:)) ?? [],
             durationSeconds: row["duration"]?.integerValue,
             summary: row["summary"]?.stringValue,
             hasTranscript: row["hasTranscript"]?.boolValue ?? false
+        )
+    }
+
+    /// One `attachments` entry, or nil when it carries no string `url`.
+    private static func attachment(from entry: JSONValue) -> TimelineAttachment? {
+        guard let url = entry["url"]?.stringValue else { return nil }
+        return TimelineAttachment(
+            url: url,
+            mimeType: entry["mimeType"]?.stringValue,
+            fileName: entry["fileName"]?.stringValue
         )
     }
 

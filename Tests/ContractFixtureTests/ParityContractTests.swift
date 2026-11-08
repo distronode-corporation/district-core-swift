@@ -177,7 +177,15 @@ final class ParityContractTests: XCTestCase {
 
         XCTAssertEqual(response.timeline.last?.type, MessageChannel.messenger)
         XCTAssertEqual(response.timeline.last?.body, "Are you open Saturday?")
-        XCTAssertEqual(response.timeline.count, 6)
+        // The service's PDF row joined the five messages and the Messenger row.
+        XCTAssertEqual(response.timeline.count, 7)
+        let pdf = try XCTUnwrap(response.timeline.first { $0.id == "msg_timeline_pdf_out" })
+        let url = "https://www.distronode.test/api/media/0b5e7c1a-3f2d-4c8e-9a61-7d2f4e8b9c10?name=Roof%20quote.pdf"
+        XCTAssertEqual(
+            pdf.attachments,
+            [TimelineAttachment(url: url, mimeType: "application/pdf", fileName: "Roof quote.pdf")]
+        )
+        XCTAssertEqual(pdf.attachments?.map(\.url), pdf.mediaUrls)
     }
 
     // MARK: - WhatsApp

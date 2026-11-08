@@ -61,7 +61,7 @@ public enum UntypedEndpoints {
 /// ⚠️ NOT EVERY DTO HERE IS FIXTURE-PINNED, and that is a property of the corpus
 /// rather than a lowered bar. The shared corpus is generated for the Android
 /// client, so a route that client never calls (`createContact`, `messages/search`,
-/// call handling, provisioning, the softphone hang-up) can have no fixture on disk;
+/// provisioning, the softphone hang-up) can have no fixture on disk;
 /// its DTO is modelled from the route source and pinned by its repository's tests.
 /// ⛔ `ContractManifest.expectedFixtureCount` is asserted EXACTLY against the files
 /// on disk, so it moves only when files do.
@@ -80,7 +80,7 @@ public enum TypedEndpoints {
         core.union(desk).union(inbox).union(callHandling).union(numbers).union(softphone)
             .union(schedulingAdmin).union(persona).union(blocking).union(setup).union(live)
             .union(liveCall).union(notifyRead).union(hqVoice).union(nativeReauth)
-            .union(twoStepSettings)
+            .union(twoStepSettings).union(emailIdentity)
 
     private static let core: Set<EndpointID> = [
         .unreadCount,

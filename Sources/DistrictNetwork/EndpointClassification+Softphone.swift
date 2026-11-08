@@ -19,7 +19,7 @@ public extension TypedEndpoints {
     /// only thing in this client that reaches the carrier leg.
     ///
     /// ⚠️ IT HAS NO MOBILE CONTRACT FIXTURE, on the same footing as `createContact`,
-    /// `searchMessages` and call handling: the mobile corpus mirrors the Android
+    /// `searchMessages` and availability: the mobile corpus mirrors the Android
     /// client and that client has no hang-up. Its shape is pinned by the DESKTOP set
     /// instead (`contracts/desktop/district-call-hangup.json`, gated in
     /// `DesktopContractFixtureTests`), by the route source and by

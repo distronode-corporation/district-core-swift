@@ -6,7 +6,7 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
-## [8.5.0] - not yet tagged
+## [8.5.0] - 2026-11-08
 
 ### Added
 

@@ -162,14 +162,14 @@ enum DistrictPaths {
     /// CREATES a call, it writes a `Call` row, tells the carrier to ring a
     /// telephone, and spends the workspace's minutes.
     ///
-    /// ⛔ `calls/outbound` IS THE THIRD ROUTE IN THIS FAMILY AND IT IS ABSENT
-    /// FROM THIS FILE ON PURPOSE. It is the AI campaign dialer: it creates a
-    /// `call_` room the voice agent joins and speaks in, so a human dialling
-    /// through it would find an agent on their own line. There is no constant for
-    /// it, no ``EndpointID`` case for it, and ``ApiRequestDescriptor``'s
-    /// initialiser is internal, so it is unconstructible from outside this
-    /// module rather than merely undocumented. `EndpointSurfaceTests` pins that.
     static let callsDial = calls + ["dial"]
+
+    /// ⛔ `calls/outbound` IS THE AI CAMPAIGN LAUNCHER, NOT A DIALER, AND ONLY
+    /// ``EndpointID/aiCampaignLaunch`` ADDRESSES IT. It creates a `call_` room the
+    /// voice agent joins and speaks in, so a human dialling through it would find an
+    /// agent on their own line. It is reached from `CampaignsRepository` alone and from
+    /// nothing softphone-related; `EndpointSurfaceTests` pins both.
+    static let aiCampaignLaunch = calls + ["outbound"]
 
     /// ⛔ A FUNCTION RATHER THAN A CONSTANT, BECAUSE THE ID SITS IN THE MIDDLE OF
     /// THE PATH. Every other per-call route appends the id LAST (`calls/{id}`,

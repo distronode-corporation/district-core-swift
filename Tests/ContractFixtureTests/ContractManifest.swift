@@ -75,9 +75,6 @@ enum ContractManifest {
         // this client does not call yet.
         "district-conversation-assignments.json",
         "district-pkce-vectors.json",
-        // The campaign dialer, an iOS parity route the server pins in its own suite,
-        // recorded before any client here calls it.
-        "district-calls-outbound.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

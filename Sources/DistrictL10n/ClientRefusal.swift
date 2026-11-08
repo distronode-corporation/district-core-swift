@@ -13,6 +13,9 @@ package enum ClientRefusal {
     /// Every refusal sentence in the active language.
     package static var sentences: Set<String> {
         [
+            CampaignCopy.noContacts,
+            CampaignCopy.promptBlank,
+            CampaignCopy.tooManyContacts,
             DeskCopy.logoEmpty,
             DeskCopy.logoSize,
             DeskCopy.logoType,

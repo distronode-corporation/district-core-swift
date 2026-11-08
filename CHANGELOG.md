@@ -34,13 +34,33 @@ All notable changes to this package are recorded here. The format is based on
 - `StudioArea.integrations`: `/dashboard/district/studio/integrations` now resolves to the
   Studio's Integrations area instead of the browser. ⚠️ `StudioArea` gains a case; an app
   that switches over it and has no integrations screen must open the web page itself.
+- The AI campaign launcher, `CampaignsRepository.launchAICampaign(workspaceId:contactIds:prompt:accountId:)`
+  (`POST /api/district/calls/outbound`): the voice agent calls each contact with the prompt
+  as its goal. It sends the web's body exactly (`workspaceId`, `contactIds`, `prompt` as
+  written, `accountId` dropped when nil, `channel: "voice"`) and never a `from` or caller
+  ID. It answers `AICampaignLaunchResponse`: `success` (the batch was processed, not that a
+  call went out), per-contact `results` (`AICampaignContactResult`: `status` queued, skipped
+  or failed, an unknown one kept by name, `callId`, `provider`, `accountId`, `error`,
+  `code`, and `localizedMessage`) and the computed `queuedCount`. No contacts, more than 100
+  or a blank prompt are refused without a request (`campaign.*`, EN and fr-CA); DNC, calling
+  hours, country, billing and the five-a-minute rate limit stay the service's, answered per
+  contact or as a refusal of the batch with its code. `AICampaignSkipText` gives the
+  sentence for a row's code, the two carrier codes the service's error catalog lacks
+  (`sinch_contact_required`, `sinch_disclosure_unsupported`) included. ⛔ The route was
+  unreachable on purpose until now: `EndpointID` gains `aiCampaignLaunch`, its only
+  address, in its own `TypedEndpoints.campaigns` family, and `EndpointSurfaceTests`'
+  negative test is replaced by `EndpointCampaignGuardTests`, which pins that one ID
+  addresses the route and that no repository but `CampaignsRepository` names it.
+  `district-calls-outbound.json` leaves `ContractManifest.unimplemented` as vendored; its
+  DNC row says `do_not_call` where the route sends `auto_dial_contact_opted_out`, and the
+  service's corrected fixture decodes unchanged.
 
 ### Changed
 
 - Call handling is gated against the service's new `district-call-handling.json` and
   `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
   change to the type. With the email identity's two, the fixture count is 238 (the Android
-  client's count moves with it). Endpoint rows 154, typed 152.
+  client's count moves with it). With the campaign launcher, endpoint rows 155, typed 153.
 
 ## [8.5.0] - 2026-11-08
 

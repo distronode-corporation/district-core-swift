@@ -73,8 +73,9 @@ final class ApiErrorLocalizationTests: XCTestCase {
             for sentence in ClientRefusal.sentences {
                 XCTAssertEqual(ApiError.http(status: 400, message: sentence).localizedMessage, sentence)
             }
-            // Nine refusals, eight sentences: the desk and the inbox both say "That file is empty."
-            XCTAssertEqual(ClientRefusal.sentences.count, 8)
+            // Twelve refusals, eleven sentences: the desk and the inbox both say "That file is
+            // empty." The AI campaign launcher's three are the newest.
+            XCTAssertEqual(ClientRefusal.sentences.count, 11)
         }
     }
 

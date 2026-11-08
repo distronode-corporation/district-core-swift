@@ -75,20 +75,9 @@ enum ContractManifest {
         // this client does not call yet.
         "district-conversation-assignments.json",
         "district-pkce-vectors.json",
-        // The iOS parity routes the server pins in its own suite, recorded before any
-        // client here calls them: the rest of the setup wizard (the facts patch, the
-        // website lookup and its refusal, the test call, and the forwarding check's
-        // start and poll), the integrations read (and its Viewer variant, which has no
-        // `calendar`), and the campaign dialer.
+        // The campaign dialer, an iOS parity route the server pins in its own suite,
+        // recorded before any client here calls it.
         "district-calls-outbound.json",
-        "district-connections-viewer.json",
-        "district-connections.json",
-        "district-forwarding-check-start.json",
-        "district-forwarding-check.json",
-        "district-setup-lookup-unreadable.json",
-        "district-setup-lookup.json",
-        "district-setup-patch.json",
-        "district-setup-test-call.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

@@ -37,6 +37,14 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// owner the rest of setup. ⚠️ Owner only: a member's 403 means "offer nothing".
     /// The raw value is the Android client's name for it (`SetupApi.districtSetup`).
     case districtSetup
+    /// The setup wizard's writes and its steps' reads, owner only like the state itself
+    /// (``workspaceConnections`` excepted).
+    case districtSetupPatch
+    case setupLookup
+    case setupTestCall
+    case forwardingCheck
+    case forwardingCheckStart
+    case workspaceConnections
 
     // Calls
     case calls

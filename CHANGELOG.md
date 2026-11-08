@@ -32,8 +32,28 @@ All notable changes to this package are recorded here. The format is based on
   `unauthorized` and `session_expired`, 404 `account_not_found`), and a 200 whose `enrolled`
   disagrees with `enrolledAt` is a decoding failure. The service's new
   `district-mfa-status.json` is vendored unchanged and gated, so the fixture count is 234 (the
-  Android client's count moves with it). Endpoint rows 146, typed 144. ⚠️ `EndpointID` gains
+  Android client's count moves with it). With the setup wizard's six below, endpoint rows
+  152, typed 150. ⚠️ `EndpointID` gains
   `mfaStatus`.
+
+- The setup wizard's writes and step reads (`SetupWizardRepository`), owner only like the
+  state itself: `load` and `save(steps:businessFacts:)` (`GET`/`PATCH /api/district/setup`;
+  the PATCH sends step states only inside `setupProgress`, each facts section whole, and
+  answers the state after the write as `DistrictSetupResponse`); `lookUp(websiteUrl:locale:)`
+  (`POST setup/lookup`, a never-written `SetupLookupResponse` draft; a page it cannot read is
+  422 `website_unreadable`, body `SetupLookupRefusal`); `placeTestCall(phone:)`
+  (`POST setup/test-call`, the consent is recorded by the service, a 200 without `success` is
+  a decoding failure); `forwardingCheck` and `startForwardingCheck(businessLine:mode:)`
+  (`GET`/`POST setup/forwarding-check`, `ForwardingCheckResponse`, the POST answers 202); and
+  `connections` (`GET /api/district/connections`, `ConnectionsResponse`, whose `calendar` a
+  viewer does not get). `SetupStep`, `SetupStepState` and `SetupSteps.state(of:)` type the
+  step vocabulary. The eight `district-setup-patch`, `-lookup`, `-lookup-unreadable`,
+  `-test-call`, `district-forwarding-check`, `-start`, `district-connections` and `-viewer`
+  fixtures leave `ContractManifest.unimplemented`. Endpoint rows 151, typed 149. ⚠️
+  `EndpointID` gains six cases (`districtSetupPatch`, `setupLookup`, `setupTestCall`,
+  `forwardingCheck`, `forwardingCheckStart`, `workspaceConnections`); neither district-ios
+  nor district-macos switches over it. Buying a number, the plan and a provider's OAuth are
+  not here: they charge a card or need a browser.
 
 ## [8.4.2] - 2026-11-07
 

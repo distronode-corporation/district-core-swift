@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 238
+    static let expectedFixtureCount = 245
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -78,6 +78,17 @@ enum ContractManifest {
         // The campaign dialer, an iOS parity route the server pins in its own suite,
         // recorded before any client here calls it.
         "district-calls-outbound.json",
+        // The destructive campaign-settings write, which no client here calls (a
+        // pause goes through `campaign-status`).
+        "district-campaign-settings.json",
+        // The web settings routes this client has no screen for: the agent's
+        // picture library, the settings calendar disconnect and the sending domain.
+        "district-agent-media-delete.json",
+        "district-agent-media-post.json",
+        "district-agent-media.json",
+        "district-calendar-disconnect.json",
+        "district-email-domain-delete.json",
+        "district-email-domain-post.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

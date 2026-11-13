@@ -12,7 +12,7 @@ import Foundation
 // here, no ``EndpointID`` case, and no descriptor, and because
 // ``ApiRequestDescriptor``'s initialiser is internal, the route is UNCONSTRUCTIBLE
 // from outside this module rather than merely undocumented. `EndpointSurfaceTests`
-// pins that, the same mechanism `calls/outbound` is held out by for an entirely
+// pins that, the same mechanism `video_` rooms are held out by for an entirely
 // different reason.
 // ⛔ AND 3.1.1 COVERS STEERING, so there is no link to the web marketplace either,
 // not even a tappable URL. ``MarketplaceCopy/readOnly`` names the site in prose and

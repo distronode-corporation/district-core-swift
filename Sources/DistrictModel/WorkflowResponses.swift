@@ -189,10 +189,9 @@ public struct CampaignStatus: Codable, Sendable {
 /// second round trip that would race its own write. A second DTO would let the read
 /// and the write drift into disagreeing about what a null batch size means.
 ///
-/// ⛔ THIS IS NOT `workspace/campaign-settings`. That route rebuilds all three SDR
-/// fields from its request body, so the same `{infiniteSdrEnabled:false}` sent there
-/// WIPES the goal text and resets the batch size to 1, with a 200. This one spreads
-/// the stored Json and assigns one key.
+/// ⛔ THIS IS NOT `workspace/campaign-settings`, which saves the batch size and the
+/// goal and answers a bare `{success}`. This one spreads the stored Json, assigns the
+/// switch, and answers the read's shape.
 ///
 /// ⚠️ THE TWO VERBS DIFFER ON ROLE: the GET admits `viewer` and the PATCH does not.
 /// It is the only verb split in this API, and it is what lets the route admit the

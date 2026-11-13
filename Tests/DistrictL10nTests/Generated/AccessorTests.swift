@@ -9,6 +9,12 @@ import XCTest
 final class GeneratedAccessorTests: XCTestCase {
     func testEveryCoreAccessorSaysWhatItsCatalogSays() {
         L10nRuntime.withLocale(.en) {
+            XCTAssertEqual(CampaignCopy.batchSizeRange, "The batch size must be between 1 and 50 contacts.")
+            XCTAssertEqual(CampaignCopy.noContacts, "Choose at least one contact to call.")
+            XCTAssertEqual(CampaignCopy.promptBlank, "Describe the goal of these calls before launching the campaign.")
+            XCTAssertEqual(CampaignCopy.sinchContactRequired, "This workspace's carrier can only place this call to a saved contact.")
+            XCTAssertEqual(CampaignCopy.sinchDisclosureUnsupported, "This workspace's carrier cannot carry the AI-call disclosure this call requires.")
+            XCTAssertEqual(CampaignCopy.tooManyContacts, "A campaign can call at most 100 contacts at a time. Split the list and launch again.")
             XCTAssertEqual(DeskCopy.logoEmpty, "That file is empty.")
             XCTAssertEqual(DeskCopy.logoSize, "Logos must be 512 KB or smaller.")
             XCTAssertEqual(DeskCopy.logoType, "Logos must be a PNG, JPEG or WebP image.")
@@ -103,6 +109,12 @@ final class GeneratedAccessorTests: XCTestCase {
             XCTAssertEqual(VoiceStudioCopy.residencyLeg("{leg}", "{place}"), "{leg}: {place}")
         }
         L10nRuntime.withLocale(.frCA) {
+            XCTAssertEqual(CampaignCopy.batchSizeRange, "La taille du lot doit être de 1 à 50 contacts.")
+            XCTAssertEqual(CampaignCopy.noContacts, "Choisissez au moins un contact à appeler.")
+            XCTAssertEqual(CampaignCopy.promptBlank, "Décrivez l'objectif de ces appels avant de lancer la campagne.")
+            XCTAssertEqual(CampaignCopy.sinchContactRequired, "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré.")
+            XCTAssertEqual(CampaignCopy.sinchDisclosureUnsupported, "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé.")
+            XCTAssertEqual(CampaignCopy.tooManyContacts, "Une campagne peut appeler au plus 100 contacts à la fois. Divisez la liste et relancez la campagne.")
             XCTAssertEqual(DeskCopy.logoEmpty, "Ce fichier est vide.")
             XCTAssertEqual(DeskCopy.logoSize, "Le logo ne doit pas dépasser 512 Ko.")
             XCTAssertEqual(DeskCopy.logoType, "Le logo doit être une image PNG, JPEG ou WebP.")

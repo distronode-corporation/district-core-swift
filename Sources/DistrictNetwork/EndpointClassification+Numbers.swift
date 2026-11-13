@@ -11,7 +11,7 @@ public extension TypedEndpoints {
     /// internal it is UNCONSTRUCTIBLE from outside `DistrictNetwork` rather than merely
     /// unmodelled. ⛔ 3.1.1 covers STEERING too, so there is no link to the web
     /// marketplace either. `EndpointSurfaceTests` pins both halves, the same mechanism
-    /// that holds out `calls/outbound` for an entirely different reason.
+    /// that holds out `video_` rooms for an entirely different reason.
     ///
     /// ⛔ THE MARKETPLACE COMMENT IN `EndpointClassification.swift` SAYS "read only",
     /// AND IT DESCRIBES `searchNumbers` AND `ownedNumbers` ONLY, not this family. Read

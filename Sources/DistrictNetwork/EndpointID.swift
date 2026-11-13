@@ -5,11 +5,12 @@ import Foundation
 /// ⛔ THIS IS A CLOSED LIST AND THAT IS THE SECURITY PROPERTY, NOT THE
 /// BOOKKEEPING. ``ApiRequestDescriptor``'s initialiser is internal, so the only
 /// requests the public API can express are the ones ``DistrictEndpoints`` builds
-/// and there is no case here for `calls/outbound` (the AI campaign dialer: a
-/// human dialling through it would find the voice agent on their own line) or
-/// for any `video_` room (a billable Tavus avatar, concurrency ceiling 1, never
-/// exercised in production). Both are UNCONSTRUCTIBLE rather than discouraged.
-/// `EndpointSurfaceTests` pins that.
+/// and there is no case here for any `video_` room (a billable Tavus avatar,
+/// concurrency ceiling 1, never exercised in production): it is UNCONSTRUCTIBLE
+/// rather than discouraged. `calls/outbound` (the AI campaign launcher: a human
+/// dialling through it would find the voice agent on their own line) has exactly
+/// one case, ``aiCampaignLaunch``, reached from `CampaignsRepository` alone.
+/// `EndpointSurfaceTests` pins both.
 ///
 /// ⚠️ THE RAW VALUE IS THE KOTLIN FUNCTION NAME, deliberately. The two clients
 /// speak the same API and are reviewed against each other; a diff between
@@ -75,6 +76,17 @@ public enum EndpointID: String, Sendable, CaseIterable {
     /// The microphone-only credential that takes a live call over from the assistant.
     /// ⛔ Never retried. See ``DistrictEndpoints/takeOverCall(callId:workspaceId:)``.
     case takeOverCall
+
+    /// AI campaigns
+    /// ⛔ `calls/outbound`, A SECTION OF ITS OWN AND NOT A CALL ROUTE: the voice agent
+    /// places the calls, never the operator. ⛔ Never retried, and reached from
+    /// `CampaignsRepository` alone. See
+    /// ``DistrictEndpoints/aiCampaignLaunch(workspaceId:contactIds:prompt:accountId:)``.
+    case aiCampaignLaunch
+    /// The campaign's batch size and goal (`workspace/campaign-settings`). ⛔ Never the on
+    /// switch, which is ``setCampaignEnabled``. See
+    /// ``DistrictEndpoints/saveCampaignSettings(workspaceId:sdrBatchSize:sdrCampaignGoal:)``.
+    case saveCampaignSettings
 
     // Rooms + meetings
     case roomToken
@@ -384,7 +396,7 @@ public enum EndpointID: String, Sendable, CaseIterable {
     // nothing. With no case here and no ``DistrictPaths`` constant, and with
     // ``ApiRequestDescriptor``'s initialiser internal, `workspace/numbers/purchase` is
     // UNCONSTRUCTIBLE from outside this module rather than merely undocumented, the
-    // same mechanism that holds out `calls/outbound`, for an entirely different reason.
+    // same mechanism that holds out `video_` rooms, for an entirely different reason.
     // ⛔ 3.1.1 ALSO COVERS STEERING, so nothing links to the web marketplace either.
     // `EndpointSurfaceTests` pins both halves.
     //

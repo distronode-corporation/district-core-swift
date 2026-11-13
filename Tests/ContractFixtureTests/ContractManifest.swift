@@ -75,12 +75,6 @@ enum ContractManifest {
         // this client does not call yet.
         "district-conversation-assignments.json",
         "district-pkce-vectors.json",
-        // The campaign dialer, an iOS parity route the server pins in its own suite,
-        // recorded before any client here calls it.
-        "district-calls-outbound.json",
-        // The destructive campaign-settings write, which no client here calls (a
-        // pause goes through `campaign-status`).
-        "district-campaign-settings.json",
         // The web settings routes this client has no screen for: the agent's
         // picture library, the settings calendar disconnect and the sending domain.
         "district-agent-media-delete.json",

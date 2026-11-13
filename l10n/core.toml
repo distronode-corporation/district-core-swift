@@ -3,6 +3,60 @@ catalog = "core"
 platform = "swift"
 apple = true
 
+[campaign.batch_size_range]
+en = "The batch size must be between 1 and 50 contacts."
+fr = "La taille du lot doit être de 1 à 50 contacts."
+ctx = "error"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before saving the always-on AI calling campaign's settings with a batch size (how many contacts it calls per run) below 1 or above 50. Mirrors the service's own range."
+
+[campaign.no_contacts]
+en = "Choose at least one contact to call."
+fr = "Choisissez au moins un contact à appeler."
+ctx = "error"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before launching an AI calling campaign with no contacts chosen. Mirrors the service's own limit."
+
+[campaign.prompt_blank]
+en = "Describe the goal of these calls before launching the campaign."
+fr = "Décrivez l'objectif de ces appels avant de lancer la campagne."
+ctx = "error"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before launching an AI calling campaign whose goal (the instructions the AI voice agent follows on every call) is empty or only spaces."
+
+[campaign.sinch_contact_required]
+en = "This workspace's carrier can only place this call to a saved contact."
+fr = "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré."
+ctx = "body"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Shown beside one contact in an AI calling campaign's results when the call was skipped because the workspace's phone carrier needs a saved contact. Same wording as the service's own English."
+
+[campaign.sinch_disclosure_unsupported]
+en = "This workspace's carrier cannot carry the AI-call disclosure this call requires."
+fr = "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé."
+ctx = "body"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Shown beside one contact in an AI calling campaign's results when the call was skipped because the carrier cannot pass on the notice that tells the callee an AI is calling. Same wording as the service's own English."
+
+[campaign.too_many_contacts]
+en = "A campaign can call at most 100 contacts at a time. Split the list and launch again."
+fr = "Une campagne peut appeler au plus 100 contacts à la fois. Divisez la liste et relancez la campagne."
+ctx = "error"
+screen = "ai campaign"
+tier = "T2"
+state = "reviewed"
+note = "Refusal shown before launching an AI calling campaign with more than 100 contacts. Mirrors the service's own limit of 100 per launch."
+
 [desk.logo_empty]
 en = "That file is empty."
 fr = "Ce fichier est vide."

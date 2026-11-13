@@ -60,8 +60,7 @@ enum WorkflowBodies {
     """#
 
     /// ⛔ THE POST-PAUSE STATE, and the two fields the request never mentioned are
-    /// still there. That is what distinguishes `campaign-status` from
-    /// `campaign-settings`, which would have wiped the goal and reset the size to 1.
+    /// still there: `campaign-status` merges into the stored Json.
     static let campaignPaused = #"""
     {"success":true,"campaign":{"infiniteSdrEnabled":false,"sdrBatchSize":25,
      "sdrCampaignGoal":"Book demos with lapsed trials"}}

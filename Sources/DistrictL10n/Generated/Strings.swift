@@ -711,6 +711,26 @@ package enum ApiErrorCopy {
     package static var workspaceOwnerProtected: String { L10nRuntime.locale == .frCA ? "L'accès du propriétaire de l'espace de travail ne peut pas être modifié ni retiré ici." : "The workspace owner's access cannot be changed or removed here." }
 }
 
+package enum CampaignCopy {
+    /// `campaign.batch_size_range`
+    package static var batchSizeRange: String { L10nRuntime.locale == .frCA ? "La taille du lot doit être de 1 à 50 contacts." : "The batch size must be between 1 and 50 contacts." }
+
+    /// `campaign.no_contacts`
+    package static var noContacts: String { L10nRuntime.locale == .frCA ? "Choisissez au moins un contact à appeler." : "Choose at least one contact to call." }
+
+    /// `campaign.prompt_blank`
+    package static var promptBlank: String { L10nRuntime.locale == .frCA ? "Décrivez l'objectif de ces appels avant de lancer la campagne." : "Describe the goal of these calls before launching the campaign." }
+
+    /// `campaign.sinch_contact_required`
+    package static var sinchContactRequired: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré." : "This workspace's carrier can only place this call to a saved contact." }
+
+    /// `campaign.sinch_disclosure_unsupported`
+    package static var sinchDisclosureUnsupported: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé." : "This workspace's carrier cannot carry the AI-call disclosure this call requires." }
+
+    /// `campaign.too_many_contacts`
+    package static var tooManyContacts: String { L10nRuntime.locale == .frCA ? "Une campagne peut appeler au plus 100 contacts à la fois. Divisez la liste et relancez la campagne." : "A campaign can call at most 100 contacts at a time. Split the list and launch again." }
+}
+
 package enum DeskCopy {
     /// `desk.logo_empty`
     package static var logoEmpty: String { L10nRuntime.locale == .frCA ? "Ce fichier est vide." : "That file is empty." }

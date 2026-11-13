@@ -102,13 +102,14 @@ enum DistrictPaths {
     static let workspaceMessaging = workspace + ["messaging"]
     static let workspaceMessagingTest = workspaceMessaging + ["test"]
 
-    /// ⛔ NOT `workspace/campaign-settings`, WHICH IS A DIFFERENT ROUTE AND A
-    /// DESTRUCTIVE ONE. The PATCH on `campaign-settings` writes all three SDR
-    /// fields unconditionally, so a partial body sent to it WIPES the goal text
-    /// and resets the batch size to 1, with a 200. `campaign-status` reads the
-    /// stored Json, spreads it and assigns ONE key. One path apart, opposite
-    /// outcomes.
+    /// ⛔ THE ON SWITCH, AND THE ONLY ROUTE THIS CLIENT SENDS IT TO.
+    /// `campaign-status` reads the stored Json, spreads it and assigns ONE key.
+    /// Its sibling ``workspaceCampaignSettings`` saves the batch size and the
+    /// goal, and never carries the switch from here.
     static let workspaceCampaignStatus = workspace + ["campaign-status"]
+    /// The campaign's batch size and goal. The route writes only the keys the
+    /// body carries.
+    static let workspaceCampaignSettings = workspace + ["campaign-settings"]
 
     /// ⛔ ONE PATH, FOUR VERBS, AND ITS SIBLING IS A SEPARATE ROUTE. The roster
     /// lives at `workspace/members` (GET/POST/PATCH/DELETE) and the display name
@@ -162,14 +163,14 @@ enum DistrictPaths {
     /// CREATES a call, it writes a `Call` row, tells the carrier to ring a
     /// telephone, and spends the workspace's minutes.
     ///
-    /// ⛔ `calls/outbound` IS THE THIRD ROUTE IN THIS FAMILY AND IT IS ABSENT
-    /// FROM THIS FILE ON PURPOSE. It is the AI campaign dialer: it creates a
-    /// `call_` room the voice agent joins and speaks in, so a human dialling
-    /// through it would find an agent on their own line. There is no constant for
-    /// it, no ``EndpointID`` case for it, and ``ApiRequestDescriptor``'s
-    /// initialiser is internal, so it is unconstructible from outside this
-    /// module rather than merely undocumented. `EndpointSurfaceTests` pins that.
     static let callsDial = calls + ["dial"]
+
+    /// ⛔ `calls/outbound` IS THE AI CAMPAIGN LAUNCHER, NOT A DIALER, AND ONLY
+    /// ``EndpointID/aiCampaignLaunch`` ADDRESSES IT. It creates a `call_` room the
+    /// voice agent joins and speaks in, so a human dialling through it would find an
+    /// agent on their own line. It is reached from `CampaignsRepository` alone and from
+    /// nothing softphone-related; `EndpointSurfaceTests` pins both.
+    static let aiCampaignLaunch = calls + ["outbound"]
 
     /// ⛔ A FUNCTION RATHER THAN A CONSTANT, BECAUSE THE ID SITS IN THE MIDDLE OF
     /// THE PATH. Every other per-call route appends the id LAST (`calls/{id}`,

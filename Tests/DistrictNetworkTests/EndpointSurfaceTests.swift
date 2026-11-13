@@ -6,36 +6,11 @@ import XCTest
 /// The negative tests: what this client must NOT be able to ask for.
 ///
 /// ⛔ THESE ASSERT THE ABSENCE OF A CAPABILITY, WHICH IS THE ONLY KIND OF TEST
-/// THAT CAN PIN A GUARD LIKE THIS. A comment asking nobody to build
-/// `calls/outbound` is not a control; a test that walks the entire expressible
-/// surface and finds it absent is.
+/// THAT CAN PIN A GUARD LIKE THIS. A comment asking nobody to build a `video_`
+/// room is not a control; a test that walks the entire expressible surface and
+/// finds it absent is. `calls/outbound`, the AI campaign launcher, has its
+/// positive guard in `EndpointCampaignGuardTests`.
 final class EndpointSurfaceTests: XCTestCase {
-    /// ⛔ `calls/outbound` IS THE AI CAMPAIGN DIALER. It creates a `call_` room the
-    /// voice agent joins and speaks in, so a human dialling through it would find
-    /// an agent on their own line. It has no `EndpointID`, no ``DistrictPaths``
-    /// constant, and, because ``ApiRequestDescriptor``'s initialiser is internal
-    /// no way to be assembled from outside this module.
-    func testTheOutboundCampaignDialerIsNotReachable() {
-        for row in EndpointTable.all() {
-            XCTAssertFalse(
-                row.descriptor.segments.contains("outbound"),
-                "\(row.id.rawValue) addresses calls/outbound"
-            )
-        }
-        XCTAssertNil(
-            EndpointID(rawValue: "callsOutbound"),
-            "an EndpointID for the campaign dialer would make it expressible"
-        )
-        // The three routes that DO exist under `calls/` and are ported, so the
-        // assertion above is not passing merely because the family is empty.
-        XCTAssertEqual(DistrictPaths.callsDial, ["api", "district", "calls", "dial"])
-        XCTAssertEqual(DistrictPaths.callsToken, ["api", "district", "calls", "token"])
-        XCTAssertEqual(
-            DistrictPaths.callAnswer("call_1"),
-            ["api", "district", "calls", "call_1", "answer"]
-        )
-    }
-
     /// ⛔ NO ENDPOINT MAY CARRY A `video_` ROOM NAME. The only route that takes a
     /// room name at all is `calls/token`, and it takes a ``RoomName``.
     func testNoEndpointCanCarryABillableAvatarRoom() throws {
@@ -340,18 +315,22 @@ final class EndpointSurfaceTests: XCTestCase {
         XCTAssertEqual(billed.method, .post)
     }
 
-    /// ⛔ A CAMPAIGN PAUSE MUST NEVER REACH `workspace/campaign-settings`, WHICH
-    /// REBUILDS ALL THREE SDR FIELDS FROM THE BODY, the same JSON sent one path
-    /// over answers 200 and wipes the goal text.
-    func testTheCampaignPauseUsesTheStatusPathNotTheSettingsPath() {
+    /// ⛔ A CAMPAIGN PAUSE NEVER REACHES `workspace/campaign-settings`, AND THAT ROUTE NEVER
+    /// CARRIES THE SWITCH. The on switch goes to `campaign-status`, which merges and answers
+    /// the read's shape; `campaign-settings` is reached by one ID only, for the batch size
+    /// and goal, and no body built for it can hold `infiniteSdrEnabled`.
+    func testTheCampaignPauseUsesTheStatusPathNotTheSettingsPath() throws {
         let pause = DistrictEndpoints.setCampaignEnabled(workspaceId: "ws_1", infiniteSdrEnabled: false)
         XCTAssertEqual(ApiPath.build(pause.segments), "/api/district/workspace/campaign-status")
-        for row in EndpointTable.all() {
-            XCTAssertFalse(
-                row.descriptor.segments.contains("campaign-settings"),
-                "\(row.id.rawValue) addresses the destructive campaign-settings route"
-            )
-        }
+        let settings = EndpointTable.all().filter { $0.descriptor.segments.contains("campaign-settings") }
+        XCTAssertEqual(settings.map(\.id), [.saveCampaignSettings])
+        let full = DistrictEndpoints.saveCampaignSettings(
+            workspaceId: "ws_1",
+            sdrBatchSize: 10,
+            sdrCampaignGoal: ""
+        )
+        XCTAssertEqual(try encodedBody(full), #"{"sdrBatchSize":10,"sdrCampaignGoal":"","workspaceId":"ws_1"}"#)
+        XCTAssertFalse(try encodedBody(full).contains("infiniteSdrEnabled"))
     }
 
     /// ⚠️ An id is encoded as exactly ONE segment. A call id of `a/../../admin`

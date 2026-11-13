@@ -34,13 +34,44 @@ All notable changes to this package are recorded here. The format is based on
 - `StudioArea.integrations`: `/dashboard/district/studio/integrations` now resolves to the
   Studio's Integrations area instead of the browser. ⚠️ `StudioArea` gains a case; an app
   that switches over it and has no integrations screen must open the web page itself.
+- The AI campaign launcher, `CampaignsRepository.launchAICampaign(workspaceId:contactIds:prompt:accountId:)`
+  (`POST /api/district/calls/outbound`): the voice agent calls each contact with the prompt
+  as its goal. It sends the web's body exactly (`workspaceId`, `contactIds`, `prompt` as
+  written, `accountId` dropped when nil, `channel: "voice"`) and never a `from` or caller
+  ID. It answers `AICampaignLaunchResponse`: `success` (the batch was processed, not that a
+  call went out), per-contact `results` (`AICampaignContactResult`: `status` queued, skipped
+  or failed, an unknown one kept by name, `callId`, `provider`, `accountId`, `error`,
+  `code`, and `localizedMessage`) and the computed `queuedCount`. No contacts, more than 100
+  or a blank prompt are refused without a request (`campaign.*`, EN and fr-CA); DNC, calling
+  hours, country, billing and the five-a-minute rate limit stay the service's, answered per
+  contact or as a refusal of the batch with its code. `AICampaignSkipText` gives the
+  sentence for a row's code, the two carrier codes the service's error catalog lacks
+  (`sinch_contact_required`, `sinch_disclosure_unsupported`) included. ⛔ The route was
+  unreachable on purpose until now: `EndpointID` gains `aiCampaignLaunch`, its only
+  address, in its own `TypedEndpoints.campaigns` family, and `EndpointSurfaceTests`'
+  negative test is replaced by `EndpointCampaignGuardTests`, which pins that one ID
+  addresses the route and that no repository but `CampaignsRepository` names it.
+  `district-calls-outbound.json` is re-vendored from the service (one row per status, and
+  one skip per recipient rule: `auto_dial_country_not_permitted`, `auto_dial_outside_hours`,
+  `auto_dial_contact_opted_out`) and leaves `ContractManifest.unimplemented`.
+- The always-on campaign's batch size and goal,
+  `CampaignsRepository.saveCampaignSettings(workspaceId:sdrBatchSize:sdrCampaignGoal:)`
+  (`PATCH /api/district/workspace/campaign-settings`, `agency` and `client`): nil leaves a
+  value alone and is not sent, `""` clears the goal, and a batch size outside 1 to 50 is
+  refused without a request (`campaign.batch_size_range`, EN and fr-CA). It answers a bare
+  `{success}`, pinned by the service's new `district-campaign-settings.json`. ⛔ The on
+  switch never goes there: pausing stays `WorkflowsRepository.setCampaignEnabled` on
+  `campaign-status`. `EndpointID` gains `saveCampaignSettings`.
 
 ### Changed
 
 - Call handling is gated against the service's new `district-call-handling.json` and
   `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
   change to the type. With the email identity's two, the fixture count is 238 (the Android
-  client's count moves with it). Endpoint rows 154, typed 152.
+  client's count moves with it). With the campaign launcher and the campaign settings
+  gated, and the six web settings fixtures (agent media, calendar disconnect, email
+  domain) vendored and listed in `ContractManifest.unimplemented`, the fixture count is
+  245, endpoint rows 156, typed 154.
 
 ## [8.5.0] - 2026-11-08
 

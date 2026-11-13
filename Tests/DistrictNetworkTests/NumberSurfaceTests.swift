@@ -18,9 +18,9 @@ import XCTest
 /// control; a test that walks the entire expressible surface and finds it absent is.
 final class NumberSurfaceTests: XCTestCase {
     /// ⛔ `workspace/numbers/purchase` MUST NOT BE REACHABLE, AND THE REASON IS NOT THE
-    /// ONE THE OTHER NEGATIVE TESTS ON THIS SURFACE HAVE. `calls/outbound` is held out
-    /// because a human dialling through it would find the voice agent on their own line;
-    /// `scheduling/sso` because a descriptor would spend a one-time credential on a
+    /// ONE THE OTHER NEGATIVE TESTS ON THIS SURFACE HAVE. A `video_` room is held out
+    /// because it is a billable avatar session; `scheduling/sso` because a descriptor would spend a one-time credential
+    /// on a
     /// transport nobody sees. This one is a POLICY boundary: buying a number charges a
     /// setup fee AND opens a recurring monthly charge for a service consumed inside the
     /// app, which is App Store Review Guideline 3.1.1, an in-app purchase or it is not

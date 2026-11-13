@@ -178,11 +178,10 @@ public struct WorkflowsRepository: Sendable {
     /// may loop, because each call is still a write to a live campaign
     /// configuration.
     ///
-    /// ⛔ AND IT GOES THROUGH `campaign-status`, WHICH MERGES. The three SDR fields
-    /// live in one free-form Json column, and `campaign-settings` rebuilds all of
-    /// them from its request body, so the same `{infiniteSdrEnabled:false}` sent
-    /// there wipes the goal text and resets the batch size to 1, answering 200. Do
-    /// not "simplify" the two writes onto one path.
+    /// ⛔ AND IT GOES THROUGH `campaign-status`, WHICH MERGES AND ANSWERS THE READ'S
+    /// SHAPE. The three SDR fields live in one free-form Json column; the batch size
+    /// and the goal are saved by `CampaignsRepository.saveCampaignSettings`, which
+    /// never sends the switch. Do not "simplify" the two writes onto one path.
     ///
     /// ⚠️ A NON-BOOLEAN `infiniteSdrEnabled` IS A 400 rather than a coercion, which
     /// is deliberate server-side: `Boolean("false")` is `true`, i.e. resuming a

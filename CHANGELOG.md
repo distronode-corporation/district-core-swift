@@ -68,8 +68,10 @@ All notable changes to this package are recorded here. The format is based on
 - Call handling is gated against the service's new `district-call-handling.json` and
   `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
   change to the type. With the email identity's two, the fixture count is 238 (the Android
-  client's count moves with it). With the campaign launcher and the campaign settings,
-  the fixture count is 239, endpoint rows 156, typed 154.
+  client's count moves with it). With the campaign launcher and the campaign settings
+  gated, and the six web settings fixtures (agent media, calendar disconnect, email
+  domain) vendored and listed in `ContractManifest.unimplemented`, the fixture count is
+  245, endpoint rows 156, typed 154.
 
 ## [8.5.0] - 2026-11-08
 

@@ -32,7 +32,7 @@ enum ContractManifest {
     ///
     /// ⚠️ The Android client asserts the same number
     /// (`ContractManifest.EXPECTED_FIXTURE_COUNT`), and the two move together.
-    static let expectedFixtureCount = 239
+    static let expectedFixtureCount = 245
 
     /// Fixtures with no Swift DTO yet.
     ///
@@ -75,6 +75,14 @@ enum ContractManifest {
         // this client does not call yet.
         "district-conversation-assignments.json",
         "district-pkce-vectors.json",
+        // The web settings routes this client has no screen for: the agent's
+        // picture library, the settings calendar disconnect and the sending domain.
+        "district-agent-media-delete.json",
+        "district-agent-media-post.json",
+        "district-agent-media.json",
+        "district-calendar-disconnect.json",
+        "district-email-domain-delete.json",
+        "district-email-domain-post.json",
     ]
 
     /// Every fixture with an `allowedExplicitNulls` entry.

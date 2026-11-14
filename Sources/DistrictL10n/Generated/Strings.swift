@@ -150,6 +150,9 @@ package enum ApiErrorCopy {
     /// `api_error.carrier_rejected`
     package static var carrierRejected: String { L10nRuntime.locale == .frCA ? "Le transporteur a refusé cette inscription. Corrigez les éléments indiqués, puis soumettez de nouveau." : "The carrier refused this registration. Fix the items listed and submit again." }
 
+    /// `api_error.checkout_marketplace_billed`
+    package static var checkoutMarketplaceBilled: String { L10nRuntime.locale == .frCA ? "Vos espaces de travail sont facturés par Microsoft Marketplace; un forfait ne peut donc pas être acheté pour eux ici. Modifiez votre forfait dans le Centre d'administration Microsoft 365." : "Your workspaces are billed through Microsoft Marketplace, so a plan can't be bought for them here. Change your plan in the Microsoft 365 admin center." }
+
     /// `api_error.checkout_setup_in_progress`
     package static var checkoutSetupInProgress: String { L10nRuntime.locale == .frCA ? "Votre forfait est déjà payé. Terminez la configuration de votre réceptionniste depuis votre tableau de bord avant d'acheter un autre forfait." : "Your plan is already paid for. Finish setting up your receptionist from your dashboard before buying another plan." }
 
@@ -335,6 +338,24 @@ package enum ApiErrorCopy {
     /// `api_error.managed_billing_required`
     package static var managedBillingRequired: String { L10nRuntime.locale == .frCA ? "La facturation gérée auprès des transporteurs n'est pas activée pour cet espace de travail. Communiquez avec notre équipe de soutien pour passer à un forfait géré." : "Managed carrier billing is not enabled for this workspace. Contact support to switch to a managed plan." }
 
+    /// `api_error.marketplace_billed_workspace`
+    package static var marketplaceBilledWorkspace: String { L10nRuntime.locale == .frCA ? "Cet espace de travail est facturé par Microsoft Marketplace, qui fixe son forfait et l'état de son abonnement. Modifiez-les chez Microsoft, ou retirez l'espace de travail de la facturation Microsoft une fois son abonnement Microsoft annulé." : "This workspace is billed through Microsoft Marketplace, which sets its plan and subscription status. Change them in Microsoft, or move the workspace off Microsoft billing once its Microsoft subscription is cancelled." }
+
+    /// `api_error.marketplace_intro_minutes_reached`
+    package static var marketplaceIntroMinutesReached: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé les minutes vocales incluses dans son forfait. Pendant les 72 heures suivant l'activation de votre abonnement Microsoft Marketplace, les appels sortants s'arrêtent aux minutes incluses. Ils reprennent à la fin de ces 72 heures." : "This workspace has used its plan's included voice minutes. For the first 72 hours after your Microsoft Marketplace subscription is activated, outgoing calls stop at the included minutes. They resume when the 72 hours end." }
+
+    /// `api_error.marketplace_intro_numbers_locked`
+    package static var marketplaceIntroNumbersLocked: String { L10nRuntime.locale == .frCA ? "Les numéros de téléphone peuvent être ajoutés 72 heures après l'activation de votre abonnement Microsoft Marketplace." : "Phone numbers can be added 72 hours after your Microsoft Marketplace subscription is activated." }
+
+    /// `api_error.marketplace_subscription_pending`
+    package static var marketplaceSubscriptionPending: String { L10nRuntime.locale == .frCA ? "L'achat Microsoft Marketplace de cet espace de travail est encore en cours de configuration. Les appels et la messagerie commencent dès que Microsoft le confirme." : "This workspace's Microsoft Marketplace purchase is still being set up. Calls and messaging start once Microsoft confirms it." }
+
+    /// `api_error.marketplace_subscription_suspended`
+    package static var marketplaceSubscriptionSuspended: String { L10nRuntime.locale == .frCA ? "Microsoft a suspendu l'abonnement de cet espace de travail, car un paiement n'a pas été reçu. Mettez le paiement à jour dans le Centre d'administration Microsoft 365 pour reprendre les appels et la messagerie." : "Microsoft has suspended this workspace's subscription because a payment was not received. Update the payment in the Microsoft 365 admin center to resume calls and messaging." }
+
+    /// `api_error.marketplace_subscription_unsubscribed`
+    package static var marketplaceSubscriptionUnsubscribed: String { L10nRuntime.locale == .frCA ? "L'abonnement Microsoft Marketplace de cet espace de travail a été annulé ou n'a jamais été finalisé. Pour utiliser de nouveau District AI ici, achetez-le de nouveau sur Microsoft Marketplace." : "This workspace's Microsoft Marketplace subscription was cancelled or never completed. To use District AI here again, buy it again on Microsoft Marketplace." }
+
     /// `api_error.media_not_found`
     package static var mediaNotFound: String { L10nRuntime.locale == .frCA ? "Ce fichier est introuvable." : "That file could not be found." }
 
@@ -391,6 +412,42 @@ package enum ApiErrorCopy {
 
     /// `api_error.mfa_code_invalid`
     package static var mfaCodeInvalid: String { L10nRuntime.locale == .frCA ? "Ce code n'est pas valide, ou il a déjà été utilisé." : "That code is not valid, or it has already been used." }
+
+    /// `api_error.microsoft_attach_stripe_billed`
+    package static var microsoftAttachStripeBilled: String { L10nRuntime.locale == .frCA ? "Cet espace de travail est facturé par Stripe; un forfait Microsoft Marketplace ne peut donc pas y être ajouté. Choisissez plutôt un nouvel espace de travail." : "This workspace is billed through Stripe, so a Microsoft Marketplace plan can't be added to it. Choose a new workspace instead." }
+
+    /// `api_error.microsoft_attach_unavailable`
+    package static var microsoftAttachUnavailable: String { L10nRuntime.locale == .frCA ? "Cet espace de travail ne peut pas recevoir cet achat. Choisissez un espace de travail dont vous êtes propriétaire et qui n'a pas d'autre forfait Microsoft, ou un nouvel espace de travail." : "That workspace can't take this purchase. Choose a workspace you own that has no other Microsoft plan, or a new workspace." }
+
+    /// `api_error.microsoft_landing_busy`
+    package static var microsoftLandingBusy: String { L10nRuntime.locale == .frCA ? "Cet achat est en cours de mise à jour, peut-être dans un autre onglet. Réessayez dans un instant." : "This purchase is being updated right now, perhaps in another tab. Try again in a moment." }
+
+    /// `api_error.microsoft_landing_consent_blocked`
+    package static var microsoftLandingConsentBlocked: String { L10nRuntime.locale == .frCA ? "Votre administrateur Microsoft 365 doit autoriser Distronode avant que vous puissiez vous connecter avec ce compte professionnel. Nous demandons seulement de confirmer qui vous êtes, soit votre nom et votre identifiant de compte." : "Your Microsoft 365 administrator must allow Distronode before you can sign in with this work account. We ask only to confirm who you are: your name and account identifier." }
+
+    /// `api_error.microsoft_landing_held_elsewhere`
+    package static var microsoftLandingHeldElsewhere: String { L10nRuntime.locale == .frCA ? "Cet achat est configuré dans une autre région; il se gère donc sur le site de cette région." : "This purchase is set up in another region, so it is managed on that region's site." }
+
+    /// `api_error.microsoft_landing_identity_mismatch`
+    package static var microsoftLandingIdentityMismatch: String { L10nRuntime.locale == .frCA ? "Connectez-vous avec le compte Microsoft qui a acheté District AI, ou celui pour qui il a été acheté." : "Sign in with the Microsoft account that bought District AI, or the one it was bought for." }
+
+    /// `api_error.microsoft_landing_refused`
+    package static var microsoftLandingRefused: String { L10nRuntime.locale == .frCA ? "Cet achat a été annulé chez Microsoft, ou ce n'est pas un forfait District AI. Pour acheter de nouveau, faites un nouvel achat sur Microsoft Marketplace." : "This purchase was cancelled in Microsoft, or it is not a District AI plan. To buy again, start a new purchase on Microsoft Marketplace." }
+
+    /// `api_error.microsoft_landing_region_check_unavailable`
+    package static var microsoftLandingRegionCheckUnavailable: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu vérifier la région de votre compte pour le moment, alors rien n'a été configuré. Réessayez dans un instant." : "We could not check your account's region just now, so nothing was set up. Try again in a moment." }
+
+    /// `api_error.microsoft_landing_token_invalid`
+    package static var microsoftLandingTokenInvalid: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu reconnaître cet achat. Rouvrez-le depuis le Centre d'administration Microsoft 365, puis choisissez Configurer le compte ou Gérer le compte." : "We could not identify this purchase. Open it again from the Microsoft 365 admin center, and choose Configure account or Manage account." }
+
+    /// `api_error.microsoft_landing_too_many_tries`
+    package static var microsoftLandingTooManyTries: String { L10nRuntime.locale == .frCA ? "Trop de tentatives pour cet achat. Rouvrez-le depuis Microsoft pour recommencer." : "Too many tries for this purchase. Open it again from Microsoft to start over." }
+
+    /// `api_error.microsoft_landing_unavailable`
+    package static var microsoftLandingUnavailable: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu joindre Microsoft pour le moment, alors rien n'a été configuré. Réessayez dans un instant." : "We could not reach Microsoft just now, so nothing was set up. Try again in a moment." }
+
+    /// `api_error.microsoft_landing_us_regional_account`
+    package static var microsoftLandingUsRegionalAccount: String { L10nRuntime.locale == .frCA ? "Un compte Distronode d'une autre région ne peut pas détenir un achat des États-Unis. Achetez dans cette région pour garder un seul compte, ou utilisez une autre adresse courriel pour créer un compte distinct aux États-Unis." : "A Distronode account in another region can't hold a US purchase. Buy in that region to keep one account, or use a different email address to create a separate US account." }
 
     /// `api_error.model_unavailable_in_region`
     package static var modelUnavailableInRegion: String { L10nRuntime.locale == .frCA ? "Ce moteur vocal n'est pas offert aux espaces de travail de cette région. Choisissez un autre moteur." : "This voice engine is not available for workspaces in this region. Choose another engine." }

@@ -62,6 +62,10 @@ All notable changes to this package are recorded here. The format is based on
   `{success}`, pinned by the service's new `district-campaign-settings.json`. ⛔ The on
   switch never goes there: pausing stays `WorkflowsRepository.setCampaignEnabled` on
   `campaign-status`. `EndpointID` gains `saveCampaignSettings`.
+- `contracts/i18n/api-errors.json` from monorepo aa7f8284d, byte for byte: nineteen
+  Microsoft Marketplace codes (`checkout_marketplace_billed`, `marketplace_*`,
+  `microsoft_attach_*`, `microsoft_landing_*`), generated into `l10n/api_errors.toml` and
+  the `ApiErrorTable` with the website's English and French.
 
 ### Changed
 

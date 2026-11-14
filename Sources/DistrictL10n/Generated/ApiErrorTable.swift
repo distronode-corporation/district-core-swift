@@ -108,6 +108,25 @@ enum ApiErrorTable {
         case "checkout_subscription_exists": return ApiErrorCopy.checkoutSubscriptionExists
         case "region_handoff": return ApiErrorCopy.regionHandoff
         case "default_card_in_use": return ApiErrorCopy.defaultCardInUse
+        case "checkout_marketplace_billed": return ApiErrorCopy.checkoutMarketplaceBilled
+        case "marketplace_billed_workspace": return ApiErrorCopy.marketplaceBilledWorkspace
+        case "marketplace_intro_numbers_locked": return ApiErrorCopy.marketplaceIntroNumbersLocked
+        case "marketplace_intro_minutes_reached": return ApiErrorCopy.marketplaceIntroMinutesReached
+        case "microsoft_attach_stripe_billed": return ApiErrorCopy.microsoftAttachStripeBilled
+        case "microsoft_attach_unavailable": return ApiErrorCopy.microsoftAttachUnavailable
+        case "microsoft_landing_token_invalid": return ApiErrorCopy.microsoftLandingTokenInvalid
+        case "microsoft_landing_refused": return ApiErrorCopy.microsoftLandingRefused
+        case "microsoft_landing_held_elsewhere": return ApiErrorCopy.microsoftLandingHeldElsewhere
+        case "microsoft_landing_identity_mismatch": return ApiErrorCopy.microsoftLandingIdentityMismatch
+        case "microsoft_landing_too_many_tries": return ApiErrorCopy.microsoftLandingTooManyTries
+        case "microsoft_landing_consent_blocked": return ApiErrorCopy.microsoftLandingConsentBlocked
+        case "microsoft_landing_us_regional_account": return ApiErrorCopy.microsoftLandingUsRegionalAccount
+        case "microsoft_landing_busy": return ApiErrorCopy.microsoftLandingBusy
+        case "microsoft_landing_region_check_unavailable": return ApiErrorCopy.microsoftLandingRegionCheckUnavailable
+        case "microsoft_landing_unavailable": return ApiErrorCopy.microsoftLandingUnavailable
+        case "marketplace_subscription_pending": return ApiErrorCopy.marketplaceSubscriptionPending
+        case "marketplace_subscription_suspended": return ApiErrorCopy.marketplaceSubscriptionSuspended
+        case "marketplace_subscription_unsubscribed": return ApiErrorCopy.marketplaceSubscriptionUnsubscribed
         case "workspace_dormant": return ApiErrorCopy.workspaceDormant
         case "REGIONS_DEGRADED":
             guard let items else { return ApiErrorCapsCopy.regionsDegradedWithoutList }

@@ -341,6 +341,9 @@ package enum ApiErrorCopy {
     /// `api_error.marketplace_billed_workspace`
     package static var marketplaceBilledWorkspace: String { L10nRuntime.locale == .frCA ? "Cet espace de travail est facturé par Microsoft Marketplace, qui fixe son forfait et l'état de son abonnement. Modifiez-les chez Microsoft, ou retirez l'espace de travail de la facturation Microsoft une fois son abonnement Microsoft annulé." : "This workspace is billed through Microsoft Marketplace, which sets its plan and subscription status. Change them in Microsoft, or move the workspace off Microsoft billing once its Microsoft subscription is cancelled." }
 
+    /// `api_error.marketplace_cancel_refused`
+    package static var marketplaceCancelRefused: String { L10nRuntime.locale == .frCA ? "Microsoft n'a pas voulu annuler un abonnement Microsoft Marketplace de votre espace de travail; rien n'a donc été supprimé. Annulez-le dans le Centre d'administration Microsoft 365, puis réessayez." : "Microsoft would not cancel a Microsoft Marketplace subscription on your workspace, so nothing was deleted. Cancel it in the Microsoft 365 admin center, then try again." }
+
     /// `api_error.marketplace_intro_minutes_reached`
     package static var marketplaceIntroMinutesReached: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé les minutes vocales incluses dans son forfait. Pendant les 72 heures suivant l'activation de votre abonnement Microsoft Marketplace, les appels sortants s'arrêtent aux minutes incluses. Ils reprennent à la fin de ces 72 heures." : "This workspace has used its plan's included voice minutes. For the first 72 hours after your Microsoft Marketplace subscription is activated, outgoing calls stop at the included minutes. They resume when the 72 hours end." }
 

@@ -66,6 +66,9 @@ All notable changes to this package are recorded here. The format is based on
   Microsoft Marketplace codes (`checkout_marketplace_billed`, `marketplace_*`,
   `microsoft_attach_*`, `microsoft_landing_*`), generated into `l10n/api_errors.toml` and
   the `ApiErrorTable` with the website's English and French.
+- `contracts/i18n/api-errors.json` in line with the service, byte for byte: one more
+  Microsoft Marketplace code, `marketplace_cancel_refused`, generated into
+  `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English and French.
 
 ### Changed
 

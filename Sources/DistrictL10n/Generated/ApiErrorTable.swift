@@ -110,6 +110,7 @@ enum ApiErrorTable {
         case "default_card_in_use": return ApiErrorCopy.defaultCardInUse
         case "checkout_marketplace_billed": return ApiErrorCopy.checkoutMarketplaceBilled
         case "marketplace_billed_workspace": return ApiErrorCopy.marketplaceBilledWorkspace
+        case "marketplace_cancel_refused": return ApiErrorCopy.marketplaceCancelRefused
         case "marketplace_intro_numbers_locked": return ApiErrorCopy.marketplaceIntroNumbersLocked
         case "marketplace_intro_minutes_reached": return ApiErrorCopy.marketplaceIntroMinutesReached
         case "microsoft_attach_stripe_billed": return ApiErrorCopy.microsoftAttachStripeBilled

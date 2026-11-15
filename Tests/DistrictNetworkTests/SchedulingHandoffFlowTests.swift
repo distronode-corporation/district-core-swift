@@ -3,7 +3,7 @@
 import Foundation
 import XCTest
 
-/// The bound scheduling hand-off (S33), driven over a fake transport and a fake clock.
+/// The bound scheduling hand-off, driven over a fake transport and a fake clock.
 ///
 /// ⛔ EVERY TEST ALSO CHECKS WHAT REACHED THE LOG, because the log is this type's only
 /// output and the one place a nonce or a state could leak from it.
@@ -325,7 +325,7 @@ final class SchedulingHandoffFlowTests: XCTestCase {
     }
 
     /// ⛔ EVERY MINT THIS FLOW SENDS CARRIES THE CALLBACK'S NONCE, across every way a
-    /// hand-off can end: no request it makes ever lacks one (S33, 7.0.1).
+    /// hand-off can end: no request it makes ever lacks one (7.0.1).
     func test_S33_17_noRequestEverLacksANonce() async throws {
         let transport = Self.mintedTransport()
         let log = LogLines()

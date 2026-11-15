@@ -78,8 +78,8 @@ public enum ApiErrorCode {
     /// is not 43 base64url characters. The mint is a failure and is NOT retried with
     /// the same nonce: it would be refused identically.
     public static let invalidNonce = "invalid_nonce"
-    /// 400 from the same route when no `nonce` was sent and the server requires one
-    /// (`HANDOFF_REQUIRE_NONCE`). Its `error` is the sentence the user sees.
+    /// 400 from the same route when no `nonce` was sent and the server requires one.
+    /// Its `error` is the sentence the user sees.
     public static let nonceRequired = "nonce_required"
     /// 409 from `POST /api/district/messages/send` when an app sends SMS to a customer who
     /// has written on WhatsApp, Messenger or Instagram and never by SMS. Not a retry: the

@@ -124,7 +124,7 @@ final class SchedulingHandoffClientTests: XCTestCase {
         XCTAssertEqual(reason, "The hand-off address was not a URL.")
     }
 
-    // MARK: - The nonce (S33)
+    // MARK: - The nonce
 
     private static let nonce = String(repeating: "n", count: 43)
     private static let minted = #"{"url":"https://www.distronode.com/dashboard/handoff?code=c","expiresIn":60}"#

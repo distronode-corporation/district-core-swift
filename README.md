@@ -46,7 +46,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.2.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.6.0"),
 ],
 ```
 
@@ -59,7 +59,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 8.2.0
+    exactVersion: 8.6.0
 ```
 
 ## Modules
@@ -126,13 +126,13 @@ desktop clients' additions.
 
 `ContractFixtureTests` runs every mobile fixture that has a Swift model through a strict
 gate: no `null` outside a reviewed allow-list, decode, re-encode, and the re-encoded keys
-must equal the fixture's at every level. It asserts the exact number of fixtures (187)
+must equal the fixture's at every level. It asserts the exact number of fixtures (245)
 and an explicit list of fixtures that have no model yet, so a missing directory or a
 newly added fixture is a failure rather than a silent pass. Set `DISTRICT_CONTRACTS_DIR`
 to read the fixtures from somewhere else.
 
-`DesktopContractFixtureTests` does the same for `contracts/desktop/`: an exact count (13)
-and one verifier per file, twelve through the strict gate and the scheduling hand-off
+`DesktopContractFixtureTests` does the same for `contracts/desktop/`: an exact count (14)
+and one verifier per file, thirteen through the strict gate and the scheduling hand-off
 through the client's own hand-written decoder. Set `DISTRICT_DESKTOP_CONTRACTS_DIR` to
 read them from somewhere else.
 

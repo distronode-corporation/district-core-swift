@@ -34,8 +34,7 @@ public enum SchedulingHandoffOutcome: Equatable, Sendable {
 /// If no matching callback arrives within ``callbackTimeout``, or leg 1 visibly
 /// fails, the hand-off ends as ``SchedulingHandoffOutcome/noCallback`` and NOTHING IS
 /// MINTED. ⛔ UNTIL 7.0.1 IT FELL BACK TO AN UNBOUND MINT (no `nonce` key), and while
-/// any build could do that the server could not switch `HANDOFF_REQUIRE_NONCE` on (S33;
-/// Sean, GitLab #2 note 4022232351). The server has served leg 1 since 2026-10-02.
+/// any build could do that the server could not require the nonce. The server has served leg 1 since 2026-10-02.
 ///
 /// ⛔ A CALLBACK IS SPENT ONLY AGAINST THE STATE THIS FLOW GENERATED FOR THE HAND-OFF
 /// IN FLIGHT. Any app can register `districtai://`, so a callback with another state,

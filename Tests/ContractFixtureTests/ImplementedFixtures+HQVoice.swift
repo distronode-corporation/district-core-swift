@@ -1,9 +1,8 @@
 import DistrictModel
 import Foundation
 
-// District HQ by voice's six fixtures (monorepo branch `wip/parity-ios-server`, held until it
-// lands on main), in a file of their own because `ImplementedFixtures.swift` is at its
-// 500-line ceiling.
+// District HQ by voice's six fixtures (recorded by the service ahead of its release), in a
+// file of their own because `ImplementedFixtures.swift` is at its 500-line ceiling.
 
 extension ImplementedFixtures {
     /// ⛔ EACH LEAVES `ContractManifest.unimplemented` WITH ITS DTO, ITS DESCRIPTOR AND THE

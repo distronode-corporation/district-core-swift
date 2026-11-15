@@ -1,8 +1,8 @@
 import DistrictModel
 import Foundation
 
-// App parity's thirteen fixtures (monorepo !105 and !106, then the Messenger and Instagram
-// window read's three), in a file of their own because `ImplementedFixtures.swift` is at its
+// App parity's thirteen fixtures (ten from the service's app parity work, then the Messenger
+// and Instagram window read's three), in a file of their own because `ImplementedFixtures.swift` is at its
 // 500-line ceiling.
 
 extension ImplementedFixtures {

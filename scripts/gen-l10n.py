@@ -35,7 +35,7 @@ which records why its French departs from the website's on purpose (an Apple cat
 says « Réglages » where the website says « Paramètres »). `l10n.py import` writes French
 into those like into any other catalog, and a regeneration does not lose it.
 
-The contracts are copied from the monorepo unchanged and the tools by `l10n.py vendor`;
+The contracts are copied from the service's repository unchanged and the tools by `l10n.py vendor`;
 this script reads both and changes neither. Python 3.11 or newer, standard library only.
 """
 

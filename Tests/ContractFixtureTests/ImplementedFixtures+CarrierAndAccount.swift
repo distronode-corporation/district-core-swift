@@ -6,7 +6,7 @@ import Foundation
 
 extension ImplementedFixtures {
     /// ⛔ TWENTY-ONE FIXTURES, AND EVERY TYPE THEY GATE WAS ALREADY DECODED BY A REPOSITORY.
-    /// The server recorded these bodies in one batch (monorepo 49019be80); until then the
+    /// The server recorded these bodies in one batch; until then the
     /// shapes were pinned only by the route source and each repository's tests. Gating them
     /// here is what makes a field the server adds fail in this package rather than on a phone.
     ///

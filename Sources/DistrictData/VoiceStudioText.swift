@@ -6,8 +6,8 @@ import Foundation
 /// ⛔ NO WORD HERE IS TYPED IN A CLIENT. The read carries the web's sentences with their
 /// placeholders left in (`labels.meterAbout` is "About {ms} ms", or "Environ {ms} ms" for a
 /// French-preference reader), so an unsaved edit's meter and the "Based on" line follow the
-/// portal language exactly as the server's own sentences do (Sean, 2026-10-03: "Follow the
-/// portal language").
+/// portal language exactly as the server's own sentences do (the maintainers' decision,
+/// 2026-10-03).
 ///
 /// ⚠️ EACH PLACEHOLDER IS REPLACED ONCE, AS LITERAL TEXT: no format strings, no patterns. A
 /// recipe name is the service's and may hold anything, so the count is filled first, and a

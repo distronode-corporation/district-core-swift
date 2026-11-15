@@ -113,7 +113,7 @@ public extension DistrictEndpoints {
                 ("workspaceId", .string(workspaceId)),
                 ("next", .optional(next)),
                 // ⛔ ALWAYS SENT (7.0.1): there is no unbound mint any more, so the
-                // server can switch `HANDOFF_REQUIRE_NONCE` on.
+                // server can require the nonce.
                 ("nonce", .string(nonce)),
             ]))
         )

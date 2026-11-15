@@ -1,7 +1,7 @@
 @testable import DistrictModel
 import XCTest
 
-/// Reading `districtai://handoff?state=<S>&nonce=<N>` (S33).
+/// Reading `districtai://handoff?state=<S>&nonce=<N>`.
 final class SchedulingHandoffCallbackTests: XCTestCase {
     private static let state = String(repeating: "s", count: 43)
     private static let nonce = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ0123-_Z"

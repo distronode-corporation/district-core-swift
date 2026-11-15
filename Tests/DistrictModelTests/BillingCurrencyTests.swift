@@ -4,7 +4,7 @@ import XCTest
 
 /// `currency` on a subscription and an invoice.
 ///
-/// ⚠️ `district-billing.json` carries `usd` on every row since monorepo 43eed5fd6, so the
+/// ⚠️ `district-billing.json` carries `usd` on every row since 7.0.0-beta.3's contracts, so the
 /// strict gate proves the present branch; these also decode `cad` from literal bytes, and
 /// the absent branch a server from before then still sends.
 final class BillingCurrencyTests: XCTestCase {

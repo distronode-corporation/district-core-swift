@@ -40,8 +40,8 @@ final class ApiErrorLocalizationTests: XCTestCase {
 
     /// ⛔ A REFUSAL THIS CLIENT WROTE ITSELF IS SHOWN IN FRENCH AS IT IS: its message is
     /// catalog text in the active language, and it has no code to look up.
-    /// ⚠️ THE TWO SUPERVISE REFUSALS SAY THE WEBSITE'S SENTENCE IN FRENCH (contracts/i18n,
-    /// monorepo e44c194b9). In English the server's own message still wins.
+    /// ⚠️ THE TWO SUPERVISE REFUSALS SAY THE WEBSITE'S SENTENCE IN FRENCH (contracts/i18n).
+    /// In English the server's own message still wins.
     func testTheSuperviseRefusalsSayTheWebsitesSentence() {
         let ended = ApiError.http(status: 409, message: "This call has ended.", code: ApiErrorCode.callEnded)
         let ownCall = ApiError.http(

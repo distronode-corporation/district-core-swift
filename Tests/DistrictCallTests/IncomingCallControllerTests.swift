@@ -6,8 +6,8 @@ import XCTest
 /// ⛔ THE MOST IMPORTANT ASSERTIONS IN THIS FILE ARE WHAT IS SENT WHEN A RING ENDS
 /// UNANSWERED. A person's decline adds exactly one request,
 /// ``IncomingCallCommand/requestDecline(workspace:call:)``, so the server can end the
-/// ring and let the agent take a message (Sean's decision, 2026-10-24, GitLab #2 note
-/// 4083623386). A timeout, a withdrawal and a missing session add NOTHING: none has a
+/// ring and let the agent take a message (the maintainers' decision,
+/// 2026-10-24). A timeout, a withdrawal and a missing session add NOTHING: none has a
 /// person behind it, and reporting one would tell the caller somebody refused them.
 final class IncomingCallControllerTests: XCTestCase {
     func testAPushRingsTheOSAndTheNotificationShadeTogether() {

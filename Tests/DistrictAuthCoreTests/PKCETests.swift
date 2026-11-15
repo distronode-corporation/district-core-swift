@@ -66,7 +66,7 @@ final class PKCETests: XCTestCase {
         XCTAssertNotEqual(PKCE.newState(), PKCE.newState())
     }
 
-    /// ⛔ THE APP USES `newState` FOR THE SCHEDULING HAND-OFF'S LEG 1 TOO (S33), so it
+    /// ⛔ THE APP USES `newState` FOR THE SCHEDULING HAND-OFF'S LEG 1 TOO, so it
     /// must satisfy that route's own rule, or every hand-off would quietly take the
     /// unbound fallback. Checked on bytes that exercise both base64url specials.
     func testStateSatisfiesTheHandoffStateRule() {

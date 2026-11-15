@@ -6,7 +6,12 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
-## [8.6.0] - not yet tagged
+## [8.6.0] - 2026-11-15
+
+Timeline attachments and PDF uploads, the workspace's email identity, the AI campaign
+launcher and the always-on campaign's settings, and the Studio's Integrations area.
+Additive only, so a minor version. ⚠️ `EndpointID` gains four cases and `StudioArea` one,
+which would break an exhaustive `switch` over either.
 
 ### Added
 
@@ -62,7 +67,7 @@ All notable changes to this package are recorded here. The format is based on
   `{success}`, pinned by the service's new `district-campaign-settings.json`. ⛔ The on
   switch never goes there: pausing stays `WorkflowsRepository.setCampaignEnabled` on
   `campaign-status`. `EndpointID` gains `saveCampaignSettings`.
-- `contracts/i18n/api-errors.json` from monorepo aa7f8284d, byte for byte: nineteen
+- `contracts/i18n/api-errors.json` from the service, byte for byte: nineteen
   Microsoft Marketplace codes (`checkout_marketplace_billed`, `marketplace_*`,
   `microsoft_attach_*`, `microsoft_landing_*`), generated into `l10n/api_errors.toml` and
   the `ApiErrorTable` with the website's English and French.
@@ -72,6 +77,8 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Changed
 
+- swift-crypto is pinned `exact: "5.1.1"`, up from 5.0.3. An app that pins this
+  package resolves swift-crypto 5.1.1 with it.
 - Call handling is gated against the service's new `district-call-handling.json` and
   `district-call-handling-patch.json` (one `CallHandlingResponse` for both verbs), with no
   change to the type. With the email identity's two, the fixture count is 238 (the Android
@@ -228,7 +235,7 @@ neither district-ios nor district-macos switches over `EndpointID` or names a ca
 
 App parity with the web Inbox: Messenger and Instagram threads, the server's reply options,
 thread assignment, and the WhatsApp 24-hour window and templates; and live supervision
-(listen in, take over, the whisper receipt; Sean, 2026-11-05, GitLab #2 note 4171521455).
+(listen in, take over, the whisper receipt).
 Nothing is removed or renamed and no existing signature changes, so this is a minor version
 (8.2.0).
 ⚠️ `EndpointID` gains five cases, which would break an exhaustive `switch` over it; neither
@@ -297,15 +304,15 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   generation, and `SuperviseEvent.engine(_:generation:_:)` must carry the one its engine was
   built with: an event from an engine the session has already left (Stop, then Listen again)
   is ignored. The endpoint total is 131 and the typed count 129.
-- Live supervision's five contract fixtures, from the website at monorepo e44c194b9 (re-synced at 6c0099cdf)
+- Live supervision's five contract fixtures, from the website
   (`district-call-monitor-token.json`, `district-call-takeover.json`,
   `district-call-whisper.json`, `telemetry-event-whisper-applied.json` and
   `telemetry-event-whisper-not-applied.json`), gated in `ImplementedFixtures+Supervise.swift`
   against the models above; `ContractManifest.expectedFixtureCount` goes 203 to 208, and the
   desktop event-set assertion counts the mobile receipts, so `whisper_applied` is no longer
   excluded. `SuperviseContractTests` reads their values.
-- `CallSummary.receptionistOnCall` (feed, detail and overview rows, from the website at monorepo
-  6c0099cdf) and `hasReceptionist`, which reads an absent value as `true`. `false` marks a team
+- `CallSummary.receptionistOnCall` (feed, detail and overview rows, from the website) and
+  `hasReceptionist`, which reads an absent value as `true`. `false` marks a team
   member's own softphone call: `SuperviseState.receptionistOnCall` (and
   `SuperviseSession(call:role:)`, which reads it from the row) keeps Listen and hides Whisper
   and Take over. The routes' 409 `call_has_no_receptionist` stays the fallback.
@@ -313,7 +320,7 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
   ringing), `.callHasNoReceptionist` (409 from the whisper and the takeover on a team
   member's own softphone call) and `.callNotInProgress`. An ended call on the whisper or the
   takeover stays `call_not_in_progress`. The two new codes are in the `ApiErrorTable` with the
-  website's English and French (`contracts/i18n/api-errors.json` from monorepo e44c194b9).
+  website's English and French (`contracts/i18n/api-errors.json`).
 - The ten app parity fixtures from #50 leave `ContractManifest.unimplemented` and are gated
   in `ImplementedFixtures+Parity.swift`, with 26 allowed null paths
   (`AllowedExplicitNulls+Parity.swift`, total 236).
@@ -321,13 +328,13 @@ Messenger and Instagram threads and `ConversationSummary.replyTargets` follows t
 ### Changed
 
 - The French of `api_error.engine_unavailable` is the website's (« offert à cet espace de
-  travail », monorepo fec800ce8), which `contracts/i18n/api-errors.json` already carried.
-- Five French sentences shared with the website follow its fixes (monorepo 35edbd30c):
+  travail »), which `contracts/i18n/api-errors.json` already carried.
+- Five French sentences shared with the website follow its fixes:
   `live_changed`, `caller_id_carrier_failed`, `caller_id_not_confirmed`,
   `caller_id_mobile_unverified` and the `quiet_hours` workflow reason.
-  `contracts/i18n/api-errors.json` and `wire-vocabulary.json` are copied from that commit.
-- `i18n/fr-CA/signoff.json` records Sean's sign-off (2026-11-05) of every catalog change since
-  8.1.0, the four catalogs as they are at da074db, so the release guard passes on the tag.
+  `contracts/i18n/api-errors.json` and `wire-vocabulary.json` are copied from the website.
+- `i18n/fr-CA/signoff.json` records the maintainers' sign-off (2026-11-05) of every catalog change since
+  8.1.0, the four catalogs as they were then, so the release guard passes on the tag.
   8.1.0 was tagged without renewing it, and its guard run failed.
 
 ### Fixed
@@ -420,8 +427,8 @@ when the pin moves.
 
 ### Changed
 
-- ⛔ A person's decline is now reported (Sean's decision, 2026-10-24, GitLab #2 note
-  4083623386). `IncomingCallController` appends `.requestDecline(workspace:call:)` to the
+- ⛔ A person's decline is now reported (the maintainers' decision,
+  2026-10-24). `IncomingCallController` appends `.requestDecline(workspace:call:)` to the
   shared ending when `.declinePressed` arrives while ringing, so the server can end the ring
   and the agent takes a message at once. A timeout, a withdrawal and a missing session still
   send nothing: the apps' `withdraw` and `endForNoSession` paths feed the new
@@ -452,7 +459,7 @@ removed or renamed.
 ### Changed
 
 - `contracts/mobile/district-voice-studio.json`, `contracts/i18n/api-errors.json` and
-  `contracts/i18n/wire-vocabulary.json` from monorepo ac4071d14, byte for byte: the Claude
+  `contracts/i18n/wire-vocabulary.json` from the service, byte for byte: the Claude
   Haiku 5.5 brain entry, 44 new error codes (`knowledge_url_*`, `member_phone_*`,
   `transfer_*`, `workflow_*`), the portal's disposition labels, and new workflow triggers, an
   action and reason codes. Five of those reason codes (`no-devices`, `no-message`,
@@ -471,14 +478,14 @@ removed or renamed.
 
 ### Changed
 
-- `contracts/i18n/api-errors.json` from monorepo b48ce94d4, byte for byte: the new code
-  `sending_domain_provider_changed` (English and French), which the monorepo's
-  `drift:app_contracts` was red on. Its catalog entry `api_error.sending_domain_provider_changed`
+- `contracts/i18n/api-errors.json` from the service, byte for byte: the new code
+  `sending_domain_provider_changed` (English and French), which the service's
+  contract drift check was red on. Its catalog entry `api_error.sending_domain_provider_changed`
   and accessor are generated (`scripts/gen-l10n.py`). ⚠️ Its French is NOT the contract's
   verbatim: the contract says « les nouveaux enregistrements DNS », which frcheck's ban on
   « enregistrement » outside a denial refuses (an error, which cannot be waived), so the
   catalog says « les nouvelles entrées DNS », the words the service's French is moving to.
-- `contracts/i18n/wire-vocabulary.json` and `format-vectors.json` from monorepo ecf098046,
+- `contracts/i18n/wire-vocabulary.json` and `format-vectors.json` from the service,
   byte for byte. New labels, generated into `l10n/wire.toml` with the fixture's French: the
   workflow skip reasons `email-misconfigured` (« Courriel mal configuré ») and `ses-missing`
   (« SES non configuré »; the English "SES missing" keeps the initialism in capitals, as
@@ -501,10 +508,10 @@ its 3.0.1, and district-ios switches over neither.
 
 ### Changed
 
-- ⛔ The scheduling hand-off never mints UNBOUND (S33; Sean, GitLab #2 note 4022232351).
+- ⛔ The scheduling hand-off never mints UNBOUND.
   `SchedulingHandoffFlow` used to fall back to a mint with no `nonce` when leg 1 did not
   call back within the clock, failed visibly, or the state was unusable; while any build
-  could do that, the server could not switch `HANDOFF_REQUIRE_NONCE` on. Those paths now
+  could do that, the server could not require the nonce. Those paths now
   end as the new `SchedulingHandoffOutcome.noCallback` and send nothing; the app shows a
   notice and the person presses again. `SchedulingHandoffClient.mint(workspaceId:next:nonce:)`
   takes a required `nonce: String`, so no caller can mint without one. The callback clock
@@ -573,7 +580,7 @@ What 7.0.0 brings over 6.0.0:
   (`249,00 $ CA`); English stays `$249.00`.
 - **Webhooks**: an editor offers the four booking events, as the web portal does, and a
   save keeps the events a webhook already has.
-- **Contracts** from monorepo 43eed5fd6: 187 mobile fixtures.
+- **Contracts** from the service: 187 mobile fixtures.
 - Breaking, for the apps: `ApiError.http` has a third value, `WireCategory` new cases,
   and several stored lists are computed; 7.0.0-beta.1 lists what the apps absorb.
 
@@ -590,7 +597,7 @@ What 7.0.0 brings over 6.0.0:
 
 ## [7.0.0-beta.3] - 2026-10-14
 
-The contracts from monorepo 43eed5fd6, whose French the catalogs copy verbatim, French
+The service's contracts, whose French the catalogs copy verbatim, French
 billing amounts that name their currency, and a webhook editor that offers only the
 booking events. English is byte-identical to 7.0.0-beta.2.
 
@@ -615,7 +622,7 @@ booking events. English is byte-identical to 7.0.0-beta.2.
   recording. They stay in `SchedulingWebhookEvent` (`allCases` is still the fork's seven),
   so a webhook already subscribed to one keeps it when saved. An editor that lists
   `allCases` should list `offered`.
-- `contracts/` from monorepo 43eed5fd6: `i18n/api-errors.json` (ten French sentences),
+- `contracts/` from the service: `i18n/api-errors.json` (ten French sentences),
   `i18n/wire-vocabulary.json` (the French of funnelStage `Total Dials` and of
   deskTicketStatus) and `mobile/district-billing.json` (`currency` on every subscription and
   invoice, which the strict gate now decodes).
@@ -640,20 +647,20 @@ scheduling formatters' French dates and times. English is byte-identical to
   `AccountSettingsSaveResponse`; its result is unchanged.
 - An optional `currency` on `BillingSubscription` and `BillingInvoice`, ahead of the server
   sending it. Today's bodies omit it and decode as before.
-- Twenty-one contract fixtures from monorepo 49019be80, all gated by the strict decoder:
+- Twenty-one contract fixtures from the service, all gated by the strict decoder:
   number configure, release, lookup and provider status, SIP trunks, Verify, A2P and
   toll-free verification, contact blocking, account settings, and the persona options in
   French.
 
 ### Changed
 
-- `contracts/i18n/wire-vocabulary.json` from monorepo 49019be80: `WireCategory` has 39
+- `contracts/i18n/wire-vocabulary.json` from the service: `WireCategory` has 39
   cases, up from 31 (number status, A2P campaign type and registration status, toll-free
   verification status, SIP trunk status, scheduling webhook delivery status, host roles and
   question types), with their labels. A `switch` over `WireCategory` without a `default`
   needs the new cases. No existing label changed.
 
-- `contracts/i18n/wire-vocabulary.json` from monorepo 46e1740: `WireCategory` has 31 cases,
+- `contracts/i18n/wire-vocabulary.json` from the service: `WireCategory` has 31 cases,
   up from 11 (Desk tickets, knowledge documents, workflows, numbers, meetings, message
   delivery, contact research, billing and messaging accounts), with their labels, and
   `WireLabel.placeholder` knows `"No answer, no conversation took place."`. A `switch` over
@@ -1061,10 +1068,26 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/7.0.0-beta.3...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/8.6.0...HEAD
+[8.6.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.6.0
+[8.5.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.5.0
+[8.4.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.4.2
+[8.4.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.4.1
+[8.4.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.4.0
+[8.3.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.3.0
+[8.2.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.2.0
+[8.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.1.0
+[8.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.0.0
+[7.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.1.0
+[7.0.3]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.3
+[7.0.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.2
+[7.0.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.1
+[7.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0
 [7.0.0-beta.3]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.3
 [7.0.0-beta.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.2
 [7.0.0-beta.1]: https://github.com/distronode-corporation/district-core-swift/releases/tag/7.0.0-beta.1
+[6.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/6.0.0
+[5.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/5.0.0
 [4.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/4.0.0
 [3.1.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.1.0
 [3.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/3.0.0

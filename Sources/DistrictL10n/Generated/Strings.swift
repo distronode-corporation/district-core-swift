@@ -204,6 +204,12 @@ package enum ApiErrorCopy {
     /// `api_error.draft_nothing_to_undo`
     package static var draftNothingToUndo: String { L10nRuntime.locale == .frCA ? "Il n'y a pas de version antérieure du brouillon à rétablir." : "There is no earlier version of the draft to go back to." }
 
+    /// `api_error.email_changed`
+    package static var emailChanged: String { L10nRuntime.locale == .frCA ? "L'adresse courriel de ce contact a changé depuis l'ouverture de sa fiche. Vérifiez la nouvelle adresse avant de la confirmer." : "This contact's email address changed since you opened it. Check the new address before confirming it." }
+
+    /// `api_error.email_unconfirmed`
+    package static var emailUnconfirmed: String { L10nRuntime.locale == .frCA ? "L'adresse courriel de ce contact n'est pas confirmée. Confirmez-la dans la fiche du contact avant de lui écrire." : "This contact's email address is unconfirmed. Confirm it in the contact panel before emailing it." }
+
     /// `api_error.emergency_acknowledgement_required`
     package static var emergencyAcknowledgementRequired: String { L10nRuntime.locale == .frCA ? "Confirmez que vous comprenez que ce numéro ne peut pas servir à appeler le 9-1-1 ni aucun autre service d'urgence, puis réessayez." : "Confirm that you understand this number cannot be used to call 911 or other emergency services, then try again." }
 
@@ -342,7 +348,7 @@ package enum ApiErrorCopy {
     package static var marketplaceBilledWorkspace: String { L10nRuntime.locale == .frCA ? "Cet espace de travail est facturé par Microsoft Marketplace, qui fixe son forfait et l'état de son abonnement. Modifiez-les chez Microsoft, ou retirez l'espace de travail de la facturation Microsoft une fois son abonnement Microsoft annulé." : "This workspace is billed through Microsoft Marketplace, which sets its plan and subscription status. Change them in Microsoft, or move the workspace off Microsoft billing once its Microsoft subscription is cancelled." }
 
     /// `api_error.marketplace_cancel_refused`
-    package static var marketplaceCancelRefused: String { L10nRuntime.locale == .frCA ? "Microsoft n'a pas voulu annuler un abonnement Microsoft Marketplace de votre espace de travail; rien n'a donc été supprimé. Annulez-le dans le Centre d'administration Microsoft 365, puis réessayez." : "Microsoft would not cancel a Microsoft Marketplace subscription on your workspace, so nothing was deleted. Cancel it in the Microsoft 365 admin center, then try again." }
+    package static var marketplaceCancelRefused: String { L10nRuntime.locale == .frCA ? "Microsoft a refusé d'annuler un abonnement Microsoft Marketplace de votre espace de travail; rien n'a donc été supprimé. Annulez-le dans le Centre d'administration Microsoft 365, puis réessayez." : "Microsoft would not cancel a Microsoft Marketplace subscription on your workspace, so nothing was deleted. Cancel it in the Microsoft 365 admin center, then try again." }
 
     /// `api_error.marketplace_intro_minutes_reached`
     package static var marketplaceIntroMinutesReached: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a utilisé les minutes vocales incluses dans son forfait. Pendant les 72 heures suivant l'activation de votre abonnement Microsoft Marketplace, les appels sortants s'arrêtent aux minutes incluses. Ils reprennent à la fin de ces 72 heures." : "This workspace has used its plan's included voice minutes. For the first 72 hours after your Microsoft Marketplace subscription is activated, outgoing calls stop at the included minutes. They resume when the 72 hours end." }
@@ -432,7 +438,7 @@ package enum ApiErrorCopy {
     package static var microsoftLandingHeldElsewhere: String { L10nRuntime.locale == .frCA ? "Cet achat est configuré dans une autre région; il se gère donc sur le site de cette région." : "This purchase is set up in another region, so it is managed on that region's site." }
 
     /// `api_error.microsoft_landing_identity_mismatch`
-    package static var microsoftLandingIdentityMismatch: String { L10nRuntime.locale == .frCA ? "Connectez-vous avec le compte Microsoft qui a acheté District AI, ou celui pour qui il a été acheté." : "Sign in with the Microsoft account that bought District AI, or the one it was bought for." }
+    package static var microsoftLandingIdentityMismatch: String { L10nRuntime.locale == .frCA ? "Connectez-vous avec le compte Microsoft qui a acheté District AI, ou celui pour lequel il a été acheté." : "Sign in with the Microsoft account that bought District AI, or the one it was bought for." }
 
     /// `api_error.microsoft_landing_refused`
     package static var microsoftLandingRefused: String { L10nRuntime.locale == .frCA ? "Cet achat a été annulé chez Microsoft, ou ce n'est pas un forfait District AI. Pour acheter de nouveau, faites un nouvel achat sur Microsoft Marketplace." : "This purchase was cancelled in Microsoft, or it is not a District AI plan. To buy again, start a new purchase on Microsoft Marketplace." }
@@ -450,10 +456,13 @@ package enum ApiErrorCopy {
     package static var microsoftLandingUnavailable: String { L10nRuntime.locale == .frCA ? "Nous n'avons pas pu joindre Microsoft pour le moment, alors rien n'a été configuré. Réessayez dans un instant." : "We could not reach Microsoft just now, so nothing was set up. Try again in a moment." }
 
     /// `api_error.microsoft_landing_us_regional_account`
-    package static var microsoftLandingUsRegionalAccount: String { L10nRuntime.locale == .frCA ? "Un compte Distronode d'une autre région ne peut pas détenir un achat des États-Unis. Achetez dans cette région pour garder un seul compte, ou utilisez une autre adresse courriel pour créer un compte distinct aux États-Unis." : "A Distronode account in another region can't hold a US purchase. Buy in that region to keep one account, or use a different email address to create a separate US account." }
+    package static var microsoftLandingUsRegionalAccount: String { L10nRuntime.locale == .frCA ? "Un compte Distronode d'une autre région ne peut pas détenir un achat fait aux États-Unis. Achetez dans cette région pour garder un seul compte, ou utilisez une autre adresse courriel pour créer un compte distinct aux États-Unis." : "A Distronode account in another region can't hold a US purchase. Buy in that region to keep one account, or use a different email address to create a separate US account." }
 
     /// `api_error.model_unavailable_in_region`
     package static var modelUnavailableInRegion: String { L10nRuntime.locale == .frCA ? "Ce moteur vocal n'est pas offert aux espaces de travail de cette région. Choisissez un autre moteur." : "This voice engine is not available for workspaces in this region. Choose another engine." }
+
+    /// `api_error.no_email`
+    package static var noEmail: String { L10nRuntime.locale == .frCA ? "Ce contact n'a aucune adresse courriel à confirmer." : "This contact has no email address to confirm." }
 
     /// `api_error.no_password`
     package static var noPassword: String { L10nRuntime.locale == .frCA ? "Ce compte se connecte avec Google ou Microsoft et n'a aucun mot de passe à ressaisir. Définissez d'abord un mot de passe sur le Web." : "This account signs in with Google or Microsoft and has no password to re-enter. Set a password on the web first." }

@@ -91,6 +91,9 @@ enum ApiErrorTable {
         case "draft_lint_refused": return ApiErrorCopy.draftLintRefused
         case "draft_nothing_to_undo": return ApiErrorCopy.draftNothingToUndo
         case "live_changed": return ApiErrorCopy.liveChanged
+        case "email_changed": return ApiErrorCopy.emailChanged
+        case "no_email": return ApiErrorCopy.noEmail
+        case "email_unconfirmed": return ApiErrorCopy.emailUnconfirmed
         case "audition_busy": return ApiErrorCopy.auditionBusy
         case "audition_daily_cap": return ApiErrorCopy.auditionDailyCap
         case "audition_unavailable": return ApiErrorCopy.auditionUnavailable

@@ -96,10 +96,9 @@ public extension DistrictEndpoints {
     /// discards a nil pair so the route's own default fires, and an explicit null is a
     /// value zod would not default over. Same decision as `registerPushToken`'s `kind`.
     ///
-    /// ⛔ `nonce` IS DROPPED WHEN nil FOR THE SAME REASON, AND HERE THE ABSENT KEY IS
-    /// THE CONTRACT. The unbound fallback must send no `nonce` key at all: the server
-    /// reads a present-but-empty value as a malformed nonce (400 `invalid_nonce`), not
-    /// as "no nonce".
+    /// ⛔ `nonce` IS REQUIRED AND ALWAYS SENT (7.0.1): there is no unbound mint any
+    /// more. The server reads an empty or malformed value as 400 `invalid_nonce`, and
+    /// a missing one as 400 `nonce_required`.
     static func schedulingHandoff(
         workspaceId: String,
         next: String? = nil,

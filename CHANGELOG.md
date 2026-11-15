@@ -6,6 +6,18 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- `contracts/i18n/api-errors.json` in line with the service, byte for byte: three contact
+  email codes, `email_changed`, `no_email` and `email_unconfirmed`, generated into
+  `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English and French.
+
+### Changed
+
+- The website's reworded French for `marketplace_cancel_refused`,
+  `microsoft_landing_identity_mismatch` and `microsoft_landing_us_regional_account`,
+  generated into `l10n/api_errors.toml` and the `ApiErrorTable` from the same sync.
+
 ## [8.6.0] - 2026-11-15
 
 Timeline attachments and PDF uploads, the workspace's email identity, the AI campaign

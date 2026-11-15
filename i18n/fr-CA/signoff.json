@@ -1,19 +1,19 @@
 {
-  "signed_off_by": "Sean Dean (sign-off 2026-11-07 of the 16 new strings: the number registration labels and three re-authentication errors, the same text signed off for district-core-rust 10.0.0)",
-  "release": "8.4.1",
-  "commit": "12294d1fab58d5fcf89a27f1f5ff87d5bbeefa3d",
+  "signed_off_by": "Sean Dean, by approving this file's pull request, 2026-11-15. The 28 French strings changed since 8.4.1 were reviewed by an AI agent and 2 were corrected.",
+  "release": "8.6.0",
+  "commit": "fdb4d3752e9ddbd3479b9e24dea9591a92fe55b3",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "62050ec4e40c34371587e12246c29a551382f759dc4aa9e1e5b94e7cca379e5d"
+      "sha256": "0007d9685654828bfd5258ce795d3c17440ba9617c512e34d63a97c45558a6fd"
     },
     {
       "path": "l10n/core.toml",
-      "sha256": "cc4b4da93892b3e7064fa3ac7c579a01030c57b5ad02d5083b04dc67cdaa43ff"
+      "sha256": "0d3b73fd9f459cf3e8bd1b6bcd566d33d6fd24debe600862aaa0b6e985274532"
     },
     {
       "path": "l10n/countries.toml",
-      "sha256": "b30df139aaa73e81ee49ac0213b117887a7d299a692a396f71cbb0b12813c28f"
+      "sha256": "bb0171c4b76c2e9ea4549cda04c710c7d2b7e9463369c88bd5c5d7e53bd9a499"
     },
     {
       "path": "l10n/wire.toml",

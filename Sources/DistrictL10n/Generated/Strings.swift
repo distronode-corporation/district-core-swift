@@ -782,10 +782,10 @@ package enum CampaignCopy {
     package static var promptBlank: String { L10nRuntime.locale == .frCA ? "Décrivez l'objectif de ces appels avant de lancer la campagne." : "Describe the goal of these calls before launching the campaign." }
 
     /// `campaign.sinch_contact_required`
-    package static var sinchContactRequired: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré." : "This workspace's carrier can only place this call to a saved contact." }
+    package static var sinchContactRequired: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut passer cet appel qu'à un contact enregistré." : "This workspace's carrier can only place this call to a saved contact." }
 
     /// `campaign.sinch_disclosure_unsupported`
-    package static var sinchDisclosureUnsupported: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé." : "This workspace's carrier cannot carry the AI-call disclosure this call requires." }
+    package static var sinchDisclosureUnsupported: String { L10nRuntime.locale == .frCA ? "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA qu'exige cet appel." : "This workspace's carrier cannot carry the AI-call disclosure this call requires." }
 
     /// `campaign.too_many_contacts`
     package static var tooManyContacts: String { L10nRuntime.locale == .frCA ? "Une campagne peut appeler au plus 100 contacts à la fois. Divisez la liste et relancez la campagne." : "A campaign can call at most 100 contacts at a time. Split the list and launch again." }

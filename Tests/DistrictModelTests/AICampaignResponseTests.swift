@@ -51,11 +51,12 @@ final class AICampaignResponseTests: XCTestCase {
             )
             XCTAssertEqual(
                 carrier.localizedMessage,
-                "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré."
+                "Le transporteur de cet espace de travail ne peut passer cet appel qu'à un contact enregistré."
             )
             XCTAssertEqual(
                 disclosure.localizedMessage,
-                "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé."
+                "Le transporteur de cet espace de travail ne peut pas transmettre "
+                    + "l'avis d'appel par IA qu'exige cet appel."
             )
         }
     }

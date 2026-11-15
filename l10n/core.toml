@@ -32,7 +32,7 @@ note = "Refusal shown before launching an AI calling campaign whose goal (the in
 
 [campaign.sinch_contact_required]
 en = "This workspace's carrier can only place this call to a saved contact."
-fr = "Le transporteur de cet espace de travail ne peut appeler qu'un contact enregistré."
+fr = "Le transporteur de cet espace de travail ne peut passer cet appel qu'à un contact enregistré."
 ctx = "body"
 screen = "ai campaign"
 tier = "T2"
@@ -41,7 +41,7 @@ note = "Shown beside one contact in an AI calling campaign's results when the ca
 
 [campaign.sinch_disclosure_unsupported]
 en = "This workspace's carrier cannot carry the AI-call disclosure this call requires."
-fr = "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA exigé."
+fr = "Le transporteur de cet espace de travail ne peut pas transmettre l'avis d'appel par IA qu'exige cet appel."
 ctx = "body"
 screen = "ai campaign"
 tier = "T2"

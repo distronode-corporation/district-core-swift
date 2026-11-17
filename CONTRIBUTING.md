@@ -45,12 +45,17 @@ workflows; run them locally if you have them.
 
 ## Rules CI enforces
 
-**Style.** SwiftFormat and SwiftLint, at the versions above, from the repository root.
+**Style.** SwiftFormat and SwiftLint, at the versions above, from the repository root,
+configured in `.swiftformat` and `.swiftlint.yml`, which are this repository's style
+guide; a pull request that fails either does not merge.
 Use exactly those versions: the two tools disagree by default about some constructs and
 are configured to agree, and another version can put them back at odds. SwiftLint runs
 with `--strict`, so a warning is a failure, and there is no baseline file.
 
-**Tests and coverage.** A change in behaviour comes with a test that fails without it.
+**Tests and coverage.** A change in behaviour comes with a test that fails without it:
+new functionality adds tests for it to the automated suite (`swift test`), and a bug fix
+adds a test that fails without the fix. CI runs the suite on every pull request and every
+push to `main`, and `verify (Linux)` and `darwin (macOS)` are required checks.
 Line coverage is 100%, and `ci/coverage-gate.sh` holds every module and the total there:
 a line a test can reach gets a test, and a line nothing can reach is deleted, with a
 comment at the site saying why. Floors never go down.
@@ -103,10 +108,23 @@ the diff already says what. Name what was wrong and how you know.
 
 Changes to public API are noted in [CHANGELOG.md](CHANGELOG.md) under `Unreleased`.
 
+Documentation moves with the code: a change in behaviour updates the README,
+ARCHITECTURE.md, SECURITY.md or SECURITY-MODEL.md in the same pull request when it changes
+what they say. How changes are reviewed and accepted is in the organization's
+[GOVERNANCE.md](https://github.com/distronode-corporation/.github/blob/main/GOVERNANCE.md).
+
 ## Releases
 
-Contributors do not cut releases. A maintainer tags a version (`1.0.0`, no `v`), following
-Semantic Versioning: a source-breaking change to a public type is a major version.
+Contributors do not cut releases. A release is a version tag (`1.0.0`, no `v`), following
+Semantic Versioning: a source-breaking change to a public type is a major version. A
+maintainer first merges the release's CHANGELOG.md section and the README's new pins, then
+runs the Release workflow (`.github/workflows/release.yml`) from `main` with the version
+and a one-line summary. It checks the version against CHANGELOG.md and the README and the
+French sign-off, creates the annotated tag on `main`'s head signed with gitsign under the
+workflow's own identity (no key to hold), verifies it and pushes it. The README's "Verify a
+release" says how anyone checks the signature. A tag pushed with the workflow's token
+starts no other workflow, which is why the release workflow runs the sign-off check itself;
+`release-guard.yml` still runs it on a tag pushed by hand, which is unsigned.
 
 The French is signed off per release. `i18n/fr-CA/signoff.json` names who signed it off,
 the release and commit the catalogs were read at, and the SHA-256 of every catalog in

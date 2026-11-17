@@ -47,6 +47,11 @@ final class HQVoiceTests: XCTestCase {
             XCTAssertFalse(text.contains("c2VjcmV0"), text)
             XCTAssertTrue(text.contains("hq_ws-1_00000000"), text)
         }
+        // A room with no key says so, in both forms, rather than looking redacted.
+        var unkeyed = ""
+        dump(credential(key: nil), to: &unkeyed)
+        XCTAssertTrue(unkeyed.contains("e2ee: \"none\""), unkeyed)
+        XCTAssertTrue(credential(key: nil).description.hasSuffix("e2ee: none)"))
     }
 
     func testPushIsTheOnlyMutedMode() {
@@ -131,6 +136,14 @@ final class HQVoiceTests: XCTestCase {
                     + #""joinCall":{"callId":"c1"}}"#
             ),
             .resolved(HQVoiceResolution(proposalId: "p1", status: .cancelled, error: nil, joinCallId: nil))
+        )
+        // An applied change naming an empty call joins nothing.
+        XCTAssertEqual(
+            packet(
+                #"{"type":"HQ_PROPOSAL_RESOLVED","proposalId":"p1","status":"applied","via":"voice","#
+                    + #""joinCall":{"callId":""}}"#
+            ),
+            .resolved(HQVoiceResolution(proposalId: "p1", status: .applied, error: nil, joinCallId: nil))
         )
     }
 

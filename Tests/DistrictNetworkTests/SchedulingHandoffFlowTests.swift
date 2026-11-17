@@ -178,6 +178,24 @@ final class SchedulingHandoffFlowTests: XCTestCase {
         XCTAssertEqual(log.lines, ["handoff path=no-callback"])
     }
 
+    /// The default clock, waited out on a short timeout: whatever the scheduler does, a
+    /// hand-off nobody answers ends at the timeout, and nothing is minted.
+    func test_S33_07c_theDefaultClockEndsAnUnansweredHandOff() async {
+        let transport = Self.mintedTransport()
+        let log = LogLines()
+        let flow = SchedulingHandoffFlow(
+            client: SchedulingHandoffClient(client: .test(transport)),
+            newState: { Self.state },
+            timeout: .milliseconds(1),
+            log: log.append
+        )
+        let outcome = await flow.run(workspaceId: "ws_1", open: Opened().record)
+
+        XCTAssertEqual(outcome, .noCallback)
+        XCTAssertTrue(transport.recorded.isEmpty)
+        XCTAssertEqual(log.lines, ["handoff path=no-callback"])
+    }
+
     /// The clock is the documented 30 s, inside the nonce cookie's 300 s.
     func test_S33_07b_theCallbackClockIsThirtySeconds() {
         XCTAssertEqual(SchedulingHandoffFlow.callbackTimeout, .seconds(30))

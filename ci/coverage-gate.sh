@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 #
-# Line-coverage floors for this package, enforced per module.
+# Coverage floors for this package (lines, functions and regions), enforced per
+# module.
+#
+# ── What is measured, and what cannot be ─────────────────────────────────────
+# Three llvm-cov metrics are gated, each per module and in total: LINES,
+# FUNCTIONS and REGIONS. Every floor applies to all three.
+#
+# ⚠️ THERE IS NO BRANCH METRIC FOR SWIFT. llvm-cov records branch counts only
+# for front ends that emit branch regions (clang, rustc on nightly); swiftc
+# does not, so `summary.branches.count` is 0 for every Swift file. REGIONS are
+# the closest stand-in: each side of an `if`, `guard`, `switch` case, `??`,
+# `&&` and `||` is its own region, so an untaken side is a region miss. If a
+# future toolchain starts reporting branches, this script fails and names it,
+# so the new metric is gated on purpose rather than ignored.
 #
 # Run it AFTER `swift test --enable-code-coverage`, from anywhere:
 #   ci/coverage-gate.sh   (path relative to the project root)
@@ -97,9 +110,10 @@ fi
 echo "coverage export: $CODECOV_JSON"
 
 # ── Enforce ──────────────────────────────────────────────────────────────────
-# The export is llvm-cov's own JSON (data[].files[].summary.lines.{count,covered}).
-# Percentages are recomputed from the raw counts rather than read from
-# `.percent`, so a module of two files is weighted by lines and not by file.
+# The export is llvm-cov's own JSON (data[].files[].summary.{lines,functions,
+# regions}.{count,covered}). Percentages are recomputed from the raw counts
+# rather than read from `.percent`, so a module of two files is weighted by
+# lines (or functions, or regions) and not by file.
 MODULES="$MODULES" \
 FLOOR_TOTAL="$FLOOR_TOTAL" \
 FLOOR_DistrictL10n="$FLOOR_DistrictL10n" \
@@ -122,33 +136,32 @@ data = report.get("data")
 if not data:
     sys.exit("FATAL: coverage export has no `data` array: llvm-cov schema changed.")
 
+METRICS = ("lines", "functions", "regions")
 modules = os.environ["MODULES"].split()
-counts = {name: [0, 0] for name in modules}   # module -> [covered, total]
-total = [0, 0]
+# metric -> module -> [covered, total]
+counts = {metric: {name: [0, 0] for name in modules} for metric in METRICS}
+total = {metric: [0, 0] for metric in METRICS}
+branches_seen = []
+# Files whose summary counts a function no test ran, named below by declaration.
+function_misses = set()
+
+
+def first_party(filename):
+    # Only first-party sources. Test files and anything checked out under
+    # .build are excluded: a test file counting towards its own coverage
+    # inflates every number and hides the code it was meant to exercise.
+    return "/Sources/" in filename and "/.build/" not in filename
+
 
 for block in data:
     for entry in block.get("files", []):
         filename = entry.get("filename", "")
-        # Only first-party sources. Test files and anything checked out under
-        # .build are excluded: a test file counting towards its own coverage
-        # inflates every number and hides the code it was meant to exercise.
-        if "/Sources/" not in filename or "/.build/" in filename:
+        if not first_party(filename):
             continue
-        lines = entry.get("summary", {}).get("lines")
-        if lines is None:
-            sys.exit(f"FATAL: no line summary for {filename}: llvm-cov schema changed.")
-        covered, count = lines["covered"], lines["count"]
-        if covered < count:
-            # ⚠️ NAMED, so a red gate says which file to read rather than only which module.
-            short = filename.split("/Sources/", 1)[1]
-            zero = sorted({seg[0] for seg in entry.get("segments", []) if len(seg) > 4 and seg[3] and seg[2] == 0})
-            print(f"  uncovered: {short}  {count - covered} line(s), regions starting at {zero}")
-        total[0] += covered
-        total[1] += count
+        summary = entry.get("summary", {})
         for name in modules:
             if f"/Sources/{name}/" in filename:
-                counts[name][0] += covered
-                counts[name][1] += count
+                module = name
                 break
         else:
             sys.exit(
@@ -156,34 +169,88 @@ for block in data:
                 "       Add its target to MODULES (and a FLOOR_ entry) in "
                 "ci/coverage-gate.sh, or it ships ungated."
             )
+        short = filename.split("/Sources/", 1)[1]
+        for metric in METRICS:
+            numbers = summary.get(metric)
+            if numbers is None:
+                sys.exit(f"FATAL: no {metric} summary for {filename}: llvm-cov schema changed.")
+            covered, count = numbers["covered"], numbers["count"]
+            if covered < count:
+                # ⚠️ NAMED, so a red gate says which file to read rather than only which module.
+                print(f"  uncovered: {short}  {count - covered} {metric[:-1]}(s)")
+                if metric == "functions":
+                    function_misses.add(short)
+            total[metric][0] += covered
+            total[metric][1] += count
+            counts[metric][module][0] += covered
+            counts[metric][module][1] += count
+        # Region entries that never ran: [line, col, count, hasCount, isRegionEntry, isGap].
+        zero = sorted(
+            {
+                f"{seg[0]}:{seg[1]}"
+                for seg in entry.get("segments", [])
+                if len(seg) > 5 and seg[3] and seg[4] and not seg[5] and seg[2] == 0
+            }
+        )
+        if zero:
+            print(f"  uncovered regions start at: {short}  {', '.join(zero)}")
+        if summary.get("branches", {}).get("count", 0):
+            branches_seen.append(short)
+
+    # Functions that never ran, by the line of their first region, so a red
+    # functions gate points at the declaration and not only at the file. ⚠️ Only
+    # for files whose summary counts a miss: the records are per instantiation,
+    # and an unrun copy of a function another copy covered is not a miss.
+    for function in block.get("functions", []):
+        if function.get("count", 0):
+            continue
+        files = [f for f in function.get("filenames", []) if first_party(f)]
+        if not files or not function.get("regions"):
+            continue
+        short = files[0].split("/Sources/", 1)[1]
+        if short not in function_misses:
+            continue
+        print(f"  uncovered function: {short}:{function['regions'][0][0]}  {function.get('name', '?')}")
 
 failures = []
 
 
-def check(label, covered, count, floor):
+def check(metric, label, covered, count, floor):
     if count == 0:
         # ⛔ NOT A PASS. Zero measurable lines means the module was not built
         # with coverage, was renamed, or its sources vanished.
-        failures.append(f"{label}: NO COVERAGE DATA (0 measurable lines): floor {floor}%")
+        failures.append(f"{label} {metric}: NO COVERAGE DATA (0 measurable): floor {floor}%")
         print(f"  {label:<20} no data                 floor {floor}%   FAIL")
         return
     pct = 100.0 * covered / count
     verdict = "ok" if pct + 1e-9 >= floor else "FAIL"
     print(f"  {label:<20} {pct:6.2f}%  ({covered}/{count})   floor {floor}%   {verdict}")
     if verdict == "FAIL":
-        failures.append(f"{label}: {pct:.2f}% < floor {floor}%")
+        failures.append(f"{label} {metric}: {pct:.2f}% < floor {floor}%")
 
 
-print("DISTRICTCORE line coverage:")
-for name in modules:
-    covered, count = counts[name]
-    check(name, covered, count, int(os.environ[f"FLOOR_{name}"]))
-check("TOTAL", total[0], total[1], int(os.environ["FLOOR_TOTAL"]))
+for metric in METRICS:
+    print(f"DISTRICTCORE {metric[:-1]} coverage:")
+    for name in modules:
+        covered, count = counts[metric][name]
+        check(metric, name, covered, count, int(os.environ[f"FLOOR_{name}"]))
+    check(metric, "TOTAL", total[metric][0], total[metric][1], int(os.environ["FLOOR_TOTAL"]))
+    print()
 
-# The one line a reader greps a job log for; keep its wording stable.
-print()
-total_pct = (100.0 * total[0] / total[1]) if total[1] else 0.0
-print(f"DISTRICTCORE TOTAL line coverage: {total_pct:.2f}%")
+# The lines a reader greps a job log for; keep their wording stable.
+for metric in METRICS:
+    covered, count = total[metric]
+    pct = (100.0 * covered / count) if count else 0.0
+    print(f"DISTRICTCORE TOTAL {metric[:-1]} coverage: {pct:.2f}%")
+
+if branches_seen:
+    # See the header: swiftc emits no branch regions today. If that changes,
+    # the new metric is to be gated deliberately, not left unread.
+    failures.append(
+        "llvm-cov now reports branch counts for "
+        + ", ".join(branches_seen[:5])
+        + ": add `branches` to METRICS in ci/coverage-gate.sh"
+    )
 
 if failures:
     print()
@@ -196,5 +263,5 @@ if failures:
     sys.exit(1)
 
 print()
-print("All coverage floors met.")
+print("All coverage floors met (lines, functions, regions; Swift has no branch metric).")
 PYTHON

@@ -59,18 +59,14 @@ public enum SchedulingOverviewSummary {
     public static func summarizeWorkingHours(_ rules: [SchedulingAvailabilityRule]) -> String? {
         var byDay: [Int: [(start: String, end: String)]] = [:]
         for rule in rules where rule.eventTypeId == nil {
-            // ⛔ THIS GUARD CANNOT FIRE AND IS KEPT BECAUSE THE SOURCE'S CANNOT EITHER.
-            // `displayIndex` has already folded every integer into 0...6, so a corrupt
-            // `day_of_week` of `9` arrives here as Tuesday and is SUMMARISED rather than
-            // skipped. ⚠️ ``SchedulingHoursFormat/weekFromRules(_:)`` checks the WIRE value
-            // instead, before the modulo, and therefore drops the same row, so the two
-            // screens genuinely disagree about a corrupt rule. That asymmetry is
-            // `overview-summary.ts` and `working-hours.ts` verbatim; removing this line
-            // would read as a decision to fold, when the truth is that it is inherited,
-            // and tightening it would put the register out of step with the browser.
+            // ⚠️ A CORRUPT `day_of_week` IS FOLDED, NOT SKIPPED: `displayIndex` maps every
+            // integer into 0...6, so a `9` is summarised as Tuesday. `overview-summary.ts`
+            // keeps a range guard after the modulo that cannot fire; it is not ported, as
+            // a branch no input reaches. ``SchedulingHoursFormat/weekFromRules(_:)`` checks
+            // the WIRE value before the modulo and drops the same row, so the two screens
+            // disagree about a corrupt rule, as the browser's do.
             // Pinned by `testADayOutsideTheWeekIsFoldedHereAndSkippedInTheGrid`.
             let index = displayIndex(rule.dayOfWeek)
-            guard index >= 0, index <= 6 else { continue }
             byDay[index, default: []].append((rule.startTime, rule.endTime))
         }
         guard !byDay.isEmpty else { return nil }
@@ -135,7 +131,7 @@ public enum SchedulingOverviewSummary {
     /// checked against the web rather than assumed.
     ///
     /// ⚠️ A PAST BOOKING FALLS THROUGH TO THE ABSOLUTE FORM. There is no "Yesterday":
-    /// a negative delta matches neither branch, which is the source's behaviour and is
+    /// a negative delta matches neither case, which is the source's behaviour and is
     /// right for a register whose query asks for upcoming rows anyway.
     public static func bookingWhen(
         startAt: String,
@@ -146,15 +142,17 @@ public enum SchedulingOverviewSummary {
         let at = SchedulingClock.parts(of: start, timezone: timezone)
         let today = SchedulingClock.parts(of: now, timezone: timezone)
         let clock = SchedulingClock.clock(at)
-        guard let delta = SchedulingClock.dayDelta(from: today, to: at) else { return nil }
-        if delta == 0 {
+        // Parts a calendar produced always convert back, so the delta is never nil
+        // here; were it, the absolute form below is still the right answer.
+        switch SchedulingClock.dayDelta(from: today, to: at) {
+        case 0?:
             return SchedulingCopy.overviewToday(clock)
-        }
-        if delta == 1 {
+        case 1?:
             return SchedulingCopy.overviewTomorrow(clock)
+        default:
+            let month = SchedulingClock.monthName(of: at)
+            return SchedulingCopy.overviewMonthDayClock(month, L10nFormat.dayOfMonth(at.day), clock)
         }
-        guard let month = SchedulingClock.monthName(at.month) else { return nil }
-        return SchedulingCopy.overviewMonthDayClock(month, L10nFormat.dayOfMonth(at.day), clock)
     }
 
     /// The first attendee's name, then their email, then `Someone`.
@@ -220,13 +218,14 @@ public enum SchedulingOverviewSummary {
     /// client word a common case differently from the browser beside it.
     static func daysPhrase(_ indexes: [Int]) -> String {
         let sorted = indexes.sorted()
-        guard let first = sorted.first, let last = sorted.last else { return "" }
         let consecutive = sorted.enumerated().allSatisfy { offset, value in
             offset == 0 || value == sorted[offset - 1] + 1
         }
+        // Indexed rather than `first`/`last`: three or more days have both, so no
+        // branch is needed for an empty list (which joins to "" below).
         if sorted.count >= 3, consecutive {
             let days = displayDays
-            return SchedulingCopy.overviewDaysRange(days[first], days[last])
+            return SchedulingCopy.overviewDaysRange(days[sorted[0]], days[sorted[sorted.count - 1]])
         }
         let days = displayDays
         return sorted.map { days[$0] }.joined(separator: ", ")

@@ -430,8 +430,8 @@ extension TelemetryEnvelope {
 
     /// ⚠️ THROUGH JSON AND BACK, because ``data`` is carried as ``WireJSON``. Lossless for
     /// these shapes: ``WireJSON`` keeps an integer an integer.
+    /// One `try?` over both steps: either failing is the same nil.
     private func decodeData<Value: Decodable>(_: Value.Type) -> Value? {
-        guard let bytes = try? JSONEncoder().encode(data) else { return nil }
-        return try? JSONDecoder().decode(Value.self, from: bytes)
+        try? JSONDecoder().decode(Value.self, from: JSONEncoder().encode(data))
     }
 }

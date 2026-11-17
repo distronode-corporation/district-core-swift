@@ -126,7 +126,7 @@ public enum SchedulingDeveloperFormat {
         let unknown = SchedulingCopy.developerStampUnknown
         guard let date = WireInstant.parse(value) else { return unknown }
         let parts = SchedulingClock.parts(of: date, timezone: timezone)
-        guard let month = SchedulingClock.monthName(parts.month) else { return unknown }
+        let month = SchedulingClock.monthName(of: parts)
         let day = L10nFormat.dayOfMonth(parts.day)
         let year = String(parts.year)
         if L10nRuntime.locale == .frCA {

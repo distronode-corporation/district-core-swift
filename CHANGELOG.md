@@ -8,6 +8,17 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Added
 
+- ARCHITECTURE.md (the modules, the seams the apps implement, a request end to end, and
+  where state lives) and SECURITY-MODEL.md (threat model, trust boundaries, secure design
+  principles and the weaknesses countered, each with its test). The README gains a quick
+  start and uninstall steps, and CONTRIBUTING.md states the test rule for new
+  functionality and that documentation moves with the code.
+- Signed release tags. `.github/workflows/release.yml`, run by hand from `main`, checks the
+  version against CHANGELOG.md and the README and the French sign-off, then creates the
+  annotated `X.Y.Z` tag signed with gitsign (keyless Sigstore, under the workflow's OIDC
+  identity) and pushes it. The README's "Verify a release" has the command to check a
+  tag. Tags up to 8.6.0 stay unsigned.
+
 - `contracts/i18n/api-errors.json` in line with the service, byte for byte: three contact
   email codes, `email_changed`, `no_email` and `email_unconfirmed`, generated into
   `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English and French.

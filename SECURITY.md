@@ -18,6 +18,9 @@ and workspaces that are yours.
 Expect an acknowledgement within a few working days. There is no paid bug bounty; what
 you get is credit in the changelog entry for the fix, if you want it.
 
+The whole process, from report to advisory, is in the organization's
+[GOVERNANCE.md](https://github.com/distronode-corporation/.github/blob/main/GOVERNANCE.md#vulnerability-response).
+
 A problem that shows up in District AI for iOS or for macOS is welcome here when its
 cause is in this package; if you are not sure which repository it belongs to, report it
 in whichever you found it from and we will move it.
@@ -32,7 +35,18 @@ adopt, rather than being backported.
 | Latest release | Yes |
 | Anything older | No |
 
+## Verifying a release
+
+Release tags from the next release on are annotated tags signed with gitsign by
+`.github/workflows/release.yml`, keyless, under the identity
+`https://github.com/distronode-corporation/district-core-swift/.github/workflows/release.yml@refs/heads/main` with the issuer `https://token.actions.githubusercontent.com`. The README's
+"Verify a release" has the command. Tags up to and including 8.6.0 are not signed. A
+release tag that does not verify against that identity is in scope for a report.
+
 ## What the package does to protect you
+
+The full assurance case (threat model, trust boundaries, design principles and the
+weaknesses the code counters, each with its test) is [SECURITY-MODEL.md](SECURITY-MODEL.md).
 
 So a report can say which of these it breaks:
 

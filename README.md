@@ -62,6 +62,33 @@ packages:
     exactVersion: 8.6.0
 ```
 
+## Quick start
+
+With Swift 6.2 or later, the smallest use of the core is the formats every District AI app
+shows, which need no account and no network. In a package that depends on this one (see
+Using it, above), with `DistrictL10n` in the target's dependencies:
+
+```swift
+import DistrictL10n
+
+let locale = DistrictL10n.locale(fromPreferred: ["fr-CA", "en-US"])
+print(locale)                                                       // frCA
+print(L10nFormat.minutesSeconds(125, locale: .en))                  // 2m 5s
+print(L10nFormat.list(["Inbox", "Calls", "Contacts"], locale: .en))  // Inbox, Calls and Contacts
+```
+
+To build the package itself and run every test, see Build and test below.
+
+## Uninstall
+
+Nothing here installs anything on the machine: the modules are compiled into the app that
+uses them. To stop using them, remove the `.package(...)` line and the products from your
+`Package.swift`, or in Xcode select the package under Package Dependencies in the project
+settings and remove it. SwiftPM keeps a cached copy of each remote package it has fetched:
+`swift package purge-cache` removes it, and Xcode's `DerivedData` folder holds its build
+products. For a clone, delete the directory. What an app built on the package keeps on the
+device (its Keychain items, its settings) is that app's to remove; its README says how.
+
 ## Modules
 
 Each module is a library product. All of them import only Foundation (and
@@ -80,6 +107,33 @@ FoundationNetworking on Linux).
 The one external dependency is [apple/swift-crypto](https://github.com/apple/swift-crypto),
 pinned `exact:`, for SHA-256 on Linux (and swift-asn1 through it). `Package.resolved` is
 committed.
+
+## Verify a release
+
+From the next release on, every release tag is an annotated tag signed with
+[gitsign](https://github.com/sigstore/gitsign): keyless Sigstore signing by the
+repository's Release workflow, under its GitHub OIDC identity, with the signature
+recorded in Sigstore's public transparency log. There is no long-lived signing key to
+publish or to lose. Tags up to and including 8.6.0 were made before this and are not
+signed.
+
+With gitsign installed (`brew install gitsign`, `go install github.com/sigstore/gitsign@latest`,
+or a binary from its releases page), in a clone with the tags fetched:
+
+```sh
+gitsign verify-tag X.Y.Z \
+  --certificate-identity https://github.com/distronode-corporation/district-core-swift/.github/workflows/release.yml@refs/heads/main \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+It succeeds only when the tag's signature is valid, is in the transparency log, and was
+made by that workflow file running on main of this repository. `git verify-tag` works
+too, with gitsign as git's signing program
+(`git -c gpg.format=x509 -c gpg.x509.program=gitsign verify-tag X.Y.Z`), but it checks
+the signature without checking whose it is; use `gitsign verify-tag` for that.
+
+An app's `Package.resolved` records the commit the tag named, and the tags are protected
+against moves and deletion, so a verified tag is also what the app resolves.
 
 ## Build and test
 
@@ -176,7 +230,13 @@ each app then bumps its exact pin in a pull request of its own. See
 ## Contributing, security and conduct
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): the local gate and the rules CI enforces.
+- [ARCHITECTURE.md](ARCHITECTURE.md): the modules, the seams the apps implement, a
+  request end to end, and where state lives.
 - [SECURITY.md](SECURITY.md): report vulnerabilities privately, not in an issue.
+- [SECURITY-MODEL.md](SECURITY-MODEL.md): the threat model, trust boundaries, design
+  principles and the weaknesses the code counters.
+- [GOVERNANCE.md](https://github.com/distronode-corporation/.github/blob/main/GOVERNANCE.md):
+  who maintains the project, how a change is accepted, and how a vulnerability is handled.
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - [SUPPORT](.github/SUPPORT.md): where questions, bugs and account problems go.
 - [CHANGELOG.md](CHANGELOG.md).

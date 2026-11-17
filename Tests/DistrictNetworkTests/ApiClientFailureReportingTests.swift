@@ -79,6 +79,20 @@ final class ApiClientFailureReportingTests: XCTestCase {
         XCTAssertFalse(message.contains("usr_private"))
     }
 
+    /// ⛔ A DICTIONARY KEY FIRST ON THE PATH IS MASKED TOO, with no separator before it.
+    func testADictionaryKeyAtTheRootIsMasked() async {
+        let client = ApiClient.test(TestTransport(json: #"{"usr_private":{"name":7}}"#))
+
+        let result = await client.send(
+            DistrictEndpoints.overview(workspaceId: "ws_1"),
+            as: [String: KeyPathProbe.Entry].self
+        )
+
+        let message = result.failureOnly?.message ?? ""
+        XCTAssertTrue(message.hasSuffix(" Field: *.name."), message)
+        XCTAssertFalse(message.contains("usr_private"))
+    }
+
     /// ⚠️ A ROOT-LEVEL FAILURE HAS NO PATH, and the sentence is then exactly the
     /// one it always was.
     func testARootLevelFailureAddsNoPath() async {

@@ -91,11 +91,20 @@ public enum SchedulingClock {
     }
 
     /// ⚠️ THE MONTH NAME FOR A 1-BASED MONTH, OR nil. A `month` outside 1...12 is a
-    /// value no calendar produced, and the callers render the raw input rather than
-    /// indexing past the end of the table, which in Swift is a crash rather than the
-    /// `undefined` the TypeScript would have shown.
+    /// value no calendar produced, answered nil rather than by indexing past the end of
+    /// the table, which in Swift is a crash rather than the `undefined` the TypeScript
+    /// would have shown. Parts read from a calendar use ``monthName(of:)``.
     public static func monthName(_ month: Int) -> String? {
         L10nFormat.monthAbbreviation(month)
+    }
+
+    /// The month name of parts ``parts(of:timezone:)`` read from a calendar.
+    ///
+    /// ⚠️ THE FORCE IS SAFE: a Gregorian calendar has no month outside 1...12, so the
+    /// nil of ``monthName(_:)`` is for numbers from elsewhere, and the force states that
+    /// rather than adding a branch no input can reach.
+    static func monthName(of parts: SchedulingZonedParts) -> String {
+        monthName(parts.month)!
     }
 
     /// ⚠️ `String(format:)` IS AVOIDED THROUGHOUT THIS MODULE. It is locale-sensitive

@@ -19,10 +19,9 @@ public enum ApiPath {
         encoded.reserveCapacity(segments.count)
         for segment in segments {
             guard !segment.isEmpty else { return nil }
-            guard let part = segment.addingPercentEncoding(
-                withAllowedCharacters: pathSegmentAllowed
-            ) else { return nil }
-            encoded.append(part)
+            // ⚠️ THE FORCE IS SAFE: percent-encoding fails only on invalid Unicode, which
+            // a Swift `String` cannot hold, so no input reaches a nil here.
+            encoded.append(segment.addingPercentEncoding(withAllowedCharacters: pathSegmentAllowed)!)
         }
         return "/" + encoded.joined(separator: "/")
     }

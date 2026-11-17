@@ -200,6 +200,8 @@ enum ApiErrorTable {
         case "transfer_cancel_refused": return ApiErrorCopy.transferCancelRefused
         case "transfer_not_cancellable": return ApiErrorCopy.transferNotCancellable
         case "transfer_release_confirmation_required": return ApiErrorCopy.transferReleaseConfirmationRequired
+        case "number_bridge_eu_workspaces_only": return ApiErrorCopy.numberBridgeEuWorkspacesOnly
+        case "number_bridge_ca_workspaces_only": return ApiErrorCopy.numberBridgeCaWorkspacesOnly
         case "auto_dial_country_not_permitted": return ApiErrorCopy.autoDialCountryNotPermitted
         case "auto_dial_outside_hours": return ApiErrorCopy.autoDialOutsideHours
         case "auto_dial_contact_opted_out": return ApiErrorCopy.autoDialContactOptedOut

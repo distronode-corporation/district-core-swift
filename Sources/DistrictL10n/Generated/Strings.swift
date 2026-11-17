@@ -479,6 +479,12 @@ package enum ApiErrorCopy {
     /// `api_error.nothing_to_update`
     package static var nothingToUpdate: String { L10nRuntime.locale == .frCA ? "Cette requête ne contenait rien à modifier." : "There was nothing to change in that request." }
 
+    /// `api_error.number_bridge_ca_workspaces_only`
+    package static var numberBridgeCaWorkspacesOnly: String { L10nRuntime.locale == .frCA ? "Les numéros canadiens de notre service téléphonique géré sont traités à Montréal; pour l'instant, ils sont donc offerts seulement aux espaces de travail canadiens." : "Canadian numbers on our managed phone service are answered in Montreal, so for now they are available to Canadian workspaces only." }
+
+    /// `api_error.number_bridge_eu_workspaces_only`
+    package static var numberBridgeEuWorkspacesOnly: String { L10nRuntime.locale == .frCA ? "Les numéros de ce pays sont traités à Francfort; pour l'instant, ils sont donc offerts seulement aux espaces de travail de l'Union européenne." : "Numbers from this country are answered in Frankfurt, so for now they are available to EU workspaces only." }
+
     /// `api_error.number_in_use`
     package static var numberInUse: String { L10nRuntime.locale == .frCA ? "Ce numéro est déjà attribué à un autre espace de travail." : "That number is already assigned to another workspace." }
 

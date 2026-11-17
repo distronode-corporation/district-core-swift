@@ -11,6 +11,10 @@ All notable changes to this package are recorded here. The format is based on
 - `contracts/i18n/api-errors.json` in line with the service, byte for byte: three contact
   email codes, `email_changed`, `no_email` and `email_unconfirmed`, generated into
   `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English and French.
+- Two more codes from the same contract file, for the numbers the service answers in one
+  region only: `number_bridge_eu_workspaces_only` and `number_bridge_ca_workspaces_only`,
+  generated into `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English
+  and French.
 
 ### Changed
 

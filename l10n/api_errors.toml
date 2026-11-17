@@ -1266,6 +1266,24 @@ tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `nothing_to_update`, in place of the service's own English."
 
+[api_error.number_bridge_ca_workspaces_only]
+en = "Canadian numbers on our managed phone service are answered in Montreal, so for now they are available to Canadian workspaces only."
+fr = "Les numéros canadiens de notre service téléphonique géré sont traités à Montréal; pour l'instant, ils sont donc offerts seulement aux espaces de travail canadiens."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `number_bridge_ca_workspaces_only`, in place of the service's own English."
+
+[api_error.number_bridge_eu_workspaces_only]
+en = "Numbers from this country are answered in Frankfurt, so for now they are available to EU workspaces only."
+fr = "Les numéros de ce pays sont traités à Francfort; pour l'instant, ils sont donc offerts seulement aux espaces de travail de l'Union européenne."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `number_bridge_eu_workspaces_only`, in place of the service's own English."
+
 [api_error.number_in_use]
 en = "That number is already assigned to another workspace."
 fr = "Ce numéro est déjà attribué à un autre espace de travail."

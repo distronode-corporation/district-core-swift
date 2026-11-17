@@ -129,9 +129,9 @@ public actor TelemetryConnectionRunner {
             // ⛔ CHAINED, NOT FIRED: two tasks started one after the other may run in either
             // order, and `socket.mode` must reach the server before the subscriptions. A
             // failed send is not reported here; the broken socket's read reports it.
-            // ⚠️ The machine sends only while open, when the socket is always held; the
-            // guard states that rather than trapping on it.
-            guard let socket = sockets[attempt] else { return }
+            // ⚠️ THE FORCE IS SAFE: the machine sends only while open, when the socket is
+            // always held, so no command sequence reaches a send without one.
+            let socket = sockets[attempt]!
             let previous = sends[attempt]
             sends[attempt] = Task {
                 await previous?.value
@@ -164,12 +164,14 @@ public actor TelemetryConnectionRunner {
     }
 
     private func read(_ socket: any TelemetrySocket, attempt: Int) async {
+        // A flag rather than `while true`, whose exit after the loop no frame reaches.
+        var open = true
         do {
-            while true {
+            while open {
                 let frame = try await socket.receive()
                 apply(.received(frame, attempt: attempt))
                 if case .closed = frame {
-                    return
+                    open = false
                 }
             }
         } catch {

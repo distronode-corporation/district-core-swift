@@ -70,6 +70,21 @@ final class IncomingCallGuardTests: XCTestCase {
         XCTAssertEqual([], IncomingCallController.reduce(state, .answerPressed).commands)
     }
 
+    /// The decline's ending still runs, but no request names a call it cannot identify.
+    func testDecliningACallWithNoIdsEndsItWithoutARequest() {
+        let ended = IncomingCallController.reduce(IncomingCallController.inRinging().state, .withdrawnLocally)
+
+        var state = IncomingCallController.inRinging().state
+        state.workspaceID = nil
+        XCTAssertEqual(ended.commands, IncomingCallController.reduce(state, .declinePressed).commands)
+
+        state = IncomingCallController.inRinging().state
+        state.callID = nil
+        let outcome = IncomingCallController.reduce(state, .declinePressed)
+        XCTAssertEqual(ended.commands, outcome.commands)
+        XCTAssertEqual(ended.state.phase, outcome.state.phase)
+    }
+
     func testTheTogglesAreNoOpsWhenNoMediaExists() {
         // ⚠️ Reachable in spirit if not in fact: the controls belong to the
         // in-call surface, but a recomposition can invoke a handler against a

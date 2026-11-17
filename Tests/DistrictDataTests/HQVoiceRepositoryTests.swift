@@ -75,6 +75,23 @@ final class HQVoiceRepositoryTests: XCTestCase {
         ])
     }
 
+    /// ⛔ A CONFIRMATION FOR ANOTHER TOOL IS NOT THIS PROPOSAL'S: the service echoed a tool
+    /// the click never sent, so nothing is reported as applied.
+    func testAConfirmationEchoingAnotherToolIsRefused() async {
+        let transport = RepositoryTransport(
+            json: #"{"success":true,"executed":true,"tool":"delete_persona","args":{},"result":{"ok":true}}"#
+        )
+        let proposal = HQVoiceProposal(
+            proposalId: "p1", tool: "update_persona", args: .object(["greeting": .string("Hi")]), summary: ""
+        )
+        let confirmed = await HQRepository(client: .repositoryTest(transport))
+            .confirm(workspaceId: "ws_1", voiceProposal: proposal)
+        XCTAssertEqual(
+            confirmed.failureOnly,
+            .decoding("HqConfirmResponse echoed a different tool than the one proposed")
+        )
+    }
+
     /// ⚠️ BOTH ANSWER A FLAG, NOT AN ERROR, FOR A SESSION THEY DID NOT CHANGE: the routes are
     /// idempotent, and a refusal is the plain envelope.
     func testASessionIsEndedAndDiscardedByItsSessionId() async {

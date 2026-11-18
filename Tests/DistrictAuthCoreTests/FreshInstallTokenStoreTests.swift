@@ -103,6 +103,11 @@ final class FreshInstallTokenStoreTests: XCTestCase {
         await expectEqual("gone") { try? await base.pendingRevokeToken() }
         try await store.clearRevokePending()
         await expectNil { try? await base.pendingRevokeToken() }
+        try await store.markRevokePending("held")
+        try await store.clearRevokePending(ifHolding: "other")
+        await expectEqual("held") { try? await base.pendingRevokeToken() }
+        try await store.clearRevokePending(ifHolding: "held")
+        await expectNil { try? await base.pendingRevokeToken() }
         try await store.clear()
         await expectNil { try? await base.read() }
     }

@@ -114,6 +114,25 @@ public protocol TokenStore: Sendable {
     /// Clear the outbox once the server has accepted the token (or was never
     /// holding it, the route answers 200 for both and declines to say which).
     func clearRevokePending() async throws
+
+    /// Clear the outbox only while it still holds `refreshToken`.
+    ///
+    /// ⛔ THE ACKNOWLEDGEMENT OF ONE REVOKE, NOT A WIPE OF THE SLOT. Two revokes can
+    /// overlap (a launch drain and a sign-out), and the older one's acceptance can
+    /// arrive after a newer token took the slot; clearing unconditionally would drop
+    /// a credential the server is still honouring. ⚠️ A store that can compare and
+    /// clear in one step should; the default reads and then clears.
+    func clearRevokePending(ifHolding refreshToken: String) async throws
+}
+
+public extension TokenStore {
+    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM. An actor store that can compare and
+    /// clear in one isolated step implements this itself, as ``InMemoryTokenStore``
+    /// does.
+    func clearRevokePending(ifHolding refreshToken: String) async throws {
+        guard try await pendingRevokeToken() == refreshToken else { return }
+        try await clearRevokePending()
+    }
 }
 
 /// What actually goes to disk.
@@ -198,6 +217,11 @@ public actor InMemoryTokenStore: TokenStore {
     }
 
     public func clearRevokePending() async throws {
+        revokePending = nil
+    }
+
+    public func clearRevokePending(ifHolding refreshToken: String) async throws {
+        guard revokePending == refreshToken else { return }
         revokePending = nil
     }
 }

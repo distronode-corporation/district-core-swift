@@ -8,6 +8,21 @@ import XCTest
 /// the reference the Keychain implementation in `App/` has to behave like, so
 /// its contract is pinned here rather than left implied.
 final class InMemoryTokenStoreTests: XCTestCase {
+    /// ⛔ THE OUTBOX IS CLEARED ONLY FOR THE TOKEN IT HOLDS. See
+    /// ``TokenStore/clearRevokePending(ifHolding:)``.
+    func testTheOutboxClearsOnlyForTheTokenItHolds() async throws {
+        let store = InMemoryTokenStore()
+        try await store.markRevokePending("newer")
+
+        try await store.clearRevokePending(ifHolding: "older")
+        let kept = try await store.pendingRevokeToken()
+        XCTAssertEqual(kept, "newer")
+
+        try await store.clearRevokePending(ifHolding: "newer")
+        let cleared = try await store.pendingRevokeToken()
+        XCTAssertNil(cleared)
+    }
+
     func testStartsEmptyAndRoundTripsASession() async throws {
         let store = InMemoryTokenStore()
         let read = try await store.read()

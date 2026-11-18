@@ -99,6 +99,11 @@ public actor FreshInstallTokenStore: TokenStore {
         try await base.clearRevokePending()
     }
 
+    public func clearRevokePending(ifHolding refreshToken: String) async throws {
+        try await settle()
+        try await base.clearRevokePending(ifHolding: refreshToken)
+    }
+
     // ── Internals ────────────────────────────────────────────────────────────
 
     /// ⚠️ ONE WIPE, HOWEVER MANY CALLERS ARRIVE DURING IT. This actor suspends at

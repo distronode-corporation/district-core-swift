@@ -14,6 +14,11 @@ import Foundation
 /// therefore chased first. ⚠️ If it still will not drain, the newer token takes
 /// the slot: one slot cannot hold two live credentials, and the newer one has
 /// the longer remaining life on the server's sliding 60-day window.
+///
+/// ⛔ AN ACCEPTANCE CLEARS ONLY THE TOKEN IT ACKNOWLEDGES
+/// (``TokenStore/clearRevokePending(ifHolding:)``). A drain and a sign-out can each
+/// be on the wire at once, and the older one's answer can arrive after the newer
+/// token took the slot.
 struct RevokeOutbox: Sendable {
     let store: any TokenStore
     let client: any RevokeClient
@@ -24,7 +29,7 @@ struct RevokeOutbox: Sendable {
         guard let pending = try? await store.pendingRevokeToken(), !pending.isEmpty else { return }
 
         if await client.revoke(refreshToken: pending) == .accepted {
-            try? await store.clearRevokePending()
+            try? await store.clearRevokePending(ifHolding: pending)
         }
     }
 
@@ -43,7 +48,7 @@ struct RevokeOutbox: Sendable {
         try? await store.markRevokePending(refreshToken)
 
         if await client.revoke(refreshToken: refreshToken) == .accepted {
-            try? await store.clearRevokePending()
+            try? await store.clearRevokePending(ifHolding: refreshToken)
         }
         // ⚠️ ON A DEFERRAL THE OUTBOX IS LEFT SET, WHICH IS THE WHOLE MECHANISM.
         // No branch is needed to write it: it is already there.

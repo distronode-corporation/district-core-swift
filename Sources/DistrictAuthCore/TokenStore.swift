@@ -58,6 +58,14 @@ public protocol TokenStore: Sendable {
     /// server-side row that outlives it. See ``pendingRevokeToken()``.
     func clear() async throws
 
+    /// ``clear()``, but only while the stored session is the one holding `refreshToken`.
+    ///
+    /// ⛔ AN UNDO OF ONE ADOPTION, NOT A WIPE OF WHATEVER IS STORED. A login can write its
+    /// own session while the undo is in progress, and an unconditional clear would sign
+    /// that login out at the next cold start. ⚠️ A store that can compare and clear in
+    /// one step should; the default reads and then clears.
+    func clear(ifHolding refreshToken: String) async throws
+
     /// The refresh token currently in flight, if a refresh was started and never
     /// observed to complete. Nil in the normal case.
     func pendingRefreshToken() async throws -> String?
@@ -114,6 +122,32 @@ public protocol TokenStore: Sendable {
     /// Clear the outbox once the server has accepted the token (or was never
     /// holding it, the route answers 200 for both and declines to say which).
     func clearRevokePending() async throws
+
+    /// Clear the outbox only while it still holds `refreshToken`.
+    ///
+    /// ⛔ THE ACKNOWLEDGEMENT OF ONE REVOKE, NOT A WIPE OF THE SLOT. Two revokes can
+    /// overlap (a launch drain and a sign-out), and the older one's acceptance can
+    /// arrive after a newer token took the slot; clearing unconditionally would drop
+    /// a credential the server is still honouring. ⚠️ A store that can compare and
+    /// clear in one step should; the default reads and then clears.
+    func clearRevokePending(ifHolding refreshToken: String) async throws
+}
+
+public extension TokenStore {
+    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM, as for
+    /// ``clearRevokePending(ifHolding:)`` below.
+    func clear(ifHolding refreshToken: String) async throws {
+        guard try await read()?.refreshToken == refreshToken else { return }
+        try await clear()
+    }
+
+    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM. An actor store that can compare and
+    /// clear in one isolated step implements this itself, as ``InMemoryTokenStore``
+    /// does.
+    func clearRevokePending(ifHolding refreshToken: String) async throws {
+        guard try await pendingRevokeToken() == refreshToken else { return }
+        try await clearRevokePending()
+    }
 }
 
 /// What actually goes to disk.
@@ -177,6 +211,12 @@ public actor InMemoryTokenStore: TokenStore {
         pending = nil
     }
 
+    public func clear(ifHolding refreshToken: String) async throws {
+        guard session?.refreshToken == refreshToken else { return }
+        session = nil
+        pending = nil
+    }
+
     public func pendingRefreshToken() async throws -> String? {
         pending
     }
@@ -198,6 +238,11 @@ public actor InMemoryTokenStore: TokenStore {
     }
 
     public func clearRevokePending() async throws {
+        revokePending = nil
+    }
+
+    public func clearRevokePending(ifHolding refreshToken: String) async throws {
+        guard revokePending == refreshToken else { return }
         revokePending = nil
     }
 }

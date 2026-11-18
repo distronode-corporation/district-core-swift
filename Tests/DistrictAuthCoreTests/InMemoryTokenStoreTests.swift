@@ -23,6 +23,25 @@ final class InMemoryTokenStoreTests: XCTestCase {
         XCTAssertNil(cleared)
     }
 
+    /// ⛔ THE SESSION IS CLEARED ONLY WHILE IT IS THE ONE NAMED. See
+    /// ``TokenStore/clear(ifHolding:)``.
+    func testTheSessionClearsOnlyForTheTokenItHolds() async throws {
+        let store = InMemoryTokenStore(session: AuthFixtures.session(refreshToken: "login"))
+        try await store.markRefreshPending("login")
+
+        try await store.clear(ifHolding: "successor")
+        let kept = try await store.read()
+        XCTAssertEqual(kept?.refreshToken, "login")
+        let marker = try await store.pendingRefreshToken()
+        XCTAssertEqual(marker, "login")
+
+        try await store.clear(ifHolding: "login")
+        let cleared = try await store.read()
+        XCTAssertNil(cleared)
+        let noMarker = try await store.pendingRefreshToken()
+        XCTAssertNil(noMarker)
+    }
+
     func testStartsEmptyAndRoundTripsASession() async throws {
         let store = InMemoryTokenStore()
         let read = try await store.read()

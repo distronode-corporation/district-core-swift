@@ -108,6 +108,11 @@ final class FreshInstallTokenStoreTests: XCTestCase {
         await expectEqual("held") { try? await base.pendingRevokeToken() }
         try await store.clearRevokePending(ifHolding: "held")
         await expectNil { try? await base.pendingRevokeToken() }
+        try await store.clear(ifHolding: "other")
+        await expectEqual("fresh") { try? await base.read()?.refreshToken }
+        try await store.clear(ifHolding: "fresh")
+        await expectNil { try? await base.read() }
+        try await store.write(AuthFixtures.session(refreshToken: "fresh"))
         try await store.clear()
         await expectNil { try? await base.read() }
     }

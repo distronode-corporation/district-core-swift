@@ -416,10 +416,8 @@ public actor TokenRefreshCoordinator {
         if unpersistedSession == successor {
             unpersistedSession = nil
         }
-        let stored = try? await store.read()
-        if stored?.refreshToken == successor.refreshToken {
-            try? await store.clear()
-        }
+        // ⛔ ONE STEP, NOT A READ AND THEN A CLEAR: a login can write between the two.
+        try? await store.clear(ifHolding: successor.refreshToken)
         await outbox.revoke(successor.refreshToken)
         return .reauthRequired(.noSession)
     }

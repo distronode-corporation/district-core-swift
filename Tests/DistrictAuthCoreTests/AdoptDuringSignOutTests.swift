@@ -67,6 +67,26 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
         await expectEqual("refresh-login") { await store.session?.refreshToken }
     }
+
+    /// ⛔ AND A LOGIN THAT LANDS DURING THE UNDO ITSELF IS NOT WIPED EITHER. The store writes
+    /// the login as soon as the undo starts touching it, which is after any snapshot the
+    /// undo could have taken; only a clear that compares in the same step keeps it.
+    func testALoginDuringTheUndoIsNotWiped() async {
+        let store = GatedWriteTokenStore(
+            session: AuthFixtures.session(),
+            loginDuringUndo: AuthFixtures.session(refreshToken: "refresh-login")
+        )
+        let coordinator = makeCoordinator(store)
+
+        let request = Task { await coordinator.accessToken() }
+        await waitUntil { await store.writeEntered }
+        await coordinator.forget()
+        await store.openGate()
+
+        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
+        await expectEqual("refresh-login") { await store.session?.refreshToken }
+        await expectEqual("refresh-2", "the successor still goes to the outbox") { await store.revokePending }
+    }
 }
 
 /// A store whose first `write` parks until released, so a sign-out can be put inside it.
@@ -82,11 +102,27 @@ private actor GatedWriteTokenStore: TokenStore {
     private let failWrites: Bool
     /// False to drop the parked write, standing in for a newer write that landed after it.
     private let applyGatedWrites: Bool
+    /// A login written the first time anything reads or clears the session once the gated
+    /// write has finished: the undo, after it has started.
+    private var loginDuringUndo: PersistedSession?
+    private var gatedWriteDone = false
 
-    init(session: PersistedSession?, failWrites: Bool = false, applyGatedWrites: Bool = true) {
+    init(
+        session: PersistedSession?,
+        failWrites: Bool = false,
+        applyGatedWrites: Bool = true,
+        loginDuringUndo: PersistedSession? = nil
+    ) {
         self.session = session
         self.failWrites = failWrites
         self.applyGatedWrites = applyGatedWrites
+        self.loginDuringUndo = loginDuringUndo
+    }
+
+    private func landLoginIfDue() {
+        guard gatedWriteDone, let login = loginDuringUndo else { return }
+        loginDuringUndo = nil
+        session = login
     }
 
     func openGate() {
@@ -100,7 +136,9 @@ private actor GatedWriteTokenStore: TokenStore {
     }
 
     func read() async throws -> PersistedSession? {
-        session
+        let snapshot = session
+        landLoginIfDue()
+        return snapshot
     }
 
     func write(_ session: PersistedSession) async throws {
@@ -114,9 +152,17 @@ private actor GatedWriteTokenStore: TokenStore {
         if applyGatedWrites {
             self.session = session
         }
+        gatedWriteDone = true
     }
 
     func clear() async throws {
+        session = nil
+        pending = nil
+    }
+
+    func clear(ifHolding refreshToken: String) async throws {
+        landLoginIfDue()
+        guard session?.refreshToken == refreshToken else { return }
         session = nil
         pending = nil
     }

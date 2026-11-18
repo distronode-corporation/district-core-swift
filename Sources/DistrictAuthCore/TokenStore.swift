@@ -58,6 +58,14 @@ public protocol TokenStore: Sendable {
     /// server-side row that outlives it. See ``pendingRevokeToken()``.
     func clear() async throws
 
+    /// ``clear()``, but only while the stored session is the one holding `refreshToken`.
+    ///
+    /// ⛔ AN UNDO OF ONE ADOPTION, NOT A WIPE OF WHATEVER IS STORED. A login can write its
+    /// own session while the undo is in progress, and an unconditional clear would sign
+    /// that login out at the next cold start. ⚠️ A store that can compare and clear in
+    /// one step should; the default reads and then clears.
+    func clear(ifHolding refreshToken: String) async throws
+
     /// The refresh token currently in flight, if a refresh was started and never
     /// observed to complete. Nil in the normal case.
     func pendingRefreshToken() async throws -> String?
@@ -126,6 +134,13 @@ public protocol TokenStore: Sendable {
 }
 
 public extension TokenStore {
+    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM, as for
+    /// ``clearRevokePending(ifHolding:)`` below.
+    func clear(ifHolding refreshToken: String) async throws {
+        guard try await read()?.refreshToken == refreshToken else { return }
+        try await clear()
+    }
+
     /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM. An actor store that can compare and
     /// clear in one isolated step implements this itself, as ``InMemoryTokenStore``
     /// does.
@@ -192,6 +207,12 @@ public actor InMemoryTokenStore: TokenStore {
     /// ``SignOutCoordinator`` test would pass against a store that loses the
     /// entry the production one keeps.
     public func clear() async throws {
+        session = nil
+        pending = nil
+    }
+
+    public func clear(ifHolding refreshToken: String) async throws {
+        guard session?.refreshToken == refreshToken else { return }
         session = nil
         pending = nil
     }

@@ -42,6 +42,18 @@ final class InMemoryTokenStoreTests: XCTestCase {
         XCTAssertNil(noMarker)
     }
 
+    /// ⚠️ AND THE PROTOCOL'S DEFAULT, which ``SpyTokenStore`` takes: it reads, then clears
+    /// only while the session read is the one named.
+    func testTheDefaultSessionClearReadsThenClearsOnlyTheNamedSession() async throws {
+        let store = SpyTokenStore(session: AuthFixtures.session(refreshToken: "login"))
+
+        try await store.clear(ifHolding: "successor")
+        await expectEqual("login") { await store.session?.refreshToken }
+        try await store.clear(ifHolding: "login")
+        await expectNil { await store.session }
+        await expectEqual([.read, .read, .clear]) { await store.operations }
+    }
+
     func testStartsEmptyAndRoundTripsASession() async throws {
         let store = InMemoryTokenStore()
         let read = try await store.read()

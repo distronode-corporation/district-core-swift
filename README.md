@@ -6,15 +6,45 @@
 
 # District Core for Swift
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/distronode-corporation/district-core-swift/badge)](https://scorecard.dev/viewer/?uri=github.com/distronode-corporation/district-core-swift)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15872/badge)](https://www.bestpractices.dev/projects/15872)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/distronode-corporation/district-core-swift/badge)](https://scorecard.dev/viewer/?uri=github.com/distronode-corporation/district-core-swift)
 [![Latest release](https://img.shields.io/github/v/release/distronode-corporation/district-core-swift?label=release)](https://github.com/distronode-corporation/district-core-swift/releases/latest)
+[![License: Apache-2.0](https://img.shields.io/github/license/distronode-corporation/district-core-swift)](LICENSE)
+[![CI](https://github.com/distronode-corporation/district-core-swift/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/distronode-corporation/district-core-swift/actions/workflows/ci.yml)
 
-The shared Swift core of the native [District AI](https://www.distronode.com/district-ai)
-apps: the models, networking, data repositories, sign-in logic and call state machines
-that the iPhone, iPad and Mac clients have in common. It builds and tests on Linux as
-well as on Apple platforms, so almost all of the apps' logic is tested without a
-simulator, a network or an account.
+The shared Swift core of the native [District AI](https://www.distronode.com/district-ai) apps
+from [Distronode](https://distronode.com): the models, networking, sign-in and call logic the
+iPhone, iPad and Mac clients have in common, built and tested on Linux as well as on Apple
+platforms.
+
+![swift test and the coverage gate in CI: 2360 tests, 0 failures, and every module at 100% line coverage](.github/assets/swift-test-ci.png)
+
+<sub>An excerpt of the `verify (Linux)` job's log in
+[CI run 44045343499](https://github.com/distronode-corporation/district-core-swift/actions/runs/44045343499)
+(commit `bf9ddbc`, 2026-11-17), rendered as a terminal. Functions and regions are held at 100% the
+same way.</sub>
+
+**Quick start:** add the package and a product to your `Package.swift` (a first call is in
+[Quick start](#quick-start) below):
+
+```swift
+.package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.6.0"),
+.product(name: "DistrictL10n", package: "district-core-swift"),
+```
+
+**Links:** [Distronode](https://distronode.com) ·
+[project page](https://www.distronode.com/open-source/district-core-swift) ·
+[Distronode on GitHub](https://github.com/distronode-corporation) ·
+[CHANGELOG](CHANGELOG.md) · [ROADMAP](ROADMAP.md) ·
+[GitLab mirror](https://gitlab.com/distronode-corporation/district-core-swift) (read only;
+issues and pull requests live on GitHub)
+
+## What it is
+
+The models, networking, data repositories, sign-in logic and call state machines that the
+District AI apps for iPhone, iPad and Mac have in common. It builds and tests on Linux as well
+as on Apple platforms, so almost all of the apps' logic is tested without a simulator, a
+network or an account.
 
 Consumers:
 
@@ -24,11 +54,6 @@ Consumers:
 
 This package was extracted from district-ios at `0b2354b`, with its history. The
 release badge above names the current release.
-
-Links: [project page](https://www.distronode.com/open-source/district-core-swift) ·
-[GitLab mirror](https://gitlab.com/distronode-corporation/district-core-swift) (read-only
-mirror; issues and pull requests live on GitHub) · [CHANGELOG](CHANGELOG.md) ·
-[CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md)
 
 The District AI service the package talks to is not open source; signing in needs a
 District AI account. Without one you can still build the package and run every test.

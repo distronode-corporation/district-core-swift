@@ -8,6 +8,9 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Added
 
+- `TokenStore.clearRevokePending(ifHolding:)`: clear the revoke outbox only while it holds
+  the given token. A default implementation reads then clears; `InMemoryTokenStore` does it
+  in one step and `FreshInstallTokenStore` passes it to the store it wraps.
 - ARCHITECTURE.md (the modules, the seams the apps implement, a request end to end, and
   where state lives) and SECURITY-MODEL.md (threat model, trust boundaries, secure design
   principles and the weaknesses countered, each with its test). The README gains a quick
@@ -32,6 +35,14 @@ All notable changes to this package are recorded here. The format is based on
 - The website's reworded French for `marketplace_cancel_refused`,
   `microsoft_landing_identity_mismatch` and `microsoft_landing_us_regional_account`,
   generated into `l10n/api_errors.toml` and the `ApiErrorTable` from the same sync.
+
+### Fixed
+
+- A revoke acceptance clears only the outbox entry it acknowledges, so an older answer can
+  no longer drop a newer token still waiting to be revoked.
+- A sign-out while a rotated session is being stored ends that adoption: nothing is cached
+  or returned, a write that landed after the wipe is removed, and the successor goes to the
+  revoke outbox.
 
 ## [8.6.0] - 2026-11-15
 

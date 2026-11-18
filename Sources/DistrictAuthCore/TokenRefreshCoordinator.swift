@@ -143,7 +143,7 @@ public actor TokenRefreshCoordinator {
     /// Resolves the write before the access token becomes visible, for the same
     /// ordering reason as a rotation.
     public func adopt(_ tokens: NativeTokens, deviceId: String) async {
-        _ = await adoptRotated(tokens, deviceId: deviceId)
+        _ = await adoptRotated(tokens, deviceId: deviceId, generation: generation)
     }
 
     /// Wait for a refresh already on the wire, and for the write of its successor,
@@ -325,7 +325,7 @@ public actor TokenRefreshCoordinator {
 
         switch result {
         case let .success(tokens):
-            return await adoptRotated(tokens, deviceId: current.deviceId)
+            return await adoptRotated(tokens, deviceId: current.deviceId, generation: started)
 
         case .rejected:
             try? await store.clear()
@@ -378,7 +378,16 @@ public actor TokenRefreshCoordinator {
     /// ACROSS A CRASH. Disk then holds the spent predecessor plus a marker
     /// naming it, so the next launch takes the `interruptedRefresh` path and
     /// re-logs in cleanly instead of presenting a spent token.
-    private func adoptRotated(_ tokens: NativeTokens, deviceId: String) async -> AccessTokenOutcome {
+    ///
+    /// ⛔ AND A SIGN-OUT DURING THE WRITE ENDS THE ADOPTION. ``forget()`` can run while
+    /// the store write is suspended; the generation is checked again once it is done,
+    /// and an adoption from an ended session caches nothing and is undone
+    /// (``discard(_:)``).
+    private func adoptRotated(
+        _ tokens: NativeTokens,
+        deviceId: String,
+        generation started: Int
+    ) async -> AccessTokenOutcome {
         let successor = PersistedSession(
             refreshToken: tokens.refreshToken,
             refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
@@ -391,9 +400,28 @@ public actor TokenRefreshCoordinator {
         } catch {
             unpersistedSession = successor
         }
+        guard generation == started else { return await discard(successor) }
         cachedAccessToken = tokens.accessToken
         cachedAccessTokenExpiresAt = tokens.accessTokenExpiresAt
         return .available(tokens.accessToken)
+    }
+
+    /// Undo an adoption whose session was signed out while it was being stored.
+    ///
+    /// ⛔ THE WRITE MAY HAVE LANDED AFTER THE SIGN-OUT'S WIPE, so the store is cleared
+    /// if it still holds this successor, and only then: a login since the sign-out
+    /// may have written its own. The successor is live server-side, so it goes to
+    /// ``outbox`` like any other credential a sign-out leaves behind.
+    private func discard(_ successor: PersistedSession) async -> AccessTokenOutcome {
+        if unpersistedSession == successor {
+            unpersistedSession = nil
+        }
+        let stored = try? await store.read()
+        if stored?.refreshToken == successor.refreshToken {
+            try? await store.clear()
+        }
+        await outbox.revoke(successor.refreshToken)
+        return .reauthRequired(.noSession)
     }
 }
 

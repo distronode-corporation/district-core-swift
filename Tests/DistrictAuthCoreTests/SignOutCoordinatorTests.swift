@@ -113,7 +113,9 @@ final class SignOutCoordinatorTests: XCTestCase {
 
         await signOut.signOut()
 
-        await expectEqual([.read, .readRevoke, .markRevokePending, .clearRevokePending, .clear]) {
+        // ⚠️ THE SECOND `.readRevoke` IS THE ACKNOWLEDGEMENT'S CHECK: this spy takes
+        // ``TokenStore``'s default `clearRevokePending(ifHolding:)`, which reads, then clears.
+        await expectEqual([.read, .readRevoke, .markRevokePending, .readRevoke, .clearRevokePending, .clear]) {
             await store.operations
         }
     }

@@ -202,6 +202,8 @@ enum ApiErrorTable {
         case "transfer_release_confirmation_required": return ApiErrorCopy.transferReleaseConfirmationRequired
         case "number_bridge_eu_workspaces_only": return ApiErrorCopy.numberBridgeEuWorkspacesOnly
         case "number_bridge_ca_workspaces_only": return ApiErrorCopy.numberBridgeCaWorkspacesOnly
+        case "registration_on_own_account": return ApiErrorCopy.registrationOnOwnAccount
+        case "tfv_filed_by_distronode": return ApiErrorCopy.tfvFiledByDistronode
         case "auto_dial_country_not_permitted": return ApiErrorCopy.autoDialCountryNotPermitted
         case "auto_dial_outside_hours": return ApiErrorCopy.autoDialOutsideHours
         case "auto_dial_contact_opted_out": return ApiErrorCopy.autoDialContactOptedOut

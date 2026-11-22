@@ -375,7 +375,7 @@ package enum ApiErrorCopy {
     package static var memberNotFound: String { L10nRuntime.locale == .frCA ? "Cette personne n'est pas membre de cet espace de travail." : "That person is not a member of this workspace." }
 
     /// `api_error.member_phone_business_number`
-    package static var memberPhoneBusinessNumber: String { L10nRuntime.locale == .frCA ? "Ce numéro appartient à une entreprise sur District, alors il ne peut pas recevoir d'alertes. Entrez votre propre numéro de cellulaire." : "This number belongs to a business on District, so it cannot receive alerts. Enter your own mobile number." }
+    package static var memberPhoneBusinessNumber: String { L10nRuntime.locale == .frCA ? "Ce numéro appartient à une entreprise sur District, alors il ne peut pas être votre cellulaire vérifié. Entrez votre propre numéro de cellulaire." : "This number belongs to a business on District, so it cannot be your verified mobile. Enter your own mobile number." }
 
     /// `api_error.member_phone_cannot_text`
     package static var memberPhoneCannotText: String { L10nRuntime.locale == .frCA ? "Cette entreprise ne peut pas encore envoyer de textos. L'envoi de textos commencera dès que la messagerie texte de son numéro sera approuvée. D'ici là, les alertes vous parviendront par courriel et dans l'application." : "This business cannot send texts yet. Texts start once its number's text messaging is approved. Until then, alerts come by email and in the app." }
@@ -554,6 +554,9 @@ package enum ApiErrorCopy {
     /// `api_error.region_unavailable`
     package static var regionUnavailable: String { L10nRuntime.locale == .frCA ? "La région de cet espace de travail est injoignable en ce moment. Veuillez réessayer sous peu." : "That workspace's region cannot be reached right now. Please try again shortly." }
 
+    /// `api_error.registration_on_own_account`
+    package static var registrationOnOwnAccount: String { L10nRuntime.locale == .frCA ? "Ce numéro doit être acheté sur le compte de transporteur de Distronode, mais l'inscription réglementaire de cet espace de travail est déposée sur son propre compte Twilio. Communiquez avec notre équipe de soutien pour déposer l'inscription sur le compte de Distronode, puis achetez ce numéro." : "This number must be bought on Distronode's carrier account, but this workspace's regulatory registration is filed on its own Twilio account. Contact support to file the registration on Distronode's account, then buy this number." }
+
     /// `api_error.reply_failed`
     package static var replyFailed: String { L10nRuntime.locale == .frCA ? "Votre réponse n'a pas pu être publiée. Veuillez réessayer." : "Your reply could not be posted. Please try again." }
 
@@ -622,6 +625,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.test_call_needs_number`
     package static var testCallNeedsNumber: String { L10nRuntime.locale == .frCA ? "Choisissez d'abord un numéro de téléphone pour cet espace de travail, afin que l'appel d'essai ait un numéro d'origine." : "Choose a phone number for this workspace first, so the test call has a number to come from." }
+
+    /// `api_error.tfv_filed_by_distronode`
+    package static var tfvFiledByDistronode: String { L10nRuntime.locale == .frCA ? "Ce numéro sans frais est détenu sur le compte de Distronode; sa vérification doit donc être déposée par Distronode. Communiquez avec notre équipe de soutien pour la déposer." : "This toll-free number is held on Distronode's account, so its verification must be filed by Distronode. Contact support to file it." }
 
     /// `api_error.ticket_create_failed`
     package static var ticketCreateFailed: String { L10nRuntime.locale == .frCA ? "Cette demande n'a pas pu être créée. Veuillez réessayer." : "That request could not be created. Please try again." }

@@ -26,12 +26,17 @@ All notable changes to this package are recorded here. The format is based on
   region only: `number_bridge_eu_workspaces_only` and `number_bridge_ca_workspaces_only`,
   generated into `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English
   and French.
+- Two codes for numbers held on Distronode's carrier account, from the same contract file:
+  `registration_on_own_account` and `tfv_filed_by_distronode`, generated into
+  `l10n/api_errors.toml` and the `ApiErrorTable` with the website's English and French.
 
 ### Changed
 
 - The website's reworded French for `marketplace_cancel_refused`,
   `microsoft_landing_identity_mismatch` and `microsoft_landing_us_regional_account`,
   generated into `l10n/api_errors.toml` and the `ApiErrorTable` from the same sync.
+- `member_phone_business_number` in English and French, as the website now words it: the
+  number "cannot be your verified mobile" (was "cannot receive alerts").
 
 ## [8.6.0] - 2026-11-15
 

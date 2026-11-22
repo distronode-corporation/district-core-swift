@@ -65,8 +65,10 @@ public protocol TokenStore: Sendable {
     /// that login out at the next cold start. ⚠️ A REQUIREMENT WITH NO DEFAULT, BECAUSE
     /// THE PRODUCTION KEYCHAIN STORE CONFORMS OUTSIDE THIS PACKAGE: a default handing
     /// out a read-then-clear is the very race this method exists to close, so every
-    /// conformer is made to compare and clear in one isolated step, which an actor
-    /// method already is.
+    /// conformer is made to compare and clear in one step. ⛔ THAT STEP IS ONLY ATOMIC
+    /// IF THE CONFORMER SERIALISES ALL OF ITS OPERATIONS, an actor's isolation or a
+    /// lock around every member; the production store is a struct of synchronous
+    /// calls that serialises nothing, so it must grow one before conforming.
     func clear(ifHolding refreshToken: String) async throws
 
     /// The refresh token currently in flight, if a refresh was started and never
@@ -132,9 +134,8 @@ public protocol TokenStore: Sendable {
     /// overlap (a launch drain and a sign-out), and the older one's acceptance can
     /// arrive after a newer token took the slot; clearing unconditionally would drop
     /// a credential the server is still honouring. ⚠️ A REQUIREMENT WITH NO DEFAULT
-    /// for the same reason as ``clear(ifHolding:)``: the compare and the clear must
-    /// be one step, and a default would hand every conformer the two-step shape
-    /// instead.
+    /// for the same reason as ``clear(ifHolding:)``, and its one step is atomic only
+    /// under the same serialisation of every operation that method demands.
     func clearRevokePending(ifHolding refreshToken: String) async throws
 }
 

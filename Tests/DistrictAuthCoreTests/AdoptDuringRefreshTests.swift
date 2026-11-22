@@ -108,4 +108,147 @@ final class AdoptDuringRefreshTests: XCTestCase {
         await expectEqual("refresh-6") { await store.session?.refreshToken }
         await expectNil { await store.pending }
     }
+
+    /// ⛔ THE LOGIN HOLDS THE SINGLE-FLIGHT GATE FOR ITS OWN WRITE. The production
+    /// store is a struct of synchronous calls that serialises nothing (see the ⛔
+    /// on ``TokenStore/clear(ifHolding:)``), so against it a caller arriving
+    /// mid-write read the OUTGOING session at the new generation, with no fence
+    /// between it and the wire: it presented the old token again, or its
+    /// rejection's clear wiped the login's write. Callers now latch onto the
+    /// adoption and get its outcome instead.
+    func testACallerDuringTheLoginWriteLatchesOntoTheAdoption() async {
+        let store = ConcurrentWriteStore(session: AuthFixtures.session())
+        let refresh = NeverRefreshClient()
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        let login = Task {
+            await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
+        }
+        await waitUntil { store.writeEntered }
+
+        let raced = Task { await coordinator.accessToken() }
+        store.openGate()
+        _ = await login.value
+
+        await expectEqual(AccessTokenOutcome.available("access-9")) { await raced.value }
+        await expectEqual(0, "nothing may be presented while the login is unwritten") { await refresh.callCount }
+        await expectEqual("refresh-9") { try? await store.read()?.refreshToken }
+    }
+
+    /// ⚠️ AND A LOGIN THAT EXISTS ONLY AS THE RESCUE COUNTS AS THE REPLACEMENT.
+    /// A sign-out's wipe plus a login whose write the store refused leaves the
+    /// replacement nowhere on disk, and the superseded caller must not be told its
+    /// verdict is terminal while the login's session is alive in memory.
+    func testASupersededCallerIsRetryableWhileTheLoginIsOnlyInMemory() async {
+        let store = SpyTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2))], open: false)
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        let stale = Task { await coordinator.accessToken() }
+        await waitUntil { await refresh.callCount >= 1 }
+        await coordinator.forget()
+        await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
+        await refresh.open()
+
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await stale.value }
+    }
+}
+
+/// A NON-ACTOR store, the production keychain store's shape: every call is
+/// individually safe but nothing serialises them, so a read landing beside a
+/// parked write answers with whatever the store holds THEN, before the write
+/// applies.
+private final class ConcurrentWriteStore: TokenStore, @unchecked Sendable {
+    private let lock = NSLock()
+    private var session: PersistedSession?
+    private var pending: String?
+    private var isOpen = false
+    private var gatedWrite: CheckedContinuation<Void, Never>?
+    private var writeEnteredStorage = false
+
+    init(session: PersistedSession?) {
+        self.session = session
+    }
+
+    var writeEntered: Bool {
+        lock.withLock { writeEnteredStorage }
+    }
+
+    func openGate() {
+        let waiter = lock.withLock {
+            isOpen = true
+            let waiter = gatedWrite
+            gatedWrite = nil
+            return waiter
+        }
+        waiter?.resume()
+    }
+
+    func read() async throws -> PersistedSession? {
+        lock.withLock { session }
+    }
+
+    func write(_ session: PersistedSession) async throws {
+        // The continuation is registered and flagged under one lock hold, so the
+        // test can observe the write parked without a missed-resume window.
+        let gate = lock.withLock {
+            if isOpen {
+                return false
+            }
+            writeEnteredStorage = true
+            return true
+        }
+        if gate {
+            await withCheckedContinuation { continuation in
+                lock.withLock {
+                    gatedWrite = continuation
+                }
+            }
+        }
+        lock.withLock {
+            self.session = session
+        }
+    }
+
+    func clear() async throws {
+        lock.withLock {
+            session = nil
+            pending = nil
+        }
+    }
+
+    func clear(ifHolding refreshToken: String) async throws {
+        lock.withLock {
+            guard session?.refreshToken == refreshToken else { return }
+            session = nil
+            pending = nil
+        }
+    }
+
+    func pendingRefreshToken() async throws -> String? {
+        lock.withLock { pending }
+    }
+
+    func markRefreshPending(_ refreshToken: String) async throws {
+        lock.withLock {
+            pending = refreshToken
+        }
+    }
+
+    func clearRefreshPending() async throws {
+        lock.withLock {
+            pending = nil
+        }
+    }
+
+    /// ⚠️ Inert: nothing here signs out, and the adoption under test never
+    /// touches the outbox.
+    func pendingRevokeToken() async throws -> String? {
+        nil
+    }
+
+    func markRevokePending(_: String) async throws {}
+    func clearRevokePending() async throws {}
+    func clearRevokePending(ifHolding _: String) async throws {}
 }

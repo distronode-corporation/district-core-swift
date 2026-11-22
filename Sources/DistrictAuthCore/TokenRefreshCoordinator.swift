@@ -75,16 +75,16 @@ public actor TokenRefreshCoordinator {
     private var inFlight: Task<AccessTokenOutcome, Never>?
 
     /// Which session a refresh was started for. ``forget()`` and
-    /// ``adopt(_:deviceId:)`` bump it: a sign-out and a re-login both replace the
-    /// session a refresh may still be in flight for.
+    /// ``adopt(_:deviceId:)`` bump it: a sign-out and a re-login both replace
+    /// the session a refresh may still be in flight for.
     ///
     /// ⛔ A REFRESH ON THE WIRE WHEN THE USER SIGNS OUT STILL COMES BACK WITH A
     /// LIVE SUCCESSOR. Without this fence it was written to the store and its
     /// access token cached after the sign-out, so the next cold start signed the
     /// previous user back in with a refresh token nothing would ever revoke. A
-    /// refresh whose generation changed across its store reads, its marker write
-    /// or the network call touches neither the store nor the cache, and hands
-    /// any successor to ``outbox``.
+    /// refresh whose generation changed across its store reads, its marker
+    /// write or the network call touches neither the store nor the cache, and
+    /// hands any successor to ``outbox``.
     private var generation = 0
 
     /// - Parameter revokeClient: where a successor that lands after ``forget()``
@@ -146,18 +146,33 @@ public actor TokenRefreshCoordinator {
     /// Resolves the write before the access token becomes visible, for the same
     /// ordering reason as a rotation.
     ///
-    /// ⛔ AND TRIPS THE SAME FENCE ``forget()`` DOES. A login replaces the session a
-    /// refresh may still be on the wire for, and without the bump that refresh's
-    /// answer passed the generation check below: its rejection's ``TokenStore/clear()``
-    /// wiped the session the login had just written, and its success overwrote it
-    /// with the old session's successor. The abandoned in-flight task and any
-    /// rescue the old session left behind are dropped with it, exactly as a
-    /// sign-out drops them.
+    /// ⛔ AND TRIPS THE SAME FENCE ``forget()`` DOES: without the bump, a refresh
+    /// still on the wire for the replaced session had its answer pass the
+    /// generation check, its rejection's ``TokenStore/clear()`` wiping the
+    /// session the login had just written, or its success overwriting it with
+    /// the old session's successor. The abandoned in-flight task and any
+    /// rescue the old session left behind are dropped with it, as a sign-out
+    /// drops them.
+    ///
+    /// ⛔ AND IT HOLDS THE SINGLE-FLIGHT GATE FOR ITS OWN WRITE, as ``accessToken()`` does
+    /// for a refresh: the store serialises nothing (see the ⛔ on
+    /// ``TokenStore/clear(ifHolding:)``), so a caller arriving mid-write read the OUTGOING
+    /// session at the new generation, unfenced; callers now latch onto the adoption instead.
     public func adopt(_ tokens: NativeTokens, deviceId: String) async {
         generation += 1
+        let started = generation
         inFlight = nil
         unpersistedSession = nil
-        _ = await adoptRotated(tokens, deviceId: deviceId, generation: generation)
+        let task = Task<AccessTokenOutcome, Never> { [self] in
+            let outcome = await adoptRotated(tokens, deviceId: deviceId, generation: started)
+            // Released HERE, as in ``accessToken()``: only if it is still this gate's.
+            if generation == started {
+                inFlight = nil
+            }
+            return outcome
+        }
+        inFlight = task
+        _ = await task.value
     }
 
     /// Wait for a refresh already on the wire, and for the write of its successor,
@@ -188,6 +203,8 @@ public actor TokenRefreshCoordinator {
         }
         if let rescued = unpersistedSession {
             await repersistRescuedSession(rescued)
+            try? await store.clearRefreshPending()
+            unpersistedSession = nil
         }
     }
 
@@ -242,16 +259,17 @@ public actor TokenRefreshCoordinator {
         return now() + Self.earlyRefreshMarginMilliseconds >= cachedAccessTokenExpiresAt ? nil : token
     }
 
-    /// What an acquisition whose session was replaced answers, and that depends
-    /// on WHAT replaced it. A sign-out left no session, so the caller's
-    /// terminal verdict stands; a login left a live one, and answering
-    /// `.noSession` would make a caller following the terminal contract of
-    /// ``AccessTokenOutcome/reauthRequired(_:)`` clear the login's state and
-    /// route to login while the login exists. ⚠️ THE ONE READ IS A PROBE, NOT A
-    /// RE-ACQUISITION: the caller's next attempt reads the replacement and
-    /// serves it. A store that cannot answer is reported the way ``acquire(generation:)``
-    /// reports every unreadable store, retryably, never as a sign-out.
+    /// What an acquisition whose session was replaced answers; WHY that must not
+    /// be a terminal verdict is on ``RetryReason/sessionReplaced``. A sign-out
+    /// left no session, so the terminal verdict stands; a login left one, on
+    /// disk or as the in-memory rescue, and the caller is told to try again.
+    /// The one read is a probe, not a re-acquisition, and an unreadable store is
+    /// reported the way ``acquire(generation:)`` reports every one: retryably,
+    /// never as a sign-out.
     private func supersededOutcome() async -> AccessTokenOutcome {
+        if unpersistedSession != nil {
+            return .retryLater(.sessionReplaced)
+        }
         do {
             if try await store.read() != nil {
                 return .retryLater(.sessionReplaced)
@@ -266,6 +284,11 @@ public actor TokenRefreshCoordinator {
         // ⛔ THE RESCUED SESSION WINS OVER THE DISK. See `unpersistedSession`.
         if let rescued = unpersistedSession {
             await repersistRescuedSession(rescued)
+            // ⛔ A REPLACEMENT LANDING INSIDE THAT WRITE ENDS THE RESCUE: the
+            // write can land after a sign-out's wipe, and ``discard(_:)`` undoes it.
+            guard generation == started else { return await discard(rescued) }
+            try? await store.clearRefreshPending()
+            unpersistedSession = nil
             return await performRefresh(rescued, generation: started)
         }
 
@@ -287,21 +310,16 @@ public actor TokenRefreshCoordinator {
             return .retryLater(.storeUnavailable)
         }
 
-        // ── The replacement fence ────────────────────────────────────────────
-        // ⛔ THE TWO READS ABOVE ARE SUSPENSION POINTS, AND A LOGIN CAN LAND
-        // INSIDE THEM, so what they produced can belong to a session this
-        // acquisition no longer speaks for. The Kotlin client puts its
-        // equivalent check at the top of the locked section because its callers
-        // queue on a mutex and each one re-runs the body; here they await one
-        // shared task and never re-enter, so the reads' window is the live one.
-        // A replaced acquisition has no authority over what it read: comparing
-        // the marker could take the login's own in-flight marker for an
-        // interrupted refresh and WIPE the session that replaced this one, and
-        // refreshing would present a token the login's next acquisition
-        // presents too, the replay that revokes the family. The one thing it
-        // may still do is serve a token the login cached while the reads were
-        // suspended, which costs nothing and saves a rotation of a credential
-        // seconds old.
+        // ⛔ THE REPLACEMENT FENCE: THE TWO READS ABOVE ARE SUSPENSION POINTS, and
+        // a login can land inside them, so what they produced can belong to a
+        // session this acquisition no longer speaks for. A replaced acquisition
+        // has no authority over what it read: comparing the marker could take
+        // the login's own in-flight marker for an interrupted refresh and WIPE
+        // the session that replaced this one, and refreshing would present a
+        // token the login's next acquisition presents too, the replay that
+        // revokes the family. The one thing it may still do is serve a token
+        // the login cached while the reads were suspended, which saves a
+        // rotation of a credential seconds old.
         if generation != started {
             if let token = cachedIfFresh() {
                 return .available(token)
@@ -331,12 +349,12 @@ public actor TokenRefreshCoordinator {
     ///
     /// Best effort: if it still fails, the in-memory copy stays authoritative
     /// and the marker stays set, which is exactly the state
-    /// ``adoptRotated(_:deviceId:)`` left behind.
+    /// ``adoptRotated(_:deviceId:)`` left behind. ⚠️ THE WRITE IS ALL IT DOES:
+    /// the callers clear the marker and the rescue slot, and only once their own
+    /// generation check has passed.
     private func repersistRescuedSession(_ rescued: PersistedSession) async {
         do {
             try await store.write(rescued)
-            try? await store.clearRefreshPending()
-            unpersistedSession = nil
         } catch {
             // Deliberately silent. The next refresh carries the same rescue.
         }
@@ -355,16 +373,11 @@ public actor TokenRefreshCoordinator {
             return .retryLater(.markerNotDurable)
         }
 
-        // ⛔ AND ONCE MORE IMMEDIATELY BEFORE THE REQUEST, WITH NO `await`
-        // BETWEEN THE TWO: the marker write suspends too, and a login can land
-        // inside it. The request is the one thing no later fence can take back,
-        // so a replaced acquisition sends nothing. ⚠️ The bail leaves the marker
-        // naming THIS acquisition's own token, which nothing that still compares
-        // against the marker can be holding: the session that replaced it holds
-        // a different one, an emptied store never reaches the comparison, and
-        // the one state that keeps this token on disk (a login whose write was
-        // refused) is entered through the rescue path, which does not compare.
-        // The next adoption clears it.
+        // ⛔ AND ONCE MORE IMMEDIATELY BEFORE THE REQUEST, WITH NO `await` BETWEEN
+        // THE TWO: the marker write suspends too, and a login can land inside it.
+        // The request is the one thing no later fence can take back. ⚠️ The bail
+        // leaves the marker naming this acquisition's own token, which nothing
+        // that still runs the comparison can be holding; the next adoption clears it.
         guard generation == started else {
             return await supersededOutcome()
         }
@@ -372,9 +385,9 @@ public actor TokenRefreshCoordinator {
         let result = await refreshClient.refresh(refreshToken: current.refreshToken)
 
         // ⛔ THE SESSION WAS REPLACED WHILE THE REQUEST WAS ON THE WIRE, by a
-        // sign-out or a login; both bump ``generation``. See ``generation``. No
-        // branch below may run: a success would resurrect the old session, and a
-        // rejection's `clear()` could wipe the login that has since replaced it.
+        // sign-out or a login; both bump ``generation``. No branch below may
+        // run: a success would resurrect the old session, and a rejection's
+        // `clear()` could wipe the login that has since replaced it.
         guard generation == started else {
             if case let .success(tokens) = result {
                 await outbox.revoke(tokens.refreshToken)
@@ -454,19 +467,22 @@ public actor TokenRefreshCoordinator {
         )
         do {
             try await store.write(successor)
-            try? await store.clearRefreshPending()
-            unpersistedSession = nil
         } catch {
             unpersistedSession = successor
         }
+        // ⛔ THE GUARD COMES BEFORE ANY OTHER MUTATION: a newer acquisition may
+        // already own the marker slot, and a fenced adoption must not take it.
+        // The rescue slot is not touched at all: a refused write's rescue must
+        // survive a current adoption, and a fenced one must not drop a newer
+        // session's. The discarded successor is reclaimed by ``discard(_:)``.
         guard generation == started else { return await discard(successor) }
+        try? await store.clearRefreshPending()
         cachedAccessToken = tokens.accessToken
         cachedAccessTokenExpiresAt = tokens.accessTokenExpiresAt
         return .available(tokens.accessToken)
     }
 
-    /// Undo an adoption whose session was replaced while it was being stored, by
-    /// a sign-out or a later login.
+    /// Undo an adoption whose session was replaced while it was being stored.
     ///
     /// ⛔ THE WRITE MAY HAVE LANDED AFTER THE SIGN-OUT'S WIPE, so the store is cleared
     /// if it still holds this successor, and only then: a login since the sign-out

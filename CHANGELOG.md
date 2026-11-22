@@ -11,10 +11,15 @@ All notable changes to this package are recorded here. The format is based on
 - `TokenStore.clearRevokePending(ifHolding:)`: clear the revoke outbox only while it holds
   the given token. A protocol requirement with no default, so no conformer can inherit the
   two-step read-then-clear the method exists to make impossible; `InMemoryTokenStore` does
-  it in one step and `FreshInstallTokenStore` passes it to the store it wraps.
+  it in one step and `FreshInstallTokenStore` passes it to the store it wraps. ⚠️
+  SOURCE-BREAKING for every conformer outside this package, the production keychain store
+  included: both clears below must be implemented or the conformer no longer compiles, and
+  each one-step compare-and-clear is atomic only if the conformer serialises all of its
+  operations, an actor's isolation or a lock around every member. The keychain store is
+  today a struct of synchronous calls that serialises nothing, so it must grow one.
 - `TokenStore.clear(ifHolding:)`: clear the session only while it is the one holding the
   given token, a requirement with no default for the same reason, with the same two
-  one-step implementations.
+  one-step implementations and the same source break.
 - `RetryReason.sessionReplaced`: the retryable answer for an acquisition whose session was
   replaced while it was suspended, so a login can no longer read as a terminal sign-out to
   the stale caller. ⚠️ `RetryReason` gains a case, which breaks an exhaustive `switch` over
@@ -59,7 +64,10 @@ All notable changes to this package are recorded here. The format is based on
   answered `retryLater(.sessionReplaced)` rather than a terminal `.noSession` whenever the
   replacement left a session on disk, so a caller following the terminal contract cannot
   clear the login's state while the login is live; a plain sign-out still answers terminal,
-  and a store that cannot say which happened answers retryable.
+  and a store that cannot say which happened answers retryable. `adopt(_:deviceId:)` also
+  holds the single-flight gate until its write resolves, so a caller arriving mid-login
+  latches onto the adoption rather than acquiring the outgoing session, which the
+  unserialised production store would otherwise have handed it.
 - A sign-out while a rotated session is being stored ends that adoption: nothing is cached
   or returned, a write that landed after the wipe is removed, and the successor goes to the
   revoke outbox.

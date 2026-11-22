@@ -64,7 +64,7 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await store.seed(AuthFixtures.session(refreshToken: "refresh-login"))
         await store.openGate()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await request.value }
         await expectEqual("refresh-login") { await store.session?.refreshToken }
     }
 
@@ -83,7 +83,7 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await coordinator.forget()
         await store.openGate()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await request.value }
         await expectEqual("refresh-login") { await store.session?.refreshToken }
         await expectEqual("refresh-2", "the successor still goes to the outbox") { await store.revokePending }
     }

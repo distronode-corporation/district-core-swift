@@ -242,6 +242,26 @@ public actor TokenRefreshCoordinator {
         return now() + Self.earlyRefreshMarginMilliseconds >= cachedAccessTokenExpiresAt ? nil : token
     }
 
+    /// What an acquisition whose session was replaced answers, and that depends
+    /// on WHAT replaced it. A sign-out left no session, so the caller's
+    /// terminal verdict stands; a login left a live one, and answering
+    /// `.noSession` would make a caller following the terminal contract of
+    /// ``AccessTokenOutcome/reauthRequired(_:)`` clear the login's state and
+    /// route to login while the login exists. ⚠️ THE ONE READ IS A PROBE, NOT A
+    /// RE-ACQUISITION: the caller's next attempt reads the replacement and
+    /// serves it. A store that cannot answer is reported the way ``acquire(generation:)``
+    /// reports every unreadable store, retryably, never as a sign-out.
+    private func supersededOutcome() async -> AccessTokenOutcome {
+        do {
+            if try await store.read() != nil {
+                return .retryLater(.sessionReplaced)
+            }
+            return .reauthRequired(.noSession)
+        } catch {
+            return .retryLater(.storeUnavailable)
+        }
+    }
+
     private func acquire(generation started: Int) async -> AccessTokenOutcome {
         // ⛔ THE RESCUED SESSION WINS OVER THE DISK. See `unpersistedSession`.
         if let rescued = unpersistedSession {
@@ -286,7 +306,7 @@ public actor TokenRefreshCoordinator {
             if let token = cachedIfFresh() {
                 return .available(token)
             }
-            return .reauthRequired(.noSession)
+            return await supersededOutcome()
         }
 
         // ── The interrupted-refresh check ────────────────────────────────────
@@ -345,7 +365,9 @@ public actor TokenRefreshCoordinator {
         // the one state that keeps this token on disk (a login whose write was
         // refused) is entered through the rescue path, which does not compare.
         // The next adoption clears it.
-        guard generation == started else { return .reauthRequired(.noSession) }
+        guard generation == started else {
+            return await supersededOutcome()
+        }
 
         let result = await refreshClient.refresh(refreshToken: current.refreshToken)
 
@@ -357,7 +379,7 @@ public actor TokenRefreshCoordinator {
             if case let .success(tokens) = result {
                 await outbox.revoke(tokens.refreshToken)
             }
-            return .reauthRequired(.noSession)
+            return await supersededOutcome()
         }
 
         switch result {
@@ -443,7 +465,8 @@ public actor TokenRefreshCoordinator {
         return .available(tokens.accessToken)
     }
 
-    /// Undo an adoption whose session was signed out while it was being stored.
+    /// Undo an adoption whose session was replaced while it was being stored, by
+    /// a sign-out or a later login.
     ///
     /// ⛔ THE WRITE MAY HAVE LANDED AFTER THE SIGN-OUT'S WIPE, so the store is cleared
     /// if it still holds this successor, and only then: a login since the sign-out
@@ -456,6 +479,6 @@ public actor TokenRefreshCoordinator {
         // ⛔ ONE STEP, NOT A READ AND THEN A CLEAR: a login can write between the two.
         try? await store.clear(ifHolding: successor.refreshToken)
         await outbox.revoke(successor.refreshToken)
-        return .reauthRequired(.noSession)
+        return await supersededOutcome()
     }
 }

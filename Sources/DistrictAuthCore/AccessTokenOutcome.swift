@@ -57,4 +57,13 @@ public enum RetryReason: Sendable, Equatable {
     /// was sent. ⛔ Sending one anyway is the fall-through this case exists to
     /// refuse.
     case markerNotDurable
+
+    /// The session this acquisition was started for was replaced while it was
+    /// suspended, by a re-login or by a sign-out a login followed. A session
+    /// exists, just not the one this request was made under: fail the request
+    /// and let the next attempt serve the replacement, rather than reporting
+    /// the login as a sign-out. ⚠️ NOT ANOTHER ``ReauthReason``, for the same
+    /// reason ``AccessTokenOutcome/retryLater(_:)`` exists: the caller must
+    /// not clear state or route to login.
+    case sessionReplaced
 }

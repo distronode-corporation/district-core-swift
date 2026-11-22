@@ -15,6 +15,10 @@ All notable changes to this package are recorded here. The format is based on
 - `TokenStore.clear(ifHolding:)`: clear the session only while it is the one holding the
   given token, a requirement with no default for the same reason, with the same two
   one-step implementations.
+- `RetryReason.sessionReplaced`: the retryable answer for an acquisition whose session was
+  replaced while it was suspended, so a login can no longer read as a terminal sign-out to
+  the stale caller. ⚠️ `RetryReason` gains a case, which breaks an exhaustive `switch` over
+  it; a consumer that switches exhaustively must handle or default it.
 - ARCHITECTURE.md (the modules, the seams the apps implement, a request end to end, and
   where state lives) and SECURITY-MODEL.md (threat model, trust boundaries, secure design
   principles and the weaknesses countered, each with its test). The README gains a quick
@@ -51,7 +55,11 @@ All notable changes to this package are recorded here. The format is based on
   acquisition the login replaces before its request is sent presents nothing either: the
   generation is rechecked once the store reads are done and again after the pending marker
   is written, so the login's token can never be presented twice and a replaced acquisition
-  can neither wipe the login's session nor take its marker slot.
+  can neither wipe the login's session nor take its marker slot. The stale caller is
+  answered `retryLater(.sessionReplaced)` rather than a terminal `.noSession` whenever the
+  replacement left a session on disk, so a caller following the terminal contract cannot
+  clear the login's state while the login is live; a plain sign-out still answers terminal,
+  and a store that cannot say which happened answers retryable.
 - A sign-out while a rotated session is being stored ends that adoption: nothing is cached
   or returned, a write that landed after the wipe is removed, and the successor goes to the
   revoke outbox.

@@ -148,6 +148,11 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
     /// session: without the fence that follows the reads, the acquisition went on
     /// to compare that session against the marker and present its refresh token
     /// on the wire.
+    ///
+    /// ⚠️ AND WITH NO FRESH CACHED TOKEN THE STALE CALLER IS TOLD THE TRUTH, not a
+    /// sign-out: a session exists, just not its own, so the answer is retryable
+    /// and a caller following the terminal contract cannot clear the login's
+    /// state and route to login while the login is live.
     func testALoginInsideTheReadsDisarmsTheAbandonedAcquisition() async {
         let store = GatedReadTokenStore(session: AuthFixtures.session())
         let refresh = NeverRefreshClient()
@@ -160,7 +165,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
         await store.openGate()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await stale.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await stale.value }
         await expectEqual(0, "a replaced acquisition must present nothing") { await refresh.callCount }
         await expectEqual("refresh-9", "and it must not have wiped or overwritten the login") {
             try? await store.read()?.refreshToken
@@ -183,7 +188,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         await store.openGate()
         await waitUntil { await refresh.callCount >= 1 }
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await stale.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await stale.value }
         await refresh.open()
         await expectEqual(AccessTokenOutcome.available("access-10")) { await fresh.value }
         await expectEqual(["refresh-9"], "once, by the acquisition that owns it") { await refresh.presented }
@@ -204,7 +209,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
         await store.openGate()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await stale.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await stale.value }
         await expectEqual(0, "the request must not have left the device") { await refresh.callCount }
         await expectEqual("refresh-1", "the marker left behind names the replaced session's token") {
             try? await store.pendingRefreshToken()
@@ -212,6 +217,25 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         await expectEqual("refresh-9", "and the login's session is untouched") {
             try? await store.read()?.refreshToken
         }
+    }
+
+    /// ⚠️ AND A STORE THAT CANNOT SAY WHETHER A REPLACEMENT EXISTS GETS THE SAFE
+    /// ANSWER, the one every unreadable store gets: retryable. A locked device's
+    /// read must not become a sign-out (see the ⛔ on ``TokenStore/read()``),
+    /// least of all for a session that was replaced while its acquisition slept.
+    func testASupersededAcquisitionWithAnUnreadableStoreIsRetryable() async {
+        let store = GatedMarkerTokenStore(session: AuthFixtures.session())
+        let refresh = NeverRefreshClient()
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        let stale = Task { await coordinator.accessToken() }
+        await waitUntil { await store.markerEntered }
+        await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
+        await store.failReads(true)
+        await store.openGate()
+
+        await expectEqual(AccessTokenOutcome.retryLater(.storeUnavailable)) { await stale.value }
+        await expectEqual(0) { await refresh.callCount }
     }
 }
 
@@ -327,14 +351,21 @@ private actor GatedReadTokenStore: TokenStore {
 /// between the marker write and the request can be entered deliberately rather
 /// than raced for.
 private actor GatedMarkerTokenStore: TokenStore {
+    private struct Failure: Error {}
+
     private var session: PersistedSession?
     private var pending: String?
+    private var failReads = false
     private(set) var markerEntered = false
     private var isOpen = false
     private var waiter: CheckedContinuation<Void, Never>?
 
     init(session: PersistedSession) {
         self.session = session
+    }
+
+    func failReads(_ shouldFail: Bool) {
+        failReads = shouldFail
     }
 
     func openGate() {
@@ -344,7 +375,10 @@ private actor GatedMarkerTokenStore: TokenStore {
     }
 
     func read() async throws -> PersistedSession? {
-        session
+        if failReads {
+            throw Failure()
+        }
+        return session
     }
 
     func write(_ session: PersistedSession) async throws {

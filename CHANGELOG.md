@@ -9,10 +9,12 @@ All notable changes to this package are recorded here. The format is based on
 ### Added
 
 - `TokenStore.clearRevokePending(ifHolding:)`: clear the revoke outbox only while it holds
-  the given token. A default implementation reads then clears; `InMemoryTokenStore` does it
-  in one step and `FreshInstallTokenStore` passes it to the store it wraps.
+  the given token. A protocol requirement with no default, so no conformer can inherit the
+  two-step read-then-clear the method exists to make impossible; `InMemoryTokenStore` does
+  it in one step and `FreshInstallTokenStore` passes it to the store it wraps.
 - `TokenStore.clear(ifHolding:)`: clear the session only while it is the one holding the
-  given token, with the same default and the same two one-step implementations.
+  given token, a requirement with no default for the same reason, with the same two
+  one-step implementations.
 - ARCHITECTURE.md (the modules, the seams the apps implement, a request end to end, and
   where state lives) and SECURITY-MODEL.md (threat model, trust boundaries, secure design
   principles and the weaknesses countered, each with its test). The README gains a quick
@@ -42,6 +44,10 @@ All notable changes to this package are recorded here. The format is based on
 
 - A revoke acceptance clears only the outbox entry it acknowledges, so an older answer can
   no longer drop a newer token still waiting to be revoked.
+- A login completing while a refresh of the outgoing session is on the wire no longer lets
+  that refresh's answer through: `TokenRefreshCoordinator.adopt(_:deviceId:)` bumps the
+  generation, as `forget()` does, so a rejection's clear cannot wipe the session the login
+  just wrote and a success cannot overwrite it with the old session's successor.
 - A sign-out while a rotated session is being stored ends that adoption: nothing is cached
   or returned, a write that landed after the wipe is removed, and the successor goes to the
   revoke outbox.

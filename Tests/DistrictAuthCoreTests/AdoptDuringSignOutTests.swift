@@ -190,4 +190,9 @@ private actor GatedWriteTokenStore: TokenStore {
     func clearRevokePending() async throws {
         revokePending = nil
     }
+
+    func clearRevokePending(ifHolding refreshToken: String) async throws {
+        guard revokePending == refreshToken else { return }
+        revokePending = nil
+    }
 }

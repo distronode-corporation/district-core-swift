@@ -119,11 +119,13 @@ actor SpyTokenStore: TokenStore {
         case read
         case write
         case clear
+        case clearIfHolding
         case markRefreshPending
         case clearRefreshPending
         case readRevoke
         case markRevokePending
         case clearRevokePending
+        case clearRevokePendingIfHolding
     }
 
     private(set) var session: PersistedSession?
@@ -202,6 +204,17 @@ actor SpyTokenStore: TokenStore {
         pending = nil
     }
 
+    /// ⚠️ ONE STEP, LIKE EVERY CONFORMER NOW THAT THE PROTOCOL SUPPLIES NO
+    /// DEFAULT. This spy is the oracle the sign-out and outbox suites derive
+    /// their sequence assertions from, so its compare-and-clear is the real
+    /// store's shape, not a read-then-clear convenience.
+    func clear(ifHolding refreshToken: String) async throws {
+        operations.append(.clearIfHolding)
+        guard session?.refreshToken == refreshToken else { return }
+        session = nil
+        pending = nil
+    }
+
     func pendingRefreshToken() async throws -> String? {
         if failRead {
             throw InjectedFailure()
@@ -242,6 +255,13 @@ actor SpyTokenStore: TokenStore {
 
     func clearRevokePending() async throws {
         operations.append(.clearRevokePending)
+        revokePending = nil
+    }
+
+    /// ⚠️ One step, as above: the acknowledgement clears only the token it names.
+    func clearRevokePending(ifHolding refreshToken: String) async throws {
+        operations.append(.clearRevokePendingIfHolding)
+        guard revokePending == refreshToken else { return }
         revokePending = nil
     }
 }

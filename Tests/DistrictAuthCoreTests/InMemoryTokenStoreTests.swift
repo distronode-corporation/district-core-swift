@@ -42,16 +42,21 @@ final class InMemoryTokenStoreTests: XCTestCase {
         XCTAssertNil(noMarker)
     }
 
-    /// ⚠️ AND THE PROTOCOL'S DEFAULT, which ``SpyTokenStore`` takes: it reads, then clears
-    /// only while the session read is the one named.
-    func testTheDefaultSessionClearReadsThenClearsOnlyTheNamedSession() async throws {
-        let store = SpyTokenStore(session: AuthFixtures.session(refreshToken: "login"))
+    /// ⚠️ AND ``SpyTokenStore``, WHICH EVERY OTHER SUITE TAKES AS ITS ORACLE: with
+    /// the protocol default gone, its own one-step compare-and-clear is what the
+    /// sequence assertions elsewhere rest on, so it is pinned here too.
+    func testTheSpyClearsOnlyWhileHoldingTheNamedToken() async throws {
+        let store = SpyTokenStore(session: AuthFixtures.session(refreshToken: "login"), revokePending: "held")
 
         try await store.clear(ifHolding: "successor")
         await expectEqual("login") { await store.session?.refreshToken }
+        try await store.clearRevokePending(ifHolding: "other")
+        await expectEqual("held") { await store.revokePending }
+
         try await store.clear(ifHolding: "login")
         await expectNil { await store.session }
-        await expectEqual([.read, .read, .clear]) { await store.operations }
+        try await store.clearRevokePending(ifHolding: "held")
+        await expectNil { await store.revokePending }
     }
 
     func testStartsEmptyAndRoundTripsASession() async throws {

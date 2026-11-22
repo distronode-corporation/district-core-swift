@@ -62,8 +62,11 @@ public protocol TokenStore: Sendable {
     ///
     /// ⛔ AN UNDO OF ONE ADOPTION, NOT A WIPE OF WHATEVER IS STORED. A login can write its
     /// own session while the undo is in progress, and an unconditional clear would sign
-    /// that login out at the next cold start. ⚠️ A store that can compare and clear in
-    /// one step should; the default reads and then clears.
+    /// that login out at the next cold start. ⚠️ A REQUIREMENT WITH NO DEFAULT, BECAUSE
+    /// THE PRODUCTION KEYCHAIN STORE CONFORMS OUTSIDE THIS PACKAGE: a default handing
+    /// out a read-then-clear is the very race this method exists to close, so every
+    /// conformer is made to compare and clear in one isolated step, which an actor
+    /// method already is.
     func clear(ifHolding refreshToken: String) async throws
 
     /// The refresh token currently in flight, if a refresh was started and never
@@ -128,26 +131,11 @@ public protocol TokenStore: Sendable {
     /// ⛔ THE ACKNOWLEDGEMENT OF ONE REVOKE, NOT A WIPE OF THE SLOT. Two revokes can
     /// overlap (a launch drain and a sign-out), and the older one's acceptance can
     /// arrive after a newer token took the slot; clearing unconditionally would drop
-    /// a credential the server is still honouring. ⚠️ A store that can compare and
-    /// clear in one step should; the default reads and then clears.
+    /// a credential the server is still honouring. ⚠️ A REQUIREMENT WITH NO DEFAULT
+    /// for the same reason as ``clear(ifHolding:)``: the compare and the clear must
+    /// be one step, and a default would hand every conformer the two-step shape
+    /// instead.
     func clearRevokePending(ifHolding refreshToken: String) async throws
-}
-
-public extension TokenStore {
-    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM, as for
-    /// ``clearRevokePending(ifHolding:)`` below.
-    func clear(ifHolding refreshToken: String) async throws {
-        guard try await read()?.refreshToken == refreshToken else { return }
-        try await clear()
-    }
-
-    /// ⚠️ TWO STEPS, SO NOT ATOMIC ACROSS THEM. An actor store that can compare and
-    /// clear in one isolated step implements this itself, as ``InMemoryTokenStore``
-    /// does.
-    func clearRevokePending(ifHolding refreshToken: String) async throws {
-        guard try await pendingRevokeToken() == refreshToken else { return }
-        try await clearRevokePending()
-    }
 }
 
 /// What actually goes to disk.

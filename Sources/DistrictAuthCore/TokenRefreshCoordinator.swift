@@ -74,7 +74,9 @@ public actor TokenRefreshCoordinator {
     /// value instead of starting their own.
     private var inFlight: Task<AccessTokenOutcome, Never>?
 
-    /// Which session a refresh was started for. ``forget()`` bumps it.
+    /// Which session a refresh was started for. ``forget()`` and
+    /// ``adopt(_:deviceId:)`` bump it: a sign-out and a re-login both replace the
+    /// session a refresh may still be in flight for.
     ///
     /// ⛔ A REFRESH ON THE WIRE WHEN THE USER SIGNS OUT STILL COMES BACK WITH A
     /// LIVE SUCCESSOR. Without this fence it was written to the store and its
@@ -142,7 +144,18 @@ public actor TokenRefreshCoordinator {
     ///
     /// Resolves the write before the access token becomes visible, for the same
     /// ordering reason as a rotation.
+    ///
+    /// ⛔ AND TRIPS THE SAME FENCE ``forget()`` DOES. A login replaces the session a
+    /// refresh may still be on the wire for, and without the bump that refresh's
+    /// answer passed the generation check below: its rejection's ``TokenStore/clear()``
+    /// wiped the session the login had just written, and its success overwrote it
+    /// with the old session's successor. The abandoned in-flight task and any
+    /// rescue the old session left behind are dropped with it, exactly as a
+    /// sign-out drops them.
     public func adopt(_ tokens: NativeTokens, deviceId: String) async {
+        generation += 1
+        inFlight = nil
+        unpersistedSession = nil
         _ = await adoptRotated(tokens, deviceId: deviceId, generation: generation)
     }
 
@@ -313,9 +326,10 @@ public actor TokenRefreshCoordinator {
 
         let result = await refreshClient.refresh(refreshToken: current.refreshToken)
 
-        // ⛔ SIGNED OUT WHILE THE REQUEST WAS ON THE WIRE. See ``generation``. No
-        // branch below may run: a success would resurrect the session, and a
-        // rejection's `clear()` could wipe a login that has since replaced it.
+        // ⛔ THE SESSION WAS REPLACED WHILE THE REQUEST WAS ON THE WIRE, by a
+        // sign-out or a login; both bump ``generation``. See ``generation``. No
+        // branch below may run: a success would resurrect the old session, and a
+        // rejection's `clear()` could wipe the login that has since replaced it.
         guard generation == started else {
             if case let .success(tokens) = result {
                 await outbox.revoke(tokens.refreshToken)

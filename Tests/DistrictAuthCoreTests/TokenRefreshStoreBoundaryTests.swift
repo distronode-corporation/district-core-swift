@@ -162,6 +162,9 @@ private actor ReadableSessionUnreadableMarkerStore: TokenStore {
 
     func write(_: PersistedSession) async throws {}
     func clear() async throws {}
+    /// ⚠️ The session is a constant here, so a conditional clear of it has
+    /// nothing to do.
+    func clear(ifHolding _: String) async throws {}
     func pendingRefreshToken() async throws -> String? {
         throw Failure()
     }
@@ -178,6 +181,7 @@ private actor ReadableSessionUnreadableMarkerStore: TokenStore {
 
     func markRevokePending(_: String) async throws {}
     func clearRevokePending() async throws {}
+    func clearRevokePending(ifHolding _: String) async throws {}
 }
 
 /// A store whose `read()` blocks until released, so the suspension window inside
@@ -219,6 +223,12 @@ private actor GatedReadTokenStore: TokenStore {
         pending = nil
     }
 
+    func clear(ifHolding refreshToken: String) async throws {
+        guard session?.refreshToken == refreshToken else { return }
+        session = nil
+        pending = nil
+    }
+
     func pendingRefreshToken() async throws -> String? {
         pending
     }
@@ -238,4 +248,5 @@ private actor GatedReadTokenStore: TokenStore {
 
     func markRevokePending(_: String) async throws {}
     func clearRevokePending() async throws {}
+    func clearRevokePending(ifHolding _: String) async throws {}
 }

@@ -113,9 +113,10 @@ final class SignOutCoordinatorTests: XCTestCase {
 
         await signOut.signOut()
 
-        // ⚠️ THE SECOND `.readRevoke` IS THE ACKNOWLEDGEMENT'S CHECK: this spy takes
-        // ``TokenStore``'s default `clearRevokePending(ifHolding:)`, which reads, then clears.
-        await expectEqual([.read, .readRevoke, .markRevokePending, .readRevoke, .clearRevokePending, .clear]) {
+        // ⚠️ THE `.clearRevokePendingIfHolding` IS THE ACKNOWLEDGEMENT'S
+        // COMPARE-AND-CLEAR, one step the spy implements itself, like every
+        // conformer now that the protocol supplies no default.
+        await expectEqual([.read, .readRevoke, .markRevokePending, .clearRevokePendingIfHolding, .clear]) {
             await store.operations
         }
     }

@@ -38,6 +38,14 @@ All notable changes to this package are recorded here. The format is based on
 - `member_phone_business_number` in English and French, as the website now words it: the
   number "cannot be your verified mobile" (was "cannot receive alerts").
 
+### Fixed
+
+- The release workflow signs the tag in gitsign's offline Rekor mode, so the signature
+  carries its transparency log entry and the workflow's own `gitsign verify-tag` checks it
+  without searching the log. In the default online mode that search can miss an entry made
+  seconds earlier, and the release fails before the tag is pushed. Verification is as
+  strict as before.
+
 ## [8.6.0] - 2026-11-15
 
 Timeline attachments and PDF uploads, the workspace's email identity, the AI campaign

@@ -37,8 +37,8 @@ What the package will not do, as the README and [ARCHITECTURE.md](ARCHITECTURE.m
 
 - **Code that needs an Apple framework.** Every module imports only Foundation (and
   FoundationNetworking on Linux). CI rejects imports of the app-side frameworks (UIKit,
-  SwiftUI, AppKit, Security, AuthenticationServices, CallKit, PushKit and LiveKit), and the
-  Linux build catches other Apple-only imports. The HTTP stack, the Keychain, the media
+  SwiftUI, AppKit, Security, AuthenticationServices, CallKit, PushKit and LiveKit); other
+  frameworks are kept out by review. The HTTP stack, the Keychain, the media
   SDK, the call registry and the user interface stay in each app, behind the protocols here.
 - **Files on the device.** The package writes no file. The refresh token lives in the app's
   `TokenStore`, and everything else lives on the service.

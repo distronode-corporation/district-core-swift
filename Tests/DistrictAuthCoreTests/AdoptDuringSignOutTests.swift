@@ -108,18 +108,46 @@ final class AdoptDuringSignOutTests: XCTestCase {
 
         // The rotation's write is refused, so its successor survives only as the rescue.
         let first = Task { await coordinator.accessToken() }
-        await waitUntil { await store.writeEntered }
+        await waitUntil { await store.writeCount == 1 }
         await store.openGate()
         await expectEqual(AccessTokenOutcome.available("access-2")) { await first.value }
 
         // The next acquisition retries the rescue's write, and the sign-out lands inside it.
         await store.closeGate()
         let rescue = Task { await coordinator.accessToken() }
-        await waitUntil { await store.writeEntered }
+        await waitUntil { await store.writeCount == 2 }
         await coordinator.forget()
         await store.openGate()
 
         await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await rescue.value }
+        await expectNil("the rescued successor the wipe missed is cleared") { await store.session }
+        await expectEqual("refresh-2", "and its live token goes to the outbox") { await store.revokePending }
+    }
+
+    /// ⛔ AND THE SAME FOR THE QUIT'S OWN RETRY OF THAT WRITE.
+    /// ``TokenRefreshCoordinator/finishRefreshInFlight()`` repersists the rescue
+    /// too, and a sign-out landing inside that write must not leave the rescued
+    /// session on disk with its token nowhere.
+    func testASignOutDuringTheQuitsRescueWriteUndoesIt() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2, accessLifetime: 0))])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // The rotation's write is refused, so its successor survives only as the rescue.
+        let first = Task { await coordinator.accessToken() }
+        await waitUntil { await store.writeCount == 1 }
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-2")) { await first.value }
+
+        // The quit retries the rescue's write, and the sign-out lands inside it.
+        await store.closeGate()
+        let quit = Task { await coordinator.finishRefreshInFlight() }
+        await waitUntil { await store.writeCount == 2 }
+        await coordinator.forget()
+        await store.openGate()
+        _ = await quit.value
+
         await expectNil("the rescued successor the wipe missed is cleared") { await store.session }
         await expectEqual("refresh-2", "and its live token goes to the outbox") { await store.revokePending }
     }
@@ -152,6 +180,9 @@ private actor GatedWriteTokenStore: TokenStore {
     private(set) var session: PersistedSession?
     private(set) var revokePending: String?
     private(set) var writeEntered = false
+    /// Every write this store has taken, gated or not, so a test can await the
+    /// SECOND write rather than a sticky "some write happened" flag.
+    private(set) var writeCount = 0
     private var pending: String?
     private var isOpen = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -209,6 +240,7 @@ private actor GatedWriteTokenStore: TokenStore {
 
     func write(_ session: PersistedSession) async throws {
         writeEntered = true
+        writeCount += 1
         if !isOpen {
             await withCheckedContinuation { waiters.append($0) }
         }

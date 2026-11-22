@@ -47,7 +47,11 @@ All notable changes to this package are recorded here. The format is based on
 - A login completing while a refresh of the outgoing session is on the wire no longer lets
   that refresh's answer through: `TokenRefreshCoordinator.adopt(_:deviceId:)` bumps the
   generation, as `forget()` does, so a rejection's clear cannot wipe the session the login
-  just wrote and a success cannot overwrite it with the old session's successor.
+  just wrote and a success cannot overwrite it with the old session's successor. An
+  acquisition the login replaces before its request is sent presents nothing either: the
+  generation is rechecked once the store reads are done and again after the pending marker
+  is written, so the login's token can never be presented twice and a replaced acquisition
+  can neither wipe the login's session nor take its marker slot.
 - A sign-out while a rotated session is being stored ends that adoption: nothing is cached
   or returned, a write that landed after the wipe is removed, and the successor goes to the
   revoke outbox.

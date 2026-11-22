@@ -82,8 +82,9 @@ public actor TokenRefreshCoordinator {
     /// LIVE SUCCESSOR. Without this fence it was written to the store and its
     /// access token cached after the sign-out, so the next cold start signed the
     /// previous user back in with a refresh token nothing would ever revoke. A
-    /// refresh whose generation changed across the network call touches neither
-    /// the store nor the cache, and hands any successor to ``outbox``.
+    /// refresh whose generation changed across its store reads, its marker write
+    /// or the network call touches neither the store nor the cache, and hands
+    /// any successor to ``outbox``.
     private var generation = 0
 
     /// - Parameter revokeClient: where a successor that lands after ``forget()``
@@ -266,6 +267,28 @@ public actor TokenRefreshCoordinator {
             return .retryLater(.storeUnavailable)
         }
 
+        // ── The replacement fence ────────────────────────────────────────────
+        // ⛔ THE TWO READS ABOVE ARE SUSPENSION POINTS, AND A LOGIN CAN LAND
+        // INSIDE THEM, so what they produced can belong to a session this
+        // acquisition no longer speaks for. The Kotlin client puts its
+        // equivalent check at the top of the locked section because its callers
+        // queue on a mutex and each one re-runs the body; here they await one
+        // shared task and never re-enter, so the reads' window is the live one.
+        // A replaced acquisition has no authority over what it read: comparing
+        // the marker could take the login's own in-flight marker for an
+        // interrupted refresh and WIPE the session that replaced this one, and
+        // refreshing would present a token the login's next acquisition
+        // presents too, the replay that revokes the family. The one thing it
+        // may still do is serve a token the login cached while the reads were
+        // suspended, which costs nothing and saves a rotation of a credential
+        // seconds old.
+        if generation != started {
+            if let token = cachedIfFresh() {
+                return .available(token)
+            }
+            return .reauthRequired(.noSession)
+        }
+
         // ── The interrupted-refresh check ────────────────────────────────────
         // If the marker names the token still on disk, a previous refresh was
         // sent and its response never landed, so this token is already spent
@@ -279,18 +302,6 @@ public actor TokenRefreshCoordinator {
         if now() >= current.refreshTokenExpiresAt {
             try? await store.clear()
             return .reauthRequired(.refreshTokenExpired)
-        }
-
-        // ⛔ THE CACHE IS RE-CHECKED HERE, AFTER THE STORE READS, AND NOT BEFORE
-        // THEM. The Kotlin client puts its equivalent double-check at the top of
-        // the locked section because callers queue on a mutex and each one
-        // re-runs the body; here they await one shared task and never re-enter,
-        // so a check at the top of this function is dead code. What IS live is
-        // the window opened by the two `await`s above: a login completing beside
-        // this refresh can `adopt` a freshly minted pair, and refreshing anyway
-        // would spend a rotation of a credential seconds old for nothing.
-        if let token = cachedIfFresh() {
-            return .available(token)
         }
 
         return await performRefresh(current, generation: started)
@@ -323,6 +334,18 @@ public actor TokenRefreshCoordinator {
         } catch {
             return .retryLater(.markerNotDurable)
         }
+
+        // ⛔ AND ONCE MORE IMMEDIATELY BEFORE THE REQUEST, WITH NO `await`
+        // BETWEEN THE TWO: the marker write suspends too, and a login can land
+        // inside it. The request is the one thing no later fence can take back,
+        // so a replaced acquisition sends nothing. ⚠️ The bail leaves the marker
+        // naming THIS acquisition's own token, which nothing that still compares
+        // against the marker can be holding: the session that replaced it holds
+        // a different one, an emptied store never reaches the comparison, and
+        // the one state that keeps this token on disk (a login whose write was
+        // refused) is entered through the rescue path, which does not compare.
+        // The next adoption clears it.
+        guard generation == started else { return .reauthRequired(.noSession) }
 
         let result = await refreshClient.refresh(refreshToken: current.refreshToken)
 
@@ -435,59 +458,4 @@ public actor TokenRefreshCoordinator {
         await outbox.revoke(successor.refreshToken)
         return .reauthRequired(.noSession)
     }
-}
-
-/// The result of asking for an access token.
-public enum AccessTokenOutcome: Sendable, Equatable {
-    case available(String)
-
-    /// Terminal. Route to login; do not retry.
-    case reauthRequired(ReauthReason)
-
-    /// Transient. The session is intact and the stored token is still valid.
-    /// Fail the in-flight request, keep the user signed in, try again later.
-    ///
-    /// ⛔ DO NOT TREAT THIS AS A SIGN-OUT. That is the entire reason it is a
-    /// separate case rather than another ``ReauthReason``.
-    case retryLater(RetryReason)
-}
-
-/// Why the session ended.
-public enum ReauthReason: Sendable, Equatable {
-    /// Never signed in, or signed out locally.
-    case noSession
-
-    /// A refresh was in flight when the process died. The stored token is
-    /// presumed spent. ⚠️ NOT A SECURITY EVENT, see ``TokenStore``.
-    case interruptedRefresh
-
-    /// The 60-day sliding window elapsed without the app being opened.
-    case refreshTokenExpired
-
-    /// The server refused the token: unknown, expired, revoked, or replayed.
-    /// Indistinguishable by design.
-    case refreshRejected
-
-    /// The refresh could not be delivered, or its response was lost. The next
-    /// attempt reports ``interruptedRefresh`` because the marker is
-    /// intentionally still set.
-    case refreshUnreachable
-}
-
-/// Why the caller should try again rather than sign out.
-public enum RetryReason: Sendable, Equatable {
-    /// HTTP 429 from the refresh route. The token was never consumed.
-    case refreshThrottled
-
-    /// The refresh request provably never left the device.
-    case refreshNotSent
-
-    /// The token store could not be read, a locked device, typically. The
-    /// session is intact; this says nothing about whether one exists.
-    case storeUnavailable
-
-    /// The pending-refresh marker could not be written durably, so no refresh
-    /// was sent. ⛔ Sending one anyway is the fall-through this case exists to
-    /// refuse.
-    case markerNotDurable
 }

@@ -1,11 +1,11 @@
 {
-  "signed_off_by": "Sean Dean, by approving this file's pull request, 2026-11-15. The 28 French strings changed since 8.4.1 were reviewed by an AI agent and 2 were corrected.",
-  "release": "8.6.0",
-  "commit": "fdb4d3752e9ddbd3479b9e24dea9591a92fe55b3",
+  "signed_off_by": "Sean Dean, by approving this file's pull request, 2026-11-23. The 2 French strings new since 8.6.0 were reviewed by an AI agent and approved as written.",
+  "release": "9.0.0",
+  "commit": "6e4194944699ab656dd3d8e6bb923a72cb8ed0a8",
   "catalogs": [
     {
       "path": "l10n/api_errors.toml",
-      "sha256": "0007d9685654828bfd5258ce795d3c17440ba9617c512e34d63a97c45558a6fd"
+      "sha256": "b508465ae6e9395b250a4e5f5aa845c9421ffb3fd30f14b10d6153ac15cf8ace"
     },
     {
       "path": "l10n/core.toml",

@@ -151,6 +151,43 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual("refresh-2") { await store.session?.refreshToken }
     }
 
+    /// ⛔ AND THE SAME FENCE HOLDS FOR THE RESCUE'S OWN ACQUISITION. A login
+    /// landing inside ``acquireRescued``'s marker clear owns the rescue slot and
+    /// the session by then; without the fence this refresh would run for the
+    /// session it replaced, presenting a token the login's own acquisition
+    /// presents too (CodeRabbit, 2026-11-23).
+    func testALoginInsideTheRescuesMarkerClearIsAnsweredSuperseded() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2, accessLifetime: 0)),
+            .success(AuthFixtures.tokens(index: 4)),
+        ])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // The first rotation's write refuses, so its successor survives as the rescue.
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-2")) { await coordinator.accessToken() }
+
+        // The next acquisition repersists the rescue and parks inside the marker clear.
+        await store.closeClearGate()
+        let acquisition = Task { await coordinator.accessToken() }
+        await waitUntil { await store.clearEntered }
+
+        // A login lands inside that clear, and its own write lands while the
+        // rescue's clear is still parked.
+        let login = Task {
+            await coordinator.adopt(AuthFixtures.tokens(index: 3, accessLifetime: 0), deviceId: "device-abc")
+        }
+        await waitUntil { await store.writeCount == 3 }
+        await store.openClearGate()
+        _ = await login.value
+
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await acquisition.value }
+        await expectEqual("refresh-3", "the login keeps its own session") { await store.session?.refreshToken }
+        await expectEqual(["refresh-1"], "the replaced rescue never reaches the wire") { await refresh.presented }
+    }
+
     /// ⚠️ A LOGIN SINCE THE SIGN-OUT KEEPS ITS OWN SESSION: only this successor is
     /// wiped. The login goes through ``TokenRefreshCoordinator/adopt(_:deviceId:)``, so
     /// its write queues behind the abandoned one and the undo's one-step clear must

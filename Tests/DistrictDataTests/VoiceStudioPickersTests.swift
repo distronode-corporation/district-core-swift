@@ -74,7 +74,7 @@ final class VoiceStudioPickersTests: XCTestCase {
         let mix = VoiceStudioFixture.fluxChain
         XCTAssertEqual(
             Pickers.voiceVendors(mix, bilingual: false, in: studio).map(\.value),
-            ["deepgram", "cartesia", "aws-polly", "google-tts"]
+            ["deepgram", "cartesia", "aws-polly", "google-tts", "elevenlabs"]
         )
         XCTAssertEqual(Pickers.voiceModels(mix, bilingual: false, in: studio).map(\.value), ["aura-2", "flux-tts"])
         // ⚠️ Bilingual keeps the held mouth listed and offers nothing else from Deepgram.

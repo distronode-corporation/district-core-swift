@@ -53,10 +53,10 @@ final class VoiceStudioTuningTests: XCTestCase {
     func testTheMouthsKeysFollowTheHeldModel() throws {
         let studio = try VoiceStudioFixture.response()
         var eleven = VoiceStudioFixture.fluxChain
-        eleven.tts = EngineMixTts(provider: "elevenlabs", model: "eleven_flash_v2_5", voice: "EXAVITQu4vr4xnSDxMaL")
+        eleven.tts = EngineMixTts(provider: "elevenlabs", model: "eleven_v4_turbo", voice: "EXAVITQu4vr4xnSDxMaL")
         XCTAssertEqual(
             Tuning.keys(for: .tts, engine: .chained(eleven), in: studio).map(\.key),
-            ["engineMix.tts.stability", "engineMix.tts.expressivity"]
+            ["engineMix.tts.stability"]
         )
         XCTAssertEqual(
             Tuning.keys(for: .tts, engine: .chained(VoiceStudioFixture.fluxChain), in: studio).map(\.key),

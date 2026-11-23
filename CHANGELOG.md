@@ -6,6 +6,20 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Changed
+
+- `contracts/`: four fixtures refreshed from the website wire:
+  `i18n/api-errors.json` (the contact-email confirmation errors, the phone-PIN
+  conflict error, the two bridge-refusal residency codes, the Twilio-registration
+  and toll-free-verification errors, and three fr-CA rewordings),
+  `mobile/district-persona-options.json` and `-fr.json` (the engines' `inRegion`
+  and `responseLengths` fields, the elevenlabs-pipeline and assemblyai-pipeline
+  engines), and `mobile/district-voice-studio.json` (the Live channel's
+  in-region residency flip with measured latencies). Additions and value
+  updates only: no field removed, renamed or retyped, verified by key-path
+  comparison against 8.6.0. The drift job flagged these; this is the fixture
+  side of the release that also carries #91.
+
 ### Added
 
 - `TokenStore.clearRevokePending(ifHolding:)`: clear the revoke outbox only while it holds

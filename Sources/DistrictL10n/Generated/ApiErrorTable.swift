@@ -96,6 +96,7 @@ enum ApiErrorTable {
         case "email_unconfirmed": return ApiErrorCopy.emailUnconfirmed
         case "audition_busy": return ApiErrorCopy.auditionBusy
         case "audition_daily_cap": return ApiErrorCopy.auditionDailyCap
+        case "pin_conflict": return ApiErrorCopy.pinConflict
         case "audition_unavailable": return ApiErrorCopy.auditionUnavailable
         case "workflow_draft_not_found": return ApiErrorCopy.workflowDraftNotFound
         case "workflow_draft_dry_run_stale": return ApiErrorCopy.workflowDraftDryRunStale
@@ -207,6 +208,7 @@ enum ApiErrorTable {
         case "auto_dial_country_not_permitted": return ApiErrorCopy.autoDialCountryNotPermitted
         case "auto_dial_outside_hours": return ApiErrorCopy.autoDialOutsideHours
         case "auto_dial_contact_opted_out": return ApiErrorCopy.autoDialContactOptedOut
+        case "campaign_daily_dial_cap_reached": return ApiErrorCopy.campaignDailyDialCapReached
         case "member_phone_invalid": return ApiErrorCopy.memberPhoneInvalid
         case "member_phone_too_many_codes": return ApiErrorCopy.memberPhoneTooManyCodes
         case "member_phone_resend_too_soon": return ApiErrorCopy.memberPhoneResendTooSoon

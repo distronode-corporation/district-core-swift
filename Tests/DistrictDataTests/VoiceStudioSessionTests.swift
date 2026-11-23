@@ -44,12 +44,23 @@ final class VoiceStudioSessionTests: XCTestCase {
     /// ⛔ A RECIPE APPLIES ITS ENGINE AND ITS BILINGUAL FLAG, and becomes the new base.
     func testARecipeAppliesItsEngineAndBilingualFlag() throws {
         let bilingual = try session().withRecipe("bilingual")
-        XCTAssertEqual(bilingual.held.engine, .realtime(modelId: VoiceStudioRules.gemini38Live, voice: "Puck"))
+        XCTAssertEqual(
+            bilingual.held.engine,
+            .chained(
+                EngineMix(
+                    stt: EngineMixStt(provider: "deepgram", model: "nova-3-general"),
+                    llm: EngineMixLlm(model: "gemini-3.5-flash", location: "auto", thinking: "minimal"),
+                    tts: EngineMixTts(provider: "elevenlabs", model: "eleven_v4_turbo", voice: "EXAVITQu4vr4xnSDxMaL"),
+                    turn: EngineMixTurn(),
+                    preemptiveTts: false
+                )
+            )
+        )
         XCTAssertTrue(bilingual.held.bilingual)
         XCTAssertEqual(bilingual.baseRecipe, "bilingual")
-        XCTAssertEqual(bilingual.leg, .realtime)
+        XCTAssertEqual(bilingual.leg, .stt)
         XCTAssertEqual(bilingual.changes, 0)
-        XCTAssertEqual(bilingual.pending, [.modelId, .voice, .temperature, .bilingual])
+        XCTAssertEqual(bilingual.pending, [.engineMix, .bilingual, .modelId, .voice])
 
         let unknown = try session()
         XCTAssertEqual(unknown.withRecipe("nope"), unknown)

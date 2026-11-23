@@ -28,7 +28,7 @@ same way.</sub>
 [Quick start](#quick-start) below):
 
 ```swift
-.package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.6.0"),
+.package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "9.0.0"),
 .product(name: "DistrictL10n", package: "district-core-swift"),
 ```
 
@@ -71,7 +71,7 @@ deployment targets in `Package.swift`), plus Linux for building and testing.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "8.6.0"),
+    .package(url: "https://github.com/distronode-corporation/district-core-swift", exact: "9.0.0"),
 ],
 ```
 
@@ -84,7 +84,7 @@ In an XcodeGen `project.yml`:
 packages:
   DistrictCore:
     url: https://github.com/distronode-corporation/district-core-swift
-    exactVersion: 8.6.0
+    exactVersion: 9.0.0
 ```
 
 ## Quick start

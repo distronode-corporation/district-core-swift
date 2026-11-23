@@ -6,6 +6,14 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+## [9.0.0] - 2026-11-23
+
+The sign-in fixes that keep a session refresh from eating a newer login, and the contract
+fixtures back in step with the service. ⚠️ Major for two reasons: every `TokenStore`
+conformer outside this package must implement `clearRevokePending(ifHolding:)` and
+`clear(ifHolding:)` or it no longer compiles, and `RetryReason` gains a case, which breaks
+an exhaustive `switch` over it.
+
 ### Changed
 
 - `contracts/`: four fixtures refreshed from the website wire:
@@ -18,7 +26,7 @@ All notable changes to this package are recorded here. The format is based on
   in-region residency flip with measured latencies). Additions and value
   updates only: no field removed, renamed or retyped, verified by key-path
   comparison against 8.6.0. The drift job flagged these; this is the fixture
-  side of the release that also carries #91.
+  side of the release that also carries the sign-in fixes.
 
 ### Added
 
@@ -1163,7 +1171,8 @@ on 1.0.0.
   100% line coverage, gitleaks, zizmor and a public-hygiene check, plus a macOS job
   that builds for iOS and macOS.
 
-[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/8.6.0...HEAD
+[Unreleased]: https://github.com/distronode-corporation/district-core-swift/compare/9.0.0...HEAD
+[9.0.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/9.0.0
 [8.6.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.6.0
 [8.5.0]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.5.0
 [8.4.2]: https://github.com/distronode-corporation/district-core-swift/releases/tag/8.4.2

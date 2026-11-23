@@ -89,7 +89,7 @@ final class SignOutDuringRefreshTests: XCTestCase {
         await waitUntil { await refresh.callCount >= 2 }
         await refresh.open()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await stale.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await stale.value }
         await expectEqual(AccessTokenOutcome.available("access-4")) { await fresh.value }
         await expectEqual(["refresh-1", "refresh-3"]) { await refresh.presented }
         await expectEqual("refresh-4") { await store.session?.refreshToken }
@@ -109,7 +109,7 @@ final class SignOutDuringRefreshTests: XCTestCase {
         await coordinator.adopt(AuthFixtures.tokens(index: 5), deviceId: "device-abc")
         await refresh.open()
 
-        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await request.value }
         await expectEqual("refresh-5", "a stale rejection must not wipe the session that replaced it") {
             await store.session?.refreshToken
         }

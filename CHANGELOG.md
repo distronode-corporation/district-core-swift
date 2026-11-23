@@ -8,6 +8,22 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Added
 
+- `TokenStore.clearRevokePending(ifHolding:)`: clear the revoke outbox only while it holds
+  the given token. A protocol requirement with no default, so no conformer can inherit the
+  two-step read-then-clear the method exists to make impossible; `InMemoryTokenStore` does
+  it in one step and `FreshInstallTokenStore` passes it to the store it wraps. ⚠️
+  SOURCE-BREAKING for every conformer outside this package, the production keychain store
+  included: both clears below must be implemented or the conformer no longer compiles, and
+  each one-step compare-and-clear is atomic only if the conformer serialises all of its
+  operations, an actor's isolation or a lock around every member. The keychain store is
+  today a struct of synchronous calls that serialises nothing, so it must grow one.
+- `TokenStore.clear(ifHolding:)`: clear the session only while it is the one holding the
+  given token, a requirement with no default for the same reason, with the same two
+  one-step implementations and the same source break.
+- `RetryReason.sessionReplaced`: the retryable answer for an acquisition whose session was
+  replaced while it was suspended, so a login can no longer read as a terminal sign-out to
+  the stale caller. ⚠️ `RetryReason` gains a case, which breaks an exhaustive `switch` over
+  it; a consumer that switches exhaustively must handle or default it.
 - ARCHITECTURE.md (the modules, the seams the apps implement, a request end to end, and
   where state lives) and SECURITY-MODEL.md (threat model, trust boundaries, secure design
   principles and the weaknesses countered, each with its test). The README gains a quick
@@ -45,6 +61,31 @@ All notable changes to this package are recorded here. The format is based on
   without searching the log. In the default online mode that search can miss an entry made
   seconds earlier, and the release fails before the tag is pushed. Verification is as
   strict as before.
+
+### Fixed
+
+- A revoke acceptance clears only the outbox entry it acknowledges, so an older answer can
+  no longer drop a newer token still waiting to be revoked.
+- A login completing while a refresh of the outgoing session is on the wire no longer lets
+  that refresh's answer through: `TokenRefreshCoordinator.adopt(_:deviceId:)` bumps the
+  generation, as `forget()` does, so a rejection's clear cannot wipe the session the login
+  just wrote and a success cannot overwrite it with the old session's successor. An
+  acquisition the login replaces before its request is sent presents nothing either: the
+  generation is rechecked once the store reads are done and again after the pending marker
+  is written, so the login's token can never be presented twice and a replaced acquisition
+  can neither wipe the login's session nor take its marker slot. The stale caller is
+  answered `retryLater(.sessionReplaced)` rather than a terminal `.noSession` whenever the
+  replacement left a session on disk, so a caller following the terminal contract cannot
+  clear the login's state while the login is live; a plain sign-out still answers terminal,
+  and a store that cannot say which happened answers retryable. `adopt(_:deviceId:)` also
+  holds the single-flight gate until its write resolves, so a caller arriving mid-login
+  latches onto the adoption rather than acquiring the outgoing session, which the
+  unserialised production store would otherwise have handed it.
+- A sign-out while a rotated session is being stored ends that adoption: nothing is cached
+  or returned, a write that landed after the wipe is removed, and the successor goes to the
+  revoke outbox.
+- Undoing that adoption no longer reads the store and then clears it: a login written
+  between the two kept its session in memory only.
 
 ## [8.6.0] - 2026-11-15
 

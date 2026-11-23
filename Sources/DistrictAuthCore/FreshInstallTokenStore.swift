@@ -69,6 +69,11 @@ public actor FreshInstallTokenStore: TokenStore {
         try await base.clear()
     }
 
+    public func clear(ifHolding refreshToken: String) async throws {
+        try await settle()
+        try await base.clear(ifHolding: refreshToken)
+    }
+
     public func pendingRefreshToken() async throws -> String? {
         try await settle()
         return try await base.pendingRefreshToken()
@@ -97,6 +102,11 @@ public actor FreshInstallTokenStore: TokenStore {
     public func clearRevokePending() async throws {
         try await settle()
         try await base.clearRevokePending()
+    }
+
+    public func clearRevokePending(ifHolding refreshToken: String) async throws {
+        try await settle()
+        try await base.clearRevokePending(ifHolding: refreshToken)
     }
 
     // ── Internals ────────────────────────────────────────────────────────────

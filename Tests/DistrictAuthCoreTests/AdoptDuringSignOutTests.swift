@@ -77,6 +77,80 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual("refresh-2", "the live successor goes to the outbox") { await store.revokePending }
     }
 
+    /// ⛔ A LOGIN INSIDE THE QUIT'S MARKER CLEAR KEEPS ITS OWN RESCUE. The clear
+    /// suspends like every store call, and the slot belongs to whichever session
+    /// replaced this one while it was parked; the quit's continuation must not
+    /// drop the login's rescued successor (CodeRabbit, 2026-11-23).
+    func testALoginInsideTheQuitsMarkerClearKeepsItsOwnRescue() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2, accessLifetime: 0)),
+            .success(AuthFixtures.tokens(index: 4)),
+        ])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // The first rotation's write refuses, so its successor survives as the rescue.
+        // ⚠️ The write gate is open from the start: the first rotation's write must
+        // reach the store to be refused, and the quit's repersist must land.
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-2")) { await coordinator.accessToken() }
+
+        // The quit's retry lands the rescue and parks inside the marker clear.
+        await store.closeClearGate()
+        let quit = Task { await coordinator.finishRefreshInFlight() }
+        await waitUntil { await store.clearEntered }
+
+        // A login whose own write refuses parks its successor in the slot while
+        // the quit is parked in the clear.
+        await store.failNextWrites(1)
+        await coordinator.adopt(AuthFixtures.tokens(index: 3, accessLifetime: 0), deviceId: "device-abc")
+        await store.openClearGate()
+        _ = await quit.value
+
+        // The login's rescue survived the quit's continuation: the next
+        // acquisition repersists IT, not the replaced session's copy on disk.
+        await expectEqual(AccessTokenOutcome.available("access-4")) { await coordinator.accessToken() }
+        await expectEqual(["refresh-1", "refresh-3"]) { await refresh.presented }
+    }
+
+    /// ⛔ A CALLER ON THE QUIT'S GATE IS ANSWERED REFRESHNOTSENT, the one answer
+    /// true for every such arrival: nothing was sent for it. The quit holds the
+    /// single-flight gate for its whole retry, so the caller cannot start a
+    /// refresh of its own and spend the rescued token (CodeRabbit, 2026-11-23).
+    func testACallerOnTheQuitsGateIsAnsweredRefreshNotSent() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2, accessLifetime: 0)),
+        ])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // The first rotation's write refuses, so its successor survives as the rescue.
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-2")) { await coordinator.accessToken() }
+
+        // The quit's retry lands the rescue and parks inside the marker clear.
+        await store.closeClearGate()
+        let quit = Task { await coordinator.finishRefreshInFlight() }
+        await waitUntil { await store.clearEntered }
+
+        // The caller's arrival is awaited through the store before the gate opens,
+        // and the parked retry cannot finish before that, so the caller's
+        // acquisition is already queued on the actor when the gate opens.
+        let caller = Task {
+            await store.noteCallerArrived()
+            return await coordinator.accessToken()
+        }
+        await waitUntil { await store.callerArrived }
+        await store.openClearGate()
+        _ = await quit.value
+
+        await expectEqual(AccessTokenOutcome.retryLater(.refreshNotSent)) { await caller.value }
+        await expectNil { try? await store.pendingRefreshToken() }
+        await expectEqual("refresh-2") { await store.session?.refreshToken }
+    }
+
     /// ⚠️ A LOGIN SINCE THE SIGN-OUT KEEPS ITS OWN SESSION: only this successor is
     /// wiped. The login goes through ``TokenRefreshCoordinator/adopt(_:deviceId:)``, so
     /// its write queues behind the abandoned one and the undo's one-step clear must
@@ -207,6 +281,9 @@ private actor GatedWriteTokenStore: TokenStore {
     /// Every write this store has taken, gated or not, so a test can await the
     /// SECOND write rather than a sticky "some write happened" flag.
     private(set) var writeCount = 0
+    /// How many gated writes have APPLIED, so the harness can apply them in
+    /// entry order rather than in whatever order the actor resumes them.
+    private var appliedWrites = 0
     private var pending: String?
     private var isOpen = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -215,6 +292,9 @@ private actor GatedWriteTokenStore: TokenStore {
     private(set) var clearEntered = false
     private var clearIsOpen = true
     private var clearWaiters: [CheckedContinuation<Void, Never>] = []
+    /// Set by a spawned caller as its first step, so a test can await the
+    /// caller's arrival before it releases the parked work (CodeRabbit, 2026-11-23).
+    private(set) var callerArrived = false
     private let failWrites: Bool
     /// Number of remaining `write` calls that should throw; `failWrites` is the
     /// "always" form.
@@ -261,6 +341,10 @@ private actor GatedWriteTokenStore: TokenStore {
         failingWrites = count
     }
 
+    func noteCallerArrived() {
+        callerArrived = true
+    }
+
     func read() async throws -> PersistedSession? {
         let snapshot = session
         landLoginIfDue()
@@ -269,10 +353,20 @@ private actor GatedWriteTokenStore: TokenStore {
 
     func write(_ session: PersistedSession) async throws {
         writeEntered = true
-        writeCount += 1
+        let myNumber = writeCount + 1
+        writeCount = myNumber
         if !isOpen {
             await withCheckedContinuation { waiters.append($0) }
         }
+        // Applied in ENTRY order, not resumption order: two writes parked across
+        // a sign-out can resume off-order on the actor, and the stale
+        // predecessor applying second overwrote the login's session, so the
+        // undo then wiped a live login as if it were the abandoned write
+        // (2026-11-23). A real store serialises its writes; this is that.
+        while appliedWrites != myNumber - 1 {
+            await Task.yield()
+        }
+        defer { appliedWrites = myNumber }
         if failWrites {
             throw Failure()
         }

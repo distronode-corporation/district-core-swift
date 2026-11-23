@@ -162,6 +162,56 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         await expectEqual(["refresh-1"]) { await client.presented }
     }
 
+    /// ⛔ THE QUIT'S RETRY IS A REAL WRITE: when the keychain has come back, the
+    /// rescue lands on disk, the marker naming the spent token is cleared, and
+    /// the next acquisition serves from the store rather than the rescue slot
+    /// (CodeRabbit, 2026-11-23).
+    func testTheQuitsRetryLandsTheRescueAndClearsTheMarkerWhenTheStoreRecovers() async {
+        let clock = TestClock(AuthFixtures.now)
+        let store = SpyTokenStore(session: AuthFixtures.session())
+        let client = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2)),
+            .success(AuthFixtures.tokens(index: 3)),
+        ])
+        let coordinator = makeCoordinator(store: store, client: client, clock: clock)
+        await store.failNextWrites(1)
+
+        // The first rotation's write refuses; the successor survives only as the
+        // rescue, with the marker naming the spent disk token.
+        await expectEqual(.available("access-2")) { await coordinator.accessToken() }
+        await expectEqual("refresh-1") { await store.pending }
+
+        await coordinator.finishRefreshInFlight()
+        await expectNil { await store.pending }
+        await expectEqual("refresh-2") { await store.session?.refreshToken }
+
+        // The next acquisition serves from the store, not the rescue slot.
+        clock.millis = AuthFixtures.now + 20 * 60 * 1000
+        await expectEqual(.available("access-3")) { await coordinator.accessToken() }
+        await expectEqual(["refresh-1", "refresh-2"]) { await client.presented }
+        await expectEqual("refresh-3") { await store.session?.refreshToken }
+    }
+
+    /// ⛔ THE QUIT WAITS FOR A REFRESH ALREADY ON THE WIRE before it touches the
+    /// marker: with the gate held for the whole retry, the parked refresh is
+    /// awaited to its own adoption, which clears its own marker, and the quit's
+    /// retry then finds nothing left to do (CodeRabbit, 2026-11-23).
+    func testTheQuitWaitsForARefreshAlreadyOnTheWire() async {
+        let store = SpyTokenStore(session: AuthFixtures.session())
+        let client = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2))], open: false)
+        let coordinator = makeCoordinator(store: store, client: client, clock: TestClock(AuthFixtures.now))
+
+        let onWire = Task { await coordinator.accessToken() }
+        await waitUntil { await client.callCount >= 1 }
+        let quit = Task { await coordinator.finishRefreshInFlight() }
+        await client.open()
+
+        await expectEqual(.available("access-2")) { await onWire.value }
+        _ = await quit.value
+        await expectNil { await store.pending }
+        await expectEqual("refresh-2") { await store.session?.refreshToken }
+    }
+
     /// ⛔ A LOGIN COMPLETING BESIDE A QUEUED REFRESH MUST NOT COST A ROTATION.
     /// The store reads inside `acquire` are suspension points, so `adopt` can
     /// land in the middle of them; without the fence that follows those reads

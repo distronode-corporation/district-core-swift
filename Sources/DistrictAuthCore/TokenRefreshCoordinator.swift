@@ -124,8 +124,14 @@ public actor TokenRefreshCoordinator {
         }
 
         let started = generation
+        // ⛔ THE RESCUE IS READ HERE, IN THE SAME ACTOR TURN AS THE GENERATION:
+        // the task below can sit queued while a replacement login parks its OWN
+        // rescued successor in the slot, and a capture made later, inside the
+        // task, could pair that login's live token with this caller's stale
+        // generation and hand it to ``discard(_:)`` (CodeRabbit, 2026-11-23).
+        let rescuedSession = unpersistedSession
         let task = Task<AccessTokenOutcome, Never> { [self] in
-            let outcome = await acquire(generation: started)
+            let outcome = await acquire(generation: started, rescuedSession: rescuedSession)
             // Cleared HERE, inside the task, so it is already nil by the time any
             // awaiting caller resumes. Clearing it after `await task.value` in
             // each caller instead would leave a completed task installed for a
@@ -203,13 +209,23 @@ public actor TokenRefreshCoordinator {
         // launch presented the spent token (CodeRabbit, 2026-11-23). Callers
         // arriving latch onto the retry and answer refreshNotSent: nothing was
         // sent for them, by design.
+        let entryGeneration = generation
         while let existing = inFlight {
             _ = await existing.value
         }
+        // ⛔ THE RESCUE IS READ IN THE TURN THE WAIT ENDS, AND ONLY IF THE
+        // GENERATION NEVER MOVED ACROSS IT: a replacement login can park its
+        // OWN rescued successor while this actor sat parked in the loop, and a
+        // quit that captured it would persist it and then discard it under a
+        // stale generation, revoking the live replacement. The refresh this
+        // quit waited for never bumps the generation; a login always does, so
+        // the entry generation is the ownership test (CodeRabbit, 2026-11-23).
+        guard generation == entryGeneration else { return }
         let started = generation
+        let rescued = unpersistedSession
         let task = Task<AccessTokenOutcome, Never> { [self] in
             var outcome = AccessTokenOutcome.retryLater(.refreshNotSent)
-            if let rescued = unpersistedSession {
+            if let rescued {
                 let persisted = await repersistRescuedSession(rescued)
                 if generation != started {
                     // A replacement inside that write ends the rescue, as in
@@ -288,11 +304,31 @@ public actor TokenRefreshCoordinator {
         return now() + Self.earlyRefreshMarginMilliseconds >= cachedAccessTokenExpiresAt ? nil : token
     }
 
+    /// What an acquisition answers once its generation has moved and it has
+    /// captured nothing: the replacement may have cached a token it can still
+    /// serve, and beyond that the answer belongs to ``supersededOutcome()``.
+    private func supersededOrCached() async -> AccessTokenOutcome {
+        if let token = cachedIfFresh() {
+            return .available(token)
+        }
+        return await supersededOutcome()
+    }
+
     /// What an acquisition whose session was replaced answers; WHY that must not
     /// be terminal is on ``RetryReason/sessionReplaced``: a sign-out left no
     /// session, so terminal stands, and a login left one, on disk or as the rescue.
     private func supersededOutcome() async -> AccessTokenOutcome {
         if unpersistedSession != nil {
+            return .retryLater(.sessionReplaced)
+        }
+        // ⛔ A LOGIN'S ADOPTION IS STILL MID-WRITE: the generation moved, so
+        // this caller no longer speaks for the session, but its replacement
+        // EXISTS and is holding the gate while its write lands; a terminal
+        // noSession here would clear live state and route to login while the
+        // login is saving. The gate is empty after a sign-out, which is
+        // exactly the case the store read below exists to answer (CodeRabbit,
+        // 2026-11-23).
+        if inFlight != nil {
             return .retryLater(.sessionReplaced)
         }
         do {
@@ -305,9 +341,16 @@ public actor TokenRefreshCoordinator {
         }
     }
 
-    private func acquire(generation started: Int) async -> AccessTokenOutcome {
+    private func acquire(
+        generation started: Int,
+        rescuedSession captured: PersistedSession?
+    ) async -> AccessTokenOutcome {
         // ⛔ THE RESCUED SESSION WINS OVER THE DISK. See `unpersistedSession`.
-        if let rescued = unpersistedSession {
+        // ⚠️ CAPTURED IN THE CALLER'S PROLOGUE, IN THE SAME TURN AS THE
+        // GENERATION (see ``accessToken()``), so a replacement login's parked
+        // successor can never be paired with a stale generation here
+        // (CodeRabbit, 2026-11-23).
+        if let rescued = captured {
             return await acquireRescued(rescued, generation: started)
         }
 
@@ -338,10 +381,7 @@ public actor TokenRefreshCoordinator {
         // next acquisition presents too, the replay that revokes the family. It
         // may still serve a token the login cached while the reads were suspended.
         if generation != started {
-            if let token = cachedIfFresh() {
-                return .available(token)
-            }
-            return await supersededOutcome()
+            return await supersededOrCached()
         }
 
         // ── The interrupted-refresh check ────────────────────────────────────

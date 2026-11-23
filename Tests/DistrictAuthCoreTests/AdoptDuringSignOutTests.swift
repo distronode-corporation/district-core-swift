@@ -149,6 +149,9 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual(AccessTokenOutcome.retryLater(.refreshNotSent)) { await caller.value }
         await expectNil { try? await store.pendingRefreshToken() }
         await expectEqual("refresh-2") { await store.session?.refreshToken }
+        await expectEqual(["refresh-1"], "a missed latch would present the token a second time") {
+            await refresh.presented
+        }
     }
 
     /// ⛔ AND THE SAME FENCE HOLDS FOR THE RESCUE'S OWN ACQUISITION. A login
@@ -188,6 +191,82 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual(["refresh-1"], "the replaced rescue never reaches the wire") { await refresh.presented }
     }
 
+    /// ⛔ A SUPERSEDED CALLER IS NEVER TERMINAL WHILE THE LOGIN IS SAVING. A
+    /// login's adoption holds the single-flight gate across its write, and
+    /// while that write is parked the store can hold nothing at all; answering
+    /// the abandoned refresh with a terminal noSession would clear live state
+    /// and route to login while the login is mid-save (CodeRabbit, 2026-11-23).
+    func testASupersededCallerDuringTheLoginsSaveIsAnsweredReplaced() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        let refresh = ScriptedRefreshClient(script: [.rejected], open: false)
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // A refresh sits on the wire when a sign-out clears the store and a
+        // login starts saving: its adoption parks inside its write.
+        let superseded = Task { await coordinator.accessToken() }
+        await waitUntil { await refresh.callCount >= 1 }
+        await coordinator.forget()
+        let login = Task { await coordinator.adopt(AuthFixtures.tokens(index: 9), deviceId: "device-abc") }
+        await waitUntil { await store.writeCount == 1 }
+
+        // The store holds nothing while the login's write is parked, and the
+        // superseded caller is still told the session was REPLACED.
+        await refresh.open()
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await superseded.value }
+
+        // And the login finishes its save untouched.
+        await store.openGate()
+        _ = await login.value
+        await expectEqual("refresh-9") { await store.session?.refreshToken }
+    }
+
+    /// ⛔ THE QUIT RETRIES ONLY ITS OWN SESSION'S RESCUE. A login whose write
+    /// refuses while the quit is parked waiting parks its OWN successor in the
+    /// slot, and a quit that captured it would persist it and then discard it
+    /// under a stale generation, revoking the login's live credential. The
+    /// quit's wait ends in the turn it reads the slot, and the entry
+    /// generation is the ownership test (CodeRabbit, 2026-11-23).
+    func testTheQuitRetriesOnlyItsOwnRescue() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.openGate()
+        await store.failNextWrites(1)
+        let refresh = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2)),
+            .success(AuthFixtures.tokens(index: 10)),
+        ], open: false)
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // A refresh sits on the wire; the quit arrives and parks waiting for it.
+        let onWire = Task { await coordinator.accessToken() }
+        await waitUntil { await refresh.callCount >= 1 }
+        let quit = Task { await coordinator.finishRefreshInFlight() }
+
+        // A login's write refuses while the quit is parked: its successor is
+        // the rescue in the slot.
+        let login = Task {
+            await coordinator.adopt(AuthFixtures.tokens(index: 9, accessLifetime: 0), deviceId: "device-abc")
+        }
+        _ = await login.value
+
+        // The wire settles; the quit's generation moved, so it retries nothing.
+        await refresh.open()
+        await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await onWire.value }
+        _ = await quit.value
+
+        await expectEqual("refresh-2", "the abandoned refresh's own successor is the one revoked") {
+            await store.revokePending
+        }
+        // The login's rescue was never touched: the login's own next
+        // acquisition is what persists and refreshes it.
+        await expectEqual(AccessTokenOutcome.available("access-10")) { await coordinator.accessToken() }
+        await expectEqual("refresh-10", "the rescue's own rotation is what the disk ends at") {
+            await store.session?.refreshToken
+        }
+        await expectEqual(["refresh-1", "refresh-9"], "the rescue refreshes once, by its owner's acquisition") {
+            await refresh.presented
+        }
+    }
+
     /// ⚠️ A LOGIN SINCE THE SIGN-OUT KEEPS ITS OWN SESSION: only this successor is
     /// wiped. The login goes through ``TokenRefreshCoordinator/adopt(_:deviceId:)``, so
     /// its write queues behind the abandoned one and the undo's one-step clear must
@@ -200,6 +279,10 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await waitUntil { await store.writeEntered }
         await coordinator.forget()
         let login = Task { await coordinator.adopt(AuthFixtures.tokens(index: 9), deviceId: "device-abc") }
+        // ⚠️ BOTH writes are parked before the gate opens: the login's write
+        // must be in the waiters too, or the abandoned write's undo can race
+        // ahead of the login's apply (CodeRabbit, 2026-11-23).
+        await waitUntil { await store.writeCount == 2 }
         await store.openGate()
         _ = await login.value
 

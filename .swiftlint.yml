@@ -46,13 +46,13 @@ line_length:
 # rescue, the pending marker) carries its reasoning in a comment at the exact
 # line it guards, because a fence whose reason is not in the file is a fence
 # the next change removes. The review rounds keep ADDING fences with their
-# reasons (2026-11-23: four more, 500 to 526), so a warning at 500 counts the
+# reasons (2026-11-23: five rounds, 500 to 582), so a warning at 500 counts the
 # invariant prose as bloat and pushes contributors to delete it to fit. The
 # ERROR tier stays the real ceiling; the warning is a prompt to split, and no
 # split exists that does not widen the actor's private state to the module
 # (a cross-file extension cannot see `private` members).
 file_length:
-  warning: 560
+  warning: 600
   error: 800
 
 type_body_length:

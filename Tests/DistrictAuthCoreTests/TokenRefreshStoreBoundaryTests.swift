@@ -200,6 +200,7 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         let store = SpyTokenStore(session: AuthFixtures.session())
         let client = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2))], open: false)
         let coordinator = makeCoordinator(store: store, client: client, clock: TestClock(AuthFixtures.now))
+        await store.failNextWrites(1)
 
         let onWire = Task { await coordinator.accessToken() }
         await waitUntil { await client.callCount >= 1 }
@@ -208,8 +209,15 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
 
         await expectEqual(.available("access-2")) { await onWire.value }
         _ = await quit.value
+        // ⛔ THE MARKER IS CLEARED ONLY BY THE QUIT'S OWN RETRY: the wire's
+        // adoption refused its write, so its marker deliberately survives, and
+        // a quit that returned without waiting would leave it naming the
+        // spent disk token. This is the assertion that pins the waiting
+        // (CodeRabbit, 2026-11-23).
         await expectNil { await store.pending }
-        await expectEqual("refresh-2") { await store.session?.refreshToken }
+        await expectEqual("refresh-2", "the quit's retry is what persisted the rescue") {
+            await store.session?.refreshToken
+        }
     }
 
     /// ⛔ A LOGIN COMPLETING BESIDE A QUEUED REFRESH MUST NOT COST A ROTATION.

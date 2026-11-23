@@ -201,13 +201,17 @@ public actor TokenRefreshCoordinator {
         }
         if let rescued = unpersistedSession {
             let started = generation
-            await repersistRescuedSession(rescued)
+            let persisted = await repersistRescuedSession(rescued)
             // ⛔ A REPLACEMENT INSIDE THAT WRITE ENDS THE RESCUE, as in
             // ``acquire(generation:)``: the write can land after the wipe.
             guard generation == started else {
                 _ = await discard(rescued)
                 return
             }
+            // ⛔ A REFUSED WRITE KEEPS THE RESCUE AND THE MARKER: clearing the
+            // marker would let the next launch replay the spent token
+            // (CodeRabbit, 2026-11-23).
+            guard persisted else { return }
             try? await store.clearRefreshPending()
             unpersistedSession = nil
         }
@@ -284,9 +288,13 @@ public actor TokenRefreshCoordinator {
     private func acquire(generation started: Int) async -> AccessTokenOutcome {
         // ⛔ THE RESCUED SESSION WINS OVER THE DISK. See `unpersistedSession`.
         if let rescued = unpersistedSession {
-            await repersistRescuedSession(rescued)
+            let persisted = await repersistRescuedSession(rescued)
             // ⛔ A REPLACEMENT INSIDE THAT WRITE ENDS THE RESCUE: ``discard(_:)`` undoes it.
             guard generation == started else { return await discard(rescued) }
+            // ⛔ A REFUSED WRITE ENDS THE ATTEMPT, NOT THE SESSION: refreshing with
+            // the rescue unwritten is the crash window the marker exists to close
+            // (CodeRabbit, 2026-11-23).
+            guard persisted else { return .retryLater(.storeUnavailable) }
             try? await store.clearRefreshPending()
             unpersistedSession = nil
             return await performRefresh(rescued, generation: started)
@@ -349,11 +357,14 @@ public actor TokenRefreshCoordinator {
     /// and the marker stays set, which is exactly the state
     /// ``adoptRotated(_:deviceId:)`` left behind. ⚠️ THE WRITE IS ALL IT DOES: the
     /// callers clear the marker and the rescue slot behind their own guard.
-    private func repersistRescuedSession(_ rescued: PersistedSession) async {
+    private func repersistRescuedSession(_ rescued: PersistedSession) async -> Bool {
         do {
             try await store.write(rescued)
+            return true
         } catch {
-            // Deliberately silent. The next refresh carries the same rescue.
+            // Deliberately silent. The rescue and the marker both stay, so the
+            // next refresh carries the same rescue (CodeRabbit, 2026-11-23).
+            return false
         }
     }
 
@@ -462,21 +473,30 @@ public actor TokenRefreshCoordinator {
             refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
             deviceId: deviceId
         )
+        var persisted = true
         do {
             try await store.write(successor)
         } catch {
-            unpersistedSession = successor
+            persisted = false
         }
         // ⛔ THE GUARD COMES BEFORE ANY OTHER MUTATION: a newer acquisition may
         // already own the marker slot, and a fenced adoption must not take it.
-        // The rescue slot is not touched at all: a refused write's rescue must
-        // survive a current adoption. The discarded successor is reclaimed by ``discard(_:)``.
+        // A STALE FAILURE ASSIGNS NOTHING, or it overwrites a replacement login's
+        // rescue here and discards it below, stranding the login; a CURRENT
+        // failure parks its own successor, after the fence (CodeRabbit, 2026-11-23).
+        // The discarded successor is reclaimed by ``discard(_:)``.
+        guard generation == started else { return await discard(successor) }
+        if !persisted {
+            unpersistedSession = successor
+        }
         // ⚠️ The marker is cleared only when nothing was rescued, i.e. when the
         // write persisted; a refused one leaves it set for the interrupted-refresh path.
-        guard generation == started else { return await discard(successor) }
         if unpersistedSession == nil {
             try? await store.clearRefreshPending()
         }
+        // ⛔ THE CLEAR SUSPENDS TOO: a sign-out inside it is answered by
+        // ``discard(_:)``, not by this session's token (CodeRabbit, 2026-11-23).
+        guard generation == started else { return await discard(successor) }
         cachedAccessToken = tokens.accessToken
         cachedAccessTokenExpiresAt = tokens.accessTokenExpiresAt
         return .available(tokens.accessToken)

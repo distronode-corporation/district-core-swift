@@ -100,22 +100,37 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         XCTAssertEqual(session?.refreshToken, "refresh-3")
     }
 
+    /// ⛔ THE RESCUE IS NEVER PRESENTED FROM MEMORY ALONE. With every write
+    /// refused, the first refresh's successor lives only in memory and the disk
+    /// keeps the spent predecessor; an acquisition that presented the rescue
+    /// anyway would re-mark the pending marker with a token the disk does not
+    /// hold, so a crash mid-refresh then presented the spent disk copy, the
+    /// replay that revokes the family. The attempts answer retryable instead,
+    /// and the marker keeps naming the spent disk token, so a crash lands on the
+    /// interrupted-refresh path (CodeRabbit, 2026-11-23).
     func testAPersistentlyFailingStoreStillNeverRepresentsAToken() async {
         let clock = TestClock(AuthFixtures.now)
         let store = SpyTokenStore(session: AuthFixtures.session())
-        let client = ScriptedRefreshClient(script: (2 ... 4).map { index in
-            .success(AuthFixtures.tokens(index: index, at: AuthFixtures.now + Int64(index) * 20 * 60 * 1000))
-        })
+        let client = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2)),
+        ])
         let coordinator = makeCoordinator(store: store, client: client, clock: clock)
         await store.failNextWrites(.max)
 
-        for index in 2 ... 4 {
-            clock.millis = AuthFixtures.now + Int64(index) * 20 * 60 * 1000
-            await expectEqual(.available("access-\(index)")) { await coordinator.accessToken() }
-        }
+        // The first refresh goes out from the disk session and its successor
+        // lands only in memory, with the marker still naming the spent disk token.
+        await expectEqual(.available("access-2")) { await coordinator.accessToken() }
+        await expectEqual("refresh-1") { await store.pending }
 
-        let presented = await client.presented
-        XCTAssertEqual(presented, ["refresh-1", "refresh-2", "refresh-3"])
+        // Every later attempt refuses: presenting the rescue while it is
+        // unwritten is the replay window above, so nothing else reaches the wire
+        // and the rescue and the marker both stay for the keychain's recovery.
+        clock.millis = AuthFixtures.now + 20 * 60 * 1000
+        await expectEqual(.retryLater(.storeUnavailable)) { await coordinator.accessToken() }
+        await expectEqual(.retryLater(.storeUnavailable)) { await coordinator.accessToken() }
+
+        await expectEqual(["refresh-1"]) { await client.presented }
+        await expectEqual("refresh-1") { await store.pending }
         let written = await store.writtenSessions
         XCTAssertTrue(written.isEmpty)
     }

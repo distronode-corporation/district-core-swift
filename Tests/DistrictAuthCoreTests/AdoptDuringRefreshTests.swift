@@ -126,7 +126,18 @@ final class AdoptDuringRefreshTests: XCTestCase {
         }
         await waitUntil { store.writeEntered }
 
-        let raced = Task { await coordinator.accessToken() }
+        // ⛔ THE GATE OPENS ONLY AFTER THE RACED CALL HAS REACHED THE COORDINATOR.
+        // The call latches onto the adoption without touching the store, so it is
+        // invisible to every hook the store has; its task flags its own arrival as
+        // its first statement, and the login cannot overtake it from there, because
+        // its parked write cannot resume before openGate, and the continuation that
+        // openGate resumes is enqueued on the actor only after the latch's own hop
+        // (CodeRabbit, 2026-11-23).
+        let raced = Task<AccessTokenOutcome, Never> {
+            await store.racedCallArrived()
+            return await coordinator.accessToken()
+        }
+        await waitUntil { store.racedArrived }
         store.openGate()
         _ = await login.value
 
@@ -166,6 +177,7 @@ private final class ConcurrentWriteStore: TokenStore, @unchecked Sendable {
     private var isOpen = false
     private var gatedWrite: CheckedContinuation<Void, Never>?
     private var writeEnteredStorage = false
+    private var racedArrivedStorage = false
 
     init(session: PersistedSession?) {
         self.session = session
@@ -173,6 +185,17 @@ private final class ConcurrentWriteStore: TokenStore, @unchecked Sendable {
 
     var writeEntered: Bool {
         lock.withLock { writeEnteredStorage }
+    }
+
+    var racedArrived: Bool {
+        lock.withLock { racedArrivedStorage }
+    }
+
+    /// The raced call's own arrival flag: the call latches onto the adoption
+    /// without touching the store, so this task-statement is the only observable
+    /// proof it has started (CodeRabbit, 2026-11-23).
+    func racedCallArrived() async {
+        lock.withLock { racedArrivedStorage = true }
     }
 
     func openGate() {
@@ -190,20 +213,21 @@ private final class ConcurrentWriteStore: TokenStore, @unchecked Sendable {
     }
 
     func write(_ session: PersistedSession) async throws {
-        // The continuation is registered and flagged under one lock hold, so the
-        // test can observe the write parked without a missed-resume window.
-        let gate = lock.withLock {
-            if isOpen {
+        // The continuation is registered and flagged in ONE lock hold, so the test
+        // can observe the write parked with no missed-resume window between the
+        // flag and the registration, and an already-open gate resumes at once
+        // instead of parking (CodeRabbit, 2026-11-23).
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let resumeNow = lock.withLock { () -> Bool in
+                if isOpen {
+                    return true
+                }
+                gatedWrite = continuation
+                writeEnteredStorage = true
                 return false
             }
-            writeEnteredStorage = true
-            return true
-        }
-        if gate {
-            await withCheckedContinuation { continuation in
-                lock.withLock {
-                    gatedWrite = continuation
-                }
+            if resumeNow {
+                continuation.resume()
             }
         }
         lock.withLock {

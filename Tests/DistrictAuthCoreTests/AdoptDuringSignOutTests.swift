@@ -220,12 +220,13 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual("refresh-9") { await store.session?.refreshToken }
     }
 
-    /// ⛔ THE QUIT RETRIES ONLY ITS OWN SESSION'S RESCUE. A login whose write
-    /// refuses while the quit is parked waiting parks its OWN successor in the
-    /// slot, and a quit that captured it would persist it and then discard it
-    /// under a stale generation, revoking the login's live credential. The
-    /// quit's wait ends in the turn it reads the slot, and the entry
-    /// generation is the ownership test (CodeRabbit, 2026-11-23).
+    /// ⛔ THE QUIT RETRIES THE RESCUE THE GENERATION NAMES, NEVER A STALE ONE.
+    /// A login whose write refuses while the quit is parked waiting parks its
+    /// OWN successor in the slot; the quit captures the rescue and the
+    /// generation as one pair in the turn its wait ends, so it persists and
+    /// clears that rescue correctly, and can never pair a replacement's
+    /// rescued token with a stale generation and hand it to discard
+    /// (CodeRabbit re-review, 2026-11-23).
     func testTheQuitRetriesOnlyItsOwnRescue() async {
         let store = GatedWriteTokenStore(session: AuthFixtures.session())
         await store.openGate()
@@ -248,7 +249,8 @@ final class AdoptDuringSignOutTests: XCTestCase {
         }
         _ = await login.value
 
-        // The wire settles; the quit's generation moved, so it retries nothing.
+        // The wire settles, and the quit retries the rescue the slot holds,
+        // under the generation that owns it.
         await refresh.open()
         await expectEqual(AccessTokenOutcome.retryLater(.sessionReplaced)) { await onWire.value }
         _ = await quit.value
@@ -256,15 +258,49 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual("refresh-2", "the abandoned refresh's own successor is the one revoked") {
             await store.revokePending
         }
-        // The login's rescue was never touched: the login's own next
-        // acquisition is what persists and refreshes it.
-        await expectEqual(AccessTokenOutcome.available("access-10")) { await coordinator.accessToken() }
-        await expectEqual("refresh-10", "the rescue's own rotation is what the disk ends at") {
-            await store.session?.refreshToken
+        await expectNil("the quit's retry is what cleared the login's marker") {
+            try? await store.pendingRefreshToken()
         }
+        // The login's rescue was persisted by the quit; the login's own next
+        // acquisition refreshes from the disk it landed on.
+        await expectEqual(AccessTokenOutcome.available("access-10")) { await coordinator.accessToken() }
+        await expectEqual("refresh-10") { await store.session?.refreshToken }
         await expectEqual(["refresh-1", "refresh-9"], "the rescue refreshes once, by its owner's acquisition") {
             await refresh.presented
         }
+    }
+
+    /// ⛔ A CALLER DURING A LOGIN'S ADOPTION WAITS FOR THE LOGIN, NOT THE
+    /// OUTGOING SESSION'S TOKEN. adopt clears the cache in its prologue, so
+    /// the fast path cannot serve the replaced session's still-fresh token to
+    /// a caller who arrived while the adoption holds the gate
+    /// (CodeRabbit re-review, 2026-11-23).
+    func testACallerDuringTheLoginsAdoptionGetsTheNewSession() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        let refresh = ScriptedRefreshClient(script: [.success(AuthFixtures.tokens(index: 2))])
+        let coordinator = TokenRefreshCoordinator(store: store, refreshClient: refresh, now: { AuthFixtures.now })
+
+        // A refresh lands a still-fresh access token, and the cache serves it.
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-2")) { await coordinator.accessToken() }
+        await expectEqual(AccessTokenOutcome.available("access-2"), "the cache serves it without a refresh") {
+            await coordinator.accessToken()
+        }
+
+        // A login's adoption parks inside its write, holding the gate.
+        await store.closeGate()
+        let login = Task {
+            await coordinator.adopt(AuthFixtures.tokens(index: 9), deviceId: "device-abc")
+        }
+        await waitUntil { await store.writeCount == 2 }
+
+        // A caller arriving now must wait for the login's gate, not be served
+        // the outgoing session's cached token.
+        let caller = Task { await coordinator.accessToken() }
+        await store.openGate()
+        await expectEqual(AccessTokenOutcome.available("access-9")) { await caller.value }
+        _ = await login.value
+        await expectEqual("refresh-9") { await store.session?.refreshToken }
     }
 
     /// ⚠️ A LOGIN SINCE THE SIGN-OUT KEEPS ITS OWN SESSION: only this successor is

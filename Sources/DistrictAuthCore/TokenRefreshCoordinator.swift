@@ -168,6 +168,13 @@ public actor TokenRefreshCoordinator {
         let started = generation
         inFlight = nil
         unpersistedSession = nil
+        // ⛔ THE OUTGOING SESSION'S ACCESS TOKEN GOES WITH IT. The fast path in
+        // ``accessToken()`` runs before the gate check, so a caller arriving
+        // while this adoption holds the gate would otherwise be served the
+        // replaced session's still-fresh token instantly, without ever waiting
+        // for the login (CodeRabbit re-review, 2026-11-23).
+        cachedAccessToken = nil
+        cachedAccessTokenExpiresAt = 0
         let task = Task<AccessTokenOutcome, Never> { [self] in
             let outcome = await adoptRotated(tokens, deviceId: deviceId, generation: started)
             if generation == started {
@@ -209,18 +216,17 @@ public actor TokenRefreshCoordinator {
         // launch presented the spent token (CodeRabbit, 2026-11-23). Callers
         // arriving latch onto the retry and answer refreshNotSent: nothing was
         // sent for them, by design.
-        let entryGeneration = generation
         while let existing = inFlight {
             _ = await existing.value
         }
-        // ⛔ THE RESCUE IS READ IN THE TURN THE WAIT ENDS, AND ONLY IF THE
-        // GENERATION NEVER MOVED ACROSS IT: a replacement login can park its
-        // OWN rescued successor while this actor sat parked in the loop, and a
-        // quit that captured it would persist it and then discard it under a
-        // stale generation, revoking the live replacement. The refresh this
-        // quit waited for never bumps the generation; a login always does, so
-        // the entry generation is the ownership test (CodeRabbit, 2026-11-23).
-        guard generation == entryGeneration else { return }
+        // ⛔ THE RESCUE AND THE GENERATION ARE CAPTURED AS ONE PAIR, IN THE
+        // TURN THE WAIT ENDS: a replacement login can park its OWN rescued
+        // successor while this actor sat parked in the loop, and a rescue read
+        // apart from its generation could be paired with a stale one, persist
+        // the token and then hand it to ``discard(_:)``, revoking the live
+        // replacement. Read together, whichever session holds the slot now is
+        // the one the retry serves, under the generation it belongs to
+        // (CodeRabbit re-review, 2026-11-23).
         let started = generation
         let rescued = unpersistedSession
         let task = Task<AccessTokenOutcome, Never> { [self] in

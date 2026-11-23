@@ -53,6 +53,30 @@ final class AdoptDuringSignOutTests: XCTestCase {
         await expectEqual("refresh-2") { await store.revokePending }
     }
 
+    /// ⛔ THE MARKER CLEAR IS ONE MORE SUSPENSION a sign-out can land inside: the
+    /// write resolved and the first fence passed, and without a second check the
+    /// successor's access token was cached and answered .available for a session
+    /// that had just been signed out, with the successor left live and unowned.
+    /// The clear is fenced again, so the sign-out's answer arrives through
+    /// ``discard(_:)``, which revokes the successor (CodeRabbit, 2026-11-23).
+    func testASignOutInsideTheMarkerClearIsAnsweredByDiscardNotAToken() async {
+        let store = GatedWriteTokenStore(session: AuthFixtures.session())
+        await store.openGate()
+        await store.closeClearGate()
+        let coordinator = makeCoordinator(store)
+
+        let request = Task { await coordinator.accessToken() }
+        await waitUntil { await store.clearEntered }
+        await coordinator.forget()
+        await store.openClearGate()
+
+        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession)) { await request.value }
+        await expectEqual(AccessTokenOutcome.reauthRequired(.noSession), "nor is it cached") {
+            await coordinator.accessToken()
+        }
+        await expectEqual("refresh-2", "the live successor goes to the outbox") { await store.revokePending }
+    }
+
     /// ⚠️ A LOGIN SINCE THE SIGN-OUT KEEPS ITS OWN SESSION: only this successor is
     /// wiped. The login goes through ``TokenRefreshCoordinator/adopt(_:deviceId:)``, so
     /// its write queues behind the abandoned one and the undo's one-step clear must
@@ -186,6 +210,11 @@ private actor GatedWriteTokenStore: TokenStore {
     private var pending: String?
     private var isOpen = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
+    /// The marker clear's own gate: open by default, so only a test that names
+    /// it parks inside the clear (CodeRabbit, 2026-11-23).
+    private(set) var clearEntered = false
+    private var clearIsOpen = true
+    private var clearWaiters: [CheckedContinuation<Void, Never>] = []
     private let failWrites: Bool
     /// Number of remaining `write` calls that should throw; `failWrites` is the
     /// "always" form.
@@ -278,7 +307,24 @@ private actor GatedWriteTokenStore: TokenStore {
     }
 
     func clearRefreshPending() async throws {
+        clearEntered = true
+        if !clearIsOpen {
+            await withCheckedContinuation { clearWaiters.append($0) }
+        }
         pending = nil
+    }
+
+    func closeClearGate() {
+        clearIsOpen = false
+    }
+
+    func openClearGate() {
+        clearIsOpen = true
+        let resuming = clearWaiters
+        clearWaiters = []
+        for waiter in resuming {
+            waiter.resume()
+        }
     }
 
     func pendingRevokeToken() async throws -> String? {

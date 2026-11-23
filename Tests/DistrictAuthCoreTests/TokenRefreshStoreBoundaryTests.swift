@@ -135,6 +135,33 @@ final class TokenRefreshStoreBoundaryTests: XCTestCase {
         XCTAssertTrue(written.isEmpty)
     }
 
+    /// ⛔ THE QUIT'S LAST-CHANCE WRITE LEAVES THE SAME FENCE BEHIND WHEN IT REFUSES:
+    /// the rescue and the marker both stay, so a process that exits anyway lands
+    /// on the interrupted-refresh path at the next launch rather than presenting
+    /// the spent disk token, and the rescue survives the quit call for the
+    /// keychain's recovery (CodeRabbit, 2026-11-23).
+    func testTheQuitsLastChanceWriteKeepsTheRescueAndTheMarkerWhenItRefuses() async {
+        let clock = TestClock(AuthFixtures.now)
+        let store = SpyTokenStore(session: AuthFixtures.session())
+        let client = ScriptedRefreshClient(script: [
+            .success(AuthFixtures.tokens(index: 2)),
+        ])
+        let coordinator = makeCoordinator(store: store, client: client, clock: clock)
+        await store.failNextWrites(.max)
+
+        // The successor exists only in memory, with the marker naming the spent disk token.
+        await expectEqual(.available("access-2")) { await coordinator.accessToken() }
+
+        await coordinator.finishRefreshInFlight()
+        await expectEqual("refresh-1") { await store.pending }
+
+        // The rescue survived the quit's refused write: the next acquisition
+        // retries the write rather than refreshing, and nothing more reaches the wire.
+        clock.millis = AuthFixtures.now + 20 * 60 * 1000
+        await expectEqual(.retryLater(.storeUnavailable)) { await coordinator.accessToken() }
+        await expectEqual(["refresh-1"]) { await client.presented }
+    }
+
     /// ⛔ A LOGIN COMPLETING BESIDE A QUEUED REFRESH MUST NOT COST A ROTATION.
     /// The store reads inside `acquire` are suspension points, so `adopt` can
     /// land in the middle of them; without the fence that follows those reads

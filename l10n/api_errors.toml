@@ -255,6 +255,15 @@ tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `caller_id_unavailable`, in place of the service's own English."
 
+[api_error.campaign_daily_dial_cap_reached]
+en = "This workspace has reached today's limit of campaign calls, so the rest of the list was not called. The limit resets at midnight UTC."
+fr = "Cet espace de travail a atteint sa limite quotidienne d'appels de campagne; le reste de la liste n'a donc pas été appelé. La limite est remise à zéro à minuit UTC."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `campaign_daily_dial_cap_reached`, in place of the service's own English."
+
 [api_error.carrier_error]
 en = "The carrier could not complete that. Please try again or contact support."
 fr = "Le transporteur n'a pas pu effectuer cette opération. Réessayez ou communiquez avec notre équipe de soutien."
@@ -1346,6 +1355,15 @@ screen = "api_error"
 tier = "T2"
 state = "reviewed"
 note = "Shown on any screen when the service refuses a request with the error code `phone_number_not_found`, in place of the service's own English."
+
+[api_error.pin_conflict]
+en = "Another change to the phone PIN was saved at the same moment. Check the PIN and try again."
+fr = "Une autre modification du NIP téléphonique a été enregistrée au même moment. Vérifiez le NIP et réessayez."
+ctx = "error"
+screen = "api_error"
+tier = "T2"
+state = "reviewed"
+note = "Shown on any screen when the service refuses a request with the error code `pin_conflict`, in place of the service's own English."
 
 [api_error.plan_upgrade_required]
 en = "That feature is not included in this workspace's plan."

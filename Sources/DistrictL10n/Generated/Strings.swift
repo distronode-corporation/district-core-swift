@@ -141,6 +141,9 @@ package enum ApiErrorCopy {
     /// `api_error.caller_id_unavailable`
     package static var callerIdUnavailable: String { L10nRuntime.locale == .frCA ? "L'utilisation de votre cellulaire comme afficheur n'est pas encore offerte." : "Using your own mobile as caller ID is not available yet." }
 
+    /// `api_error.campaign_daily_dial_cap_reached`
+    package static var campaignDailyDialCapReached: String { L10nRuntime.locale == .frCA ? "Cet espace de travail a atteint sa limite quotidienne d'appels de campagne; le reste de la liste n'a donc pas été appelé. La limite est remise à zéro à minuit UTC." : "This workspace has reached today's limit of campaign calls, so the rest of the list was not called. The limit resets at midnight UTC." }
+
     /// `api_error.carrier_error`
     package static var carrierError: String { L10nRuntime.locale == .frCA ? "Le transporteur n'a pas pu effectuer cette opération. Réessayez ou communiquez avec notre équipe de soutien." : "The carrier could not complete that. Please try again or contact support." }
 
@@ -505,6 +508,9 @@ package enum ApiErrorCopy {
 
     /// `api_error.phone_number_not_found`
     package static var phoneNumberNotFound: String { L10nRuntime.locale == .frCA ? "Ce numéro de téléphone ne fait pas partie des numéros de cet espace de travail." : "That phone number is not one of this workspace's numbers." }
+
+    /// `api_error.pin_conflict`
+    package static var pinConflict: String { L10nRuntime.locale == .frCA ? "Une autre modification du NIP téléphonique a été enregistrée au même moment. Vérifiez le NIP et réessayez." : "Another change to the phone PIN was saved at the same moment. Check the PIN and try again." }
 
     /// `api_error.plan_upgrade_required`
     package static var planUpgradeRequired: String { L10nRuntime.locale == .frCA ? "Cette fonction n'est pas incluse dans le forfait de cet espace de travail." : "That feature is not included in this workspace's plan." }

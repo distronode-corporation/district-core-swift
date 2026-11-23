@@ -145,7 +145,7 @@ final class VoiceStudioLegEditsTests: XCTestCase {
             EngineMixTts(provider: "cartesia", model: "sonic-3", voice: "db6b0ed5-d5d3-463d-ae85-518a07d3c2b4")
         )
         let bilingual = Edits.voiceVendor(mix, provider: "elevenlabs", bilingual: true, in: studio)
-        XCTAssertEqual(bilingual.tts.model, "eleven_multilingual_v2")
+        XCTAssertEqual(bilingual.tts.model, "eleven_v4_turbo")
         XCTAssertEqual(Edits.voiceVendor(mix, provider: "nope", bilingual: false, in: studio), mix)
     }
 

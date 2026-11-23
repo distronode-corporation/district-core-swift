@@ -8,7 +8,7 @@ All notable changes to this package are recorded here. The format is based on
 
 ### Changed
 
-- `contracts/`: four fixtures refreshed from the website wire —
+- `contracts/`: four fixtures refreshed from the website wire:
   `i18n/api-errors.json` (the contact-email confirmation errors, the phone-PIN
   conflict error, the two bridge-refusal residency codes, the Twilio-registration
   and toll-free-verification errors, and three fr-CA rewordings),

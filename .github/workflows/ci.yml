@@ -5,6 +5,8 @@ name: CI
 # many ran, and the coverage floors. `hygiene`, `gitleaks` and `zizmor` are what a public
 # repository owes its readers: no dashes, internal host names or GitLab URLs, the licence
 # files, no secrets anywhere in the history, and workflows that pass static analysis.
+# `repeatable` builds the package in release twice from clean in the same image and fails
+# unless every compiled artifact is byte for byte the same.
 # `darwin` builds the package with Xcode for iOS and macOS, the two platforms its
 # consumers ship on. `dependency graph` submits the Package.resolved pins to GitHub's
 # dependency graph, which does not read that file itself.
@@ -195,6 +197,41 @@ jobs:
         with:
           name: swift-test-log
           path: swift-test.log
+          if-no-files-found: warn
+          retention-days: 7
+
+  # ⛔ REPEATABLE BUILD: the package built in release twice from clean, in verify's pinned
+  # image, and every object file and module compared (ci/repeatable-build.sh, which is also
+  # the recipe for repeating it yourself). Linux, so it runs on every pull request too. No
+  # cache: a restored `.build` is exactly what a clean build must not start from.
+  repeatable:
+    name: repeatable (Linux)
+    runs-on: ubuntu-24.04
+    container: swift:6.2.4@sha256:29b983751c605c2d3102d2ab93438c6e0cadf110d9d2aa6e929b6dec9dcb7cbc
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # git and the CA bundle, for SwiftPM to fetch the pinned swift-crypto.
+      - name: Install system packages
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Build twice and compare
+        run: ci/repeatable-build.sh
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: repeatable
+          path: ${{ runner.temp }}/repeatable/
           if-no-files-found: warn
           retention-days: 7
 

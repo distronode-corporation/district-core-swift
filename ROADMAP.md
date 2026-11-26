@@ -8,11 +8,10 @@ discuss an item or to propose a new one.
 
 ## Near term
 
-- **The first signed release.** The Release workflow that signs each tag with gitsign is merged
-  and listed under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md), together with the API error
-  codes synced from the service since 8.6.0. Tags up to and including 8.6.0 are not signed
-  (README, "Verify a release"). The plan is to ship all of it in the next release, the first
-  whose tag can be checked with `gitsign verify-tag`.
+- **A repeatable build.** One open pull request adds a CI job that builds the package in
+  release twice from clean and compares every object file and module byte for byte
+  ([#101](https://github.com/distronode-corporation/district-core-swift/pull/101)). The plan is
+  to merge it once it is green, so every change to `main` is checked for it.
 - **Models for the fixtures that have none yet.** The contract gate lists, by name, the
   service's recorded responses that have no Swift model yet: the Inbox thread-assignment read,
   and three web settings areas the apps have no screen for (the agent's picture library, the

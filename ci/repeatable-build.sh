@@ -23,18 +23,34 @@
 # hash seed that is random per process unless this variable is set; district-ios's two
 # clean builds differed for that reason. It changes no source and no build setting.
 #
+# ⛔ EVERY SOURCE FILE'S MODIFICATION TIME IS SET TO THE COMMIT'S TIME BEFORE EACH BUILD
+# (SOURCE_DATE_EPOCH, the reproducible-builds.org convention). swift-crypto's Swift code imports
+# its C module CCryptoBoringSSL, and clang records the mtime of every header in that module's
+# precompiled form, whose signature then lands in each importing object file's
+# `.swift_modhash` and debug info. SwiftPM clones the dependencies afresh into `.build` for
+# each clean build, so without this the headers' mtimes, and with them 106 of swift-crypto's
+# object files, differed between two builds of the same commit (first run on #101). This
+# package's own seven modules import no C module and were identical either way.
+#
 # On a difference it prints each differing file and keeps both sets of artifacts under
 # $RUNNER_TEMP/repeatable (or /tmp/repeatable) for the job to upload.
 set -euo pipefail
 
 OUT=${RUNNER_TEMP:-/tmp}/repeatable
 export SWIFT_DETERMINISTIC_HASHING=1
+SOURCE_DATE_EPOCH=$(git -c safe.directory="$PWD" log -1 --format=%ct)
+export SOURCE_DATE_EPOCH
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
 for n in 1 2; do
   echo "== build $n"
   rm -rf .build
+  swift package resolve > "$OUT/resolve-$n.log" 2>&1 || {
+    tail -n 100 "$OUT/resolve-$n.log"
+    exit 1
+  }
+  find . -path ./.git -prune -o -exec touch -h -d "@$SOURCE_DATE_EPOCH" {} +
   swift build -c release > "$OUT/build-$n.log" 2>&1 || {
     tail -n 100 "$OUT/build-$n.log"
     exit 1

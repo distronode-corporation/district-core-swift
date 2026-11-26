@@ -226,6 +226,10 @@ every pull request, and uses no secrets:
 - **verify** (Linux, `swift:6.2.4`): SwiftFormat, SwiftLint, the Foundation-only import
   rule, the `Package.resolved` guard, `swift test`, a floor on the number of tests run,
   and the coverage floors.
+- **repeatable** (Linux, `swift:6.2.4`): builds the package in release twice from clean and
+  fails unless every object file and module is byte for byte the same
+  ([`ci/repeatable-build.sh`](ci/repeatable-build.sh), which is also the recipe for repeating
+  a build yourself).
 - **hygiene** (Linux): no em or en dashes, internal host names or GitLab URLs other than
   this repository's own mirror
   ([`scripts/check-public-hygiene.py`](scripts/check-public-hygiene.py)), the licence

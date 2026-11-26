@@ -37,7 +37,7 @@ adopt, rather than being backported.
 
 ## Verifying a release
 
-Release tags from the next release on are annotated tags signed with gitsign by
+Since 9.0.0, release tags are annotated tags signed with gitsign by
 `.github/workflows/release.yml`, keyless, under the identity
 `https://github.com/distronode-corporation/district-core-swift/.github/workflows/release.yml@refs/heads/main` with the issuer `https://token.actions.githubusercontent.com`. The README's
 "Verify a release" has the command. Tags up to and including 8.6.0 are not signed. A

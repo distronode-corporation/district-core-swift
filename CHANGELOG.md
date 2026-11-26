@@ -6,6 +6,12 @@ All notable changes to this package are recorded here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- CI's `repeatable` job builds the package in release twice from clean and fails unless every
+  object file and module is byte for byte the same (`ci/repeatable-build.sh`). No change to
+  the package itself.
+
 ## [9.0.0] - 2026-11-23
 
 The sign-in fixes that keep a session refresh from eating a newer login, and the contract

@@ -135,7 +135,7 @@ committed.
 
 ## Verify a release
 
-From the next release on, every release tag is an annotated tag signed with
+Since 9.0.0, every release tag is an annotated tag signed with
 [gitsign](https://github.com/sigstore/gitsign): keyless Sigstore signing by the
 repository's Release workflow, under its GitHub OIDC identity, with the signature
 recorded in Sigstore's public transparency log. There is no long-lived signing key to

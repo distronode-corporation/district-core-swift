@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 /// ⛔ THE COORDINATION POINT FOR THE SHARED FIXTURE CORPUS. Both numbers below

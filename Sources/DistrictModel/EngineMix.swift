@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 /// `aiPersona.engineMix` version 1, exactly as the service's engine catalogue defines it:

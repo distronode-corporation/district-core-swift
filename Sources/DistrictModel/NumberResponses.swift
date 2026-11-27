@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // Release and configure are modelled, along with the whole regulatory-registration

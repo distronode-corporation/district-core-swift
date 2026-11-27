@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: CodeQL Swift
 
 # The Swift half of code scanning, in ADVANCED setup: traced through a `swift build` of

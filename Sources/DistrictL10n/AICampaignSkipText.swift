@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 /// The sentence a campaign results screen shows beside one contact, from the row's `code`.

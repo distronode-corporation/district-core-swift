@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // The Voice Studio's per-leg catalogue, its voices and its tuning keys: what a leg editor

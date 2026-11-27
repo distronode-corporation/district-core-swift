@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 /// Who answers a call, and whether the person asking can be rung at all.

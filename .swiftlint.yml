@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # SwiftLint configuration for district-core-swift.
 #
 # Minimal on purpose: the default rule set, no opt-in rules and NO BASELINE.

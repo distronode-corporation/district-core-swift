@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import DistrictModel
 
 /// Which of a supervise session's two room connections an engine event or command

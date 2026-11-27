@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: CodeQL
 
 # Code scanning of the workflow files (CodeQL's `actions` language), in ADVANCED setup. It

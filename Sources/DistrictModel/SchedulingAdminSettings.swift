@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // The scheduling admin's SELF and SETTINGS rows: `me.*`, `settings.branding.*` and

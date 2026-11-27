@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 @testable import DistrictCall
 
 let testWorkspace = WorkspaceID("ws-1")

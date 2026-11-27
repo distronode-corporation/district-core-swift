@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 @testable import DistrictCall
 
 /// The number every test dials. ⚠️ Held as the operator typed it; the server

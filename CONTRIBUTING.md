@@ -3,6 +3,8 @@
 Thanks for helping. The [README](README.md) covers what the package is, its modules and
 how to build it. This file is the rules a change has to meet.
 
+New here? Issues labelled [good first issue](https://github.com/distronode-corporation/district-core-swift/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22) are small, well scoped and need no access beyond this repository.
+
 ## Upstream first
 
 This package is the shared core of District AI for iOS and for macOS. A change to the

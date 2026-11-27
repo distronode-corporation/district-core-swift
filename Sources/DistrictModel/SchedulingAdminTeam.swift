@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // The row DTOs for the scheduling admin's `users.*` and `teams.*` namespaces.

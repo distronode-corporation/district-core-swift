@@ -19,3 +19,11 @@ path = [
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Distronode Corporation"
 SPDX-License-Identifier = "Apache-2.0"
+
+# At SwiftLint's file_length limit (600 lines, an error under --strict): a comment header
+# would push it over, so its licence and copyright are recorded here instead.
+[[annotations]]
+path = "Sources/DistrictAuthCore/TokenRefreshCoordinator.swift"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Distronode Corporation"
+SPDX-License-Identifier = "Apache-2.0"

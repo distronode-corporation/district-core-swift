@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// The workspace a call belongs to.
 ///
 /// ⛔ A TYPE RATHER THAN A `String`, BECAUSE THE TWO IDS TRAVEL TOGETHER AND ARE

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // ⛔ BILLING IS READ ONLY IN THIS CLIENT AND THAT IS NOT REVISITABLE, App Store

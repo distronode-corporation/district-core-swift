@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// The part of a live call that looks the same in both directions: how long it
 /// has been running, what the microphone is doing, where the audio is going.
 ///

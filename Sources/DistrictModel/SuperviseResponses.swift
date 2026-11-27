@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 /// `POST /api/district/calls/token` with a `Call.id`: a listen-only seat on a live call.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import DistrictModel
 
 /// Live supervision of one call: listen in, take over, hand back.

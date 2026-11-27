@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // ⛔ ONE ROUTE, TWO RESPONSE TYPES ON THE SAME KEY, WHICH IS WHY THERE ARE TWO

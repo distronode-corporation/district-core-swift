@@ -249,6 +249,9 @@ every pull request, and uses no secrets:
 [`codeql-swift.yml`](.github/workflows/codeql-swift.yml) (the library targets, on pushes to
 `main` that change them, weekly and on demand) and
 [`scorecard.yml`](.github/workflows/scorecard.yml) add CodeQL and the OpenSSF Scorecard.
+[`reuse.yml`](.github/workflows/reuse.yml) runs `reuse lint` on every push to `main` and pull
+request: every file carries an SPDX licence and copyright header, or is listed in
+[`REUSE.toml`](REUSE.toml).
 
 ## Changing the core
 

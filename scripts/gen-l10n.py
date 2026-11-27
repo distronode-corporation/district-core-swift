@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Generate DistrictL10n's catalogs and Swift from contracts/i18n/ and l10n/, or check
 that what is committed is what they produce.
 

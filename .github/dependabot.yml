@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 version: 2
 
 # Every `uses:` in .github/workflows is pinned to a commit SHA with a `# vX.Y.Z`

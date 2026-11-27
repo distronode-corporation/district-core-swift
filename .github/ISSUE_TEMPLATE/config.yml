@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # No blank issues: everything goes through the structured bug report form, or one of
 # the links below. The tracker is for bugs in this package's source; app problems go to
 # the app's repository, and account and service questions go to District AI support

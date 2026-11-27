@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// Where the app is in an INBOUND call.
 ///
 /// ⛔ ``answering`` IS A PHASE OF ITS OWN AND NOT A SPINNER OVER ``ringing``,

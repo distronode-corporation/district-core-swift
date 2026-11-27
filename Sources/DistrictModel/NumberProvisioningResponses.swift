@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // ⛔ NO PURCHASE DTO BELONGS IN THIS FILE OR ANY OTHER. `workspace/numbers/purchase`

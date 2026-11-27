@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// What an outbound call asks the app to do.
 ///
 /// ⛔ ITS OWN FILE PURELY FOR SwiftLint's 500-LINE `file_length`, WHICH

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # The Linux toolchain for district-core-swift: Swift, SwiftLint and SwiftFormat.
 #
 # ⛔ THIS TOOLCHAIN BUILDS AND TESTS THE PACKAGE, WHICH IS THE WHOLE LINUX-FIRST

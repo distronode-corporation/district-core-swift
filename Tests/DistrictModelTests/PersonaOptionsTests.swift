@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // ⚠️ `@testable` FOR THE MEMBERWISE INITIALISERS AND FOR NOTHING ELSE. These DTOs
 // are `public struct`s with `public let` members, so their synthesised memberwise
 // initialiser is INTERNAL, a plain import can decode one and cannot build one. The

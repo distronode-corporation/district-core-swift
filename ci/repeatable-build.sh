@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 #
 # Build the package in release twice from clean, and fail unless every compiled artifact of
 # the two builds is byte for byte the same.

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// The half of an ending that reaches the CARRIER rather than this device.
 ///
 /// ⛔ A SEPARATE FILE BECAUSE `SoftphoneSession.swift` IS AT SwiftLint's 500-LINE

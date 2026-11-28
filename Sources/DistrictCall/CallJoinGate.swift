@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// Whether a call's join is still on its way, for the microphone command that must not
 /// race it.
 ///

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Distronode Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Release guard
 
 # Fires on a version tag (`7.0.0`, no `v`). A release here is the tag and a GitHub

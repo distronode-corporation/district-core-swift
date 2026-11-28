@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// The seam between this app and the realtime-media SDK.
 ///
 /// ⛔ NO LIVEKIT TYPE CROSSES THIS PROTOCOL, AND ON THIS TARGET THAT IS ENFORCED

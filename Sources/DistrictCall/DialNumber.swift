@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import DistrictL10n
 
 /// The place a number's leading digits name, for DISCLOSURE only.

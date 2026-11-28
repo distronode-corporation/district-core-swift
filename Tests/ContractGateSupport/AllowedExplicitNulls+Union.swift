@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import Foundation
 
 // ⛔ THIS FILE EXISTS BECAUSE OF A LINE CEILING, NOT A BOUNDARY IN THE DOMAIN.

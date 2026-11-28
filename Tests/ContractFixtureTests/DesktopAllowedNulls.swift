@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// The exact paths in the desktop fixtures permitted to hold an explicit `null`.
 ///
 /// ⛔ THE SAME RULES AS THE MOBILE REGISTER (`AllowedExplicitNulls.swift`): exact

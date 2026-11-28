@@ -1,4 +1,8 @@
 // swift-tools-version: 6.2
+// SPDX-FileCopyrightText: Distronode Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 //
 // DistrictCore, the Linux-testable core shared by the District AI apps for iOS
 // (district-ios) and macOS (district-macos). Repository: district-core-swift.
